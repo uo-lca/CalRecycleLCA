@@ -289,7 +289,6 @@
     <Compile Include="GWPtController.cs" />
     <Compile Include="GWPtRepository.cs" />
     <Compile Include="IGWPtRepository.cs" />
-    <Compile Include="IUserRepository.cs" />
     <Compile Include="Models\IdentityModels.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Site.Master.cs">
@@ -307,9 +306,6 @@
       <DependentUpon>Site.Mobile.Master</DependentUpon>
     </Compile>
     <Compile Include="Startup.cs" />
-    <Compile Include="UserRepository.cs" />
-    <Compile Include="Users.cs" />
-    <Compile Include="UserController.cs" />
     <Compile Include="ViewSwitcher.ascx.cs">
       <DependentUpon>ViewSwitcher.ascx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
