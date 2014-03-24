@@ -1,0 +1,1457 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<edmx:Edmx Version="3.0" xmlns:edmx="http://schemas.microsoft.com/ado/2009/11/edmx">
+  <!-- EF Runtime content -->
+  <edmx:Runtime>
+    <!-- SSDL content -->
+    <edmx:StorageModels>
+      <Schema Namespace="LCAToolDevModel.Store" Provider="System.Data.SqlClient" ProviderManifestToken="2012" Alias="Self" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" xmlns="http://schemas.microsoft.com/ado/2009/11/edm/ssdl">
+        <EntityType Name="Category">
+          <Key>
+            <PropertyRef Name="CategoryID" />
+          </Key>
+          <Property Name="CategoryID" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="CategorySystemID" Type="int" />
+          <Property Name="CategoryClassID" Type="int" />
+          <Property Name="Parent" Type="int" />
+          <Property Name="HierarchyLevel" Type="int" />
+          <Property Name="Hier" Type="varchar" MaxLength="250" />
+        </EntityType>
+        <EntityType Name="CategorySystem">
+          <Key>
+            <PropertyRef Name="CategorySystemID" />
+          </Key>
+          <Property Name="CategorySystemID" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="CategorySystem" Type="varchar" MaxLength="250" />
+          <Property Name="URI" Type="varchar" MaxLength="100" />
+          <Property Name="CategorySystemDataTypeID" Type="int" />
+          <Property Name="Delimeter" Type="varchar" MaxLength="2" />
+        </EntityType>
+        <EntityType Name="Class">
+          <Key>
+            <PropertyRef Name="ClassID" />
+          </Key>
+          <Property Name="ClassID" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="ClassName" Type="varchar" MaxLength="250" />
+        </EntityType>
+        <EntityType Name="Classifications">
+          <Key>
+            <PropertyRef Name="ClassificationID" />
+          </Key>
+          <Property Name="ClassificationID" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="ClassificationUUID" Type="int" />
+          <Property Name="ClassificationCategoryListID" Type="int" />
+          <Property Name="ClassID" Type="int" />
+        </EntityType>
+        <!--Errors Found During Generation:
+warning 6013: The table/view 'LCAToolDev.dbo.DataProvider' does not have a primary key defined and no valid primary key could be inferred. This table/view has been excluded. To use the entity, you will need to review your schema, add the correct keys, and uncomment it.
+        <EntityType Name="DataProvider">
+          <Property Name="UUID" Type="int" />
+          <Property Name="DataProviderName" Type="varchar" MaxLength="100" />
+        </EntityType>-->
+        <EntityType Name="DataType">
+          <Key>
+            <PropertyRef Name="DataTypeID" />
+          </Key>
+          <Property Name="DataTypeID" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="DataType" Type="varchar" MaxLength="250" />
+        </EntityType>
+        <EntityType Name="Direction">
+          <Key>
+            <PropertyRef Name="DirectionID" />
+          </Key>
+          <Property Name="DirectionID" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="Direction" Type="varchar" MaxLength="100" />
+        </EntityType>
+        <!--Errors Found During Generation:
+warning 6013: The table/view 'LCAToolDev.dbo.Dummy' does not have a primary key defined and no valid primary key could be inferred. This table/view has been excluded. To use the entity, you will need to review your schema, add the correct keys, and uncomment it.
+        <EntityType Name="Dummy">
+          <Property Name="DummyUUID" Type="int" />
+          <Property Name="Description" Type="nvarchar" MaxLength="100" />
+          <Property Name="OriginUUID" Type="int" />
+        </EntityType>-->
+        <EntityType Name="Flow">
+          <Key>
+            <PropertyRef Name="FlowID" />
+          </Key>
+          <Property Name="FlowID" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="FlowUUID" Type="int" />
+          <Property Name="FlowVersion" Type="int" />
+          <Property Name="CASNumber" Type="int" />
+          <Property Name="FlowPropertyID" Type="int" />
+          <Property Name="FlowTypeID" Type="int" />
+        </EntityType>
+        <EntityType Name="FlowProperty">
+          <Key>
+            <PropertyRef Name="FlowPropertyID" />
+          </Key>
+          <Property Name="FlowPropertyID" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="FlowPropertyUUID" Type="int" />
+          <Property Name="FlowPropertyVersion" Type="int" />
+          <Property Name="FlowProperty" Type="varchar" MaxLength="250" />
+          <Property Name="Units" Type="varchar" MaxLength="250" />
+          <Property Name="FlowPropertyUnitGroupID" Type="int" />
+        </EntityType>
+        <EntityType Name="FlowPropertyVersion">
+          <Key>
+            <PropertyRef Name="FlowPropertyVersionID" />
+          </Key>
+          <Property Name="FlowPropertyVersionID" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="FlowPropertyVersionFlowID" Type="int" Nullable="false" />
+          <Property Name="FlowPropertyVersionFlowPropertyID" Type="int" Nullable="false" />
+          <Property Name="MeanValue" Type="float" />
+          <Property Name="StDev" Type="float" />
+        </EntityType>
+        <EntityType Name="FlowType">
+          <Key>
+            <PropertyRef Name="FlowTypeID" />
+          </Key>
+          <Property Name="FlowTypeID" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="FlowType" Type="varchar" MaxLength="100" />
+        </EntityType>
+        <EntityType Name="Indicators">
+          <Key>
+            <PropertyRef Name="IndicatorId" />
+          </Key>
+          <Property Name="IndicatorId" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="IndicatorName" Type="varchar" MaxLength="250" />
+        </EntityType>
+        <EntityType Name="LCIA">
+          <Key>
+            <PropertyRef Name="LCIAID" />
+          </Key>
+          <Property Name="LCIAID" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="LCIAMethodID" Type="int" />
+          <Property Name="LCIAFlowID" Type="int" />
+          <Property Name="LCIADirectionID" Type="int" />
+          <Property Name="Factor" Type="float" />
+        </EntityType>
+        <EntityType Name="LCIAMethod">
+          <Key>
+            <PropertyRef Name="LCIAMethodID" />
+          </Key>
+          <Property Name="LCIAMethodID" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="LCIAMethodUUID" Type="int" />
+          <Property Name="LCIAMethodVersion" Type="int" />
+          <Property Name="LCIAMethod" Type="varchar" MaxLength="250" />
+          <Property Name="Methodology" Type="varchar" MaxLength="100" />
+          <Property Name="ImpactCategory" Type="varchar" MaxLength="100" />
+          <Property Name="ImpactIndicator" Type="varchar" MaxLength="100" />
+          <Property Name="ReferenceYear" Type="varchar" MaxLength="4" />
+          <Property Name="Duration" Type="varchar" MaxLength="100" />
+          <Property Name="ImpactLocation" Type="geography" />
+          <Property Name="IndicatorType" Type="varchar" MaxLength="100" />
+          <Property Name="Normalization" Type="bit" />
+          <Property Name="Weighting" Type="bit" />
+          <Property Name="UseAdvice" Type="varchar" MaxLength="100" />
+          <Property Name="LCIAMethodSourceID" Type="int" />
+          <Property Name="LCIAMethodFlowPropertyID" Type="int" />
+        </EntityType>
+        <EntityType Name="MasterLCAModels">
+          <Key>
+            <PropertyRef Name="MasterLCAModelID" />
+          </Key>
+          <Property Name="MasterLCAModelID" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="UUlID" Type="int" />
+          <Property Name="Version" Type="varchar" MaxLength="100" />
+          <Property Name="DataType" Type="varchar" MaxLength="100" />
+          <Property Name="URI" Type="varchar" MaxLength="250" />
+          <Property Name="OldIndex" Type="varchar(max)" Nullable="false" />
+        </EntityType>
+        <EntityType Name="Process">
+          <Key>
+            <PropertyRef Name="ProcessID" />
+          </Key>
+          <Property Name="ProcessID" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="ProcessUUID" Type="int" />
+          <Property Name="ProcessVersion" Type="int" />
+          <Property Name="Process" Type="varchar" MaxLength="250" />
+          <Property Name="Year" Type="date" />
+          <Property Name="Geography" Type="geography" />
+          <Property Name="ReferenceFlow" Type="int" />
+          <Property Name="RefererenceType" Type="varchar" MaxLength="250" />
+          <Property Name="ProcessType" Type="varchar" MaxLength="250" />
+          <Property Name="Diagram" Type="varchar" MaxLength="250" />
+        </EntityType>
+        <EntityType Name="ProcessFlow">
+          <Key>
+            <PropertyRef Name="ProcessFlowID" />
+          </Key>
+          <Property Name="ProcessFlowID" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="ProcessFlowProcessID" Type="int" />
+          <Property Name="FlowID" Type="int" />
+          <Property Name="DirectionID" Type="int" />
+          <Property Name="Type" Type="varchar" MaxLength="50" />
+          <Property Name="VarName" Type="varchar" MaxLength="50" />
+          <Property Name="Magnitude" Type="float" />
+          <Property Name="Result" Type="float" />
+          <Property Name="STDev" Type="float" />
+        </EntityType>
+        <EntityType Name="Source">
+          <Key>
+            <PropertyRef Name="SourceID" />
+          </Key>
+          <Property Name="SourceID" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="SourceUUID" Type="int" />
+          <Property Name="Version" Type="int" />
+          <Property Name="Source" Type="varchar" MaxLength="100" />
+          <Property Name="Citation" Type="varchar" MaxLength="100" />
+          <Property Name="PubType" Type="varchar" MaxLength="100" />
+          <Property Name="URI" Type="varchar" MaxLength="100" />
+        </EntityType>
+        <EntityType Name="sysdiagrams">
+          <Key>
+            <PropertyRef Name="diagram_id" />
+          </Key>
+          <Property Name="name" Type="nvarchar" MaxLength="128" Nullable="false" />
+          <Property Name="principal_id" Type="int" Nullable="false" />
+          <Property Name="diagram_id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="version" Type="int" />
+          <Property Name="definition" Type="varbinary(max)" />
+        </EntityType>
+        <EntityType Name="UnitConversion">
+          <Key>
+            <PropertyRef Name="UnitConversionID" />
+          </Key>
+          <Property Name="UnitConversionID" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="UnitConversionUUID" Type="int" />
+          <Property Name="Unit" Type="varchar" MaxLength="250" />
+          <Property Name="UnitConversionUnitGroupID" Type="int" />
+          <Property Name="Conversion" Type="float" />
+        </EntityType>
+        <EntityType Name="UnitGroup">
+          <Key>
+            <PropertyRef Name="UnitGroupID" />
+          </Key>
+          <Property Name="UnitGroupID" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="UnitGroupUUID" Type="int" />
+          <Property Name="Version" Type="int" />
+          <Property Name="UnitGroup" Type="varchar" MaxLength="100" />
+          <Property Name="ReferenceUnit" Type="varchar" MaxLength="100" />
+        </EntityType>
+        <Association Name="FK_Category_CategorySystem">
+          <End Role="CategorySystem" Type="Self.CategorySystem" Multiplicity="0..1" />
+          <End Role="Category" Type="Self.Category" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="CategorySystem">
+              <PropertyRef Name="CategorySystemID" />
+            </Principal>
+            <Dependent Role="Category">
+              <PropertyRef Name="CategorySystemID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_Category_Class">
+          <End Role="Class" Type="Self.Class" Multiplicity="0..1" />
+          <End Role="Category" Type="Self.Category" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Class">
+              <PropertyRef Name="ClassID" />
+            </Principal>
+            <Dependent Role="Category">
+              <PropertyRef Name="CategoryClassID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_Classifications_CategorySystem">
+          <End Role="CategorySystem" Type="Self.CategorySystem" Multiplicity="0..1" />
+          <End Role="Classifications" Type="Self.Classifications" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="CategorySystem">
+              <PropertyRef Name="CategorySystemID" />
+            </Principal>
+            <Dependent Role="Classifications">
+              <PropertyRef Name="ClassificationCategoryListID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_Classifications_Class">
+          <End Role="Class" Type="Self.Class" Multiplicity="0..1" />
+          <End Role="Classifications" Type="Self.Classifications" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Class">
+              <PropertyRef Name="ClassID" />
+            </Principal>
+            <Dependent Role="Classifications">
+              <PropertyRef Name="ClassID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_Flow_FlowProperty">
+          <End Role="FlowProperty" Type="Self.FlowProperty" Multiplicity="0..1" />
+          <End Role="Flow" Type="Self.Flow" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="FlowProperty">
+              <PropertyRef Name="FlowPropertyID" />
+            </Principal>
+            <Dependent Role="Flow">
+              <PropertyRef Name="FlowPropertyID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_Flow_FlowType">
+          <End Role="FlowType" Type="Self.FlowType" Multiplicity="0..1" />
+          <End Role="Flow" Type="Self.Flow" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="FlowType">
+              <PropertyRef Name="FlowTypeID" />
+            </Principal>
+            <Dependent Role="Flow">
+              <PropertyRef Name="FlowTypeID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_FlowProperty_UnitGroup">
+          <End Role="UnitGroup" Type="Self.UnitGroup" Multiplicity="0..1" />
+          <End Role="FlowProperty" Type="Self.FlowProperty" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="UnitGroup">
+              <PropertyRef Name="UnitGroupID" />
+            </Principal>
+            <Dependent Role="FlowProperty">
+              <PropertyRef Name="FlowPropertyUnitGroupID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_FlowPropertyVersion_Flow">
+          <End Role="Flow" Type="Self.Flow" Multiplicity="1" />
+          <End Role="FlowPropertyVersion" Type="Self.FlowPropertyVersion" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Flow">
+              <PropertyRef Name="FlowID" />
+            </Principal>
+            <Dependent Role="FlowPropertyVersion">
+              <PropertyRef Name="FlowPropertyVersionFlowID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_FlowPropertyVersion_FlowProperty">
+          <End Role="FlowProperty" Type="Self.FlowProperty" Multiplicity="1" />
+          <End Role="FlowPropertyVersion" Type="Self.FlowPropertyVersion" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="FlowProperty">
+              <PropertyRef Name="FlowPropertyID" />
+            </Principal>
+            <Dependent Role="FlowPropertyVersion">
+              <PropertyRef Name="FlowPropertyVersionFlowPropertyID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_LCIA_Direction">
+          <End Role="Direction" Type="Self.Direction" Multiplicity="0..1" />
+          <End Role="LCIA" Type="Self.LCIA" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Direction">
+              <PropertyRef Name="DirectionID" />
+            </Principal>
+            <Dependent Role="LCIA">
+              <PropertyRef Name="LCIADirectionID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_LCIA_Flow1">
+          <End Role="Flow" Type="Self.Flow" Multiplicity="0..1" />
+          <End Role="LCIA" Type="Self.LCIA" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Flow">
+              <PropertyRef Name="FlowID" />
+            </Principal>
+            <Dependent Role="LCIA">
+              <PropertyRef Name="LCIAFlowID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_LCIA_LCIAMethod">
+          <End Role="LCIAMethod" Type="Self.LCIAMethod" Multiplicity="0..1" />
+          <End Role="LCIA" Type="Self.LCIA" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="LCIAMethod">
+              <PropertyRef Name="LCIAMethodID" />
+            </Principal>
+            <Dependent Role="LCIA">
+              <PropertyRef Name="LCIAMethodID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_LCIAMethod_FlowProperty">
+          <End Role="FlowProperty" Type="Self.FlowProperty" Multiplicity="0..1" />
+          <End Role="LCIAMethod" Type="Self.LCIAMethod" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="FlowProperty">
+              <PropertyRef Name="FlowPropertyID" />
+            </Principal>
+            <Dependent Role="LCIAMethod">
+              <PropertyRef Name="LCIAMethodFlowPropertyID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_LCIAMethod_Source">
+          <End Role="Source" Type="Self.Source" Multiplicity="0..1" />
+          <End Role="LCIAMethod" Type="Self.LCIAMethod" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Source">
+              <PropertyRef Name="SourceID" />
+            </Principal>
+            <Dependent Role="LCIAMethod">
+              <PropertyRef Name="LCIAMethodSourceID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_ProcessFlow_Direction">
+          <End Role="Direction" Type="Self.Direction" Multiplicity="0..1" />
+          <End Role="ProcessFlow" Type="Self.ProcessFlow" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Direction">
+              <PropertyRef Name="DirectionID" />
+            </Principal>
+            <Dependent Role="ProcessFlow">
+              <PropertyRef Name="DirectionID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_ProcessFlow_Flow">
+          <End Role="Flow" Type="Self.Flow" Multiplicity="0..1" />
+          <End Role="ProcessFlow" Type="Self.ProcessFlow" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Flow">
+              <PropertyRef Name="FlowID" />
+            </Principal>
+            <Dependent Role="ProcessFlow">
+              <PropertyRef Name="FlowID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_ProcessFlow_Process">
+          <End Role="Process" Type="Self.Process" Multiplicity="0..1" />
+          <End Role="ProcessFlow" Type="Self.ProcessFlow" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Process">
+              <PropertyRef Name="ProcessID" />
+            </Principal>
+            <Dependent Role="ProcessFlow">
+              <PropertyRef Name="ProcessFlowProcessID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_UnitConversion_UnitGroup">
+          <End Role="UnitGroup" Type="Self.UnitGroup" Multiplicity="0..1" />
+          <End Role="UnitConversion" Type="Self.UnitConversion" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="UnitGroup">
+              <PropertyRef Name="UnitGroupID" />
+            </Principal>
+            <Dependent Role="UnitConversion">
+              <PropertyRef Name="UnitConversionUnitGroupID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Function Name="fn_diagramobjects" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="true" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo" ReturnType="int" />
+        <Function Name="sp_alterdiagram" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo">
+          <Parameter Name="diagramname" Type="nvarchar" Mode="In" />
+          <Parameter Name="owner_id" Type="int" Mode="In" />
+          <Parameter Name="version" Type="int" Mode="In" />
+          <Parameter Name="definition" Type="varbinary(max)" Mode="In" />
+        </Function>
+        <Function Name="sp_creatediagram" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo">
+          <Parameter Name="diagramname" Type="nvarchar" Mode="In" />
+          <Parameter Name="owner_id" Type="int" Mode="In" />
+          <Parameter Name="version" Type="int" Mode="In" />
+          <Parameter Name="definition" Type="varbinary(max)" Mode="In" />
+        </Function>
+        <Function Name="sp_dropdiagram" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo">
+          <Parameter Name="diagramname" Type="nvarchar" Mode="In" />
+          <Parameter Name="owner_id" Type="int" Mode="In" />
+        </Function>
+        <Function Name="sp_helpdiagramdefinition" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo">
+          <Parameter Name="diagramname" Type="nvarchar" Mode="In" />
+          <Parameter Name="owner_id" Type="int" Mode="In" />
+        </Function>
+        <Function Name="sp_helpdiagrams" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo">
+          <Parameter Name="diagramname" Type="nvarchar" Mode="In" />
+          <Parameter Name="owner_id" Type="int" Mode="In" />
+        </Function>
+        <Function Name="sp_renamediagram" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo">
+          <Parameter Name="diagramname" Type="nvarchar" Mode="In" />
+          <Parameter Name="owner_id" Type="int" Mode="In" />
+          <Parameter Name="new_diagramname" Type="nvarchar" Mode="In" />
+        </Function>
+        <Function Name="sp_upgraddiagrams" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo" />
+        <EntityContainer Name="LCAToolDevModelStoreContainer">
+          <EntitySet Name="Category" EntityType="Self.Category" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="CategorySystem" EntityType="Self.CategorySystem" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="Class" EntityType="Self.Class" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="Classifications" EntityType="Self.Classifications" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="DataType" EntityType="Self.DataType" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="Direction" EntityType="Self.Direction" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="Flow" EntityType="Self.Flow" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="FlowProperty" EntityType="Self.FlowProperty" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="FlowPropertyVersion" EntityType="Self.FlowPropertyVersion" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="FlowType" EntityType="Self.FlowType" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="Indicators" EntityType="Self.Indicators" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="LCIA" EntityType="Self.LCIA" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="LCIAMethod" EntityType="Self.LCIAMethod" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="MasterLCAModels" EntityType="Self.MasterLCAModels" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="Process" EntityType="Self.Process" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="ProcessFlow" EntityType="Self.ProcessFlow" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="Source" EntityType="Self.Source" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="sysdiagrams" EntityType="Self.sysdiagrams" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="UnitConversion" EntityType="Self.UnitConversion" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="UnitGroup" EntityType="Self.UnitGroup" Schema="dbo" store:Type="Tables" />
+          <AssociationSet Name="FK_Category_CategorySystem" Association="Self.FK_Category_CategorySystem">
+            <End Role="CategorySystem" EntitySet="CategorySystem" />
+            <End Role="Category" EntitySet="Category" />
+          </AssociationSet>
+          <AssociationSet Name="FK_Category_Class" Association="Self.FK_Category_Class">
+            <End Role="Class" EntitySet="Class" />
+            <End Role="Category" EntitySet="Category" />
+          </AssociationSet>
+          <AssociationSet Name="FK_Classifications_CategorySystem" Association="Self.FK_Classifications_CategorySystem">
+            <End Role="CategorySystem" EntitySet="CategorySystem" />
+            <End Role="Classifications" EntitySet="Classifications" />
+          </AssociationSet>
+          <AssociationSet Name="FK_Classifications_Class" Association="Self.FK_Classifications_Class">
+            <End Role="Class" EntitySet="Class" />
+            <End Role="Classifications" EntitySet="Classifications" />
+          </AssociationSet>
+          <AssociationSet Name="FK_Flow_FlowProperty" Association="Self.FK_Flow_FlowProperty">
+            <End Role="FlowProperty" EntitySet="FlowProperty" />
+            <End Role="Flow" EntitySet="Flow" />
+          </AssociationSet>
+          <AssociationSet Name="FK_Flow_FlowType" Association="Self.FK_Flow_FlowType">
+            <End Role="FlowType" EntitySet="FlowType" />
+            <End Role="Flow" EntitySet="Flow" />
+          </AssociationSet>
+          <AssociationSet Name="FK_FlowProperty_UnitGroup" Association="Self.FK_FlowProperty_UnitGroup">
+            <End Role="UnitGroup" EntitySet="UnitGroup" />
+            <End Role="FlowProperty" EntitySet="FlowProperty" />
+          </AssociationSet>
+          <AssociationSet Name="FK_FlowPropertyVersion_Flow" Association="Self.FK_FlowPropertyVersion_Flow">
+            <End Role="Flow" EntitySet="Flow" />
+            <End Role="FlowPropertyVersion" EntitySet="FlowPropertyVersion" />
+          </AssociationSet>
+          <AssociationSet Name="FK_FlowPropertyVersion_FlowProperty" Association="Self.FK_FlowPropertyVersion_FlowProperty">
+            <End Role="FlowProperty" EntitySet="FlowProperty" />
+            <End Role="FlowPropertyVersion" EntitySet="FlowPropertyVersion" />
+          </AssociationSet>
+          <AssociationSet Name="FK_LCIA_Direction" Association="Self.FK_LCIA_Direction">
+            <End Role="Direction" EntitySet="Direction" />
+            <End Role="LCIA" EntitySet="LCIA" />
+          </AssociationSet>
+          <AssociationSet Name="FK_LCIA_Flow1" Association="Self.FK_LCIA_Flow1">
+            <End Role="Flow" EntitySet="Flow" />
+            <End Role="LCIA" EntitySet="LCIA" />
+          </AssociationSet>
+          <AssociationSet Name="FK_LCIA_LCIAMethod" Association="Self.FK_LCIA_LCIAMethod">
+            <End Role="LCIAMethod" EntitySet="LCIAMethod" />
+            <End Role="LCIA" EntitySet="LCIA" />
+          </AssociationSet>
+          <AssociationSet Name="FK_LCIAMethod_FlowProperty" Association="Self.FK_LCIAMethod_FlowProperty">
+            <End Role="FlowProperty" EntitySet="FlowProperty" />
+            <End Role="LCIAMethod" EntitySet="LCIAMethod" />
+          </AssociationSet>
+          <AssociationSet Name="FK_LCIAMethod_Source" Association="Self.FK_LCIAMethod_Source">
+            <End Role="Source" EntitySet="Source" />
+            <End Role="LCIAMethod" EntitySet="LCIAMethod" />
+          </AssociationSet>
+          <AssociationSet Name="FK_ProcessFlow_Direction" Association="Self.FK_ProcessFlow_Direction">
+            <End Role="Direction" EntitySet="Direction" />
+            <End Role="ProcessFlow" EntitySet="ProcessFlow" />
+          </AssociationSet>
+          <AssociationSet Name="FK_ProcessFlow_Flow" Association="Self.FK_ProcessFlow_Flow">
+            <End Role="Flow" EntitySet="Flow" />
+            <End Role="ProcessFlow" EntitySet="ProcessFlow" />
+          </AssociationSet>
+          <AssociationSet Name="FK_ProcessFlow_Process" Association="Self.FK_ProcessFlow_Process">
+            <End Role="Process" EntitySet="Process" />
+            <End Role="ProcessFlow" EntitySet="ProcessFlow" />
+          </AssociationSet>
+          <AssociationSet Name="FK_UnitConversion_UnitGroup" Association="Self.FK_UnitConversion_UnitGroup">
+            <End Role="UnitGroup" EntitySet="UnitGroup" />
+            <End Role="UnitConversion" EntitySet="UnitConversion" />
+          </AssociationSet>
+        </EntityContainer>
+      </Schema>
+    </edmx:StorageModels>
+    <!-- CSDL content -->
+    <edmx:ConceptualModels>
+      <Schema Namespace="LCAToolDevModel" Alias="Self" annotation:UseStrongSpatialTypes="false" xmlns:annotation="http://schemas.microsoft.com/ado/2009/02/edm/annotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm">
+        <EntityType Name="Category">
+          <Key>
+            <PropertyRef Name="CategoryID" />
+          </Key>
+          <Property Name="CategoryID" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="CategorySystemID" Type="Int32" />
+          <Property Name="CategoryClassID" Type="Int32" />
+          <Property Name="Parent" Type="Int32" />
+          <Property Name="HierarchyLevel" Type="Int32" />
+          <Property Name="Hier" Type="String" MaxLength="250" FixedLength="false" Unicode="false" />
+          <NavigationProperty Name="CategorySystem" Relationship="Self.FK_Category_CategorySystem" FromRole="Category" ToRole="CategorySystem" />
+          <NavigationProperty Name="Class" Relationship="Self.FK_Category_Class" FromRole="Category" ToRole="Class" />
+        </EntityType>
+        <EntityType Name="CategorySystem">
+          <Key>
+            <PropertyRef Name="CategorySystemID" />
+          </Key>
+          <Property Name="CategorySystemID" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="CategorySystem1" Type="String" MaxLength="250" FixedLength="false" Unicode="false" />
+          <Property Name="URI" Type="String" MaxLength="100" FixedLength="false" Unicode="false" />
+          <Property Name="CategorySystemDataTypeID" Type="Int32" />
+          <Property Name="Delimeter" Type="String" MaxLength="2" FixedLength="false" Unicode="false" />
+          <NavigationProperty Name="Categories" Relationship="Self.FK_Category_CategorySystem" FromRole="CategorySystem" ToRole="Category" />
+          <NavigationProperty Name="Classifications" Relationship="Self.FK_Classifications_CategorySystem" FromRole="CategorySystem" ToRole="Classifications" />
+        </EntityType>
+        <EntityType Name="Class">
+          <Key>
+            <PropertyRef Name="ClassID" />
+          </Key>
+          <Property Name="ClassID" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="ClassName" Type="String" MaxLength="250" FixedLength="false" Unicode="false" />
+          <NavigationProperty Name="Categories" Relationship="Self.FK_Category_Class" FromRole="Class" ToRole="Category" />
+          <NavigationProperty Name="Classifications" Relationship="Self.FK_Classifications_Class" FromRole="Class" ToRole="Classifications" />
+        </EntityType>
+        <EntityType Name="Classification">
+          <Key>
+            <PropertyRef Name="ClassificationID" />
+          </Key>
+          <Property Name="ClassificationID" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="ClassificationUUID" Type="Int32" />
+          <Property Name="ClassificationCategoryListID" Type="Int32" />
+          <Property Name="ClassID" Type="Int32" />
+          <NavigationProperty Name="CategorySystem" Relationship="Self.FK_Classifications_CategorySystem" FromRole="Classifications" ToRole="CategorySystem" />
+          <NavigationProperty Name="Class" Relationship="Self.FK_Classifications_Class" FromRole="Classifications" ToRole="Class" />
+        </EntityType>
+        <EntityType Name="DataType">
+          <Key>
+            <PropertyRef Name="DataTypeID" />
+          </Key>
+          <Property Name="DataTypeID" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="DataType1" Type="String" MaxLength="250" FixedLength="false" Unicode="false" />
+        </EntityType>
+        <EntityType Name="Direction">
+          <Key>
+            <PropertyRef Name="DirectionID" />
+          </Key>
+          <Property Name="DirectionID" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="Direction1" Type="String" MaxLength="100" FixedLength="false" Unicode="false" />
+          <NavigationProperty Name="LCIAs" Relationship="Self.FK_LCIA_Direction" FromRole="Direction" ToRole="LCIA" />
+          <NavigationProperty Name="ProcessFlows" Relationship="Self.FK_ProcessFlow_Direction" FromRole="Direction" ToRole="ProcessFlow" />
+        </EntityType>
+        <EntityType Name="Flow">
+          <Key>
+            <PropertyRef Name="FlowID" />
+          </Key>
+          <Property Name="FlowID" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="FlowUUID" Type="Int32" />
+          <Property Name="FlowVersion" Type="Int32" />
+          <Property Name="CASNumber" Type="Int32" />
+          <Property Name="FlowPropertyID" Type="Int32" />
+          <Property Name="FlowTypeID" Type="Int32" />
+          <NavigationProperty Name="FlowProperty" Relationship="Self.FK_Flow_FlowProperty" FromRole="Flow" ToRole="FlowProperty" />
+          <NavigationProperty Name="FlowType" Relationship="Self.FK_Flow_FlowType" FromRole="Flow" ToRole="FlowType" />
+          <NavigationProperty Name="FlowPropertyVersions" Relationship="Self.FK_FlowPropertyVersion_Flow" FromRole="Flow" ToRole="FlowPropertyVersion" />
+          <NavigationProperty Name="LCIAs" Relationship="Self.FK_LCIA_Flow1" FromRole="Flow" ToRole="LCIA" />
+          <NavigationProperty Name="ProcessFlows" Relationship="Self.FK_ProcessFlow_Flow" FromRole="Flow" ToRole="ProcessFlow" />
+        </EntityType>
+        <EntityType Name="FlowProperty">
+          <Key>
+            <PropertyRef Name="FlowPropertyID" />
+          </Key>
+          <Property Name="FlowPropertyID" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="FlowPropertyUUID" Type="Int32" />
+          <Property Name="FlowPropertyVersion" Type="Int32" />
+          <Property Name="FlowProperty1" Type="String" MaxLength="250" FixedLength="false" Unicode="false" />
+          <Property Name="Units" Type="String" MaxLength="250" FixedLength="false" Unicode="false" />
+          <Property Name="FlowPropertyUnitGroupID" Type="Int32" />
+          <NavigationProperty Name="Flows" Relationship="Self.FK_Flow_FlowProperty" FromRole="FlowProperty" ToRole="Flow" />
+          <NavigationProperty Name="UnitGroup" Relationship="Self.FK_FlowProperty_UnitGroup" FromRole="FlowProperty" ToRole="UnitGroup" />
+          <NavigationProperty Name="FlowPropertyVersions" Relationship="Self.FK_FlowPropertyVersion_FlowProperty" FromRole="FlowProperty" ToRole="FlowPropertyVersion" />
+          <NavigationProperty Name="LCIAMethods" Relationship="Self.FK_LCIAMethod_FlowProperty" FromRole="FlowProperty" ToRole="LCIAMethod" />
+        </EntityType>
+        <EntityType Name="FlowPropertyVersion">
+          <Key>
+            <PropertyRef Name="FlowPropertyVersionID" />
+          </Key>
+          <Property Name="FlowPropertyVersionID" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="FlowPropertyVersionFlowID" Type="Int32" Nullable="false" />
+          <Property Name="FlowPropertyVersionFlowPropertyID" Type="Int32" Nullable="false" />
+          <Property Name="MeanValue" Type="Double" />
+          <Property Name="StDev" Type="Double" />
+          <NavigationProperty Name="Flow" Relationship="Self.FK_FlowPropertyVersion_Flow" FromRole="FlowPropertyVersion" ToRole="Flow" />
+          <NavigationProperty Name="FlowProperty" Relationship="Self.FK_FlowPropertyVersion_FlowProperty" FromRole="FlowPropertyVersion" ToRole="FlowProperty" />
+        </EntityType>
+        <EntityType Name="FlowType">
+          <Key>
+            <PropertyRef Name="FlowTypeID" />
+          </Key>
+          <Property Name="FlowTypeID" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="FlowType1" Type="String" MaxLength="100" FixedLength="false" Unicode="false" />
+          <NavigationProperty Name="Flows" Relationship="Self.FK_Flow_FlowType" FromRole="FlowType" ToRole="Flow" />
+        </EntityType>
+        <EntityType Name="Indicator">
+          <Key>
+            <PropertyRef Name="IndicatorId" />
+          </Key>
+          <Property Name="IndicatorId" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="IndicatorName" Type="String" MaxLength="250" FixedLength="false" Unicode="false" />
+        </EntityType>
+        <EntityType Name="LCIA">
+          <Key>
+            <PropertyRef Name="LCIAID" />
+          </Key>
+          <Property Name="LCIAID" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="LCIAMethodID" Type="Int32" />
+          <Property Name="LCIAFlowID" Type="Int32" />
+          <Property Name="LCIADirectionID" Type="Int32" />
+          <Property Name="Factor" Type="Double" />
+          <NavigationProperty Name="Direction" Relationship="Self.FK_LCIA_Direction" FromRole="LCIA" ToRole="Direction" />
+          <NavigationProperty Name="Flow" Relationship="Self.FK_LCIA_Flow1" FromRole="LCIA" ToRole="Flow" />
+          <NavigationProperty Name="LCIAMethod" Relationship="Self.FK_LCIA_LCIAMethod" FromRole="LCIA" ToRole="LCIAMethod" />
+        </EntityType>
+        <EntityType Name="LCIAMethod">
+          <Key>
+            <PropertyRef Name="LCIAMethodID" />
+          </Key>
+          <Property Name="LCIAMethodID" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="LCIAMethodUUID" Type="Int32" />
+          <Property Name="LCIAMethodVersion" Type="Int32" />
+          <Property Name="LCIAMethod1" Type="String" MaxLength="250" FixedLength="false" Unicode="false" />
+          <Property Name="Methodology" Type="String" MaxLength="100" FixedLength="false" Unicode="false" />
+          <Property Name="ImpactCategory" Type="String" MaxLength="100" FixedLength="false" Unicode="false" />
+          <Property Name="ImpactIndicator" Type="String" MaxLength="100" FixedLength="false" Unicode="false" />
+          <Property Name="ReferenceYear" Type="String" MaxLength="4" FixedLength="false" Unicode="false" />
+          <Property Name="Duration" Type="String" MaxLength="100" FixedLength="false" Unicode="false" />
+          <Property Name="ImpactLocation" Type="Geography" />
+          <Property Name="IndicatorType" Type="String" MaxLength="100" FixedLength="false" Unicode="false" />
+          <Property Name="Normalization" Type="Boolean" />
+          <Property Name="Weighting" Type="Boolean" />
+          <Property Name="UseAdvice" Type="String" MaxLength="100" FixedLength="false" Unicode="false" />
+          <Property Name="LCIAMethodSourceID" Type="Int32" />
+          <Property Name="LCIAMethodFlowPropertyID" Type="Int32" />
+          <NavigationProperty Name="FlowProperty" Relationship="Self.FK_LCIAMethod_FlowProperty" FromRole="LCIAMethod" ToRole="FlowProperty" />
+          <NavigationProperty Name="LCIAs" Relationship="Self.FK_LCIA_LCIAMethod" FromRole="LCIAMethod" ToRole="LCIA" />
+          <NavigationProperty Name="Source" Relationship="Self.FK_LCIAMethod_Source" FromRole="LCIAMethod" ToRole="Source" />
+        </EntityType>
+        <EntityType Name="MasterLCAModel">
+          <Key>
+            <PropertyRef Name="MasterLCAModelID" />
+          </Key>
+          <Property Name="MasterLCAModelID" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="UUlID" Type="Int32" />
+          <Property Name="Version" Type="String" MaxLength="100" FixedLength="false" Unicode="false" />
+          <Property Name="DataType" Type="String" MaxLength="100" FixedLength="false" Unicode="false" />
+          <Property Name="URI" Type="String" MaxLength="250" FixedLength="false" Unicode="false" />
+          <Property Name="OldIndex" Type="String" MaxLength="Max" FixedLength="false" Unicode="false" Nullable="false" />
+        </EntityType>
+        <EntityType Name="Process">
+          <Key>
+            <PropertyRef Name="ProcessID" />
+          </Key>
+          <Property Name="ProcessID" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="ProcessUUID" Type="Int32" />
+          <Property Name="ProcessVersion" Type="Int32" />
+          <Property Name="Process1" Type="String" MaxLength="250" FixedLength="false" Unicode="false" />
+          <Property Name="Year" Type="DateTime" Precision="0" />
+          <Property Name="Geography" Type="Geography" />
+          <Property Name="ReferenceFlow" Type="Int32" />
+          <Property Name="RefererenceType" Type="String" MaxLength="250" FixedLength="false" Unicode="false" />
+          <Property Name="ProcessType" Type="String" MaxLength="250" FixedLength="false" Unicode="false" />
+          <Property Name="Diagram" Type="String" MaxLength="250" FixedLength="false" Unicode="false" />
+          <NavigationProperty Name="ProcessFlows" Relationship="Self.FK_ProcessFlow_Process" FromRole="Process" ToRole="ProcessFlow" />
+        </EntityType>
+        <EntityType Name="ProcessFlow">
+          <Key>
+            <PropertyRef Name="ProcessFlowID" />
+          </Key>
+          <Property Name="ProcessFlowID" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="ProcessFlowProcessID" Type="Int32" />
+          <Property Name="FlowID" Type="Int32" />
+          <Property Name="DirectionID" Type="Int32" />
+          <Property Name="Type" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="VarName" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="Magnitude" Type="Double" />
+          <Property Name="Result" Type="Double" />
+          <Property Name="STDev" Type="Double" />
+          <NavigationProperty Name="Direction" Relationship="Self.FK_ProcessFlow_Direction" FromRole="ProcessFlow" ToRole="Direction" />
+          <NavigationProperty Name="Flow" Relationship="Self.FK_ProcessFlow_Flow" FromRole="ProcessFlow" ToRole="Flow" />
+          <NavigationProperty Name="Process" Relationship="Self.FK_ProcessFlow_Process" FromRole="ProcessFlow" ToRole="Process" />
+        </EntityType>
+        <EntityType Name="Source">
+          <Key>
+            <PropertyRef Name="SourceID" />
+          </Key>
+          <Property Name="SourceID" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="SourceUUID" Type="Int32" />
+          <Property Name="Version" Type="Int32" />
+          <Property Name="Source1" Type="String" MaxLength="100" FixedLength="false" Unicode="false" />
+          <Property Name="Citation" Type="String" MaxLength="100" FixedLength="false" Unicode="false" />
+          <Property Name="PubType" Type="String" MaxLength="100" FixedLength="false" Unicode="false" />
+          <Property Name="URI" Type="String" MaxLength="100" FixedLength="false" Unicode="false" />
+          <NavigationProperty Name="LCIAMethods" Relationship="Self.FK_LCIAMethod_Source" FromRole="Source" ToRole="LCIAMethod" />
+        </EntityType>
+        <EntityType Name="sysdiagram">
+          <Key>
+            <PropertyRef Name="diagram_id" />
+          </Key>
+          <Property Name="name" Type="String" MaxLength="128" FixedLength="false" Unicode="true" Nullable="false" />
+          <Property Name="principal_id" Type="Int32" Nullable="false" />
+          <Property Name="diagram_id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="version" Type="Int32" />
+          <Property Name="definition" Type="Binary" MaxLength="Max" FixedLength="false" />
+        </EntityType>
+        <EntityType Name="UnitConversion">
+          <Key>
+            <PropertyRef Name="UnitConversionID" />
+          </Key>
+          <Property Name="UnitConversionID" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="UnitConversionUUID" Type="Int32" />
+          <Property Name="Unit" Type="String" MaxLength="250" FixedLength="false" Unicode="false" />
+          <Property Name="UnitConversionUnitGroupID" Type="Int32" />
+          <Property Name="Conversion" Type="Double" />
+          <NavigationProperty Name="UnitGroup" Relationship="Self.FK_UnitConversion_UnitGroup" FromRole="UnitConversion" ToRole="UnitGroup" />
+        </EntityType>
+        <EntityType Name="UnitGroup">
+          <Key>
+            <PropertyRef Name="UnitGroupID" />
+          </Key>
+          <Property Name="UnitGroupID" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="UnitGroupUUID" Type="Int32" />
+          <Property Name="Version" Type="Int32" />
+          <Property Name="UnitGroup1" Type="String" MaxLength="100" FixedLength="false" Unicode="false" />
+          <Property Name="ReferenceUnit" Type="String" MaxLength="100" FixedLength="false" Unicode="false" />
+          <NavigationProperty Name="FlowProperties" Relationship="Self.FK_FlowProperty_UnitGroup" FromRole="UnitGroup" ToRole="FlowProperty" />
+          <NavigationProperty Name="UnitConversions" Relationship="Self.FK_UnitConversion_UnitGroup" FromRole="UnitGroup" ToRole="UnitConversion" />
+        </EntityType>
+        <Association Name="FK_Category_CategorySystem">
+          <End Role="CategorySystem" Type="Self.CategorySystem" Multiplicity="0..1" />
+          <End Role="Category" Type="Self.Category" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="CategorySystem">
+              <PropertyRef Name="CategorySystemID" />
+            </Principal>
+            <Dependent Role="Category">
+              <PropertyRef Name="CategorySystemID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_Category_Class">
+          <End Role="Class" Type="Self.Class" Multiplicity="0..1" />
+          <End Role="Category" Type="Self.Category" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Class">
+              <PropertyRef Name="ClassID" />
+            </Principal>
+            <Dependent Role="Category">
+              <PropertyRef Name="CategoryClassID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_Classifications_CategorySystem">
+          <End Role="CategorySystem" Type="Self.CategorySystem" Multiplicity="0..1" />
+          <End Role="Classifications" Type="Self.Classification" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="CategorySystem">
+              <PropertyRef Name="CategorySystemID" />
+            </Principal>
+            <Dependent Role="Classifications">
+              <PropertyRef Name="ClassificationCategoryListID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_Classifications_Class">
+          <End Role="Class" Type="Self.Class" Multiplicity="0..1" />
+          <End Role="Classifications" Type="Self.Classification" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Class">
+              <PropertyRef Name="ClassID" />
+            </Principal>
+            <Dependent Role="Classifications">
+              <PropertyRef Name="ClassID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_LCIA_Direction">
+          <End Role="Direction" Type="Self.Direction" Multiplicity="0..1" />
+          <End Role="LCIA" Type="Self.LCIA" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Direction">
+              <PropertyRef Name="DirectionID" />
+            </Principal>
+            <Dependent Role="LCIA">
+              <PropertyRef Name="LCIADirectionID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_ProcessFlow_Direction">
+          <End Role="Direction" Type="Self.Direction" Multiplicity="0..1" />
+          <End Role="ProcessFlow" Type="Self.ProcessFlow" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Direction">
+              <PropertyRef Name="DirectionID" />
+            </Principal>
+            <Dependent Role="ProcessFlow">
+              <PropertyRef Name="DirectionID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_Flow_FlowProperty">
+          <End Role="FlowProperty" Type="Self.FlowProperty" Multiplicity="0..1" />
+          <End Role="Flow" Type="Self.Flow" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="FlowProperty">
+              <PropertyRef Name="FlowPropertyID" />
+            </Principal>
+            <Dependent Role="Flow">
+              <PropertyRef Name="FlowPropertyID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_Flow_FlowType">
+          <End Role="FlowType" Type="Self.FlowType" Multiplicity="0..1" />
+          <End Role="Flow" Type="Self.Flow" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="FlowType">
+              <PropertyRef Name="FlowTypeID" />
+            </Principal>
+            <Dependent Role="Flow">
+              <PropertyRef Name="FlowTypeID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_FlowPropertyVersion_Flow">
+          <End Role="Flow" Type="Self.Flow" Multiplicity="1" />
+          <End Role="FlowPropertyVersion" Type="Self.FlowPropertyVersion" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Flow">
+              <PropertyRef Name="FlowID" />
+            </Principal>
+            <Dependent Role="FlowPropertyVersion">
+              <PropertyRef Name="FlowPropertyVersionFlowID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_LCIA_Flow1">
+          <End Role="Flow" Type="Self.Flow" Multiplicity="0..1" />
+          <End Role="LCIA" Type="Self.LCIA" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Flow">
+              <PropertyRef Name="FlowID" />
+            </Principal>
+            <Dependent Role="LCIA">
+              <PropertyRef Name="LCIAFlowID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_ProcessFlow_Flow">
+          <End Role="Flow" Type="Self.Flow" Multiplicity="0..1" />
+          <End Role="ProcessFlow" Type="Self.ProcessFlow" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Flow">
+              <PropertyRef Name="FlowID" />
+            </Principal>
+            <Dependent Role="ProcessFlow">
+              <PropertyRef Name="FlowID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_FlowProperty_UnitGroup">
+          <End Role="UnitGroup" Type="Self.UnitGroup" Multiplicity="0..1" />
+          <End Role="FlowProperty" Type="Self.FlowProperty" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="UnitGroup">
+              <PropertyRef Name="UnitGroupID" />
+            </Principal>
+            <Dependent Role="FlowProperty">
+              <PropertyRef Name="FlowPropertyUnitGroupID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_FlowPropertyVersion_FlowProperty">
+          <End Role="FlowProperty" Type="Self.FlowProperty" Multiplicity="1" />
+          <End Role="FlowPropertyVersion" Type="Self.FlowPropertyVersion" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="FlowProperty">
+              <PropertyRef Name="FlowPropertyID" />
+            </Principal>
+            <Dependent Role="FlowPropertyVersion">
+              <PropertyRef Name="FlowPropertyVersionFlowPropertyID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_LCIAMethod_FlowProperty">
+          <End Role="FlowProperty" Type="Self.FlowProperty" Multiplicity="0..1" />
+          <End Role="LCIAMethod" Type="Self.LCIAMethod" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="FlowProperty">
+              <PropertyRef Name="FlowPropertyID" />
+            </Principal>
+            <Dependent Role="LCIAMethod">
+              <PropertyRef Name="LCIAMethodFlowPropertyID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_LCIA_LCIAMethod">
+          <End Role="LCIAMethod" Type="Self.LCIAMethod" Multiplicity="0..1" />
+          <End Role="LCIA" Type="Self.LCIA" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="LCIAMethod">
+              <PropertyRef Name="LCIAMethodID" />
+            </Principal>
+            <Dependent Role="LCIA">
+              <PropertyRef Name="LCIAMethodID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_LCIAMethod_Source">
+          <End Role="Source" Type="Self.Source" Multiplicity="0..1" />
+          <End Role="LCIAMethod" Type="Self.LCIAMethod" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Source">
+              <PropertyRef Name="SourceID" />
+            </Principal>
+            <Dependent Role="LCIAMethod">
+              <PropertyRef Name="LCIAMethodSourceID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_ProcessFlow_Process">
+          <End Role="Process" Type="Self.Process" Multiplicity="0..1" />
+          <End Role="ProcessFlow" Type="Self.ProcessFlow" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Process">
+              <PropertyRef Name="ProcessID" />
+            </Principal>
+            <Dependent Role="ProcessFlow">
+              <PropertyRef Name="ProcessFlowProcessID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_UnitConversion_UnitGroup">
+          <End Role="UnitGroup" Type="Self.UnitGroup" Multiplicity="0..1" />
+          <End Role="UnitConversion" Type="Self.UnitConversion" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="UnitGroup">
+              <PropertyRef Name="UnitGroupID" />
+            </Principal>
+            <Dependent Role="UnitConversion">
+              <PropertyRef Name="UnitConversionUnitGroupID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <EntityContainer Name="LCAToolDevEntities" annotation:LazyLoadingEnabled="true">
+          <EntitySet Name="Categories" EntityType="Self.Category" />
+          <EntitySet Name="CategorySystems" EntityType="Self.CategorySystem" />
+          <EntitySet Name="Classes" EntityType="Self.Class" />
+          <EntitySet Name="Classifications" EntityType="Self.Classification" />
+          <EntitySet Name="DataTypes" EntityType="Self.DataType" />
+          <EntitySet Name="Directions" EntityType="Self.Direction" />
+          <EntitySet Name="Flows" EntityType="Self.Flow" />
+          <EntitySet Name="FlowProperties" EntityType="Self.FlowProperty" />
+          <EntitySet Name="FlowPropertyVersions" EntityType="Self.FlowPropertyVersion" />
+          <EntitySet Name="FlowTypes" EntityType="Self.FlowType" />
+          <EntitySet Name="Indicators" EntityType="Self.Indicator" />
+          <EntitySet Name="LCIAs" EntityType="Self.LCIA" />
+          <EntitySet Name="LCIAMethods" EntityType="Self.LCIAMethod" />
+          <EntitySet Name="MasterLCAModels" EntityType="Self.MasterLCAModel" />
+          <EntitySet Name="Processes" EntityType="Self.Process" />
+          <EntitySet Name="ProcessFlows" EntityType="Self.ProcessFlow" />
+          <EntitySet Name="Sources" EntityType="Self.Source" />
+          <EntitySet Name="sysdiagrams" EntityType="Self.sysdiagram" />
+          <EntitySet Name="UnitConversions" EntityType="Self.UnitConversion" />
+          <EntitySet Name="UnitGroups" EntityType="Self.UnitGroup" />
+          <AssociationSet Name="FK_Category_CategorySystem" Association="Self.FK_Category_CategorySystem">
+            <End Role="CategorySystem" EntitySet="CategorySystems" />
+            <End Role="Category" EntitySet="Categories" />
+          </AssociationSet>
+          <AssociationSet Name="FK_Category_Class" Association="Self.FK_Category_Class">
+            <End Role="Class" EntitySet="Classes" />
+            <End Role="Category" EntitySet="Categories" />
+          </AssociationSet>
+          <AssociationSet Name="FK_Classifications_CategorySystem" Association="Self.FK_Classifications_CategorySystem">
+            <End Role="CategorySystem" EntitySet="CategorySystems" />
+            <End Role="Classifications" EntitySet="Classifications" />
+          </AssociationSet>
+          <AssociationSet Name="FK_Classifications_Class" Association="Self.FK_Classifications_Class">
+            <End Role="Class" EntitySet="Classes" />
+            <End Role="Classifications" EntitySet="Classifications" />
+          </AssociationSet>
+          <AssociationSet Name="FK_LCIA_Direction" Association="Self.FK_LCIA_Direction">
+            <End Role="Direction" EntitySet="Directions" />
+            <End Role="LCIA" EntitySet="LCIAs" />
+          </AssociationSet>
+          <AssociationSet Name="FK_ProcessFlow_Direction" Association="Self.FK_ProcessFlow_Direction">
+            <End Role="Direction" EntitySet="Directions" />
+            <End Role="ProcessFlow" EntitySet="ProcessFlows" />
+          </AssociationSet>
+          <AssociationSet Name="FK_Flow_FlowProperty" Association="Self.FK_Flow_FlowProperty">
+            <End Role="FlowProperty" EntitySet="FlowProperties" />
+            <End Role="Flow" EntitySet="Flows" />
+          </AssociationSet>
+          <AssociationSet Name="FK_Flow_FlowType" Association="Self.FK_Flow_FlowType">
+            <End Role="FlowType" EntitySet="FlowTypes" />
+            <End Role="Flow" EntitySet="Flows" />
+          </AssociationSet>
+          <AssociationSet Name="FK_FlowPropertyVersion_Flow" Association="Self.FK_FlowPropertyVersion_Flow">
+            <End Role="Flow" EntitySet="Flows" />
+            <End Role="FlowPropertyVersion" EntitySet="FlowPropertyVersions" />
+          </AssociationSet>
+          <AssociationSet Name="FK_LCIA_Flow1" Association="Self.FK_LCIA_Flow1">
+            <End Role="Flow" EntitySet="Flows" />
+            <End Role="LCIA" EntitySet="LCIAs" />
+          </AssociationSet>
+          <AssociationSet Name="FK_ProcessFlow_Flow" Association="Self.FK_ProcessFlow_Flow">
+            <End Role="Flow" EntitySet="Flows" />
+            <End Role="ProcessFlow" EntitySet="ProcessFlows" />
+          </AssociationSet>
+          <AssociationSet Name="FK_FlowProperty_UnitGroup" Association="Self.FK_FlowProperty_UnitGroup">
+            <End Role="UnitGroup" EntitySet="UnitGroups" />
+            <End Role="FlowProperty" EntitySet="FlowProperties" />
+          </AssociationSet>
+          <AssociationSet Name="FK_FlowPropertyVersion_FlowProperty" Association="Self.FK_FlowPropertyVersion_FlowProperty">
+            <End Role="FlowProperty" EntitySet="FlowProperties" />
+            <End Role="FlowPropertyVersion" EntitySet="FlowPropertyVersions" />
+          </AssociationSet>
+          <AssociationSet Name="FK_LCIAMethod_FlowProperty" Association="Self.FK_LCIAMethod_FlowProperty">
+            <End Role="FlowProperty" EntitySet="FlowProperties" />
+            <End Role="LCIAMethod" EntitySet="LCIAMethods" />
+          </AssociationSet>
+          <AssociationSet Name="FK_LCIA_LCIAMethod" Association="Self.FK_LCIA_LCIAMethod">
+            <End Role="LCIAMethod" EntitySet="LCIAMethods" />
+            <End Role="LCIA" EntitySet="LCIAs" />
+          </AssociationSet>
+          <AssociationSet Name="FK_LCIAMethod_Source" Association="Self.FK_LCIAMethod_Source">
+            <End Role="Source" EntitySet="Sources" />
+            <End Role="LCIAMethod" EntitySet="LCIAMethods" />
+          </AssociationSet>
+          <AssociationSet Name="FK_ProcessFlow_Process" Association="Self.FK_ProcessFlow_Process">
+            <End Role="Process" EntitySet="Processes" />
+            <End Role="ProcessFlow" EntitySet="ProcessFlows" />
+          </AssociationSet>
+          <AssociationSet Name="FK_UnitConversion_UnitGroup" Association="Self.FK_UnitConversion_UnitGroup">
+            <End Role="UnitGroup" EntitySet="UnitGroups" />
+            <End Role="UnitConversion" EntitySet="UnitConversions" />
+          </AssociationSet>
+          <FunctionImport Name="sp_alterdiagram">
+            <Parameter Name="diagramname" Mode="In" Type="String" />
+            <Parameter Name="owner_id" Mode="In" Type="Int32" />
+            <Parameter Name="version" Mode="In" Type="Int32" />
+            <Parameter Name="definition" Mode="In" Type="Binary" />
+          </FunctionImport>
+          <FunctionImport Name="sp_creatediagram">
+            <Parameter Name="diagramname" Mode="In" Type="String" />
+            <Parameter Name="owner_id" Mode="In" Type="Int32" />
+            <Parameter Name="version" Mode="In" Type="Int32" />
+            <Parameter Name="definition" Mode="In" Type="Binary" />
+          </FunctionImport>
+          <FunctionImport Name="sp_dropdiagram">
+            <Parameter Name="diagramname" Mode="In" Type="String" />
+            <Parameter Name="owner_id" Mode="In" Type="Int32" />
+          </FunctionImport>
+          <FunctionImport Name="sp_helpdiagramdefinition" ReturnType="Collection(LCAToolDevModel.sp_helpdiagramdefinition_Result)">
+            <Parameter Name="diagramname" Mode="In" Type="String" />
+            <Parameter Name="owner_id" Mode="In" Type="Int32" />
+          </FunctionImport>
+          <FunctionImport Name="sp_helpdiagrams" ReturnType="Collection(LCAToolDevModel.sp_helpdiagrams_Result)">
+            <Parameter Name="diagramname" Mode="In" Type="String" />
+            <Parameter Name="owner_id" Mode="In" Type="Int32" />
+          </FunctionImport>
+          <FunctionImport Name="sp_renamediagram">
+            <Parameter Name="diagramname" Mode="In" Type="String" />
+            <Parameter Name="owner_id" Mode="In" Type="Int32" />
+            <Parameter Name="new_diagramname" Mode="In" Type="String" />
+          </FunctionImport>
+          <FunctionImport Name="sp_upgraddiagrams" />
+        </EntityContainer>
+        <ComplexType Name="sp_helpdiagramdefinition_Result">
+          <Property Type="Int32" Name="version" Nullable="true" />
+          <Property Type="Binary" Name="definition" Nullable="true" />
+        </ComplexType>
+        <ComplexType Name="sp_helpdiagrams_Result">
+          <Property Type="String" Name="Database" Nullable="true" MaxLength="128" />
+          <Property Type="String" Name="Name" Nullable="false" MaxLength="128" />
+          <Property Type="Int32" Name="ID" Nullable="false" />
+          <Property Type="String" Name="Owner" Nullable="true" MaxLength="128" />
+          <Property Type="Int32" Name="OwnerID" Nullable="false" />
+        </ComplexType>
+      </Schema>
+    </edmx:ConceptualModels>
+    <!-- C-S mapping content -->
+    <edmx:Mappings>
+      <Mapping Space="C-S" xmlns="http://schemas.microsoft.com/ado/2009/11/mapping/cs">
+        <EntityContainerMapping StorageEntityContainer="LCAToolDevModelStoreContainer" CdmEntityContainer="LCAToolDevEntities">
+          <EntitySetMapping Name="Categories">
+            <EntityTypeMapping TypeName="LCAToolDevModel.Category">
+              <MappingFragment StoreEntitySet="Category">
+                <ScalarProperty Name="CategoryID" ColumnName="CategoryID" />
+                <ScalarProperty Name="CategorySystemID" ColumnName="CategorySystemID" />
+                <ScalarProperty Name="CategoryClassID" ColumnName="CategoryClassID" />
+                <ScalarProperty Name="Parent" ColumnName="Parent" />
+                <ScalarProperty Name="HierarchyLevel" ColumnName="HierarchyLevel" />
+                <ScalarProperty Name="Hier" ColumnName="Hier" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="CategorySystems">
+            <EntityTypeMapping TypeName="LCAToolDevModel.CategorySystem">
+              <MappingFragment StoreEntitySet="CategorySystem">
+                <ScalarProperty Name="CategorySystemID" ColumnName="CategorySystemID" />
+                <ScalarProperty Name="CategorySystem1" ColumnName="CategorySystem" />
+                <ScalarProperty Name="URI" ColumnName="URI" />
+                <ScalarProperty Name="CategorySystemDataTypeID" ColumnName="CategorySystemDataTypeID" />
+                <ScalarProperty Name="Delimeter" ColumnName="Delimeter" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="Classes">
+            <EntityTypeMapping TypeName="LCAToolDevModel.Class">
+              <MappingFragment StoreEntitySet="Class">
+                <ScalarProperty Name="ClassID" ColumnName="ClassID" />
+                <ScalarProperty Name="ClassName" ColumnName="ClassName" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="Classifications">
+            <EntityTypeMapping TypeName="LCAToolDevModel.Classification">
+              <MappingFragment StoreEntitySet="Classifications">
+                <ScalarProperty Name="ClassificationID" ColumnName="ClassificationID" />
+                <ScalarProperty Name="ClassificationUUID" ColumnName="ClassificationUUID" />
+                <ScalarProperty Name="ClassificationCategoryListID" ColumnName="ClassificationCategoryListID" />
+                <ScalarProperty Name="ClassID" ColumnName="ClassID" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="DataTypes">
+            <EntityTypeMapping TypeName="LCAToolDevModel.DataType">
+              <MappingFragment StoreEntitySet="DataType">
+                <ScalarProperty Name="DataTypeID" ColumnName="DataTypeID" />
+                <ScalarProperty Name="DataType1" ColumnName="DataType" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="Directions">
+            <EntityTypeMapping TypeName="LCAToolDevModel.Direction">
+              <MappingFragment StoreEntitySet="Direction">
+                <ScalarProperty Name="DirectionID" ColumnName="DirectionID" />
+                <ScalarProperty Name="Direction1" ColumnName="Direction" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="Flows">
+            <EntityTypeMapping TypeName="LCAToolDevModel.Flow">
+              <MappingFragment StoreEntitySet="Flow">
+                <ScalarProperty Name="FlowID" ColumnName="FlowID" />
+                <ScalarProperty Name="FlowUUID" ColumnName="FlowUUID" />
+                <ScalarProperty Name="FlowVersion" ColumnName="FlowVersion" />
+                <ScalarProperty Name="CASNumber" ColumnName="CASNumber" />
+                <ScalarProperty Name="FlowPropertyID" ColumnName="FlowPropertyID" />
+                <ScalarProperty Name="FlowTypeID" ColumnName="FlowTypeID" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="FlowProperties">
+            <EntityTypeMapping TypeName="LCAToolDevModel.FlowProperty">
+              <MappingFragment StoreEntitySet="FlowProperty">
+                <ScalarProperty Name="FlowPropertyID" ColumnName="FlowPropertyID" />
+                <ScalarProperty Name="FlowPropertyUUID" ColumnName="FlowPropertyUUID" />
+                <ScalarProperty Name="FlowPropertyVersion" ColumnName="FlowPropertyVersion" />
+                <ScalarProperty Name="FlowProperty1" ColumnName="FlowProperty" />
+                <ScalarProperty Name="Units" ColumnName="Units" />
+                <ScalarProperty Name="FlowPropertyUnitGroupID" ColumnName="FlowPropertyUnitGroupID" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="FlowPropertyVersions">
+            <EntityTypeMapping TypeName="LCAToolDevModel.FlowPropertyVersion">
+              <MappingFragment StoreEntitySet="FlowPropertyVersion">
+                <ScalarProperty Name="FlowPropertyVersionID" ColumnName="FlowPropertyVersionID" />
+                <ScalarProperty Name="FlowPropertyVersionFlowID" ColumnName="FlowPropertyVersionFlowID" />
+                <ScalarProperty Name="FlowPropertyVersionFlowPropertyID" ColumnName="FlowPropertyVersionFlowPropertyID" />
+                <ScalarProperty Name="MeanValue" ColumnName="MeanValue" />
+                <ScalarProperty Name="StDev" ColumnName="StDev" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="FlowTypes">
+            <EntityTypeMapping TypeName="LCAToolDevModel.FlowType">
+              <MappingFragment StoreEntitySet="FlowType">
+                <ScalarProperty Name="FlowTypeID" ColumnName="FlowTypeID" />
+                <ScalarProperty Name="FlowType1" ColumnName="FlowType" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="Indicators">
+            <EntityTypeMapping TypeName="LCAToolDevModel.Indicator">
+              <MappingFragment StoreEntitySet="Indicators">
+                <ScalarProperty Name="IndicatorId" ColumnName="IndicatorId" />
+                <ScalarProperty Name="IndicatorName" ColumnName="IndicatorName" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="LCIAs">
+            <EntityTypeMapping TypeName="LCAToolDevModel.LCIA">
+              <MappingFragment StoreEntitySet="LCIA">
+                <ScalarProperty Name="LCIAID" ColumnName="LCIAID" />
+                <ScalarProperty Name="LCIAMethodID" ColumnName="LCIAMethodID" />
+                <ScalarProperty Name="LCIAFlowID" ColumnName="LCIAFlowID" />
+                <ScalarProperty Name="LCIADirectionID" ColumnName="LCIADirectionID" />
+                <ScalarProperty Name="Factor" ColumnName="Factor" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="LCIAMethods">
+            <EntityTypeMapping TypeName="LCAToolDevModel.LCIAMethod">
+              <MappingFragment StoreEntitySet="LCIAMethod">
+                <ScalarProperty Name="LCIAMethodID" ColumnName="LCIAMethodID" />
+                <ScalarProperty Name="LCIAMethodUUID" ColumnName="LCIAMethodUUID" />
+                <ScalarProperty Name="LCIAMethodVersion" ColumnName="LCIAMethodVersion" />
+                <ScalarProperty Name="LCIAMethod1" ColumnName="LCIAMethod" />
+                <ScalarProperty Name="Methodology" ColumnName="Methodology" />
+                <ScalarProperty Name="ImpactCategory" ColumnName="ImpactCategory" />
+                <ScalarProperty Name="ImpactIndicator" ColumnName="ImpactIndicator" />
+                <ScalarProperty Name="ReferenceYear" ColumnName="ReferenceYear" />
+                <ScalarProperty Name="Duration" ColumnName="Duration" />
+                <ScalarProperty Name="ImpactLocation" ColumnName="ImpactLocation" />
+                <ScalarProperty Name="IndicatorType" ColumnName="IndicatorType" />
+                <ScalarProperty Name="Normalization" ColumnName="Normalization" />
+                <ScalarProperty Name="Weighting" ColumnName="Weighting" />
+                <ScalarProperty Name="UseAdvice" ColumnName="UseAdvice" />
+                <ScalarProperty Name="LCIAMethodSourceID" ColumnName="LCIAMethodSourceID" />
+                <ScalarProperty Name="LCIAMethodFlowPropertyID" ColumnName="LCIAMethodFlowPropertyID" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="MasterLCAModels">
+            <EntityTypeMapping TypeName="LCAToolDevModel.MasterLCAModel">
+              <MappingFragment StoreEntitySet="MasterLCAModels">
+                <ScalarProperty Name="MasterLCAModelID" ColumnName="MasterLCAModelID" />
+                <ScalarProperty Name="UUlID" ColumnName="UUlID" />
+                <ScalarProperty Name="Version" ColumnName="Version" />
+                <ScalarProperty Name="DataType" ColumnName="DataType" />
+                <ScalarProperty Name="URI" ColumnName="URI" />
+                <ScalarProperty Name="OldIndex" ColumnName="OldIndex" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="Processes">
+            <EntityTypeMapping TypeName="LCAToolDevModel.Process">
+              <MappingFragment StoreEntitySet="Process">
+                <ScalarProperty Name="ProcessID" ColumnName="ProcessID" />
+                <ScalarProperty Name="ProcessUUID" ColumnName="ProcessUUID" />
+                <ScalarProperty Name="ProcessVersion" ColumnName="ProcessVersion" />
+                <ScalarProperty Name="Process1" ColumnName="Process" />
+                <ScalarProperty Name="Year" ColumnName="Year" />
+                <ScalarProperty Name="Geography" ColumnName="Geography" />
+                <ScalarProperty Name="ReferenceFlow" ColumnName="ReferenceFlow" />
+                <ScalarProperty Name="RefererenceType" ColumnName="RefererenceType" />
+                <ScalarProperty Name="ProcessType" ColumnName="ProcessType" />
+                <ScalarProperty Name="Diagram" ColumnName="Diagram" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="ProcessFlows">
+            <EntityTypeMapping TypeName="LCAToolDevModel.ProcessFlow">
+              <MappingFragment StoreEntitySet="ProcessFlow">
+                <ScalarProperty Name="ProcessFlowID" ColumnName="ProcessFlowID" />
+                <ScalarProperty Name="ProcessFlowProcessID" ColumnName="ProcessFlowProcessID" />
+                <ScalarProperty Name="FlowID" ColumnName="FlowID" />
+                <ScalarProperty Name="DirectionID" ColumnName="DirectionID" />
+                <ScalarProperty Name="Type" ColumnName="Type" />
+                <ScalarProperty Name="VarName" ColumnName="VarName" />
+                <ScalarProperty Name="Magnitude" ColumnName="Magnitude" />
+                <ScalarProperty Name="Result" ColumnName="Result" />
+                <ScalarProperty Name="STDev" ColumnName="STDev" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="Sources">
+            <EntityTypeMapping TypeName="LCAToolDevModel.Source">
+              <MappingFragment StoreEntitySet="Source">
+                <ScalarProperty Name="SourceID" ColumnName="SourceID" />
+                <ScalarProperty Name="SourceUUID" ColumnName="SourceUUID" />
+                <ScalarProperty Name="Version" ColumnName="Version" />
+                <ScalarProperty Name="Source1" ColumnName="Source" />
+                <ScalarProperty Name="Citation" ColumnName="Citation" />
+                <ScalarProperty Name="PubType" ColumnName="PubType" />
+                <ScalarProperty Name="URI" ColumnName="URI" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="sysdiagrams">
+            <EntityTypeMapping TypeName="LCAToolDevModel.sysdiagram">
+              <MappingFragment StoreEntitySet="sysdiagrams">
+                <ScalarProperty Name="name" ColumnName="name" />
+                <ScalarProperty Name="principal_id" ColumnName="principal_id" />
+                <ScalarProperty Name="diagram_id" ColumnName="diagram_id" />
+                <ScalarProperty Name="version" ColumnName="version" />
+                <ScalarProperty Name="definition" ColumnName="definition" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="UnitConversions">
+            <EntityTypeMapping TypeName="LCAToolDevModel.UnitConversion">
+              <MappingFragment StoreEntitySet="UnitConversion">
+                <ScalarProperty Name="UnitConversionID" ColumnName="UnitConversionID" />
+                <ScalarProperty Name="UnitConversionUUID" ColumnName="UnitConversionUUID" />
+                <ScalarProperty Name="Unit" ColumnName="Unit" />
+                <ScalarProperty Name="UnitConversionUnitGroupID" ColumnName="UnitConversionUnitGroupID" />
+                <ScalarProperty Name="Conversion" ColumnName="Conversion" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="UnitGroups">
+            <EntityTypeMapping TypeName="LCAToolDevModel.UnitGroup">
+              <MappingFragment StoreEntitySet="UnitGroup">
+                <ScalarProperty Name="UnitGroupID" ColumnName="UnitGroupID" />
+                <ScalarProperty Name="UnitGroupUUID" ColumnName="UnitGroupUUID" />
+                <ScalarProperty Name="Version" ColumnName="Version" />
+                <ScalarProperty Name="UnitGroup1" ColumnName="UnitGroup" />
+                <ScalarProperty Name="ReferenceUnit" ColumnName="ReferenceUnit" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <FunctionImportMapping FunctionImportName="sp_alterdiagram" FunctionName="LCAToolDevModel.Store.sp_alterdiagram" />
+          <FunctionImportMapping FunctionImportName="sp_creatediagram" FunctionName="LCAToolDevModel.Store.sp_creatediagram" />
+          <FunctionImportMapping FunctionImportName="sp_dropdiagram" FunctionName="LCAToolDevModel.Store.sp_dropdiagram" />
+          <FunctionImportMapping FunctionImportName="sp_helpdiagramdefinition" FunctionName="LCAToolDevModel.Store.sp_helpdiagramdefinition">
+            <ResultMapping>
+              <ComplexTypeMapping TypeName="LCAToolDevModel.sp_helpdiagramdefinition_Result">
+                <ScalarProperty Name="version" ColumnName="version" />
+                <ScalarProperty Name="definition" ColumnName="definition" />
+              </ComplexTypeMapping>
+            </ResultMapping>
+          </FunctionImportMapping>
+          <FunctionImportMapping FunctionImportName="sp_helpdiagrams" FunctionName="LCAToolDevModel.Store.sp_helpdiagrams">
+            <ResultMapping>
+              <ComplexTypeMapping TypeName="LCAToolDevModel.sp_helpdiagrams_Result">
+                <ScalarProperty Name="Database" ColumnName="Database" />
+                <ScalarProperty Name="Name" ColumnName="Name" />
+                <ScalarProperty Name="ID" ColumnName="ID" />
+                <ScalarProperty Name="Owner" ColumnName="Owner" />
+                <ScalarProperty Name="OwnerID" ColumnName="OwnerID" />
+              </ComplexTypeMapping>
+            </ResultMapping>
+          </FunctionImportMapping>
+          <FunctionImportMapping FunctionImportName="sp_renamediagram" FunctionName="LCAToolDevModel.Store.sp_renamediagram" />
+          <FunctionImportMapping FunctionImportName="sp_upgraddiagrams" FunctionName="LCAToolDevModel.Store.sp_upgraddiagrams" />
+        </EntityContainerMapping>
+      </Mapping>
+    </edmx:Mappings>
+  </edmx:Runtime>
+  <!-- EF Designer content (DO NOT EDIT MANUALLY BELOW HERE) -->
+  <Designer xmlns="http://schemas.microsoft.com/ado/2009/11/edmx">
+    <Connection>
+      <DesignerInfoPropertySet>
+        <DesignerProperty Name="MetadataArtifactProcessing" Value="EmbedInOutputAssembly" />
+      </DesignerInfoPropertySet>
+    </Connection>
+    <Options>
+      <DesignerInfoPropertySet>
+        <DesignerProperty Name="ValidateOnBuild" Value="true" />
+        <DesignerProperty Name="EnablePluralization" Value="true" />
+        <DesignerProperty Name="IncludeForeignKeysInModel" Value="true" />
+        <DesignerProperty Name="UseLegacyProvider" Value="false" />
+        <DesignerProperty Name="CodeGenerationStrategy" Value="None" />
+      </DesignerInfoPropertySet>
+    </Options>
+    <!-- Diagram content (shape and connector positions) -->
+    <Diagrams></Diagrams>
+  </Designer>
+</edmx:Edmx>
