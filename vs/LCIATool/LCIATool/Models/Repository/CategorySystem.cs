@@ -25,6 +25,7 @@ namespace LCIATool.Models.Repository
         public string URI { get; set; }
         public Nullable<int> CategorySystemDataTypeID { get; set; }
         public string Delimeter { get; set; }
+        public string DataType_SQL { get; set; }
     
         public virtual ICollection<Category> Categories { get; set; }
         public virtual ICollection<Classification> Classifications { get; set; }

@@ -22,11 +22,11 @@ namespace LCIATool.Models.Repository
         }
     
         public int FlowPropertyID { get; set; }
-        public Nullable<int> FlowPropertyUUID { get; set; }
-        public Nullable<int> FlowPropertyVersion { get; set; }
+        public string FlowPropertyUUID { get; set; }
+        public string FlowPropertyVersion { get; set; }
         public string FlowProperty1 { get; set; }
-        public string Units { get; set; }
         public Nullable<int> FlowPropertyUnitGroupID { get; set; }
+        public string UnitGroup_SQL { get; set; }
     
         public virtual ICollection<Flow> Flows { get; set; }
         public virtual UnitGroup UnitGroup { get; set; }

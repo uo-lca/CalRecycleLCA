@@ -15,11 +15,10 @@ namespace LCIATool.Models.Repository
     public partial class UnitConversion
     {
         public int UnitConversionID { get; set; }
-        public Nullable<int> UnitConversionUUID { get; set; }
+        public string UnitConversionUUID { get; set; }
         public string Unit { get; set; }
         public Nullable<int> UnitConversionUnitGroupID { get; set; }
         public Nullable<double> Conversion { get; set; }
-    
-        public virtual UnitGroup UnitGroup { get; set; }
+        public Nullable<int> Ind_sql { get; set; }
     }
 }

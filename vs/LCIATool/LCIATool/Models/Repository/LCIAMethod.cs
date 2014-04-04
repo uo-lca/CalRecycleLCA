@@ -20,15 +20,15 @@ namespace LCIATool.Models.Repository
         }
     
         public int LCIAMethodID { get; set; }
-        public Nullable<int> LCIAMethodUUID { get; set; }
-        public Nullable<int> LCIAMethodVersion { get; set; }
+        public string LCIAMethodUUID { get; set; }
+        public string LCIAMethodVersion { get; set; }
         public string LCIAMethod1 { get; set; }
         public string Methodology { get; set; }
         public string ImpactCategory { get; set; }
         public string ImpactIndicator { get; set; }
         public string ReferenceYear { get; set; }
         public string Duration { get; set; }
-        public System.Data.Entity.Spatial.DbGeography ImpactLocation { get; set; }
+        public string ImpactLocation { get; set; }
         public string IndicatorType { get; set; }
         public Nullable<bool> Normalization { get; set; }
         public Nullable<bool> Weighting { get; set; }

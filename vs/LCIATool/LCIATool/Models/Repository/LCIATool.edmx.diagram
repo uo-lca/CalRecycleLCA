@@ -4,36 +4,37 @@
   <edmx:Designer xmlns="http://schemas.microsoft.com/ado/2009/11/edmx">
     <!-- Diagram content (shape and connector positions) -->
     <edmx:Diagrams>
-      <Diagram DiagramId="9442c5943a6a4297b7d57bd46018ad5c" Name="Diagram1">
-        <EntityTypeShape EntityType="LCAToolDevModel.Category" Width="1.5" PointX="8.5" PointY="11.75" IsExpanded="true" />
-        <EntityTypeShape EntityType="LCAToolDevModel.CategorySystem" Width="1.5" PointX="9.25" PointY="8.625" IsExpanded="true" />
-        <EntityTypeShape EntityType="LCAToolDevModel.Class" Width="1.5" PointX="10.75" PointY="12" IsExpanded="true" />
-        <EntityTypeShape EntityType="LCAToolDevModel.Classification" Width="1.5" PointX="12" PointY="9" IsExpanded="true" />
-        <EntityTypeShape EntityType="LCAToolDevModel.DataType" Width="1.5" PointX="0.75" PointY="0.75" IsExpanded="true" />
-        <EntityTypeShape EntityType="LCAToolDevModel.Direction" Width="1.5" PointX="6.875" PointY="0.875" IsExpanded="true" />
-        <EntityTypeShape EntityType="LCAToolDevModel.Flow" Width="1.5" PointX="9.5" PointY="3" IsExpanded="true" />
-        <EntityTypeShape EntityType="LCAToolDevModel.FlowProperty" Width="1.5" PointX="5" PointY="3.625" IsExpanded="true" />
-        <EntityTypeShape EntityType="LCAToolDevModel.FlowPropertyVersion" Width="1.5" PointX="12.25" PointY="3" IsExpanded="true" />
-        <EntityTypeShape EntityType="LCAToolDevModel.FlowType" Width="1.5" PointX="0.75" PointY="2.625" IsExpanded="true" />
-        <EntityTypeShape EntityType="LCAToolDevModel.Indicator" Width="1.5" PointX="2.75" PointY="0.75" IsExpanded="true" />
-        <EntityTypeShape EntityType="LCAToolDevModel.LCIA" Width="1.5" PointX="12.125" PointY="6.125" IsExpanded="true" />
-        <EntityTypeShape EntityType="LCAToolDevModel.LCIAMethod" Width="1.5" PointX="0.5" PointY="5" IsExpanded="true" />
-        <EntityTypeShape EntityType="LCAToolDevModel.MasterLCAModel" Width="1.5" PointX="4.75" PointY="0.75" IsExpanded="true" />
-        <EntityTypeShape EntityType="LCAToolDevModel.Process" Width="1.5" PointX="6.5" PointY="8.5" IsExpanded="true" />
-        <EntityTypeShape EntityType="LCAToolDevModel.ProcessFlow" Width="1.5" PointX="6.875" PointY="3" IsExpanded="true" />
-        <EntityTypeShape EntityType="LCAToolDevModel.Source" Width="1.5" PointX="2.875" PointY="2.625" IsExpanded="true" />
-        <EntityTypeShape EntityType="LCAToolDevModel.UnitConversion" Width="1.5" PointX="0.5" PointY="10.125" IsExpanded="true" />
-        <EntityTypeShape EntityType="LCAToolDevModel.UnitGroup" Width="1.5" PointX="3.125" PointY="8.625" IsExpanded="true" />
+      <Diagram DiagramId="2823142954b142b7845ad472fdeb3513" Name="Diagram1">
+        <EntityTypeShape EntityType="LCAToolDevModel.Category" Width="1.5" PointX="15" PointY="14.75" IsExpanded="true" />
+        <EntityTypeShape EntityType="LCAToolDevModel.CategorySystem" Width="1.5" PointX="12.75" PointY="15.25" IsExpanded="true" />
+        <EntityTypeShape EntityType="LCAToolDevModel.Class" Width="1.5" PointX="12.75" PointY="19.375" IsExpanded="true" />
+        <EntityTypeShape EntityType="LCAToolDevModel.Classification" Width="1.5" PointX="18" PointY="15.25" IsExpanded="true" />
+        <EntityTypeShape EntityType="LCAToolDevModel.DataProvider" Width="1.5" PointX="0.75" PointY="0.75" IsExpanded="true" />
+        <EntityTypeShape EntityType="LCAToolDevModel.DataType" Width="1.5" PointX="2.75" PointY="0.75" IsExpanded="true" />
+        <EntityTypeShape EntityType="LCAToolDevModel.Direction" Width="1.5" PointX="11.25" PointY="5.75" IsExpanded="true" />
+        <EntityTypeShape EntityType="LCAToolDevModel.Flow" Width="1.5" PointX="1.25" PointY="3.25" IsExpanded="true" />
+        <EntityTypeShape EntityType="LCAToolDevModel.FlowProperty" Width="1.5" PointX="3" PointY="8.875" IsExpanded="true" />
+        <EntityTypeShape EntityType="LCAToolDevModel.FlowPropertyVersion" Width="1.5" PointX="10.5" PointY="8.75" IsExpanded="true" />
+        <EntityTypeShape EntityType="LCAToolDevModel.FlowType" Width="1.5" PointX="3" PointY="5.5" IsExpanded="true" />
+        <EntityTypeShape EntityType="LCAToolDevModel.LCIA" Width="1.5" PointX="13.5" PointY="8.75" IsExpanded="true" />
+        <EntityTypeShape EntityType="LCAToolDevModel.LCIAMethod" Width="1.5" PointX="8.25" PointY="8" IsExpanded="true" />
+        <EntityTypeShape EntityType="LCAToolDevModel.Process" Width="1.5" PointX="7.5" PointY="16.375" IsExpanded="true" />
+        <EntityTypeShape EntityType="LCAToolDevModel.ProcessFlow" Width="1.5" PointX="10.75" PointY="13" IsExpanded="true" />
+        <EntityTypeShape EntityType="LCAToolDevModel.Source" Width="1.5" PointX="6" PointY="4" IsExpanded="true" />
+        <EntityTypeShape EntityType="LCAToolDevModel.sysdiagram" Width="1.5" PointX="4.75" PointY="0.75" IsExpanded="true" />
+        <EntityTypeShape EntityType="LCAToolDevModel.UnitConversion" Width="1.5" PointX="6.75" PointY="0.75" IsExpanded="true" />
+        <EntityTypeShape EntityType="LCAToolDevModel.UnitGroup" Width="1.5" PointX="0.75" PointY="9.25" IsExpanded="true" />
         <AssociationConnector Association="LCAToolDevModel.FK_Category_CategorySystem" ManuallyRouted="false" />
         <AssociationConnector Association="LCAToolDevModel.FK_Category_Class" ManuallyRouted="false" />
-        <AssociationConnector Association="LCAToolDevModel.FK_Classifications_CategorySystem" ManuallyRouted="false" />
-        <AssociationConnector Association="LCAToolDevModel.FK_Classifications_Class" ManuallyRouted="false" />
+        <AssociationConnector Association="LCAToolDevModel.FK_Classification_CategorySystem" ManuallyRouted="false" />
+        <AssociationConnector Association="LCAToolDevModel.FK_Classification_Class" ManuallyRouted="false" />
         <AssociationConnector Association="LCAToolDevModel.FK_LCIA_Direction" ManuallyRouted="false" />
         <AssociationConnector Association="LCAToolDevModel.FK_ProcessFlow_Direction" ManuallyRouted="false" />
         <AssociationConnector Association="LCAToolDevModel.FK_Flow_FlowProperty" ManuallyRouted="false" />
         <AssociationConnector Association="LCAToolDevModel.FK_Flow_FlowType" ManuallyRouted="false" />
         <AssociationConnector Association="LCAToolDevModel.FK_FlowPropertyVersion_Flow" ManuallyRouted="false" />
-        <AssociationConnector Association="LCAToolDevModel.FK_LCIA_Flow1" ManuallyRouted="false" />
+        <AssociationConnector Association="LCAToolDevModel.FK_LCIA_Flow" ManuallyRouted="false" />
+        <AssociationConnector Association="LCAToolDevModel.FK_Process_Flow" ManuallyRouted="false" />
         <AssociationConnector Association="LCAToolDevModel.FK_ProcessFlow_Flow" ManuallyRouted="false" />
         <AssociationConnector Association="LCAToolDevModel.FK_FlowProperty_UnitGroup" ManuallyRouted="false" />
         <AssociationConnector Association="LCAToolDevModel.FK_FlowPropertyVersion_FlowProperty" ManuallyRouted="false" />
@@ -41,7 +42,6 @@
         <AssociationConnector Association="LCAToolDevModel.FK_LCIA_LCIAMethod" ManuallyRouted="false" />
         <AssociationConnector Association="LCAToolDevModel.FK_LCIAMethod_Source" ManuallyRouted="false" />
         <AssociationConnector Association="LCAToolDevModel.FK_ProcessFlow_Process" ManuallyRouted="false" />
-        <AssociationConnector Association="LCAToolDevModel.FK_UnitConversion_UnitGroup" ManuallyRouted="false" />
       </Diagram>
     </edmx:Diagrams>
   </edmx:Designer>

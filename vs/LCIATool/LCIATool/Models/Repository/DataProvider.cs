@@ -10,13 +10,12 @@
 namespace LCIATool.Models.Repository
 {
     using System;
+    using System.Collections.Generic;
     
-    public partial class sp_helpdiagrams_Result
+    public partial class DataProvider
     {
-        public string Database { get; set; }
-        public string Name { get; set; }
-        public int ID { get; set; }
-        public string Owner { get; set; }
-        public int OwnerID { get; set; }
+        public int DataProviderID { get; set; }
+        public string DataProviderUUID { get; set; }
+        public string DataProviderName { get; set; }
     }
 }

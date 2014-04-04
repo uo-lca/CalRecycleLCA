@@ -92,9 +92,17 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="Global.asax" />
+    <Content Include="Pages\LCIAComputation.aspx" />
     <Content Include="Web.config" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Global.asax.cs">
+      <DependentUpon>Global.asax</DependentUpon>
+    </Compile>
+    <Compile Include="Models\LCIA.cs" />
+    <Compile Include="Models\LCIAMethod.cs" />
+    <Compile Include="Models\Process.cs" />
+    <Compile Include="Models\ProcessFlow.cs" />
     <Compile Include="Models\Repository\Category.cs">
       <DependentUpon>LCIATool.tt</DependentUpon>
     </Compile>
@@ -107,12 +115,16 @@
     <Compile Include="Models\Repository\Classification.cs">
       <DependentUpon>LCIATool.tt</DependentUpon>
     </Compile>
+    <Compile Include="Models\Repository\DataProvider.cs">
+      <DependentUpon>LCIATool.tt</DependentUpon>
+    </Compile>
     <Compile Include="Models\Repository\DataType.cs">
       <DependentUpon>LCIATool.tt</DependentUpon>
     </Compile>
     <Compile Include="Models\Repository\Direction.cs">
       <DependentUpon>LCIATool.tt</DependentUpon>
     </Compile>
+    <Compile Include="Models\Repository\EFDbContext.cs" />
     <Compile Include="Models\Repository\Flow.cs">
       <DependentUpon>LCIATool.tt</DependentUpon>
     </Compile>
@@ -123,12 +135,6 @@
       <DependentUpon>LCIATool.tt</DependentUpon>
     </Compile>
     <Compile Include="Models\Repository\FlowType.cs">
-      <DependentUpon>LCIATool.tt</DependentUpon>
-    </Compile>
-    <Compile Include="Global.asax.cs">
-      <DependentUpon>Global.asax</DependentUpon>
-    </Compile>
-    <Compile Include="Models\Repository\Indicator.cs">
       <DependentUpon>LCIATool.tt</DependentUpon>
     </Compile>
     <Compile Include="Models\Repository\LCIA.cs">
@@ -152,29 +158,14 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>LCIATool.edmx</DependentUpon>
     </Compile>
-    <Compile Include="Models\Repository\MasterLCAModel.cs">
-      <DependentUpon>LCIATool.tt</DependentUpon>
-    </Compile>
-    <Compile Include="Models\LCIA.cs" />
-    <Compile Include="Models\LCIAMethod.cs" />
-    <Compile Include="Models\Process.cs" />
-    <Compile Include="Models\ProcessFlow.cs" />
-    <Compile Include="Models\Repository\EFDbContext.cs" />
-    <Compile Include="Models\Repository\Repository.cs" />
     <Compile Include="Models\Repository\Process.cs">
       <DependentUpon>LCIATool.tt</DependentUpon>
     </Compile>
     <Compile Include="Models\Repository\ProcessFlow.cs">
       <DependentUpon>LCIATool.tt</DependentUpon>
     </Compile>
-    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Models\Repository\Repository.cs" />
     <Compile Include="Models\Repository\Source.cs">
-      <DependentUpon>LCIATool.tt</DependentUpon>
-    </Compile>
-    <Compile Include="Models\Repository\sp_helpdiagramdefinition_Result.cs">
-      <DependentUpon>LCIATool.tt</DependentUpon>
-    </Compile>
-    <Compile Include="Models\Repository\sp_helpdiagrams_Result.cs">
       <DependentUpon>LCIATool.tt</DependentUpon>
     </Compile>
     <Compile Include="Models\Repository\sysdiagram.cs">
@@ -186,6 +177,14 @@
     <Compile Include="Models\Repository\UnitGroup.cs">
       <DependentUpon>LCIATool.tt</DependentUpon>
     </Compile>
+    <Compile Include="Pages\LCIAComputation.aspx.cs">
+      <DependentUpon>LCIAComputation.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Pages\LCIAComputation.aspx.designer.cs">
+      <DependentUpon>LCIAComputation.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

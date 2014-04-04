@@ -20,16 +20,18 @@ namespace LCIATool.Models.Repository
         }
     
         public int ProcessID { get; set; }
-        public Nullable<int> ProcessUUID { get; set; }
-        public Nullable<int> ProcessVersion { get; set; }
+        public string ProcessUUID { get; set; }
+        public string ProcessVersion { get; set; }
         public string Process1 { get; set; }
-        public Nullable<System.DateTime> Year { get; set; }
-        public System.Data.Entity.Spatial.DbGeography Geography { get; set; }
-        public Nullable<int> ReferenceFlow { get; set; }
+        public string Year { get; set; }
+        public string Geography { get; set; }
+        public string ReferenceFlow_SQL { get; set; }
         public string RefererenceType { get; set; }
         public string ProcessType { get; set; }
         public string Diagram { get; set; }
+        public Nullable<int> ProcessFlowID { get; set; }
     
+        public virtual Flow Flow { get; set; }
         public virtual ICollection<ProcessFlow> ProcessFlows { get; set; }
     }
 }

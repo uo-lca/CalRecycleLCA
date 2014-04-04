@@ -20,8 +20,8 @@ namespace LCIATool.Models.Repository
         }
     
         public int SourceID { get; set; }
-        public Nullable<int> SourceUUID { get; set; }
-        public Nullable<int> Version { get; set; }
+        public string SourceUUID { get; set; }
+        public string SourceVersion { get; set; }
         public string Source1 { get; set; }
         public string Citation { get; set; }
         public string PubType { get; set; }

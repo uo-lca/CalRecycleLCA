@@ -16,9 +16,12 @@ namespace LCIATool.Models.Repository
     {
         public int LCIAID { get; set; }
         public Nullable<int> LCIAMethodID { get; set; }
+        public string LCIAUUID { get; set; }
         public Nullable<int> LCIAFlowID { get; set; }
         public Nullable<int> LCIADirectionID { get; set; }
         public Nullable<double> Factor { get; set; }
+        public string Flow_SQL { get; set; }
+        public string Direction_SQL { get; set; }
     
         public virtual Direction Direction { get; set; }
         public virtual Flow Flow { get; set; }

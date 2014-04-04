@@ -12,5 +12,6 @@ namespace LCIATool.Models.Repository
         public DbSet<LCIAMethod> LCIAMethods { get; set; }
         public DbSet<Process> Processes { get; set; }
         public DbSet<ProcessFlow> ProcessFlows { get; set; }
+        public DbSet<Flow> Flow { get; set; }
     }
 }

@@ -6,11 +6,11 @@ namespace LCIATool.Models.Repository
 {
     public class Repository
     {
-        private LCAToolDevEntities context = new LCAToolDevEntities();
+        private LCAToolDevEntities2 context = new LCAToolDevEntities2();
 
         public IEnumerable<LCIA> LCIAs
         {
-            get { return context.LCIAs;  }
+            get { return context.LCIAs; }
         }
 
         public IEnumerable<LCIAMethod> LCIAMethods
@@ -25,6 +25,11 @@ namespace LCIATool.Models.Repository
         public IEnumerable<ProcessFlow> ProcessFlows
         {
             get { return context.ProcessFlows; }
+        }
+
+        public IEnumerable<Flow> Flows
+        {
+            get { return context.Flows; }
         }
     }
 }

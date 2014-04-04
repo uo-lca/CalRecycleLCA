@@ -20,8 +20,10 @@ namespace LCIATool.Models.Repository
             this.Classifications = new HashSet<Classification>();
         }
     
-        public int ClassID { get; set; }
+        public int ID { get; set; }
+        public string ClassID { get; set; }
         public string ClassName { get; set; }
+        public Nullable<int> CategorySystemID_SQL { get; set; }
     
         public virtual ICollection<Category> Categories { get; set; }
         public virtual ICollection<Classification> Classifications { get; set; }

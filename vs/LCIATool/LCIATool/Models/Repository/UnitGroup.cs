@@ -17,16 +17,14 @@ namespace LCIATool.Models.Repository
         public UnitGroup()
         {
             this.FlowProperties = new HashSet<FlowProperty>();
-            this.UnitConversions = new HashSet<UnitConversion>();
         }
     
         public int UnitGroupID { get; set; }
-        public Nullable<int> UnitGroupUUID { get; set; }
-        public Nullable<int> Version { get; set; }
+        public string UnitGroupUUID { get; set; }
+        public string Version { get; set; }
         public string UnitGroup1 { get; set; }
         public string ReferenceUnit { get; set; }
     
         public virtual ICollection<FlowProperty> FlowProperties { get; set; }
-        public virtual ICollection<UnitConversion> UnitConversions { get; set; }
     }
 }
