@@ -18,10 +18,16 @@ namespace LCIATool.Pages
                              join f in context.Flows on pf.ProcessFlowFlowID equals f.FlowID
                              join l in context.LCIAs on f.FlowID equals l.LCIAFlowID
                              join lm in context.LCIAMethods on l.LCIAMethodID equals lm.LCIAMethodID
+                             join ft in context.FlowTypes on f.FlowTypeID equals ft.FlowTypeID
                              join fp in context.FlowProperties on f.FlowPropertyID equals fp.FlowPropertyID
                              where f.FlowTypeID == 2
                              select new
                              {
+                                 p.ProcessUUID,
+                                 f.FlowUUID,
+                                 lm.LCIAMethodUUID,
+                                 LCIAMethod = lm.LCIAMethod1,
+                                 FlowType = ft.FlowType1,
                                  pf.Result,
                                  l.Factor,
                                  LCIAResult = pf.Result * l.Factor
