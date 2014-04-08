@@ -35,17 +35,6 @@ namespace LCIATool.Pages
             gvLCIAComp.DataSource = _lciaList.ToList();
             gvLCIAComp.DataBind();
 
-            //var _lciaList = (from p in context.Processes
-            //                 where p.ProcessID == p.ProcessFlows.
-            //                 select new PersonInfo
-            //                 {
-            //                     Name = p.FirstName + " " + p.LastName,
-            //                     BornIn = p.BornInCity.Name,
-            //                     LivesIn = p.LivesInCity.Name,
-            //                     Gender = p.Sex.Name,
-            //                     CarsOwnedCount = p.Cars.Count(),
-            //                 });
-
         }
     }
 }
