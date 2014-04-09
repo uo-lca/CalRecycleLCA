@@ -1,0 +1,175 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<edmx:Edmx Version="3.0" xmlns:edmx="http://schemas.microsoft.com/ado/2009/11/edmx">
+  <!-- EF Runtime content -->
+  <edmx:Runtime>
+    <!-- SSDL content -->
+    <edmx:StorageModels>
+    <Schema Namespace="ILCD_matlabModel.Store" Provider="System.Data.SqlClient" ProviderManifestToken="2012" Alias="Self" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" xmlns="http://schemas.microsoft.com/ado/2009/11/edm/ssdl">
+        <EntityType Name="LCIA-DUPE">
+          <Key>
+            <PropertyRef Name="Ind" />
+          </Key>
+          <Property Name="Ind" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="UUID" Type="char" MaxLength="36" Nullable="false" />
+          <Property Name="Flow" Type="char" MaxLength="36" Nullable="false" />
+          <Property Name="Direction" Type="varchar" MaxLength="15" Nullable="false" />
+          <Property Name="Factor" Type="real" Nullable="false" />
+        </EntityType>
+        <EntityType Name="LCIAMethod-DUPE">
+          <Key>
+            <PropertyRef Name="UUID" />
+          </Key>
+          <Property Name="UUID" Type="char" MaxLength="36" Nullable="false" />
+          <Property Name="Version" Type="varchar" MaxLength="15" />
+          <Property Name="LCIAMethod" Type="varchar" MaxLength="255" Nullable="false" />
+          <Property Name="Methodology" Type="varchar" MaxLength="60" />
+          <Property Name="ImpactCategory" Type="varchar" MaxLength="255" />
+          <Property Name="ImpactIndicator" Type="varchar" MaxLength="255" />
+          <Property Name="ReferenceYear" Type="varchar" MaxLength="60" />
+          <Property Name="Duration" Type="varchar" MaxLength="60" />
+          <Property Name="ImpactLocation" Type="varchar" MaxLength="60" />
+          <Property Name="IndicatorType" Type="varchar" MaxLength="60" />
+          <Property Name="Normalization" Type="bit" Nullable="false" />
+          <Property Name="Weighting" Type="bit" Nullable="false" />
+          <Property Name="UseAdvice" Type="varchar" MaxLength="255" />
+          <Property Name="Source" Type="varchar" MaxLength="255" />
+          <Property Name="ReferenceQuantity" Type="varchar" MaxLength="255" />
+        </EntityType>
+        <Association Name="FK_LCIA-DUPE_LCIAMethod-DUPE">
+          <End Role="LCIAMethod-DUPE" Type="Self.LCIAMethod-DUPE" Multiplicity="1" />
+          <End Role="LCIA-DUPE" Type="Self.LCIA-DUPE" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="LCIAMethod-DUPE">
+              <PropertyRef Name="UUID" />
+            </Principal>
+            <Dependent Role="LCIA-DUPE">
+              <PropertyRef Name="UUID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <EntityContainer Name="ILCD_matlabModelStoreContainer">
+          <EntitySet Name="LCIA-DUPE" EntityType="Self.LCIA-DUPE" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="LCIAMethod-DUPE" EntityType="Self.LCIAMethod-DUPE" Schema="dbo" store:Type="Tables" />
+          <AssociationSet Name="FK_LCIA-DUPE_LCIAMethod-DUPE" Association="Self.FK_LCIA-DUPE_LCIAMethod-DUPE">
+            <End Role="LCIAMethod-DUPE" EntitySet="LCIAMethod-DUPE" />
+            <End Role="LCIA-DUPE" EntitySet="LCIA-DUPE" />
+          </AssociationSet>
+        </EntityContainer>
+      </Schema></edmx:StorageModels>
+    <!-- CSDL content -->
+    <edmx:ConceptualModels>
+      <Schema Namespace="ILCD_matlabModel" Alias="Self" annotation:UseStrongSpatialTypes="false" xmlns:annotation="http://schemas.microsoft.com/ado/2009/02/edm/annotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm">
+        <EntityContainer Name="ILCD_matlab_Entities" annotation:LazyLoadingEnabled="true">
+          <EntitySet Name="LCIA_DUPE" EntityType="ILCD_matlabModel.LCIA_DUPE" />
+          <EntitySet Name="LCIAMethod_DUPE" EntityType="ILCD_matlabModel.LCIAMethod_DUPE" />
+          <AssociationSet Name="FK_LCIA_DUPE_LCIAMethod_DUPE" Association="ILCD_matlabModel.FK_LCIA_DUPE_LCIAMethod_DUPE">
+            <End Role="LCIAMethod_DUPE" EntitySet="LCIAMethod_DUPE" />
+            <End Role="LCIA_DUPE" EntitySet="LCIA_DUPE" />
+          </AssociationSet>
+        </EntityContainer>
+        <EntityType Name="LCIA_DUPE">
+          <Key>
+            <PropertyRef Name="Ind" />
+          </Key>
+          <Property Name="Ind" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="UUID" Type="String" Nullable="false" MaxLength="36" FixedLength="true" Unicode="false" />
+          <Property Name="Flow" Type="String" Nullable="false" MaxLength="36" FixedLength="true" Unicode="false" />
+          <Property Name="Direction" Type="String" Nullable="false" MaxLength="15" FixedLength="false" Unicode="false" />
+          <Property Name="Factor" Type="Single" Nullable="false" />
+          <NavigationProperty Name="LCIAMethod_DUPE" Relationship="ILCD_matlabModel.FK_LCIA_DUPE_LCIAMethod_DUPE" FromRole="LCIA_DUPE" ToRole="LCIAMethod_DUPE" />
+        </EntityType>
+        <EntityType Name="LCIAMethod_DUPE">
+          <Key>
+            <PropertyRef Name="UUID" />
+          </Key>
+          <Property Name="UUID" Type="String" Nullable="false" MaxLength="36" FixedLength="true" Unicode="false" />
+          <Property Name="Version" Type="String" MaxLength="15" FixedLength="false" Unicode="false" />
+          <Property Name="LCIAMethod" Type="String" Nullable="false" MaxLength="255" FixedLength="false" Unicode="false" />
+          <Property Name="Methodology" Type="String" MaxLength="60" FixedLength="false" Unicode="false" />
+          <Property Name="ImpactCategory" Type="String" MaxLength="255" FixedLength="false" Unicode="false" />
+          <Property Name="ImpactIndicator" Type="String" MaxLength="255" FixedLength="false" Unicode="false" />
+          <Property Name="ReferenceYear" Type="String" MaxLength="60" FixedLength="false" Unicode="false" />
+          <Property Name="Duration" Type="String" MaxLength="60" FixedLength="false" Unicode="false" />
+          <Property Name="ImpactLocation" Type="String" MaxLength="60" FixedLength="false" Unicode="false" />
+          <Property Name="IndicatorType" Type="String" MaxLength="60" FixedLength="false" Unicode="false" />
+          <Property Name="Normalization" Type="Boolean" Nullable="false" />
+          <Property Name="Weighting" Type="Boolean" Nullable="false" />
+          <Property Name="UseAdvice" Type="String" MaxLength="255" FixedLength="false" Unicode="false" />
+          <Property Name="Source" Type="String" MaxLength="255" FixedLength="false" Unicode="false" />
+          <Property Name="ReferenceQuantity" Type="String" MaxLength="255" FixedLength="false" Unicode="false" />
+          <NavigationProperty Name="LCIA_DUPE" Relationship="ILCD_matlabModel.FK_LCIA_DUPE_LCIAMethod_DUPE" FromRole="LCIAMethod_DUPE" ToRole="LCIA_DUPE" />
+        </EntityType>
+        <Association Name="FK_LCIA_DUPE_LCIAMethod_DUPE">
+          <End Type="ILCD_matlabModel.LCIAMethod_DUPE" Role="LCIAMethod_DUPE" Multiplicity="1" />
+          <End Type="ILCD_matlabModel.LCIA_DUPE" Role="LCIA_DUPE" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="LCIAMethod_DUPE">
+              <PropertyRef Name="UUID" />
+            </Principal>
+            <Dependent Role="LCIA_DUPE">
+              <PropertyRef Name="UUID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+      </Schema>
+    </edmx:ConceptualModels>
+    <!-- C-S mapping content -->
+    <edmx:Mappings>
+      <Mapping Space="C-S" xmlns="http://schemas.microsoft.com/ado/2009/11/mapping/cs">
+        <EntityContainerMapping StorageEntityContainer="ILCD_matlabModelStoreContainer" CdmEntityContainer="ILCD_matlab_Entities">
+          <EntitySetMapping Name="LCIA_DUPE">
+            <EntityTypeMapping TypeName="ILCD_matlabModel.LCIA_DUPE">
+              <MappingFragment StoreEntitySet="LCIA-DUPE">
+                <ScalarProperty Name="Factor" ColumnName="Factor" />
+                <ScalarProperty Name="Direction" ColumnName="Direction" />
+                <ScalarProperty Name="Flow" ColumnName="Flow" />
+                <ScalarProperty Name="UUID" ColumnName="UUID" />
+                <ScalarProperty Name="Ind" ColumnName="Ind" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="LCIAMethod_DUPE">
+            <EntityTypeMapping TypeName="ILCD_matlabModel.LCIAMethod_DUPE">
+              <MappingFragment StoreEntitySet="LCIAMethod-DUPE">
+                <ScalarProperty Name="ReferenceQuantity" ColumnName="ReferenceQuantity" />
+                <ScalarProperty Name="Source" ColumnName="Source" />
+                <ScalarProperty Name="UseAdvice" ColumnName="UseAdvice" />
+                <ScalarProperty Name="Weighting" ColumnName="Weighting" />
+                <ScalarProperty Name="Normalization" ColumnName="Normalization" />
+                <ScalarProperty Name="IndicatorType" ColumnName="IndicatorType" />
+                <ScalarProperty Name="ImpactLocation" ColumnName="ImpactLocation" />
+                <ScalarProperty Name="Duration" ColumnName="Duration" />
+                <ScalarProperty Name="ReferenceYear" ColumnName="ReferenceYear" />
+                <ScalarProperty Name="ImpactIndicator" ColumnName="ImpactIndicator" />
+                <ScalarProperty Name="ImpactCategory" ColumnName="ImpactCategory" />
+                <ScalarProperty Name="Methodology" ColumnName="Methodology" />
+                <ScalarProperty Name="LCIAMethod" ColumnName="LCIAMethod" />
+                <ScalarProperty Name="Version" ColumnName="Version" />
+                <ScalarProperty Name="UUID" ColumnName="UUID" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+        </EntityContainerMapping>
+      </Mapping>
+    </edmx:Mappings>
+  </edmx:Runtime>
+  <!-- EF Designer content (DO NOT EDIT MANUALLY BELOW HERE) -->
+  <Designer xmlns="http://schemas.microsoft.com/ado/2009/11/edmx">
+    <Connection>
+      <DesignerInfoPropertySet>
+        <DesignerProperty Name="MetadataArtifactProcessing" Value="EmbedInOutputAssembly" />
+      </DesignerInfoPropertySet>
+    </Connection>
+    <Options>
+      <DesignerInfoPropertySet>
+        <DesignerProperty Name="ValidateOnBuild" Value="true" />
+        <DesignerProperty Name="EnablePluralization" Value="true" />
+        <DesignerProperty Name="IncludeForeignKeysInModel" Value="true" />
+        <DesignerProperty Name="UseLegacyProvider" Value="false" />
+        <DesignerProperty Name="CodeGenerationStrategy" Value="None" />
+      </DesignerInfoPropertySet>
+    </Options>
+    <!-- Diagram content (shape and connector positions) -->
+    <Diagrams></Diagrams>
+  </Designer>
+</edmx:Edmx>
