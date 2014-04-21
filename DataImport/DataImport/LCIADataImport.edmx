@@ -1,0 +1,567 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<edmx:Edmx Version="3.0" xmlns:edmx="http://schemas.microsoft.com/ado/2009/11/edmx">
+  <!-- EF Runtime content -->
+  <edmx:Runtime>
+    <!-- SSDL content -->
+    <edmx:StorageModels>
+    <Schema Namespace="LCAToolDevModel.Store" Provider="System.Data.SqlClient" ProviderManifestToken="2012" Alias="Self" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" xmlns="http://schemas.microsoft.com/ado/2009/11/edm/ssdl">
+        <EntityType Name="Direction">
+          <Key>
+            <PropertyRef Name="DirectionID" />
+          </Key>
+          <Property Name="DirectionID" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="Direction" Type="varchar" MaxLength="100" />
+        </EntityType>
+        <EntityType Name="Flow">
+          <Key>
+            <PropertyRef Name="FlowID" />
+          </Key>
+          <Property Name="FlowID" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="FlowUUID" Type="char" MaxLength="36" />
+          <Property Name="FlowVersion" Type="varchar" MaxLength="15" />
+          <Property Name="Flow" Type="varchar" MaxLength="255" />
+          <Property Name="CASNumber" Type="char" MaxLength="15" />
+          <Property Name="FlowPropertyID" Type="int" />
+          <Property Name="FlowTypeID" Type="int" />
+          <Property Name="FlowMass" Type="real" />
+          <Property Name="FlowMassChg" Type="int" />
+          <Property Name="FlowType-SQL" Type="varchar" MaxLength="200" />
+          <Property Name="ReferenceFlowProperty-SQL" Type="varchar" MaxLength="36" />
+        </EntityType>
+        <EntityType Name="LCIA">
+          <Key>
+            <PropertyRef Name="LCIAID" />
+          </Key>
+          <Property Name="LCIAID" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="LCIAMethodID" Type="int" />
+          <Property Name="LCIAUUID" Type="char" MaxLength="36" />
+          <Property Name="LCIAFlowID" Type="int" />
+          <Property Name="LCIADirectionID" Type="int" />
+          <Property Name="Factor" Type="float" />
+          <Property Name="Flow-SQL" Type="varchar" MaxLength="36" />
+          <Property Name="Direction-SQL" Type="varchar" MaxLength="100" />
+        </EntityType>
+        <EntityType Name="LCIAMethod">
+          <Key>
+            <PropertyRef Name="LCIAMethodID" />
+          </Key>
+          <Property Name="LCIAMethodID" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="LCIAMethodUUID" Type="varchar" MaxLength="36" />
+          <Property Name="LCIAMethodVersion" Type="varchar" MaxLength="15" />
+          <Property Name="LCIAMethod" Type="varchar" MaxLength="255" />
+          <Property Name="Methodology" Type="varchar" MaxLength="60" />
+          <Property Name="ImpactCategory" Type="varchar" MaxLength="255" />
+          <Property Name="ImpactIndicator" Type="varchar(max)" />
+          <Property Name="ReferenceYear" Type="varchar" MaxLength="60" />
+          <Property Name="Duration" Type="varchar" MaxLength="255" />
+          <Property Name="ImpactLocation" Type="varchar" MaxLength="60" />
+          <Property Name="IndicatorType" Type="varchar" MaxLength="60" />
+          <Property Name="Normalization" Type="bit" />
+          <Property Name="Weighting" Type="bit" />
+          <Property Name="UseAdvice" Type="varchar(max)" />
+          <Property Name="LCIAMethodSourceID" Type="int" />
+          <Property Name="LCIAMethodFlowPropertyID" Type="int" />
+          <Property Name="Source" Type="varchar" MaxLength="255" />
+          <Property Name="ReferenceQuantity" Type="varchar" MaxLength="255" />
+        </EntityType>
+        <EntityType Name="Process">
+          <Key>
+            <PropertyRef Name="ProcessID" />
+          </Key>
+          <Property Name="ProcessID" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="ProcessUUID" Type="varchar" MaxLength="36" />
+          <Property Name="ProcessVersion" Type="varchar" MaxLength="255" />
+          <Property Name="Process" Type="varchar" MaxLength="255" />
+          <Property Name="Year" Type="varchar" MaxLength="60" />
+          <Property Name="Geography" Type="varchar" MaxLength="15" />
+          <Property Name="ReferenceFlow-SQL" Type="varchar" MaxLength="36" />
+          <Property Name="RefererenceType" Type="varchar" MaxLength="60" />
+          <Property Name="ProcessType" Type="varchar" MaxLength="60" />
+          <Property Name="Diagram" Type="varchar" MaxLength="60" />
+          <Property Name="ProcessFlowID" Type="int" />
+        </EntityType>
+        <EntityType Name="ProcessFlow">
+          <Key>
+            <PropertyRef Name="ProcessFlowID" />
+          </Key>
+          <Property Name="ProcessFlowID" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="ProcessUUID" Type="varchar" MaxLength="36" />
+          <Property Name="ProcessFlowProcessID" Type="int" />
+          <Property Name="ProcessFlowFlowID" Type="int" />
+          <Property Name="ProcessFlowDirectionID" Type="int" />
+          <Property Name="ProcessFlowType" Type="varchar" MaxLength="15" />
+          <Property Name="VarName" Type="varchar" MaxLength="15" />
+          <Property Name="Magnitude" Type="float" />
+          <Property Name="Result" Type="float" />
+          <Property Name="STDev" Type="float" />
+          <Property Name="Flow-SQL" Type="varchar" MaxLength="50" />
+          <Property Name="Direction-SQL" Type="varchar" MaxLength="50" />
+          <Property Name="Ind-SQL" Type="int" />
+          <Property Name="Geography" Type="varchar" MaxLength="15" />
+        </EntityType>
+        <Association Name="FK_LCIA_Direction">
+          <End Role="Direction" Type="Self.Direction" Multiplicity="0..1" />
+          <End Role="LCIA" Type="Self.LCIA" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Direction">
+              <PropertyRef Name="DirectionID" />
+            </Principal>
+            <Dependent Role="LCIA">
+              <PropertyRef Name="LCIADirectionID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_LCIA_LCIAMethod">
+          <End Role="LCIAMethod" Type="Self.LCIAMethod" Multiplicity="0..1" />
+          <End Role="LCIA" Type="Self.LCIA" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="LCIAMethod">
+              <PropertyRef Name="LCIAMethodID" />
+            </Principal>
+            <Dependent Role="LCIA">
+              <PropertyRef Name="LCIAMethodID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_Process_Flow">
+          <End Role="Flow" Type="Self.Flow" Multiplicity="0..1" />
+          <End Role="Process" Type="Self.Process" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Flow">
+              <PropertyRef Name="FlowID" />
+            </Principal>
+            <Dependent Role="Process">
+              <PropertyRef Name="ProcessFlowID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_ProcessFlow_Direction">
+          <End Role="Direction" Type="Self.Direction" Multiplicity="0..1" />
+          <End Role="ProcessFlow" Type="Self.ProcessFlow" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Direction">
+              <PropertyRef Name="DirectionID" />
+            </Principal>
+            <Dependent Role="ProcessFlow">
+              <PropertyRef Name="ProcessFlowDirectionID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_ProcessFlow_Flow">
+          <End Role="Flow" Type="Self.Flow" Multiplicity="0..1" />
+          <End Role="ProcessFlow" Type="Self.ProcessFlow" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Flow">
+              <PropertyRef Name="FlowID" />
+            </Principal>
+            <Dependent Role="ProcessFlow">
+              <PropertyRef Name="ProcessFlowFlowID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_ProcessFlow_Process">
+          <End Role="Process" Type="Self.Process" Multiplicity="0..1" />
+          <End Role="ProcessFlow" Type="Self.ProcessFlow" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Process">
+              <PropertyRef Name="ProcessID" />
+            </Principal>
+            <Dependent Role="ProcessFlow">
+              <PropertyRef Name="ProcessFlowProcessID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <EntityContainer Name="LCAToolDevModelStoreContainer">
+          <EntitySet Name="Direction" EntityType="Self.Direction" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="Flow" EntityType="Self.Flow" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="LCIA" EntityType="Self.LCIA" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="LCIAMethod" EntityType="Self.LCIAMethod" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="Process" EntityType="Self.Process" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="ProcessFlow" EntityType="Self.ProcessFlow" Schema="dbo" store:Type="Tables" />
+          <AssociationSet Name="FK_LCIA_Direction" Association="Self.FK_LCIA_Direction">
+            <End Role="Direction" EntitySet="Direction" />
+            <End Role="LCIA" EntitySet="LCIA" />
+          </AssociationSet>
+          <AssociationSet Name="FK_LCIA_LCIAMethod" Association="Self.FK_LCIA_LCIAMethod">
+            <End Role="LCIAMethod" EntitySet="LCIAMethod" />
+            <End Role="LCIA" EntitySet="LCIA" />
+          </AssociationSet>
+          <AssociationSet Name="FK_Process_Flow" Association="Self.FK_Process_Flow">
+            <End Role="Flow" EntitySet="Flow" />
+            <End Role="Process" EntitySet="Process" />
+          </AssociationSet>
+          <AssociationSet Name="FK_ProcessFlow_Direction" Association="Self.FK_ProcessFlow_Direction">
+            <End Role="Direction" EntitySet="Direction" />
+            <End Role="ProcessFlow" EntitySet="ProcessFlow" />
+          </AssociationSet>
+          <AssociationSet Name="FK_ProcessFlow_Flow" Association="Self.FK_ProcessFlow_Flow">
+            <End Role="Flow" EntitySet="Flow" />
+            <End Role="ProcessFlow" EntitySet="ProcessFlow" />
+          </AssociationSet>
+          <AssociationSet Name="FK_ProcessFlow_Process" Association="Self.FK_ProcessFlow_Process">
+            <End Role="Process" EntitySet="Process" />
+            <End Role="ProcessFlow" EntitySet="ProcessFlow" />
+          </AssociationSet>
+        </EntityContainer>
+      </Schema></edmx:StorageModels>
+    <!-- CSDL content -->
+    <edmx:ConceptualModels>
+      <Schema Namespace="LCAToolDevModel" Alias="Self" annotation:UseStrongSpatialTypes="false" xmlns:annotation="http://schemas.microsoft.com/ado/2009/02/edm/annotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm">
+        <EntityContainer Name="LCAToolDevEntities" annotation:LazyLoadingEnabled="true">
+          <EntitySet Name="LCIAs" EntityType="LCAToolDevModel.LCIA" />
+          <EntitySet Name="LCIAMethods" EntityType="LCAToolDevModel.LCIAMethod" />
+          <AssociationSet Name="FK_LCIA_LCIAMethod" Association="LCAToolDevModel.FK_LCIA_LCIAMethod">
+            <End Role="LCIAMethod" EntitySet="LCIAMethods" />
+            <End Role="LCIA" EntitySet="LCIAs" />
+          </AssociationSet>
+          <EntitySet Name="Directions" EntityType="LCAToolDevModel.Direction" />
+          <EntitySet Name="Flows" EntityType="LCAToolDevModel.Flow" />
+          <AssociationSet Name="FK_LCIA_Direction" Association="LCAToolDevModel.FK_LCIA_Direction">
+            <End Role="Direction" EntitySet="Directions" />
+            <End Role="LCIA" EntitySet="LCIAs" />
+          </AssociationSet>
+          <AssociationSet Name="FK_LCIA_Flow" Association="LCAToolDevModel.FK_LCIA_Flow">
+            <End Role="Flow" EntitySet="Flows" />
+            <End Role="LCIA" EntitySet="LCIAs" />
+          </AssociationSet>
+          <EntitySet Name="Processes" EntityType="LCAToolDevModel.Process" />
+          <EntitySet Name="ProcessFlows" EntityType="LCAToolDevModel.ProcessFlow" />
+          <AssociationSet Name="FK_ProcessFlow_Direction" Association="LCAToolDevModel.FK_ProcessFlow_Direction">
+            <End Role="Direction" EntitySet="Directions" />
+            <End Role="ProcessFlow" EntitySet="ProcessFlows" />
+          </AssociationSet>
+          <AssociationSet Name="FK_Process_Flow" Association="LCAToolDevModel.FK_Process_Flow">
+            <End Role="Flow" EntitySet="Flows" />
+            <End Role="Process" EntitySet="Processes" />
+          </AssociationSet>
+          <AssociationSet Name="FK_ProcessFlow_Flow" Association="LCAToolDevModel.FK_ProcessFlow_Flow">
+            <End Role="Flow" EntitySet="Flows" />
+            <End Role="ProcessFlow" EntitySet="ProcessFlows" />
+          </AssociationSet>
+          <AssociationSet Name="FK_ProcessFlow_Process" Association="LCAToolDevModel.FK_ProcessFlow_Process">
+            <End Role="Process" EntitySet="Processes" />
+            <End Role="ProcessFlow" EntitySet="ProcessFlows" />
+          </AssociationSet>
+          </EntityContainer>
+        <EntityType Name="LCIA">
+          <Key>
+            <PropertyRef Name="LCIAID" />
+          </Key>
+          <Property Name="LCIAID" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="LCIAMethodID" Type="Int32" />
+          <Property Name="LCIAUUID" Type="String" MaxLength="36" FixedLength="true" Unicode="false" />
+          <Property Name="LCIAFlowID" Type="Int32" />
+          <Property Name="LCIADirectionID" Type="Int32" />
+          <Property Name="Factor" Type="Double" />
+          <Property Name="Flow_SQL" Type="String" MaxLength="36" FixedLength="false" Unicode="false" />
+          <Property Name="Direction_SQL" Type="String" MaxLength="100" FixedLength="false" Unicode="false" />
+          <NavigationProperty Name="LCIAMethod" Relationship="LCAToolDevModel.FK_LCIA_LCIAMethod" FromRole="LCIA" ToRole="LCIAMethod" />
+          <NavigationProperty Name="Direction" Relationship="LCAToolDevModel.FK_LCIA_Direction" FromRole="LCIA" ToRole="Direction" />
+          <NavigationProperty Name="Flow" Relationship="LCAToolDevModel.FK_LCIA_Flow" FromRole="LCIA" ToRole="Flow" />
+        </EntityType>
+        <EntityType Name="LCIAMethod">
+          <Key>
+            <PropertyRef Name="LCIAMethodID" />
+          </Key>
+          <Property Name="LCIAMethodID" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="LCIAMethodUUID" Type="String" MaxLength="36" FixedLength="false" Unicode="false" />
+          <Property Name="LCIAMethodVersion" Type="String" MaxLength="15" FixedLength="false" Unicode="false" />
+          <Property Name="LCIAMethod1" Type="String" MaxLength="255" FixedLength="false" Unicode="false" />
+          <Property Name="Methodology" Type="String" MaxLength="60" FixedLength="false" Unicode="false" />
+          <Property Name="ImpactCategory" Type="String" MaxLength="255" FixedLength="false" Unicode="false" />
+          <Property Name="ImpactIndicator" Type="String" MaxLength="Max" FixedLength="false" Unicode="false" />
+          <Property Name="ReferenceYear" Type="String" MaxLength="60" FixedLength="false" Unicode="false" />
+          <Property Name="Duration" Type="String" MaxLength="255" FixedLength="false" Unicode="false" />
+          <Property Name="ImpactLocation" Type="String" MaxLength="60" FixedLength="false" Unicode="false" />
+          <Property Name="IndicatorType" Type="String" MaxLength="60" FixedLength="false" Unicode="false" />
+          <Property Name="Normalization" Type="Boolean" />
+          <Property Name="Weighting" Type="Boolean" />
+          <Property Name="UseAdvice" Type="String" MaxLength="Max" FixedLength="false" Unicode="false" />
+          <Property Name="LCIAMethodSourceID" Type="Int32" />
+          <Property Name="LCIAMethodFlowPropertyID" Type="Int32" />
+          <Property Name="Source" Type="String" MaxLength="255" FixedLength="false" Unicode="false" />
+          <Property Name="ReferenceQuantity" Type="String" MaxLength="255" FixedLength="false" Unicode="false" />
+          <NavigationProperty Name="LCIAs" Relationship="LCAToolDevModel.FK_LCIA_LCIAMethod" FromRole="LCIAMethod" ToRole="LCIA" />
+        </EntityType>
+        <Association Name="FK_LCIA_LCIAMethod">
+          <End Type="LCAToolDevModel.LCIAMethod" Role="LCIAMethod" Multiplicity="0..1" />
+          <End Type="LCAToolDevModel.LCIA" Role="LCIA" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="LCIAMethod">
+              <PropertyRef Name="LCIAMethodID" />
+            </Principal>
+            <Dependent Role="LCIA">
+              <PropertyRef Name="LCIAMethodID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <EntityType Name="Direction">
+          <Key>
+            <PropertyRef Name="DirectionID" />
+          </Key>
+          <Property Name="DirectionID" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="Direction1" Type="String" MaxLength="100" FixedLength="false" Unicode="false" />
+          <NavigationProperty Name="LCIAs" Relationship="LCAToolDevModel.FK_LCIA_Direction" FromRole="Direction" ToRole="LCIA" />
+          <NavigationProperty Name="ProcessFlows" Relationship="LCAToolDevModel.FK_ProcessFlow_Direction" FromRole="Direction" ToRole="ProcessFlow" />
+        </EntityType>
+        <EntityType Name="Flow">
+          <Key>
+            <PropertyRef Name="FlowID" />
+          </Key>
+          <Property Name="FlowID" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="FlowUUID" Type="String" MaxLength="36" FixedLength="true" Unicode="false" />
+          <Property Name="FlowVersion" Type="String" MaxLength="15" FixedLength="false" Unicode="false" />
+          <Property Name="Flow1" Type="String" MaxLength="255" FixedLength="false" Unicode="false" />
+          <Property Name="CASNumber" Type="String" MaxLength="15" FixedLength="true" Unicode="false" />
+          <Property Name="FlowPropertyID" Type="Int32" />
+          <Property Name="FlowTypeID" Type="Int32" />
+          <Property Name="FlowMass" Type="Single" />
+          <Property Name="FlowMassChg" Type="Int32" />
+          <Property Name="FlowType_SQL" Type="String" MaxLength="200" FixedLength="false" Unicode="false" />
+          <Property Name="ReferenceFlowProperty_SQL" Type="String" MaxLength="36" FixedLength="false" Unicode="false" />
+          <NavigationProperty Name="LCIAs" Relationship="LCAToolDevModel.FK_LCIA_Flow" FromRole="Flow" ToRole="LCIA" />
+          <NavigationProperty Name="Processes" Relationship="LCAToolDevModel.FK_Process_Flow" FromRole="Flow" ToRole="Process" />
+          <NavigationProperty Name="ProcessFlows" Relationship="LCAToolDevModel.FK_ProcessFlow_Flow" FromRole="Flow" ToRole="ProcessFlow" />
+        </EntityType>
+        <Association Name="FK_LCIA_Direction">
+          <End Type="LCAToolDevModel.Direction" Role="Direction" Multiplicity="0..1" />
+          <End Type="LCAToolDevModel.LCIA" Role="LCIA" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Direction">
+              <PropertyRef Name="DirectionID" />
+            </Principal>
+            <Dependent Role="LCIA">
+              <PropertyRef Name="LCIADirectionID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_LCIA_Flow">
+          <End Type="LCAToolDevModel.Flow" Role="Flow" Multiplicity="0..1" />
+          <End Type="LCAToolDevModel.LCIA" Role="LCIA" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Flow">
+              <PropertyRef Name="FlowID" />
+            </Principal>
+            <Dependent Role="LCIA">
+              <PropertyRef Name="LCIAFlowID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <EntityType Name="Process">
+          <Key>
+            <PropertyRef Name="ProcessID" />
+          </Key>
+          <Property Name="ProcessID" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="ProcessUUID" Type="String" MaxLength="36" FixedLength="false" Unicode="false" />
+          <Property Name="ProcessVersion" Type="String" MaxLength="255" FixedLength="false" Unicode="false" />
+          <Property Name="Process1" Type="String" MaxLength="255" FixedLength="false" Unicode="false" />
+          <Property Name="Year" Type="String" MaxLength="60" FixedLength="false" Unicode="false" />
+          <Property Name="Geography" Type="String" MaxLength="15" FixedLength="false" Unicode="false" />
+          <Property Name="ReferenceFlow_SQL" Type="String" MaxLength="36" FixedLength="false" Unicode="false" />
+          <Property Name="RefererenceType" Type="String" MaxLength="60" FixedLength="false" Unicode="false" />
+          <Property Name="ProcessType" Type="String" MaxLength="60" FixedLength="false" Unicode="false" />
+          <Property Name="Diagram" Type="String" MaxLength="60" FixedLength="false" Unicode="false" />
+          <Property Name="ProcessFlowID" Type="Int32" />
+          <NavigationProperty Name="Flow" Relationship="LCAToolDevModel.FK_Process_Flow" FromRole="Process" ToRole="Flow" />
+          <NavigationProperty Name="ProcessFlows" Relationship="LCAToolDevModel.FK_ProcessFlow_Process" FromRole="Process" ToRole="ProcessFlow" />
+        </EntityType>
+        <EntityType Name="ProcessFlow">
+          <Key>
+            <PropertyRef Name="ProcessFlowID" />
+          </Key>
+          <Property Name="ProcessFlowID" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="ProcessUUID" Type="String" MaxLength="36" FixedLength="false" Unicode="false" />
+          <Property Name="ProcessFlowProcessID" Type="Int32" />
+          <Property Name="ProcessFlowFlowID" Type="Int32" />
+          <Property Name="ProcessFlowDirectionID" Type="Int32" />
+          <Property Name="ProcessFlowType" Type="String" MaxLength="15" FixedLength="false" Unicode="false" />
+          <Property Name="VarName" Type="String" MaxLength="15" FixedLength="false" Unicode="false" />
+          <Property Name="Magnitude" Type="Double" />
+          <Property Name="Result" Type="Double" />
+          <Property Name="STDev" Type="Double" />
+          <Property Name="Flow_SQL" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="Direction_SQL" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="Ind_SQL" Type="Int32" />
+          <Property Name="Geography" Type="String" MaxLength="15" FixedLength="false" Unicode="false" />
+          <NavigationProperty Name="Direction" Relationship="LCAToolDevModel.FK_ProcessFlow_Direction" FromRole="ProcessFlow" ToRole="Direction" />
+          <NavigationProperty Name="Flow" Relationship="LCAToolDevModel.FK_ProcessFlow_Flow" FromRole="ProcessFlow" ToRole="Flow" />
+          <NavigationProperty Name="Process" Relationship="LCAToolDevModel.FK_ProcessFlow_Process" FromRole="ProcessFlow" ToRole="Process" />
+        </EntityType>
+        <Association Name="FK_ProcessFlow_Direction">
+          <End Type="LCAToolDevModel.Direction" Role="Direction" Multiplicity="0..1" />
+          <End Type="LCAToolDevModel.ProcessFlow" Role="ProcessFlow" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Direction">
+              <PropertyRef Name="DirectionID" />
+            </Principal>
+            <Dependent Role="ProcessFlow">
+              <PropertyRef Name="ProcessFlowDirectionID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_Process_Flow">
+          <End Type="LCAToolDevModel.Flow" Role="Flow" Multiplicity="0..1" />
+          <End Type="LCAToolDevModel.Process" Role="Process" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Flow">
+              <PropertyRef Name="FlowID" />
+            </Principal>
+            <Dependent Role="Process">
+              <PropertyRef Name="ProcessFlowID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_ProcessFlow_Flow">
+          <End Type="LCAToolDevModel.Flow" Role="Flow" Multiplicity="0..1" />
+          <End Type="LCAToolDevModel.ProcessFlow" Role="ProcessFlow" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Flow">
+              <PropertyRef Name="FlowID" />
+            </Principal>
+            <Dependent Role="ProcessFlow">
+              <PropertyRef Name="ProcessFlowFlowID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_ProcessFlow_Process">
+          <End Type="LCAToolDevModel.Process" Role="Process" Multiplicity="0..1" />
+          <End Type="LCAToolDevModel.ProcessFlow" Role="ProcessFlow" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Process">
+              <PropertyRef Name="ProcessID" />
+            </Principal>
+            <Dependent Role="ProcessFlow">
+              <PropertyRef Name="ProcessFlowProcessID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        </Schema>
+    </edmx:ConceptualModels>
+    <!-- C-S mapping content -->
+    <edmx:Mappings>
+      <Mapping Space="C-S" xmlns="http://schemas.microsoft.com/ado/2009/11/mapping/cs">
+        <EntityContainerMapping StorageEntityContainer="LCAToolDevModelStoreContainer" CdmEntityContainer="LCAToolDevEntities">
+          <EntitySetMapping Name="LCIAs">
+            <EntityTypeMapping TypeName="LCAToolDevModel.LCIA">
+              <MappingFragment StoreEntitySet="LCIA">
+                <ScalarProperty Name="Direction_SQL" ColumnName="Direction-SQL" />
+                <ScalarProperty Name="Flow_SQL" ColumnName="Flow-SQL" />
+                <ScalarProperty Name="Factor" ColumnName="Factor" />
+                <ScalarProperty Name="LCIADirectionID" ColumnName="LCIADirectionID" />
+                <ScalarProperty Name="LCIAFlowID" ColumnName="LCIAFlowID" />
+                <ScalarProperty Name="LCIAUUID" ColumnName="LCIAUUID" />
+                <ScalarProperty Name="LCIAMethodID" ColumnName="LCIAMethodID" />
+                <ScalarProperty Name="LCIAID" ColumnName="LCIAID" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="LCIAMethods">
+            <EntityTypeMapping TypeName="LCAToolDevModel.LCIAMethod">
+              <MappingFragment StoreEntitySet="LCIAMethod">
+                <ScalarProperty Name="ReferenceQuantity" ColumnName="ReferenceQuantity" />
+                <ScalarProperty Name="Source" ColumnName="Source" />
+                <ScalarProperty Name="LCIAMethodFlowPropertyID" ColumnName="LCIAMethodFlowPropertyID" />
+                <ScalarProperty Name="LCIAMethodSourceID" ColumnName="LCIAMethodSourceID" />
+                <ScalarProperty Name="UseAdvice" ColumnName="UseAdvice" />
+                <ScalarProperty Name="Weighting" ColumnName="Weighting" />
+                <ScalarProperty Name="Normalization" ColumnName="Normalization" />
+                <ScalarProperty Name="IndicatorType" ColumnName="IndicatorType" />
+                <ScalarProperty Name="ImpactLocation" ColumnName="ImpactLocation" />
+                <ScalarProperty Name="Duration" ColumnName="Duration" />
+                <ScalarProperty Name="ReferenceYear" ColumnName="ReferenceYear" />
+                <ScalarProperty Name="ImpactIndicator" ColumnName="ImpactIndicator" />
+                <ScalarProperty Name="ImpactCategory" ColumnName="ImpactCategory" />
+                <ScalarProperty Name="Methodology" ColumnName="Methodology" />
+                <ScalarProperty Name="LCIAMethod1" ColumnName="LCIAMethod" />
+                <ScalarProperty Name="LCIAMethodVersion" ColumnName="LCIAMethodVersion" />
+                <ScalarProperty Name="LCIAMethodUUID" ColumnName="LCIAMethodUUID" />
+                <ScalarProperty Name="LCIAMethodID" ColumnName="LCIAMethodID" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="Directions">
+            <EntityTypeMapping TypeName="LCAToolDevModel.Direction">
+              <MappingFragment StoreEntitySet="Direction">
+                <ScalarProperty Name="Direction1" ColumnName="Direction" />
+                <ScalarProperty Name="DirectionID" ColumnName="DirectionID" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="Flows">
+            <EntityTypeMapping TypeName="LCAToolDevModel.Flow">
+              <MappingFragment StoreEntitySet="Flow">
+                <ScalarProperty Name="ReferenceFlowProperty_SQL" ColumnName="ReferenceFlowProperty-SQL" />
+                <ScalarProperty Name="FlowType_SQL" ColumnName="FlowType-SQL" />
+                <ScalarProperty Name="FlowMassChg" ColumnName="FlowMassChg" />
+                <ScalarProperty Name="FlowMass" ColumnName="FlowMass" />
+                <ScalarProperty Name="FlowTypeID" ColumnName="FlowTypeID" />
+                <ScalarProperty Name="FlowPropertyID" ColumnName="FlowPropertyID" />
+                <ScalarProperty Name="CASNumber" ColumnName="CASNumber" />
+                <ScalarProperty Name="Flow1" ColumnName="Flow" />
+                <ScalarProperty Name="FlowVersion" ColumnName="FlowVersion" />
+                <ScalarProperty Name="FlowUUID" ColumnName="FlowUUID" />
+                <ScalarProperty Name="FlowID" ColumnName="FlowID" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="Processes">
+            <EntityTypeMapping TypeName="LCAToolDevModel.Process">
+              <MappingFragment StoreEntitySet="Process">
+                <ScalarProperty Name="ProcessFlowID" ColumnName="ProcessFlowID" />
+                <ScalarProperty Name="Diagram" ColumnName="Diagram" />
+                <ScalarProperty Name="ProcessType" ColumnName="ProcessType" />
+                <ScalarProperty Name="RefererenceType" ColumnName="RefererenceType" />
+                <ScalarProperty Name="ReferenceFlow_SQL" ColumnName="ReferenceFlow-SQL" />
+                <ScalarProperty Name="Geography" ColumnName="Geography" />
+                <ScalarProperty Name="Year" ColumnName="Year" />
+                <ScalarProperty Name="Process1" ColumnName="Process" />
+                <ScalarProperty Name="ProcessVersion" ColumnName="ProcessVersion" />
+                <ScalarProperty Name="ProcessUUID" ColumnName="ProcessUUID" />
+                <ScalarProperty Name="ProcessID" ColumnName="ProcessID" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="ProcessFlows">
+            <EntityTypeMapping TypeName="LCAToolDevModel.ProcessFlow">
+              <MappingFragment StoreEntitySet="ProcessFlow">
+                <ScalarProperty Name="Geography" ColumnName="Geography" />
+                <ScalarProperty Name="Ind_SQL" ColumnName="Ind-SQL" />
+                <ScalarProperty Name="Direction_SQL" ColumnName="Direction-SQL" />
+                <ScalarProperty Name="Flow_SQL" ColumnName="Flow-SQL" />
+                <ScalarProperty Name="STDev" ColumnName="STDev" />
+                <ScalarProperty Name="Result" ColumnName="Result" />
+                <ScalarProperty Name="Magnitude" ColumnName="Magnitude" />
+                <ScalarProperty Name="VarName" ColumnName="VarName" />
+                <ScalarProperty Name="ProcessFlowType" ColumnName="ProcessFlowType" />
+                <ScalarProperty Name="ProcessFlowDirectionID" ColumnName="ProcessFlowDirectionID" />
+                <ScalarProperty Name="ProcessFlowFlowID" ColumnName="ProcessFlowFlowID" />
+                <ScalarProperty Name="ProcessFlowProcessID" ColumnName="ProcessFlowProcessID" />
+                <ScalarProperty Name="ProcessUUID" ColumnName="ProcessUUID" />
+                <ScalarProperty Name="ProcessFlowID" ColumnName="ProcessFlowID" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+        </EntityContainerMapping>
+      </Mapping>
+    </edmx:Mappings>
+  </edmx:Runtime>
+  <!-- EF Designer content (DO NOT EDIT MANUALLY BELOW HERE) -->
+  <Designer xmlns="http://schemas.microsoft.com/ado/2009/11/edmx">
+    <Connection>
+      <DesignerInfoPropertySet>
+        <DesignerProperty Name="MetadataArtifactProcessing" Value="EmbedInOutputAssembly" />
+      </DesignerInfoPropertySet>
+    </Connection>
+    <Options>
+      <DesignerInfoPropertySet>
+        <DesignerProperty Name="ValidateOnBuild" Value="true" />
+        <DesignerProperty Name="EnablePluralization" Value="true" />
+        <DesignerProperty Name="IncludeForeignKeysInModel" Value="true" />
+        <DesignerProperty Name="UseLegacyProvider" Value="false" />
+        <DesignerProperty Name="CodeGenerationStrategy" Value="None" />
+      </DesignerInfoPropertySet>
+    </Options>
+    <!-- Diagram content (shape and connector positions) -->
+    <Diagrams></Diagrams>
+  </Designer>
+</edmx:Edmx>

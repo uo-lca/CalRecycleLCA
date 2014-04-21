@@ -9,7 +9,12 @@
 <body>
     <form id="form1" runat="server">
     <div>
-        <asp:GridView ID="gvLCIAComp" runat="server"></asp:GridView>
+        <asp:DropDownList ID="ddlProcess" runat="server" AutoPostBack="true" OnSelectedIndexChanged="ddlProcess_SelectedIndexChanged">
+        </asp:DropDownList>
+        <asp:DropDownList ID="ddlLCIAMethod" runat="server" AutoPostBack="true" OnSelectedIndexChanged="ddlLCIAMethod_SelectedIndexChanged" >
+        </asp:DropDownList>
+        <br />
+        <asp:GridView ID="gvLCIAComp" runat="server" EnableViewState="false"></asp:GridView>
     
     </div>
     </form>

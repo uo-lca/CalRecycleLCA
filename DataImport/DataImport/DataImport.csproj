@@ -83,6 +83,23 @@
       <LastGenOutput>DataImport.cs</LastGenOutput>
     </Content>
     <Content Include="packages.config" />
+    <EntityDeploy Include="LCIADataImport.edmx">
+      <Generator>EntityModelCodeGenerator</Generator>
+      <LastGenOutput>LCIADataImport.Designer.cs</LastGenOutput>
+    </EntityDeploy>
+    <Content Include="LCIADataImport.Context.tt">
+      <Generator>TextTemplatingFileGenerator</Generator>
+      <DependentUpon>LCIADataImport.edmx</DependentUpon>
+      <LastGenOutput>LCIADataImport.Context.cs</LastGenOutput>
+    </Content>
+    <Content Include="LCIADataImport.edmx.diagram">
+      <DependentUpon>LCIADataImport.edmx</DependentUpon>
+    </Content>
+    <Content Include="LCIADataImport.tt">
+      <Generator>TextTemplatingFileGenerator</Generator>
+      <DependentUpon>LCIADataImport.edmx</DependentUpon>
+      <LastGenOutput>LCIADataImport.cs</LastGenOutput>
+    </Content>
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>
@@ -111,6 +128,12 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>DataImport.edmx</DependentUpon>
     </Compile>
+    <Compile Include="Direction.cs">
+      <DependentUpon>LCIADataImport.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Flow.cs">
+      <DependentUpon>LCIADataImport.tt</DependentUpon>
+    </Compile>
     <Compile Include="Import.aspx.cs">
       <DependentUpon>Import.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
@@ -118,12 +141,39 @@
     <Compile Include="Import.aspx.designer.cs">
       <DependentUpon>Import.aspx</DependentUpon>
     </Compile>
+    <Compile Include="LCIA.cs">
+      <DependentUpon>LCIADataImport.tt</DependentUpon>
+    </Compile>
+    <Compile Include="LCIADataImport.Context.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>LCIADataImport.Context.tt</DependentUpon>
+    </Compile>
+    <Compile Include="LCIADataImport.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>LCIADataImport.tt</DependentUpon>
+    </Compile>
+    <Compile Include="LCIADataImport.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>LCIADataImport.edmx</DependentUpon>
+    </Compile>
+    <Compile Include="LCIAMethod.cs">
+      <DependentUpon>LCIADataImport.tt</DependentUpon>
+    </Compile>
     <Compile Include="LCIAMethodsMaster.cs" />
     <Compile Include="LCIAMethod_DUPE.cs">
       <DependentUpon>DataImport.tt</DependentUpon>
     </Compile>
     <Compile Include="LCIA_DUPE.cs">
       <DependentUpon>DataImport.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Process.cs">
+      <DependentUpon>LCIADataImport.tt</DependentUpon>
+    </Compile>
+    <Compile Include="ProcessFlow.cs">
+      <DependentUpon>LCIADataImport.tt</DependentUpon>
     </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="WebForm1.aspx.cs">
@@ -138,7 +188,7 @@
     <Service Include="{508349B6-6B84-4DF5-91F0-309BEEBAD82D}" />
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="UploadDocuments\" />
+    <Folder Include="UploadDocuments\Process\" />
   </ItemGroup>
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>
