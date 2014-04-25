@@ -97,5 +97,6 @@
     <Build Include="Security\lca1.sql" />
     <Build Include="Security\RoleMemberships.sql" />
     <Build Include="dbo\Stored Procedures\spGenerateDBDictionary.sql" />
+    <Build Include="Security\Login1.sql" />
   </ItemGroup>
 </Project>
