@@ -94,11 +94,7 @@
     <Build Include="dbo\Tables\UnitConversion.sql" />
     <Build Include="dbo\Tables\Class.sql" />
     <Build Include="dbo\Tables\MasterLCAModels.sql" />
-    <Build Include="Security\lca.sql" />
     <Build Include="Security\lca1.sql" />
-    <Build Include="Security\lca2.sql" />
-    <Build Include="Security\sabina.sql" />
-    <Build Include="Security\sabina_1.sql" />
     <Build Include="Security\RoleMemberships.sql" />
     <Build Include="dbo\Stored Procedures\spGenerateDBDictionary.sql" />
   </ItemGroup>
