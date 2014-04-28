@@ -1,0 +1,102 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003" ToolsVersion="4.0">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <Name>LCAToolDev</Name>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectVersion>4.1</ProjectVersion>
+    <ProjectGuid>{096a3a7f-ee22-4b56-a5a1-49f909ad8b61}</ProjectGuid>
+    <DSP>Microsoft.Data.Tools.Schema.Sql.Sql110DatabaseSchemaProvider</DSP>
+    <OutputType>Database</OutputType>
+    <RootPath>
+    </RootPath>
+    <RootNamespace>LCAToolDev</RootNamespace>
+    <AssemblyName>LCAToolDev</AssemblyName>
+    <ModelCollation>1033,CI</ModelCollation>
+    <DefaultFileStructure>BySchemaAndSchemaType</DefaultFileStructure>
+    <DeployToDatabase>True</DeployToDatabase>
+    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
+    <TargetLanguage>CS</TargetLanguage>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <SqlServerVerification>False</SqlServerVerification>
+    <IncludeCompositeObjects>True</IncludeCompositeObjects>
+    <TargetDatabaseSet>True</TargetDatabaseSet>
+    <DefaultCollation>SQL_Latin1_General_CP1_CI_AS</DefaultCollation>
+    <DefaultFilegroup>PRIMARY</DefaultFilegroup>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <OutputPath>bin\Release\</OutputPath>
+    <BuildScriptName>$(MSBuildProjectName).sql</BuildScriptName>
+    <TreatWarningsAsErrors>False</TreatWarningsAsErrors>
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <DefineDebug>false</DefineDebug>
+    <DefineTrace>true</DefineTrace>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <OutputPath>bin\Debug\</OutputPath>
+    <BuildScriptName>$(MSBuildProjectName).sql</BuildScriptName>
+    <TreatWarningsAsErrors>false</TreatWarningsAsErrors>
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <DefineDebug>true</DefineDebug>
+    <DefineTrace>true</DefineTrace>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <!-- VS10 without SP1 will not have VisualStudioVersion set, so do that here -->
+  <PropertyGroup>
+    <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>
+    <!-- Default to the v10.0 targets path if the targets file for the current VS version is not found -->
+    <SSDTExists Condition="Exists('$(MSBuildExtensionsPath)\Microsoft\VisualStudio\v$(VisualStudioVersion)\SSDT\Microsoft.Data.Tools.Schema.SqlTasks.targets')">True</SSDTExists>
+    <VisualStudioVersion Condition="'$(SSDTExists)' == ''">10.0</VisualStudioVersion>
+  </PropertyGroup>
+  <Import Project="$(MSBuildExtensionsPath)\Microsoft\VisualStudio\v$(VisualStudioVersion)\SSDT\Microsoft.Data.Tools.Schema.SqlTasks.targets" />
+  <ItemGroup>
+    <Folder Include="Properties" />
+    <Folder Include="dbo\" />
+    <Folder Include="dbo\Tables\" />
+    <Folder Include="Security\" />
+    <Folder Include="dbo\Stored Procedures\" />
+  </ItemGroup>
+  <ItemGroup>
+    <Build Include="dbo\Tables\CategorySystem.sql" />
+    <Build Include="dbo\Tables\Process.sql" />
+    <Build Include="dbo\Tables\DataType.sql" />
+    <Build Include="dbo\Tables\Direction.sql" />
+    <Build Include="dbo\Tables\Dummy.sql" />
+    <Build Include="dbo\Tables\FlowType.sql" />
+    <Build Include="dbo\Tables\LCIA.sql" />
+    <Build Include="dbo\Tables\Flow.sql" />
+    <Build Include="dbo\Tables\FlowProperty.sql" />
+    <Build Include="dbo\Tables\UnitGroup.sql" />
+    <Build Include="dbo\Tables\Fragment.sql" />
+    <Build Include="dbo\Tables\Category.sql" />
+    <Build Include="dbo\Tables\FragmentStage.sql" />
+    <Build Include="dbo\Tables\ScenarioSet.sql" />
+    <Build Include="dbo\Tables\Scenario.sql" />
+    <Build Include="dbo\Tables\Param.sql" />
+    <Build Include="dbo\Tables\Classification.sql" />
+    <Build Include="dbo\Tables\FragmentNode.sql" />
+    <Build Include="dbo\Tables\FlowPropertyVersion.sql" />
+    <Build Include="dbo\Tables\FragmentEdge.sql" />
+    <Build Include="dbo\Tables\FragmentEmission.sql" />
+    <Build Include="dbo\Tables\FragmentScore.sql" />
+    <Build Include="dbo\Tables\DataProvider.sql" />
+    <Build Include="dbo\Tables\LCIAMethod.sql" />
+    <Build Include="dbo\Tables\ProcessFlow.sql" />
+    <Build Include="dbo\Tables\Source.sql" />
+    <Build Include="dbo\Tables\UnitConversion.sql" />
+    <Build Include="dbo\Tables\Class.sql" />
+    <Build Include="dbo\Tables\MasterLCAModels.sql" />
+    <Build Include="Security\lca1.sql" />
+    <Build Include="Security\RoleMemberships.sql" />
+    <Build Include="dbo\Stored Procedures\spGenerateDBDictionary.sql" />
+    <Build Include="Security\Login1.sql" />
+  </ItemGroup>
+</Project>
