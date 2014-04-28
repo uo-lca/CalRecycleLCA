@@ -12,18 +12,17 @@ namespace DataImport
     using System;
     using System.Collections.Generic;
     
-    public partial class Direction
+    public partial class UnitGroup
     {
-        public Direction()
-        {
-            this.LCIAs = new HashSet<LCIA>();
-            this.ProcessFlows = new HashSet<ProcessFlow>();
-        }
-    
-        public int DirectionID { get; set; }
+        public int UnitGroupID { get; set; }
+        public string UnitGroupUUID { get; set; }
+        public string Version { get; set; }
         public string Name { get; set; }
-    
-        public virtual ICollection<LCIA> LCIAs { get; set; }
-        public virtual ICollection<ProcessFlow> ProcessFlows { get; set; }
+        public string ReferenceUnit { get; set; }
+        public System.DateTime CreatedOn { get; set; }
+        public int CreatedBy { get; set; }
+        public System.DateTime UpdatedOn { get; set; }
+        public int UpdatedBy { get; set; }
+        public bool Voided { get; set; }
     }
 }

@@ -16,10 +16,10 @@ namespace DataImport
     {
         public int ProcessFlowID { get; set; }
         public string ProcessUUID { get; set; }
-        public Nullable<int> ProcessFlowProcessID { get; set; }
-        public Nullable<int> ProcessFlowFlowID { get; set; }
-        public Nullable<int> ProcessFlowDirectionID { get; set; }
-        public string ProcessFlowType { get; set; }
+        public Nullable<int> ProcessID { get; set; }
+        public Nullable<int> FlowID { get; set; }
+        public Nullable<int> DirectionID { get; set; }
+        public string Type { get; set; }
         public string VarName { get; set; }
         public Nullable<double> Magnitude { get; set; }
         public Nullable<double> Result { get; set; }
@@ -29,8 +29,7 @@ namespace DataImport
         public Nullable<int> Ind_SQL { get; set; }
         public string Geography { get; set; }
     
-        public virtual Direction Direction { get; set; }
-        public virtual Flow Flow { get; set; }
         public virtual Process Process { get; set; }
+        public virtual Direction Direction { get; set; }
     }
 }

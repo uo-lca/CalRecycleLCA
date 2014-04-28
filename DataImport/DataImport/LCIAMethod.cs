@@ -22,7 +22,7 @@ namespace DataImport
         public int LCIAMethodID { get; set; }
         public string LCIAMethodUUID { get; set; }
         public string LCIAMethodVersion { get; set; }
-        public string LCIAMethod1 { get; set; }
+        public string Name { get; set; }
         public string Methodology { get; set; }
         public string ImpactCategory { get; set; }
         public string ImpactIndicator { get; set; }
@@ -33,8 +33,8 @@ namespace DataImport
         public Nullable<bool> Normalization { get; set; }
         public Nullable<bool> Weighting { get; set; }
         public string UseAdvice { get; set; }
-        public Nullable<int> LCIAMethodSourceID { get; set; }
-        public Nullable<int> LCIAMethodFlowPropertyID { get; set; }
+        public Nullable<int> SourceID { get; set; }
+        public Nullable<int> FlowPropertyID { get; set; }
         public string Source { get; set; }
         public string ReferenceQuantity { get; set; }
     

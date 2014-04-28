@@ -11,17 +11,14 @@ namespace DataImport
 {
     using System;
     using System.Collections.Generic;
-    using System.ComponentModel.DataAnnotations.Schema;
     
-    public partial class LCIA_DUPE
+    public partial class FlowProperty
     {
-        [DatabaseGeneratedAttribute(DatabaseGeneratedOption.Identity)]
-        public int Ind { get; set; }
-        public string UUID { get; set; }
-        public string Flow { get; set; }
-        public string Direction { get; set; }
-        public float Factor { get; set; }
-    
-        public virtual LCIAMethod_DUPE LCIAMethod_DUPE { get; set; }
+        public int FlowPropertyID { get; set; }
+        public string FlowPropertyUUID { get; set; }
+        public string FlowPropertyVersion { get; set; }
+        public string Name { get; set; }
+        public Nullable<int> UnitGroupID { get; set; }
+        public string UnitGroup_SQL { get; set; }
     }
 }
