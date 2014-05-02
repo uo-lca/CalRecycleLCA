@@ -16,6 +16,6 @@ namespace LCIATool.Models.Repository
     {
         public int DataProviderID { get; set; }
         public string DataProviderUUID { get; set; }
-        public string DataProviderName { get; set; }
+        public string Name { get; set; }
     }
 }

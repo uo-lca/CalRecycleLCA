@@ -15,6 +15,6 @@ namespace LCIATool.Models.Repository
     public partial class DataType
     {
         public int DataTypeID { get; set; }
-        public string DataType1 { get; set; }
+        public string Name { get; set; }
     }
 }

@@ -23,7 +23,7 @@ namespace LCIATool.Models.Repository
         public int CategorySystemID { get; set; }
         public string CategorySystem1 { get; set; }
         public string URI { get; set; }
-        public Nullable<int> CategorySystemDataTypeID { get; set; }
+        public Nullable<int> DataTypeID { get; set; }
         public string Delimeter { get; set; }
         public string DataType_SQL { get; set; }
     

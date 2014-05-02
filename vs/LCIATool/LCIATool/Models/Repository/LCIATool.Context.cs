@@ -35,14 +35,14 @@ namespace LCIATool.Models.Repository
         public virtual DbSet<Flow> Flows { get; set; }
         public virtual DbSet<FlowProperty> FlowProperties { get; set; }
         public virtual DbSet<FlowPropertyVersion> FlowPropertyVersions { get; set; }
-        public virtual DbSet<FlowType> FlowTypes { get; set; }
         public virtual DbSet<LCIA> LCIAs { get; set; }
-        public virtual DbSet<LCIAMethod> LCIAMethods { get; set; }
         public virtual DbSet<Process> Processes { get; set; }
         public virtual DbSet<ProcessFlow> ProcessFlows { get; set; }
-        public virtual DbSet<Source> Sources { get; set; }
-        public virtual DbSet<sysdiagram> sysdiagrams { get; set; }
         public virtual DbSet<UnitConversion> UnitConversions { get; set; }
         public virtual DbSet<UnitGroup> UnitGroups { get; set; }
+        public virtual DbSet<FlowType> FlowTypes { get; set; }
+        public virtual DbSet<ImpactCategory> ImpactCategories { get; set; }
+        public virtual DbSet<IndicatorType> IndicatorTypes { get; set; }
+        public virtual DbSet<LCIAMethod> LCIAMethods { get; set; }
     }
 }

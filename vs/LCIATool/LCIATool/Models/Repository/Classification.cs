@@ -16,8 +16,8 @@ namespace LCIATool.Models.Repository
     {
         public int ClassificationID { get; set; }
         public string ClassificationUUID { get; set; }
-        public Nullable<int> ClassificationCategorySystemID { get; set; }
-        public Nullable<int> ClassificationClassID { get; set; }
+        public Nullable<int> CategorySystemID { get; set; }
+        public Nullable<int> ClassID { get; set; }
         public string ClassID_SQL { get; set; }
         public string CategorySystem_SQL { get; set; }
     

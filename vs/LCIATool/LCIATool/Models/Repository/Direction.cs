@@ -21,7 +21,7 @@ namespace LCIATool.Models.Repository
         }
     
         public int DirectionID { get; set; }
-        public string Direction1 { get; set; }
+        public string Name { get; set; }
     
         public virtual ICollection<LCIA> LCIAs { get; set; }
         public virtual ICollection<ProcessFlow> ProcessFlows { get; set; }

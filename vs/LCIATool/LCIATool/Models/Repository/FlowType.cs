@@ -20,7 +20,7 @@ namespace LCIATool.Models.Repository
         }
     
         public int FlowTypeID { get; set; }
-        public string FlowType1 { get; set; }
+        public string Type { get; set; }
     
         public virtual ICollection<Flow> Flows { get; set; }
     }

@@ -16,8 +16,8 @@ namespace LCIATool.Models.Repository
     {
         public int CategoryID { get; set; }
         public Nullable<int> CategorySystemID { get; set; }
-        public Nullable<int> CategoryClassID { get; set; }
-        public Nullable<int> ParentClassID_notneededremovelater { get; set; }
+        public Nullable<int> ClassID { get; set; }
+        public Nullable<int> ParentClassID { get; set; }
         public Nullable<int> DataTypeID_notneededremovelater { get; set; }
         public Nullable<int> HierarchyLevel { get; set; }
         public string Hier { get; set; }

@@ -17,28 +17,21 @@ namespace LCIATool.Models.Repository
         public Flow()
         {
             this.FlowPropertyVersions = new HashSet<FlowPropertyVersion>();
-            this.LCIAs = new HashSet<LCIA>();
             this.Processes = new HashSet<Process>();
-            this.ProcessFlows = new HashSet<ProcessFlow>();
         }
     
         public int FlowID { get; set; }
         public string FlowUUID { get; set; }
         public string FlowVersion { get; set; }
-        public string Flow1 { get; set; }
+        public string Name { get; set; }
         public string CASNumber { get; set; }
         public Nullable<int> FlowPropertyID { get; set; }
         public Nullable<int> FlowTypeID { get; set; }
-        public Nullable<float> FlowMass { get; set; }
-        public Nullable<int> FlowMassChg { get; set; }
         public string FlowType_SQL { get; set; }
         public string ReferenceFlowProperty_SQL { get; set; }
     
-        public virtual FlowProperty FlowProperty { get; set; }
-        public virtual FlowType FlowType { get; set; }
         public virtual ICollection<FlowPropertyVersion> FlowPropertyVersions { get; set; }
-        public virtual ICollection<LCIA> LCIAs { get; set; }
         public virtual ICollection<Process> Processes { get; set; }
-        public virtual ICollection<ProcessFlow> ProcessFlows { get; set; }
+        public virtual FlowType FlowType { get; set; }
     }
 }

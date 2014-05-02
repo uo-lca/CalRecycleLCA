@@ -18,9 +18,9 @@ namespace LCIATool.Pages
             if (!Page.IsPostBack)
             {
                 var process = (from p in context.Processes
-                               join pf in context.ProcessFlows on p.ProcessID equals pf.ProcessFlowProcessID
-                               join f in context.Flows on pf.ProcessFlowFlowID equals f.FlowID
-                               join l in context.LCIAs on f.FlowID equals l.LCIAFlowID
+                               join pf in context.ProcessFlows on p.ProcessID equals pf.ProcessID
+                               join f in context.Flows on pf.FlowID equals f.FlowID
+                               join l in context.LCIAs on f.FlowID equals l.FlowID
                                join lm in context.LCIAMethods on l.LCIAMethodID equals lm.LCIAMethodID
                                join ft in context.FlowTypes on f.FlowTypeID equals ft.FlowTypeID
                                join fp in context.FlowProperties on f.FlowPropertyID equals fp.FlowPropertyID
@@ -39,16 +39,16 @@ namespace LCIATool.Pages
                 ddlProcess.Items.Insert(0, new ListItem("Select", "0"));
 
                 var lciaMethod = (from p in context.Processes
-                               join pf in context.ProcessFlows on p.ProcessID equals pf.ProcessFlowProcessID
-                               join f in context.Flows on pf.ProcessFlowFlowID equals f.FlowID
-                               join l in context.LCIAs on f.FlowID equals l.LCIAFlowID
+                               join pf in context.ProcessFlows on p.ProcessID equals pf.ProcessID
+                               join f in context.Flows on pf.FlowID equals f.FlowID
+                               join l in context.LCIAs on f.FlowID equals l.FlowID
                                join lm in context.LCIAMethods on l.LCIAMethodID equals lm.LCIAMethodID
                                join ft in context.FlowTypes on f.FlowTypeID equals ft.FlowTypeID
                                join fp in context.FlowProperties on f.FlowPropertyID equals fp.FlowPropertyID
                                where f.FlowTypeID == 2
                                select new
                                {
-                                   LCIAMethod = lm.LCIAMethod1,
+                                   LCIAMethod = lm.Name,
                                    LCIAMethodID = lm.LCIAMethodID,
                                }).ToList()
                               .GroupBy(lciam => lciam)
@@ -75,27 +75,27 @@ namespace LCIATool.Pages
             lciameth = int.Parse(ddlLCIAMethod.SelectedValue);
 
             var _lciaList = (from p in context.Processes
-                             join pf in context.ProcessFlows on p.ProcessID equals pf.ProcessFlowProcessID
-                             join f in context.Flows on pf.ProcessFlowFlowID equals f.FlowID
-                             join l in context.LCIAs on f.FlowID equals l.LCIAFlowID
+                             join pf in context.ProcessFlows on p.ProcessID equals pf.ProcessID
+                             join f in context.Flows on pf.FlowID equals f.FlowID
+                             join l in context.LCIAs on f.FlowID equals l.FlowID
                              join lm in context.LCIAMethods on l.LCIAMethodID equals lm.LCIAMethodID
                              join ft in context.FlowTypes on f.FlowTypeID equals ft.FlowTypeID
                              join fp in context.FlowProperties on f.FlowPropertyID equals fp.FlowPropertyID
                              where f.FlowTypeID == 2 && (p.ProcessID == proc || proc == 0) && (lm.LCIAMethodID == lciameth || lciameth == 0)
                              group new { p, pf, f, l, lm, ft } by new
                              {
-                                 p.ProcessType,
-                                 lm.LCIAMethod1,
-                                 ft.FlowType1,
+                                 p.Name,
+                                 lciamethodname= lm.Name,
+                                 ft.Type,
                                  pf.Result,
                                  p.Geography,
                                  l.Factor
                              } into g
                              select new
                              {
-                                 ProcessType = g.Key.ProcessType,
-                                 LCIAMethod = g.Key.LCIAMethod1,
-                                 FlowType = g.Key.FlowType1,
+                                 Process = g.Key.Name,
+                                 LCIAMethod = g.Key.lciamethodname,
+                                 FlowType = g.Key.Type,
                                  Result = g.Key.Result,
                                  Geography = g.Key.Geography,
                                  Factor = g.Key.Factor,

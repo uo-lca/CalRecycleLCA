@@ -16,8 +16,8 @@ namespace LCIATool.Models.Repository
     {
         public int FlowPropertyVersionID { get; set; }
         public string FlowPropertyVersionUUID { get; set; }
-        public Nullable<int> FlowPropertyVersionFlowID { get; set; }
-        public Nullable<int> FlowPropertyVersionFlowPropertyID { get; set; }
+        public Nullable<int> FlowID { get; set; }
+        public Nullable<int> FlowPropertyID { get; set; }
         public Nullable<double> MeanValue { get; set; }
         public Nullable<double> StDev { get; set; }
         public string FlowProperty_SQL { get; set; }
@@ -25,6 +25,5 @@ namespace LCIATool.Models.Repository
         public Nullable<int> Ind_SQL { get; set; }
     
         public virtual Flow Flow { get; set; }
-        public virtual FlowProperty FlowProperty { get; set; }
     }
 }
