@@ -12,10 +12,6 @@ namespace LCIATool.API
 {
     public class LCIAComputationController : ApiController
     {
-        int processID = 0;
-        int lciaMethodId = 0;
-        int impactCategoryId = 0;
-
         // GET api/<controller>
         static IRepository repository = new Repository();
 
@@ -23,6 +19,11 @@ namespace LCIATool.API
         [System.Web.Http.HttpGet]
         public IQueryable<LCIAComputationModel> LCIAComputation()
         {
+            int processID = 0;
+            int lciaMethodId = 0;
+            int impactCategoryId = 0;
+
+            //grab the values from the querystring and assign each to a local variable
             if (HttpContext.Current.Request.QueryString["processID"] != null)
             {
                 processID = Convert.ToInt32(HttpContext.Current.Request.QueryString["processID"].ToString());
@@ -38,11 +39,13 @@ namespace LCIATool.API
                 impactCategoryId = Convert.ToInt32(HttpContext.Current.Request.QueryString["impactCategoryId"].ToString());
             }
 
-
+            //We return the records which correspond to what is sent in the querystring of the api call.
+            //if the parameter is not sent for any of the above omit it from the query.
             var _lciaList = repository.LCIAComputation()
-                 .Where(l => l.FlowTypeID == 2 && (l.ProcessID== processID || processID == 0) && (l.LCIAMethodID == lciaMethodId || lciaMethodId == 0) && (l.ImpactCategoryID == impactCategoryId || impactCategoryId == 0));
+                 .Where(l => (l.ProcessID== processID || processID == 0) && (l.LCIAMethodID == lciaMethodId || lciaMethodId == 0) && (l.ImpactCategoryID == impactCategoryId || impactCategoryId == 0));
             return _lciaList;
-
         }
+
+        
     }
 }

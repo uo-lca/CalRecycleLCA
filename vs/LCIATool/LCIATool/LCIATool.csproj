@@ -148,19 +148,6 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="Areas\HelpPage\HelpPage.css" />
-    <Content Include="Models\Repository\LCIATool.Context.tt">
-      <DependentUpon>LCIATool.edmx</DependentUpon>
-      <Generator>TextTemplatingFileGenerator</Generator>
-      <LastGenOutput>LCIATool.Context.cs</LastGenOutput>
-    </Content>
-    <Content Include="Models\Repository\LCIATool.edmx.diagram">
-      <DependentUpon>LCIATool.edmx</DependentUpon>
-    </Content>
-    <Content Include="Models\Repository\LCIATool.tt">
-      <DependentUpon>LCIATool.edmx</DependentUpon>
-      <Generator>TextTemplatingFileGenerator</Generator>
-      <LastGenOutput>LCIATool.cs</LastGenOutput>
-    </Content>
     <Content Include="packages.config" />
     <Content Include="Site.Mobile.Master" />
     <Content Include="Areas\HelpPage\Views\Web.config" />
@@ -183,6 +170,23 @@
     <Content Include="Areas\HelpPage\Views\Help\DisplayTemplates\ApiGroup.cshtml" />
     <Content Include="Areas\HelpPage\Views\Help\Api.cshtml" />
     <Content Include="Areas\HelpPage\Views\_ViewStart.cshtml" />
+    <EntityDeploy Include="Models\Repository\LCAModel.edmx">
+      <Generator>EntityModelCodeGenerator</Generator>
+      <LastGenOutput>LCAModel.Designer.cs</LastGenOutput>
+    </EntityDeploy>
+    <Content Include="Models\Repository\LCAModel.Context.tt">
+      <Generator>TextTemplatingFileGenerator</Generator>
+      <DependentUpon>LCAModel.edmx</DependentUpon>
+      <LastGenOutput>LCAModel.Context.cs</LastGenOutput>
+    </Content>
+    <Content Include="Models\Repository\LCAModel.edmx.diagram">
+      <DependentUpon>LCAModel.edmx</DependentUpon>
+    </Content>
+    <Content Include="Models\Repository\LCAModel.tt">
+      <Generator>TextTemplatingFileGenerator</Generator>
+      <DependentUpon>LCAModel.edmx</DependentUpon>
+      <LastGenOutput>LCAModel.cs</LastGenOutput>
+    </Content>
     <None Include="Properties\PublishProfiles\LCIATool.pubxml" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
@@ -254,96 +258,78 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="Models\Repository\Category.cs">
-      <DependentUpon>LCIATool.tt</DependentUpon>
-      <SubType>Code</SubType>
+      <DependentUpon>LCAModel.tt</DependentUpon>
     </Compile>
     <Compile Include="Models\Repository\CategorySystem.cs">
-      <DependentUpon>LCIATool.tt</DependentUpon>
-      <SubType>Code</SubType>
+      <DependentUpon>LCAModel.tt</DependentUpon>
     </Compile>
     <Compile Include="Models\Repository\Class.cs">
-      <DependentUpon>LCIATool.tt</DependentUpon>
-      <SubType>Code</SubType>
+      <DependentUpon>LCAModel.tt</DependentUpon>
     </Compile>
     <Compile Include="Models\Repository\Classification.cs">
-      <DependentUpon>LCIATool.tt</DependentUpon>
-      <SubType>Code</SubType>
+      <DependentUpon>LCAModel.tt</DependentUpon>
     </Compile>
     <Compile Include="Models\Repository\DataProvider.cs">
-      <DependentUpon>LCIATool.tt</DependentUpon>
-      <SubType>Code</SubType>
+      <DependentUpon>LCAModel.tt</DependentUpon>
     </Compile>
     <Compile Include="Models\Repository\DataType.cs">
-      <DependentUpon>LCIATool.tt</DependentUpon>
-      <SubType>Code</SubType>
+      <DependentUpon>LCAModel.tt</DependentUpon>
     </Compile>
     <Compile Include="Models\Repository\Direction.cs">
-      <DependentUpon>LCIATool.tt</DependentUpon>
-      <SubType>Code</SubType>
+      <DependentUpon>LCAModel.tt</DependentUpon>
     </Compile>
     <Compile Include="Models\Repository\Flow.cs">
-      <DependentUpon>LCIATool.tt</DependentUpon>
-      <SubType>Code</SubType>
+      <DependentUpon>LCAModel.tt</DependentUpon>
     </Compile>
     <Compile Include="Models\Repository\FlowProperty.cs">
-      <DependentUpon>LCIATool.tt</DependentUpon>
-      <SubType>Code</SubType>
+      <DependentUpon>LCAModel.tt</DependentUpon>
     </Compile>
     <Compile Include="Models\Repository\FlowPropertyVersion.cs">
-      <DependentUpon>LCIATool.tt</DependentUpon>
-      <SubType>Code</SubType>
+      <DependentUpon>LCAModel.tt</DependentUpon>
     </Compile>
     <Compile Include="Models\Repository\FlowType.cs">
-      <DependentUpon>LCIATool.tt</DependentUpon>
-      <SubType>Code</SubType>
+      <DependentUpon>LCAModel.tt</DependentUpon>
     </Compile>
     <Compile Include="Models\Repository\ImpactCategory.cs">
-      <DependentUpon>LCIATool.tt</DependentUpon>
+      <DependentUpon>LCAModel.tt</DependentUpon>
     </Compile>
     <Compile Include="Models\Repository\IndicatorType.cs">
-      <DependentUpon>LCIATool.tt</DependentUpon>
+      <DependentUpon>LCAModel.tt</DependentUpon>
     </Compile>
     <Compile Include="Models\Repository\IRepository.cs" />
+    <Compile Include="Models\Repository\LCAModel.Context.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>LCAModel.Context.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\Repository\LCAModel.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>LCAModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\Repository\LCAModel.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>LCAModel.edmx</DependentUpon>
+    </Compile>
     <Compile Include="Models\Repository\LCIA.cs">
-      <DependentUpon>LCIATool.tt</DependentUpon>
-      <SubType>Code</SubType>
+      <DependentUpon>LCAModel.tt</DependentUpon>
     </Compile>
     <Compile Include="Models\Repository\LCIAMethod.cs">
-      <DependentUpon>LCIATool.tt</DependentUpon>
-    </Compile>
-    <Compile Include="Models\Repository\LCIATool.Context.cs">
-      <DependentUpon>LCIATool.Context.tt</DependentUpon>
-      <SubType>Code</SubType>
-      <DesignTime>True</DesignTime>
-      <AutoGen>True</AutoGen>
-    </Compile>
-    <Compile Include="Models\Repository\LCIATool.cs">
-      <DependentUpon>LCIATool.tt</DependentUpon>
-      <SubType>Code</SubType>
-      <DesignTime>True</DesignTime>
-      <AutoGen>True</AutoGen>
-    </Compile>
-    <Compile Include="Models\Repository\LCIATool.Designer.cs">
-      <DependentUpon>LCIATool.edmx</DependentUpon>
-      <DesignTime>True</DesignTime>
-      <AutoGen>True</AutoGen>
+      <DependentUpon>LCAModel.tt</DependentUpon>
     </Compile>
     <Compile Include="Models\Repository\Process.cs">
-      <DependentUpon>LCIATool.tt</DependentUpon>
-      <SubType>Code</SubType>
+      <DependentUpon>LCAModel.tt</DependentUpon>
     </Compile>
     <Compile Include="Models\Repository\ProcessFlow.cs">
-      <DependentUpon>LCIATool.tt</DependentUpon>
-      <SubType>Code</SubType>
+      <DependentUpon>LCAModel.tt</DependentUpon>
     </Compile>
     <Compile Include="Models\Repository\Repository.cs" />
     <Compile Include="Models\Repository\UnitConversion.cs">
-      <DependentUpon>LCIATool.tt</DependentUpon>
-      <SubType>Code</SubType>
+      <DependentUpon>LCAModel.tt</DependentUpon>
     </Compile>
     <Compile Include="Models\Repository\UnitGroup.cs">
-      <DependentUpon>LCIATool.tt</DependentUpon>
-      <SubType>Code</SubType>
+      <DependentUpon>LCAModel.tt</DependentUpon>
     </Compile>
     <Compile Include="Pages\Default.aspx.cs">
       <DependentUpon>Default.aspx</DependentUpon>
@@ -385,12 +371,6 @@
   </ItemGroup>
   <ItemGroup>
     <Service Include="{508349B6-6B84-4DF5-91F0-309BEEBAD82D}" />
-  </ItemGroup>
-  <ItemGroup>
-    <EntityDeploy Include="Models\Repository\LCIATool.edmx">
-      <Generator>EntityModelCodeGenerator</Generator>
-      <LastGenOutput>LCIATool.Designer.cs</LastGenOutput>
-    </EntityDeploy>
   </ItemGroup>
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>

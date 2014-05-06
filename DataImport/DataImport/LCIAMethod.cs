@@ -24,12 +24,12 @@ namespace DataImport
         public string LCIAMethodVersion { get; set; }
         public string Name { get; set; }
         public string Methodology { get; set; }
-        public string ImpactCategory { get; set; }
+        public Nullable<int> ImpactCategoryID { get; set; }
         public string ImpactIndicator { get; set; }
         public string ReferenceYear { get; set; }
         public string Duration { get; set; }
         public string ImpactLocation { get; set; }
-        public string IndicatorType { get; set; }
+        public Nullable<int> IndicatorTypeID { get; set; }
         public Nullable<bool> Normalization { get; set; }
         public Nullable<bool> Weighting { get; set; }
         public string UseAdvice { get; set; }

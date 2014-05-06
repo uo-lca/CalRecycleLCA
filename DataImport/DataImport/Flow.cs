@@ -29,7 +29,7 @@ namespace DataImport
         public string FlowType_SQL { get; set; }
         public string ReferenceFlowProperty_SQL { get; set; }
     
-        public virtual FlowType FlowType { get; set; }
         public virtual ICollection<Process> Processes { get; set; }
+        public virtual FlowType FlowType { get; set; }
     }
 }

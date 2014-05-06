@@ -14,17 +14,11 @@ namespace LCIATool.Models.Repository
     
     public partial class LCIAMethod
     {
-        public LCIAMethod()
-        {
-            this.LCIAs = new HashSet<LCIA>();
-        }
-    
         public int LCIAMethodID { get; set; }
         public string LCIAMethodUUID { get; set; }
         public string LCIAMethodVersion { get; set; }
         public string Name { get; set; }
         public string Methodology { get; set; }
-        
         public Nullable<int> ImpactCategoryID { get; set; }
         public string ImpactIndicator { get; set; }
         public string ReferenceYear { get; set; }
@@ -38,7 +32,5 @@ namespace LCIATool.Models.Repository
         public Nullable<int> FlowPropertyID { get; set; }
         public string Source { get; set; }
         public string ReferenceQuantity { get; set; }
-    
-        public virtual ICollection<LCIA> LCIAs { get; set; }
     }
 }

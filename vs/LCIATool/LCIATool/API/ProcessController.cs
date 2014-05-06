@@ -18,6 +18,7 @@ namespace LCIATool.API
          [System.Web.Http.HttpGet]
          public IQueryable<ProcessModel> ProcessDDL()
          {
+             //gets all processes for the dropdownlist by calling the function within the interface.
              var processes = repository.ProcessDDL();
              return processes;
          }

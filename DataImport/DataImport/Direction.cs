@@ -16,14 +16,14 @@ namespace DataImport
     {
         public Direction()
         {
-            this.LCIAs = new HashSet<LCIA>();
             this.ProcessFlows = new HashSet<ProcessFlow>();
+            this.LCIAs = new HashSet<LCIA>();
         }
     
         public int DirectionID { get; set; }
         public string Name { get; set; }
     
-        public virtual ICollection<LCIA> LCIAs { get; set; }
         public virtual ICollection<ProcessFlow> ProcessFlows { get; set; }
+        public virtual ICollection<LCIA> LCIAs { get; set; }
     }
 }

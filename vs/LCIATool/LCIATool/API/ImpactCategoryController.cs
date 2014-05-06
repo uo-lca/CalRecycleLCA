@@ -19,6 +19,7 @@ namespace LCIATool.API
         [System.Web.Http.HttpGet]
         public IQueryable<ImpactCategoryModel> ImpactCategoryDDL()
         {
+            //gets all impact categories for the dropdownlist by calling the function within the interface.
             var impactCategories = repository.ImpactCategoryDDL();
             return impactCategories;
         }

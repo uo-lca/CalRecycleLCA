@@ -12,7 +12,7 @@ namespace LCIATool.Pages
     {
         int proc=0;
         int lciameth = 0;
-        private LCAToolDevEntities2 context = new LCAToolDevEntities2();
+        private LCAToolDevEntities1 context = new LCAToolDevEntities1();
         protected void Page_Load(object sender, EventArgs e)
         {
             if (!Page.IsPostBack)

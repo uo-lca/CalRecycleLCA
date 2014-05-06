@@ -20,7 +20,7 @@ namespace DataImport
         }
     
         public int FlowTypeID { get; set; }
-        public string Name { get; set; }
+        public string Type { get; set; }
     
         public virtual ICollection<Flow> Flows { get; set; }
     }

@@ -19,6 +19,7 @@ namespace LCIATool.Models
         [JsonIgnore]
         public int? ImpactCategoryID { get; set; }
         public string Flow { get; set; }
+        public string Location { get; set; }
         public string Direction { get; set; }
         public double? Quantity { get; set; }
         public double? STDev { get; set; }

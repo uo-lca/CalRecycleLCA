@@ -114,12 +114,18 @@
     <Compile Include="FlowType.cs">
       <DependentUpon>LCIADataImport.tt</DependentUpon>
     </Compile>
+    <Compile Include="ImpactCategory.cs">
+      <DependentUpon>LCIADataImport.tt</DependentUpon>
+    </Compile>
     <Compile Include="Import.aspx.cs">
       <DependentUpon>Import.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
     <Compile Include="Import.aspx.designer.cs">
       <DependentUpon>Import.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="IndicatorType.cs">
+      <DependentUpon>LCIADataImport.tt</DependentUpon>
     </Compile>
     <Compile Include="LCIA.cs">
       <DependentUpon>LCIADataImport.tt</DependentUpon>

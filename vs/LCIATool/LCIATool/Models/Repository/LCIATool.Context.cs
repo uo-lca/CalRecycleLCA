@@ -35,7 +35,6 @@ namespace LCIATool.Models.Repository
         public virtual DbSet<Flow> Flows { get; set; }
         public virtual DbSet<FlowProperty> FlowProperties { get; set; }
         public virtual DbSet<FlowPropertyVersion> FlowPropertyVersions { get; set; }
-        public virtual DbSet<LCIA> LCIAs { get; set; }
         public virtual DbSet<Process> Processes { get; set; }
         public virtual DbSet<ProcessFlow> ProcessFlows { get; set; }
         public virtual DbSet<UnitConversion> UnitConversions { get; set; }

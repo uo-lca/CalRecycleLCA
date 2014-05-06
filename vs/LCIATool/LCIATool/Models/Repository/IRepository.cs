@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 
 namespace LCIATool.Models.Repository
 {
+    //repository interface 
     public interface IRepository
     {
         IQueryable<Process> Processes { get; }
@@ -22,5 +23,6 @@ namespace LCIATool.Models.Repository
         IQueryable<ImpactCategoryModel> ImpactCategoryDDL();
         IQueryable<LCIAMethodModel> LCIAMethodDDL();
         IQueryable<LCIAComputationModel> LCIAComputation();
+         
     }
 }

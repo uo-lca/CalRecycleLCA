@@ -5,9 +5,11 @@ using System.Web;
 
 namespace LCIATool.Models.Repository
 {
+    //Repository class implements all of the functions listed in IRepository class.
+    //These functions can then be called from within the web API via the interface.
     public class Repository : IRepository
     {
-        private LCAToolDevEntities2 context = new LCAToolDevEntities2();
+        private LCAToolDevEntities1 context = new LCAToolDevEntities1();
 
         public IQueryable<Process> Processes
         {
@@ -56,6 +58,8 @@ namespace LCIATool.Models.Repository
 
         public IQueryable<ImpactCategoryModel> ImpactCategoryDDL()
         {
+            //returns a list of Impact Categories as IQueryable<ImpactCategoryModel> type
+            //with just the fields needed for the dropdownlist
             return context.ImpactCategories
                 .Select(ic => new ImpactCategoryModel
                 {
@@ -68,7 +72,8 @@ namespace LCIATool.Models.Repository
 
         public IQueryable<ProcessModel> ProcessDDL()
         {
-
+            //returns a list of Processes as IQueryable<ProcessModel> type
+            //with just the fields needed for the dropdownlist
             return context.Processes
             .Select(p => new ProcessModel
             {
@@ -81,7 +86,8 @@ namespace LCIATool.Models.Repository
 
         public IQueryable<LCIAMethodModel> LCIAMethodDDL()
         {
-
+            //returns a list of LCIAMethods as IQueryable<LCIAMethodModel> type
+            //with just the fields needed for the dropdownlist
             return context.LCIAMethods
             .Select(lm => new LCIAMethodModel
             {
@@ -96,7 +102,8 @@ namespace LCIATool.Models.Repository
 
         public IQueryable<LCIAComputationModel> LCIAComputation()
         {
-
+            //returns a list of records as IQueryable<LCIAComputationModel> type
+            //these records are grouped by process
             var _lciaList = (from p in context.Processes
                              join pf in context.ProcessFlows on p.ProcessID equals pf.ProcessID
                              join f in context.Flows on pf.FlowID equals f.FlowID
@@ -106,6 +113,7 @@ namespace LCIATool.Models.Repository
                              join ft in context.FlowTypes on f.FlowTypeID equals ft.FlowTypeID
                              join fp in context.FlowProperties on f.FlowPropertyID equals fp.FlowPropertyID
                              //where f.FlowTypeID == 2 && (p.ProcessID == processID || processID == 0) && (lm.LCIAMethodID == lciaMethodId || lciaMethodId == 0) && (lm.ImpactCategoryID == impactCategoryId || impactCategoryId == 0)
+                             where f.FlowTypeID == 2 && l.Location == null && pf.DirectionID == l.DirectionID
                              group new { p, pf, f, l, lm, ft } by new
                              {
                                  Process = p.Name,

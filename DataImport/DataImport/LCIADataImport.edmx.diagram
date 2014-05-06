@@ -9,21 +9,23 @@
         <EntityTypeShape EntityType="LCAToolDevModel.Classification" Width="1.5" PointX="8" PointY="7" />
         <EntityTypeShape EntityType="LCAToolDevModel.Flow" Width="1.5" PointX="3" PointY="1.5" />
         <EntityTypeShape EntityType="LCAToolDevModel.FlowProperty" Width="1.5" PointX="9.75" PointY="0.75" />
-        <EntityTypeShape EntityType="LCAToolDevModel.FlowType" Width="1.5" PointX="0.75" PointY="2.25" />
-        <EntityTypeShape EntityType="LCAToolDevModel.LCIA" Width="1.5" PointX="3" PointY="6.875" />
-        <EntityTypeShape EntityType="LCAToolDevModel.LCIAMethod" Width="1.5" PointX="0.75" PointY="6" />
         <EntityTypeShape EntityType="LCAToolDevModel.Process" Width="1.5" PointX="5.25" PointY="1.375" />
         <EntityTypeShape EntityType="LCAToolDevModel.ProcessFlow" Width="1.5" PointX="7.5" PointY="1" />
         <EntityTypeShape EntityType="LCAToolDevModel.UnitConversion" Width="1.5" PointX="2.75" PointY="10.75" />
         <EntityTypeShape EntityType="LCAToolDevModel.UnitGroup" Width="1.5" PointX="10.75" PointY="3.75" />
         <AssociationConnector Association="LCAToolDevModel.FK_Classification_Class" />
-        <AssociationConnector Association="LCAToolDevModel.FK_Flow_FlowType" />
         <AssociationConnector Association="LCAToolDevModel.FK_Process_Flow" />
-        <AssociationConnector Association="LCAToolDevModel.FK_LCIA_LCIAMethod" />
         <AssociationConnector Association="LCAToolDevModel.FK_ProcessFlow_Process" />
-        <EntityTypeShape EntityType="LCAToolDevModel.Direction" Width="1.5" PointX="0.75" PointY="4.5" />
-        <AssociationConnector Association="LCAToolDevModel.FK_LCIA_Direction" />
+        <EntityTypeShape EntityType="LCAToolDevModel.Direction" Width="1.5" PointX="0.625" PointY="4" />
         <AssociationConnector Association="LCAToolDevModel.FK_ProcessFlow_Direction" />
+        <EntityTypeShape EntityType="LCAToolDevModel.ImpactCategory" Width="1.5" PointX="10.375" PointY="7.75" />
+        <EntityTypeShape EntityType="LCAToolDevModel.IndicatorType" Width="1.5" PointX="7.375" PointY="10.75" />
+        <EntityTypeShape EntityType="LCAToolDevModel.LCIAMethod" Width="1.5" PointX="9.375" PointY="11" />
+        <EntityTypeShape EntityType="LCAToolDevModel.LCIA" Width="1.5" PointX="12.625" PointY="8.25" />
+        <AssociationConnector Association="LCAToolDevModel.FK_LCIA_Direction" />
+        <AssociationConnector Association="LCAToolDevModel.FK_LCIA_LCIAMethod" />
+        <EntityTypeShape EntityType="LCAToolDevModel.FlowType" Width="1.5" PointX="0.75" PointY="1.25" />
+        <AssociationConnector Association="LCAToolDevModel.FK_Flow_FlowType" />
         </Diagram>
     </edmx:Diagrams>
   </edmx:Designer>

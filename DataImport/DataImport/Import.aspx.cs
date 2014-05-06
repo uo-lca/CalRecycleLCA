@@ -16,7 +16,7 @@ namespace DataImport
     public partial class Import : System.Web.UI.Page
     {
 
-        
+
         protected void Page_Load(object sender, EventArgs e)
         {
 
@@ -24,7 +24,7 @@ namespace DataImport
         protected void btnImport_Click(object sender, EventArgs e)
         {
 
-            
+
 
             if (FileUpload1.PostedFile.ContentType == "application/xml" || FileUpload1.PostedFile.ContentType == "text/xml")
             {
@@ -37,8 +37,9 @@ namespace DataImport
                     XNamespace df = xDoc.Root.Name.Namespace;
                     XNamespace common = "http://lca.jrc.it/ILCD/Common";
 
-                    
-                        
+
+                    LCAToolDevEntities ent = new LCAToolDevEntities();
+
                     LCIAMethod lciaMethod = new LCIAMethod();
                     lciaMethod.LCIAMethodUUID = xDoc.Root
                         .Descendants(common + "UUID")
@@ -68,13 +69,22 @@ namespace DataImport
                             new StringBuilder(),
                             (s, i) => s.Append(i),
                             s => s.ToString().TrimEnd());
-                    lciaMethod.ImpactCategory = xDoc.Root
-                        .Descendants(df + "impactCategory")
-                        .Select(s => s.Value)
-                        .Aggregate(
-                            new StringBuilder(),
-                            (s, i) => s.Append(i),
-                            s => s.ToString());
+
+                    string impactCategory = xDoc.Root
+                       .Descendants(df + "impactCategory")
+                       .Select(s => s.Value)
+                       .Aggregate(
+                           new StringBuilder(),
+                           (s, i) => s.Append(i),
+                           s => s.ToString());
+
+                    List<ImpactCategory> impactCategories = new List<ImpactCategory>();
+                    impactCategories = ent.ImpactCategories.ToList();
+                    int? impactCategoryId = impactCategories.Where(ic => ic.Name == impactCategory)
+                       .Select(ic => ic.ImpactCategoryID).FirstOrDefault();
+
+                    lciaMethod.ImpactCategoryID = impactCategoryId;
+
                     lciaMethod.ImpactIndicator = xDoc.Root
                         .Descendants(df + "impactIndicator")
                         .Select(s => s.Value)
@@ -103,13 +113,22 @@ namespace DataImport
                             new StringBuilder(),
                             (s, i) => s.Append(i),
                             s => s.ToString());
-                    lciaMethod.IndicatorType = xDoc.Root
-                        .Descendants(df + "typeOfDataSet")
-                        .Select(s => s.Value)
-                        .Aggregate(
-                            new StringBuilder(),
-                            (s, i) => s.Append(i),
-                            s => s.ToString());
+
+                    string indicatorType = xDoc.Root
+                       .Descendants(df + "typeOfDataSet")
+                       .Select(s => s.Value)
+                       .Aggregate(
+                           new StringBuilder(),
+                           (s, i) => s.Append(i),
+                           s => s.ToString());
+
+                    List<IndicatorType> indicatorTypes = new List<IndicatorType>();
+                    indicatorTypes = ent.IndicatorTypes.ToList();
+                    int? indicatorTypeId = indicatorTypes.Where(it => it.Name == indicatorType)
+                       .Select(it => it.IndicatorTypeID).FirstOrDefault();
+
+                    lciaMethod.IndicatorTypeID = indicatorTypeId;
+
                     lciaMethod.Normalization = Convert.ToBoolean(xDoc.Root
                         .Descendants(df + "normalisation")
                         .Select(s => s.Value)
@@ -148,9 +167,9 @@ namespace DataImport
                             (s, i) => s.Append(i),
                             s => s.ToString());
 
-                    LCAToolDevEntities ent = new LCAToolDevEntities();
-
                     
+
+
                     List<Flow> flows = new List<Flow>();
                     flows = ent.Flows.ToList();
 
@@ -160,24 +179,25 @@ namespace DataImport
                     List<LCIA> lciaList = xDoc.Root.Descendants(df + "characterisationFactors").Elements(df + "factor").Select(d =>
                     new LCIA
                     {
-                         LCIAUUID = xDoc.Root
-                        .Descendants(common + "UUID")
-                        .Select(s => s.Value)
-                        .Aggregate(
-                            new StringBuilder(),
-                            (s, i) => s.Append(i),
-                            s => s.ToString()), 
+                        LCIAUUID = xDoc.Root
+                       .Descendants(common + "UUID")
+                       .Select(s => s.Value)
+                       .Aggregate(
+                           new StringBuilder(),
+                           (s, i) => s.Append(i),
+                           s => s.ToString()),
                         Flow_SQL = d.Element(df + "referenceToFlowDataSet").Attribute("refObjectId").Value,
                         Factor = float.Parse(d.Element(df + "meanValue").Value, System.Globalization.CultureInfo.InvariantCulture),
                         Direction_SQL = d.Element(df + "exchangeDirection").Value,
-                         FlowID = flows.Where(f => f.FlowUUID == d.Element(df + "referenceToFlowDataSet").Attribute("refObjectId").Value)
-                         .Select(f => f.FlowID).FirstOrDefault(),
-                         DirectionID = directions.Where(dir => dir.Name == d.Element(df + "exchangeDirection").Value)
-                         .Select(dir => dir.DirectionID).FirstOrDefault(),
-                        
+                        Location = (string)d.Element(df + "location"),
+                        FlowID = flows.Where(f => f.FlowUUID == (string)d.Element(df + "referenceToFlowDataSet").Attribute("refObjectId"))
+                        .Select(f => f.FlowID).FirstOrDefault(),
+                        DirectionID = directions.Where(dir => dir.Name == d.Element(df + "exchangeDirection").Value)
+                        .Select(dir => dir.DirectionID).FirstOrDefault(),
+
                     }).ToList();
 
-                  
+
 
 
                     ent.LCIAMethods.Add(lciaMethod);
@@ -213,7 +233,7 @@ namespace DataImport
                     foreach (var i in lciaList)
                     {
                         ent.LCIAs.Add(i);
-                        i.LCIAMethodID = lciaMethodId;     
+                        i.LCIAMethodID = lciaMethodId;
                     }
 
                     //check for EntityValidationErrors before saving
@@ -239,7 +259,7 @@ namespace DataImport
                         throw new DbEntityValidationException(string.Format("Validation errors\r\n{0}"
                          , outputLines.ToString()), dbValEx);
                     }
-                    
+
 
                     lblMessage.Text = "Import Done successfully!";
                 }
@@ -275,7 +295,7 @@ namespace DataImport
                             new StringBuilder(),
                             (s, i) => s.Append(i),
                             s => s.ToString());
-                    process.ProcessVersion= xDoc.Root
+                    process.ProcessVersion = xDoc.Root
                         .Descendants(common + "dataSetVersion")
                         .Select(s => s.Value)
                         .Aggregate(
@@ -344,19 +364,19 @@ namespace DataImport
                     List<Direction> directions = new List<Direction>();
                     directions = ent.Directions.ToList();
 
-                    List<ProcessFlow> processFlowList = xDoc.Root.Descendants(p + "exchanges").Elements(p+"exchange").Select(d =>
+                    List<ProcessFlow> processFlowList = xDoc.Root.Descendants(p + "exchanges").Elements(p + "exchange").Select(d =>
                     new ProcessFlow
                     {
                         ProcessUUID = process.ProcessUUID,
                         Type = (string)d.Element(p + "referenceToVariable"),
                         VarName = (string)d.Element(common + "other").Element(gabi + "GaBi").Attribute("IOType"),
-                       Magnitude = (double)d.Element(p + "meanAmount"),
-                       // //Not sure where this value comes from.  Need to ask Brandon.
-                       // //Result = d.Element(df + "meanAmount").Value,
-                       STDev = (double)d.Element(p + "relativeStandardDeviation95In"),
-                       Flow_SQL = (string)d.Element(p + "referenceToFlowDataSet").Attribute("refObjectId"),
-                       Direction_SQL = (string)d.Element(p + "exchangeDirection"),
-                       Geography = (string)d.Element(p + "location"),
+                        Magnitude = (double)d.Element(p + "meanAmount"),
+                        // //Not sure where this value comes from.  Need to ask Brandon.
+                        // //Result = d.Element(df + "meanAmount").Value,
+                        STDev = (double)d.Element(p + "relativeStandardDeviation95In"),
+                        Flow_SQL = (string)d.Element(p + "referenceToFlowDataSet").Attribute("refObjectId"),
+                        Direction_SQL = (string)d.Element(p + "exchangeDirection"),
+                        Geography = (string)d.Element(p + "location"),
                         FlowID = flows.Where(f => f.FlowUUID == d.Element(p + "referenceToFlowDataSet").Attribute("refObjectId").Value)
                          .Select(f => f.FlowID).FirstOrDefault(),
                         DirectionID = directions.Where(dir => dir.Name == d.Element(p + "exchangeDirection").Value)
@@ -473,7 +493,7 @@ namespace DataImport
                             new StringBuilder(),
                             (s, i) => s.Append(i),
                             s => s.ToString());
-                    
+
 
                     LCAToolDevEntities ent = new LCAToolDevEntities();
 
@@ -582,7 +602,7 @@ namespace DataImport
 
                     Flow flow = new Flow();
 
-                     
+
 
                     flow.FlowUUID = xDoc.Root
                         .Descendants(common + "UUID")
@@ -592,7 +612,7 @@ namespace DataImport
                             (s, i) => s.Append(i),
                             s => s.ToString());
 
-                    int? classId = classifications.Where(cn => cn.ClassificationUUID == flow.FlowUUID )
+                    int? classId = classifications.Where(cn => cn.ClassificationUUID == flow.FlowUUID)
                         .Select(cn => cn.ClassID).FirstOrDefault();
                     string className = classes.Where(cl => cl.ClassID == classId)
                         .Select(cl => cl.Name).FirstOrDefault();
@@ -648,7 +668,7 @@ namespace DataImport
                     flow.FlowPropertyID = flowProperties.Where(fp => fp.FlowPropertyUUID == flow.ReferenceFlowProperty_SQL)
                         .Select(fp => fp.FlowPropertyID).FirstOrDefault();
 
-                    flow.FlowTypeID = flowTypes.Where(ft => ft.Name == flow.FlowType_SQL)
+                    flow.FlowTypeID = flowTypes.Where(ft => ft.Type == flow.FlowType_SQL)
                         .Select(fp => fp.FlowTypeID).FirstOrDefault();
 
                     ent.Flows.Add(flow);
@@ -759,7 +779,7 @@ namespace DataImport
                             new StringBuilder(),
                             (s, i) => s.Append(i),
                             s => s.ToString());
-                    
+
                     List<UnitGroup> unitGroups = new List<UnitGroup>();
                     unitGroups = ent.UnitGroups.ToList();
 
