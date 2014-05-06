@@ -313,8 +313,7 @@ function lciaComputation() {
      * @param {Array} lciaResultData  JSON data from web API
      */
     function visualizeResults(error, lciaResultData) {
-        var barData = [],
-            flowList = [],
+        var flowList = [],
             runningTotal = 0,
             rects,
             colorClassSize = 9, // Number of classes in colorbrewer scale, ranges from 3 to 9
@@ -326,9 +325,8 @@ function lciaComputation() {
             window.alert(error);
         }
         impactScore = 0;
-        barData = lciaResultData;
-        barData.sort(compareLciaResults);
-        flowList = barData.map(function (d) {
+        lciaResultData.sort(compareLciaResults);
+        flowList = lciaResultData.map(function (d) {
             return d.Flow;
         });
         color.domain(flowList);
@@ -346,7 +344,7 @@ function lciaComputation() {
          * Compute impact score.
          * Add rect start and end points for each flow
          */
-        barData.forEach(function (d) {
+        lciaResultData.forEach(function (d) {
             impactScore += +d.LCIAResult;
             d.x0 = runningTotal;
             // ignore negative values in chart
@@ -361,7 +359,7 @@ function lciaComputation() {
         /**
          * Update/Add/Delete rect data
          */
-        rects = d3.select(".chartgroup").selectAll("rect").data(barData);
+        rects = d3.select(".chartgroup").selectAll("rect").data(lciaResultData);
         rects.enter().append("rect");
         rects.exit().remove();
         rects.attr("width", function (d) {
@@ -375,7 +373,7 @@ function lciaComputation() {
             .style("fill", function (d) {
                 return color(d.Flow);
             });
-        makeLegend(barData);
+        makeLegend(lciaResultData);
     }
 
     /**
