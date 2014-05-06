@@ -16,10 +16,11 @@ function lciaComputation() {
         methodList = [],
         lciaResultData = [],
         // Web API methods
-        processesURL = "http://rachelscanlon.com/api/process",
-        impactCategoriesURL = "http://rachelscanlon.com/api/impactcategory",
-        methodsURL = "http://rachelscanlon.com/api/lciamethod",
-        lciaResultsURL = "http://rachelscanlon.com/api/LCIAComputation",
+        baseURI = "http://rachelscanlon.com/api/",
+        processesURL = baseURI + "process",
+        impactCategoriesURL = baseURI + "impactcategory",
+        methodsURL = baseURI + "lciamethod",
+        lciaResultsURL = baseURI + "LCIAComputation",
         // Current selections
         selectedProcessID = 2,
         selectedImpactCategoryID = 10,
