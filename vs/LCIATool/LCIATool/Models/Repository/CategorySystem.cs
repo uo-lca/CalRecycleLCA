@@ -29,5 +29,6 @@ namespace LCIATool.Models.Repository
     
         public virtual ICollection<Category> Categories { get; set; }
         public virtual ICollection<Classification> Classifications { get; set; }
+        public virtual DataType DataType { get; set; }
     }
 }

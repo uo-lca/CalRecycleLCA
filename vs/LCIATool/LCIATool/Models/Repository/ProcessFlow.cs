@@ -31,5 +31,6 @@ namespace LCIATool.Models.Repository
     
         public virtual Direction Direction { get; set; }
         public virtual Process Process { get; set; }
+        public virtual Flow Flow { get; set; }
     }
 }

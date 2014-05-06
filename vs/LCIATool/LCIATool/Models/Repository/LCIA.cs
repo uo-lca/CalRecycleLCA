@@ -25,5 +25,6 @@ namespace LCIATool.Models.Repository
         public string Direction_SQL { get; set; }
     
         public virtual Direction Direction { get; set; }
+        public virtual LCIAMethod LCIAMethod { get; set; }
     }
 }

@@ -34,7 +34,6 @@ namespace LCIATool.Models.Repository
         public virtual DbSet<Direction> Directions { get; set; }
         public virtual DbSet<Flow> Flows { get; set; }
         public virtual DbSet<FlowProperty> FlowProperties { get; set; }
-        public virtual DbSet<FlowPropertyVersion> FlowPropertyVersions { get; set; }
         public virtual DbSet<FlowType> FlowTypes { get; set; }
         public virtual DbSet<ImpactCategory> ImpactCategories { get; set; }
         public virtual DbSet<IndicatorType> IndicatorTypes { get; set; }
@@ -44,5 +43,6 @@ namespace LCIATool.Models.Repository
         public virtual DbSet<ProcessFlow> ProcessFlows { get; set; }
         public virtual DbSet<UnitConversion> UnitConversions { get; set; }
         public virtual DbSet<UnitGroup> UnitGroups { get; set; }
+        public virtual DbSet<FlowFlowProperty> FlowFlowProperties { get; set; }
     }
 }

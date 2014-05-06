@@ -111,7 +111,6 @@ namespace LCIATool.Models.Repository
                              join d in context.Directions on l.DirectionID equals d.DirectionID
                              join lm in context.LCIAMethods on l.LCIAMethodID equals lm.LCIAMethodID
                              join ft in context.FlowTypes on f.FlowTypeID equals ft.FlowTypeID
-                             join fp in context.FlowProperties on f.FlowPropertyID equals fp.FlowPropertyID
                              //where f.FlowTypeID == 2 && (p.ProcessID == processID || processID == 0) && (lm.LCIAMethodID == lciaMethodId || lciaMethodId == 0) && (lm.ImpactCategoryID == impactCategoryId || impactCategoryId == 0)
                              where f.FlowTypeID == 2 && l.Location == null && pf.DirectionID == l.DirectionID
                              group new { p, pf, f, l, lm, ft } by new

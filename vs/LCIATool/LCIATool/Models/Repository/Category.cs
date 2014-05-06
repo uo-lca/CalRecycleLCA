@@ -27,5 +27,6 @@ namespace LCIATool.Models.Repository
     
         public virtual CategorySystem CategorySystem { get; set; }
         public virtual Class Class { get; set; }
+        public virtual Class Class1 { get; set; }
     }
 }

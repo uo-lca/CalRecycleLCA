@@ -16,8 +16,9 @@ namespace LCIATool.Models.Repository
     {
         public Flow()
         {
-            this.FlowPropertyVersions = new HashSet<FlowPropertyVersion>();
             this.Processes = new HashSet<Process>();
+            this.FlowFlowProperties = new HashSet<FlowFlowProperty>();
+            this.ProcessFlows = new HashSet<ProcessFlow>();
         }
     
         public int FlowID { get; set; }
@@ -31,7 +32,11 @@ namespace LCIATool.Models.Repository
         public string ReferenceFlowProperty_SQL { get; set; }
     
         public virtual FlowType FlowType { get; set; }
-        public virtual ICollection<FlowPropertyVersion> FlowPropertyVersions { get; set; }
         public virtual ICollection<Process> Processes { get; set; }
+        public virtual ICollection<FlowFlowProperty> FlowFlowProperties { get; set; }
+        public virtual Flow Flow1 { get; set; }
+        public virtual Flow Flow2 { get; set; }
+        public virtual FlowProperty FlowProperty { get; set; }
+        public virtual ICollection<ProcessFlow> ProcessFlows { get; set; }
     }
 }

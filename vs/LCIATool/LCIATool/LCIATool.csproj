@@ -203,6 +203,9 @@
     <Content Include="Web.config" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="API\CountController.cs">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="API\ImpactCategoryController.cs" />
     <Compile Include="API\LCIAComputationController.cs" />
     <Compile Include="API\LCIAMethodController.cs" />
@@ -281,10 +284,10 @@
     <Compile Include="Models\Repository\Flow.cs">
       <DependentUpon>LCAModel.tt</DependentUpon>
     </Compile>
-    <Compile Include="Models\Repository\FlowProperty.cs">
+    <Compile Include="Models\Repository\FlowFlowProperty.cs">
       <DependentUpon>LCAModel.tt</DependentUpon>
     </Compile>
-    <Compile Include="Models\Repository\FlowPropertyVersion.cs">
+    <Compile Include="Models\Repository\FlowProperty.cs">
       <DependentUpon>LCAModel.tt</DependentUpon>
     </Compile>
     <Compile Include="Models\Repository\FlowType.cs">

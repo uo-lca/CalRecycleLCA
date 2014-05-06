@@ -25,5 +25,7 @@ namespace LCIATool.Models.Repository
         public System.DateTime UpdatedOn { get; set; }
         public int UpdatedBy { get; set; }
         public bool Voided { get; set; }
+    
+        public virtual UnitGroup UnitGroup { get; set; }
     }
 }

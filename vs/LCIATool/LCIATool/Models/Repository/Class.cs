@@ -18,6 +18,7 @@ namespace LCIATool.Models.Repository
         {
             this.Categories = new HashSet<Category>();
             this.Classifications = new HashSet<Classification>();
+            this.Categories1 = new HashSet<Category>();
         }
     
         public int ClassID { get; set; }
@@ -27,5 +28,6 @@ namespace LCIATool.Models.Repository
     
         public virtual ICollection<Category> Categories { get; set; }
         public virtual ICollection<Classification> Classifications { get; set; }
+        public virtual ICollection<Category> Categories1 { get; set; }
     }
 }

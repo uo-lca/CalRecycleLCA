@@ -14,7 +14,14 @@ namespace LCIATool.Models.Repository
     
     public partial class DataType
     {
+        public DataType()
+        {
+            this.CategorySystems = new HashSet<CategorySystem>();
+        }
+    
         public int DataTypeID { get; set; }
         public string Name { get; set; }
+    
+        public virtual ICollection<CategorySystem> CategorySystems { get; set; }
     }
 }

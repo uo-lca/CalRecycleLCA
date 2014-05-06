@@ -14,7 +14,6 @@
         <EntityTypeShape EntityType="LCAToolDevModel.Direction" Width="1.5" PointX="5.25" PointY="11.375" IsExpanded="true" />
         <EntityTypeShape EntityType="LCAToolDevModel.Flow" Width="1.5" PointX="3" PointY="4.75" IsExpanded="true" />
         <EntityTypeShape EntityType="LCAToolDevModel.FlowProperty" Width="1.5" PointX="9.75" PointY="9.125" IsExpanded="true" />
-        <EntityTypeShape EntityType="LCAToolDevModel.FlowPropertyVersion" Width="1.5" PointX="5.25" PointY="2.875" IsExpanded="true" />
         <EntityTypeShape EntityType="LCAToolDevModel.FlowType" Width="1.5" PointX="0.75" PointY="5.625" IsExpanded="true" />
         <EntityTypeShape EntityType="LCAToolDevModel.ImpactCategory" Width="1.5" PointX="0.75" PointY="12.125" IsExpanded="true" />
         <EntityTypeShape EntityType="LCAToolDevModel.IndicatorType" Width="1.5" PointX="9.75" PointY="12.125" IsExpanded="true" />
@@ -31,9 +30,21 @@
         <AssociationConnector Association="LCAToolDevModel.FK_LCIA_Direction" ManuallyRouted="false" />
         <AssociationConnector Association="LCAToolDevModel.FK_ProcessFlow_Direction" ManuallyRouted="false" />
         <AssociationConnector Association="LCAToolDevModel.FK_Flow_FlowType" ManuallyRouted="false" />
-        <AssociationConnector Association="LCAToolDevModel.FK_FlowPropertyVersion_Flow" ManuallyRouted="false" />
         <AssociationConnector Association="LCAToolDevModel.FK_Process_Flow" ManuallyRouted="false" />
         <AssociationConnector Association="LCAToolDevModel.FK_ProcessFlow_Process" ManuallyRouted="false" />
+        <EntityTypeShape EntityType="LCAToolDevModel.FlowFlowProperty" Width="1.5" PointX="5.25" PointY="2" />
+        <AssociationConnector Association="LCAToolDevModel.FK_FlowPropertyVersion_Flow" />
+        <AssociationConnector Association="LCAToolDevModel.FK_Category_ParentClass" />
+        <AssociationConnector Association="LCAToolDevModel.FK_CategorySystem_DataType" />
+        <AssociationConnector Association="LCAToolDevModel.FK_Flow_Flow" />
+        <AssociationConnector Association="LCAToolDevModel.FK_Flow_FlowProperty" />
+        <AssociationConnector Association="LCAToolDevModel.FK_ProcessFlow_Flow" />
+        <AssociationConnector Association="LCAToolDevModel.FK_FlowProperty_UnitGroup" />
+        <AssociationConnector Association="LCAToolDevModel.FK_LCIAMethod_FlowProperty" />
+        <AssociationConnector Association="LCAToolDevModel.FK_LCIAMethod_ImpactCategory" />
+        <AssociationConnector Association="LCAToolDevModel.FK_LCIAMethod_IndicatorType" />
+        <AssociationConnector Association="LCAToolDevModel.FK_LCIA_LCIAMethod" />
+        <AssociationConnector Association="LCAToolDevModel.FK_UnitConversion_UnitGroup" />
       </Diagram>
     </edmx:Diagrams>
   </edmx:Designer>

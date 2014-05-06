@@ -650,7 +650,7 @@ namespace DataImport
                          new StringBuilder(),
                          (s, i) => s.Append(i),
                          s => s.ToString());
-                    flow.ReferenceFlowProperty_SQL = xDoc.Root
+                    flow.ReferenceFlowProperty_SQL = (string)xDoc.Root
                          .Descendants(f + "referenceToFlowPropertyDataSet")
                          .Attributes("refObjectId")
                          .Select(s => s.Value)
@@ -658,6 +658,8 @@ namespace DataImport
                              new StringBuilder(),
                              (s, i) => s.Append(i),
                              s => s.ToString());
+
+                    //Location = (string)d.Element(df + "location"),
 
                     List<FlowProperty> flowProperties = new List<FlowProperty>();
                     flowProperties = ent.FlowProperties.ToList();

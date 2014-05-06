@@ -14,7 +14,14 @@ namespace LCIATool.Models.Repository
     
     public partial class ImpactCategory
     {
+        public ImpactCategory()
+        {
+            this.LCIAMethods = new HashSet<LCIAMethod>();
+        }
+    
         public int ImpactCategoryID { get; set; }
         public string Name { get; set; }
+    
+        public virtual ICollection<LCIAMethod> LCIAMethods { get; set; }
     }
 }

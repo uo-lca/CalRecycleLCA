@@ -14,6 +14,12 @@ namespace LCIATool.Models.Repository
     
     public partial class UnitGroup
     {
+        public UnitGroup()
+        {
+            this.FlowProperties = new HashSet<FlowProperty>();
+            this.UnitConversions = new HashSet<UnitConversion>();
+        }
+    
         public int UnitGroupID { get; set; }
         public string UnitGroupUUID { get; set; }
         public string Version { get; set; }
@@ -24,5 +30,8 @@ namespace LCIATool.Models.Repository
         public System.DateTime UpdatedOn { get; set; }
         public int UpdatedBy { get; set; }
         public bool Voided { get; set; }
+    
+        public virtual ICollection<FlowProperty> FlowProperties { get; set; }
+        public virtual ICollection<UnitConversion> UnitConversions { get; set; }
     }
 }

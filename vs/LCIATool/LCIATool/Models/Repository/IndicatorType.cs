@@ -14,7 +14,14 @@ namespace LCIATool.Models.Repository
     
     public partial class IndicatorType
     {
+        public IndicatorType()
+        {
+            this.LCIAMethods = new HashSet<LCIAMethod>();
+        }
+    
         public int IndicatorTypeID { get; set; }
         public string Name { get; set; }
+    
+        public virtual ICollection<LCIAMethod> LCIAMethods { get; set; }
     }
 }
