@@ -9,8 +9,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <!-- Place favicon.ico and apple-touch-icon(s) in the root directory -->
     <!-- Stylesheets -->
-<!--    <link rel="stylesheet" href="dist/css/normalize.css">-->
+    <!--    <link rel="stylesheet" href="dist/css/normalize.css">-->
     <link rel="stylesheet" type="text/css" href="http://www.calrecycle.ca.gov/CSSShared/CAStandard/ca_master.css" />
+    <link rel="stylesheet" type="text/css" href="http://www.calrecycle.ca.gov/CSSShared/CAStandard/ca_department.css">
+
     <link rel="stylesheet" type="text/css" href="http://www.calrecycle.ca.gov/CSS/DRRR_color_scheme.css" />
     <link rel="stylesheet" href="LciaComputation.css">
     <!-- JavaScript -->
@@ -35,28 +37,29 @@
 
     <div class="container">
         <h1>Used Oil LCIA Computation</h1>
+        <a id="lciaHelp" href="Help.html">About LCIA Computation</a>
         <fieldset>
-        <p>
-            <label for="processSelect">Process</label>
-            <select name="processSelect" id="processSelect">
-            </select>
-        </p>
-        <p>
-            <label for="impactCategorySelect">Impact Category</label>
-            <select name="impactCategorySelect" id="impactCategorySelect">
-            </select>
-        </p>
-        <p>
-            <label for="lciaMethodSelect">LCIA Method</label>
-            <select name="lciaMethodSelect" id="lciaMethodSelect">
-            </select>
-        </p>
-        <p>
-            <label id="impactLabel">Impact Score:</label>
-            <span id="impactScore"></span>
-        </p>
+            <p>
+                <label for="processSelect">Process</label>
+                <select name="processSelect" id="processSelect">
+                </select>
+            </p>
+            <p>
+                <label for="impactCategorySelect">Impact Category</label>
+                <select name="impactCategorySelect" id="impactCategorySelect">
+                </select>
+            </p>
+            <p>
+                <label for="lciaMethodSelect">LCIA Method</label>
+                <select name="lciaMethodSelect" id="lciaMethodSelect">
+                </select>
+            </p>
+            <p>
+                <label id="impactLabel">Impact Score:</label>
+                <span id="impactScore"></span>
+            </p>
         </fieldset>
-    <div id="chartcontainer"></div>
+        <div id="chartcontainer"></div>
     </div>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
     <script>
