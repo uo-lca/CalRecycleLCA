@@ -83,7 +83,6 @@
     <Build Include="dbo\Tables\Param.sql" />
     <Build Include="dbo\Tables\Classification.sql" />
     <Build Include="dbo\Tables\FragmentNode.sql" />
-    <Build Include="dbo\Tables\FlowPropertyVersion.sql" />
     <Build Include="dbo\Tables\FragmentEdge.sql" />
     <Build Include="dbo\Tables\FragmentEmission.sql" />
     <Build Include="dbo\Tables\FragmentScore.sql" />
@@ -96,7 +95,9 @@
     <Build Include="dbo\Tables\MasterLCAModels.sql" />
     <Build Include="Security\lca1.sql" />
     <Build Include="Security\RoleMemberships.sql" />
-    <Build Include="dbo\Stored Procedures\spGenerateDBDictionary.sql" />
     <Build Include="Security\Login1.sql" />
+    <Build Include="dbo\Tables\IndicatorType.sql" />
+    <Build Include="dbo\Tables\ImpactCategory.sql" />
+    <Build Include="dbo\Tables\FlowFlowProperty.sql" />
   </ItemGroup>
 </Project>
