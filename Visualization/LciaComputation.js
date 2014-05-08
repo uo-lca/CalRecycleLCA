@@ -5,7 +5,7 @@ function lciaComputation() {
 
 
     // library globals
-    /*global d3, console, window, $, colorbrewer */
+    /*global d3, console, window, colorbrewer */
 
     /**
      * lciaComputation variables
