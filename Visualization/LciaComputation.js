@@ -380,11 +380,13 @@ function lciaComputation() {
      * Starting point for lciaComputation
      */
     function init() {
+        var filteredMethodsURL = methodsURL + "?impactCategoryid=" + selectedImpactCategoryID;
+
         prepareSelect(processesURL, "#processSelect", "ProcessID",
             onProcessChange, selectedProcessID);
         prepareSelect(impactCategoriesURL, "#impactCategorySelect", "ImpactCategoryID",
             onImpactCategoryChange, selectedImpactCategoryID);
-        prepareSelect(methodsURL, "#lciaMethodSelect", "LCIAMethodID",
+        prepareSelect(filteredMethodsURL, "#lciaMethodSelect", "LCIAMethodID",
             onMethodChange, selectedMethodID);
         prepareSvg();
         displayResults();
