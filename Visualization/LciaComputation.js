@@ -45,10 +45,14 @@ function lciaComputation() {
     var x = d3.scale.linear()
         .rangeRound([0, width]);
 
+    var labelFormat = d3.format("^.2g"); // Format numbers with precision 2;
+
     var xAxis = d3.svg.axis()
         .scale(x)
         .orient("bottom")
-        .ticks(5);
+        .ticks(4)
+        .tickFormat(labelFormat);
+
     //
     // Color scales to be used in chart. Index is (ImpactCategoryID - 1)
     //
@@ -226,8 +230,7 @@ function lciaComputation() {
      */
     function makeLegendHeader(flowX, resultX, headerY, flowsExist) {
         var legendGroup = svg.select(".legendgroup"),
-            header = legendGroup.selectAll(".legendheader"),
-            visibility = flowsExist ? "visible" : "hidden";
+            header = legendGroup.selectAll(".legendheader");
         if (header.empty() && flowsExist) {
             legendGroup.append("text").attr({
                 class: "legendheader",
@@ -314,9 +317,9 @@ function lciaComputation() {
     /**
      * Callback function for LCIA computation.
      * @param {string} error          Web API GET error
-     * @param {Array} lciaResultData  JSON data from web API
+     * @param {Array} results  JSON data from web API
      */
-    function visualizeResults(error, lciaResultData) {
+    function visualizeResults(error, results) {
         var flowList = [],
             runningTotal = 0,
             rects,
@@ -325,10 +328,12 @@ function lciaComputation() {
             colorIndex = 1, // Index to color scale (ImpactCategoryID - 1)
             reverseScale; // Clone of color scale in reverse order (dark to light)
 
+
         if (error) {
             window.alert(error);
         }
         impactScore = 0;
+        lciaResultData = results;
         lciaResultData.sort(compareLciaResults);
         flowList = lciaResultData.map(function (d) {
             return d.Flow;
@@ -361,7 +366,8 @@ function lciaComputation() {
         x.domain([0, runningTotal]);
         d3.select("#impactScore").text(impactScore.toPrecision(4));
         svg.select(".x.axis")
-            .call(xAxis);
+            .call(xAxis)
+            .style("visibility", lciaResultData.length > 0 ? "visible" : "hidden");
         /**
          * Update/Add/Delete rect data
          */
