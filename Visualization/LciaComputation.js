@@ -5,7 +5,7 @@ function lciaComputation() {
 
 
     // library globals
-    /*global d3, console, window, colorbrewer */
+    /*global d3, console, window, $, colorbrewer */
 
     /**
      * lciaComputation variables
@@ -31,7 +31,7 @@ function lciaComputation() {
      * d3 variables
      */
     var margin = {
-        top: 20,
+        top: 10,
         right: 20,
         bottom: 30,
         left: 20
@@ -47,7 +47,8 @@ function lciaComputation() {
 
     var xAxis = d3.svg.axis()
         .scale(x)
-        .orient("bottom");
+        .orient("bottom")
+        .ticks(5);
     //
     // Color scales to be used in chart. Index is (ImpactCategoryID - 1)
     //
@@ -69,8 +70,11 @@ function lciaComputation() {
             .attr("class", "chartgroup")
             .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
         svg.append("g")
+            .attr("class", "x axis")
+            .attr("transform", "translate(" + margin.left + "," + (chartHeight - margin.bottom) + ")");
+        svg.append("g")
             .attr("class", "legendgroup")
-            .attr("transform", "translate(" + margin.left + "," + chartHeight + ")");
+            .attr("transform", "translate(" + margin.left + "," + (chartHeight + margin.top) + ")");
     }
 
     /**
@@ -356,6 +360,8 @@ function lciaComputation() {
 
         x.domain([0, runningTotal]);
         d3.select("#impactScore").text(impactScore.toPrecision(4));
+        svg.select(".x.axis")
+            .call(xAxis);
         /**
          * Update/Add/Delete rect data
          */
