@@ -1,0 +1,80 @@
+
+.container {
+    position: relative;
+    padding: 10px 5px 15px 20px;
+}
+
+fieldset {
+    border: 1px;
+    padding: 0.35em 0.625em 0.75em 0.35em;
+}
+fieldset select,
+fieldset label {
+    display: table-cell;
+    margin: 5px;
+}
+fieldset label {
+    text-align: right;
+	font-weight: bold;
+    vertical-align: middle;
+}
+fieldset p {
+    display: table-row;
+}
+fieldset #impactScore {
+    display: table-cell;
+    padding: 5px;
+}
+
+
+text {
+    font: 10px sans-serif;
+}
+
+/*
+.dropdown.label {
+    font-weight: bold;
+//    display: block;
+}
+*/
+
+.legendheader{
+   font-weight: bold;
+}
+
+.axis path,
+.axis line {
+  fill: none;
+  stroke: #000;
+  shape-rendering: crispEdges;
+}
+
+/*
+.x.axis path {
+  display: none;
+}
+*/
+
+.y.axis path {
+  display: none;
+}
+
+.reference.line  {
+  stroke: #000;
+  stroke-width: 1;
+  stroke-opacity: 0.2;
+}
+
+.bar.text {
+  font: 10px sans-serif;
+  text-anchor: left;
+}
+
+.connect.line  {
+  stroke-width: 2;
+}
+
+.end.line {
+  stroke-width: 3;
+}
+

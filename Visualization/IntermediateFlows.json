@@ -1,0 +1,146 @@
+[
+  {
+    "ProcessFlowId":39,
+    "FlowName":"UO Transport",
+    "FlowDirection":"Input",
+    "ProcessFlowResult":20245325824,
+    "FlowPropertyName":"kgkm",
+    "ReferenceUnit":"kgkm",
+    "FlowType":"Product flow"
+  },
+  {
+    "ProcessFlowId":40,
+    "FlowName":"UO_222 Collected",
+    "FlowDirection":"Input",
+    "ProcessFlowResult":19601554,
+    "FlowPropertyName":"Mass",
+    "ReferenceUnit":"kg",
+    "FlowType":"Product flow"
+  },
+  {
+    "ProcessFlowId":41,
+    "FlowName":"Lost or Unknown",
+    "FlowDirection":"Output",
+    "ProcessFlowResult":405266.75,
+    "FlowPropertyName":"Coproduct",
+    "ReferenceUnit":"kgP",
+    "FlowType":"Product flow"
+  },
+  {
+    "ProcessFlowId":42,
+    "FlowName":"Recycled Oil Exported",
+    "FlowDirection":"Output",
+    "ProcessFlowResult":2588558.25,
+    "FlowPropertyName":"Coproduct",
+    "ReferenceUnit":"kgP",
+    "FlowType":"Product flow"
+  },
+  {
+    "ProcessFlowId":43,
+    "FlowName":"Recycled Oil Reprocessed",
+    "FlowDirection":"Output",
+    "ProcessFlowResult":17331780,
+    "FlowPropertyName":"Coproduct",
+    "ReferenceUnit":"kgP",
+    "FlowType":"Product flow"
+  },
+  {
+    "ProcessFlowId":44,
+    "FlowName":"UO_222 Collected",
+    "FlowDirection":"Output",
+    "ProcessFlowResult":7948.98193359375,
+    "FlowPropertyName":"Mass",
+    "ReferenceUnit":"kg",
+    "FlowType":"Product flow"
+  },
+  {
+    "ProcessFlowId":45,
+    "FlowName":"UO_Exports",
+    "FlowDirection":"Output",
+    "ProcessFlowResult":2588558.25,
+    "FlowPropertyName":"Mass",
+    "ReferenceUnit":"kg",
+    "FlowType":"Product flow"
+  },
+  {
+    "ProcessFlowId":46,
+    "FlowName":"UO_Pre-processed",
+    "FlowDirection":"Output",
+    "ProcessFlowResult":14587297,
+    "FlowPropertyName":"Imputed Mass",
+    "ReferenceUnit":"kg-Im",
+    "FlowType":"Product flow"
+  },
+  {
+    "ProcessFlowId":47,
+    "FlowName":"UO_Transfer Losses",
+    "FlowDirection":"Output",
+    "ProcessFlowResult":4524.5849609375,
+    "FlowPropertyName":"Mass",
+    "ReferenceUnit":"kg",
+    "FlowType":"Product flow"
+  },
+  {
+    "ProcessFlowId":48,
+    "FlowName":"UO_Transfer to DK",
+    "FlowDirection":"Output",
+    "ProcessFlowResult":14587297,
+    "FlowPropertyName":"Mass",
+    "ReferenceUnit":"kg",
+    "FlowType":"Product flow"
+  },
+  {
+    "ProcessFlowId":49,
+    "FlowName":"UO_Transfer to Evergreen",
+    "FlowDirection":"Output",
+    "ProcessFlowResult":155924.6875,
+    "FlowPropertyName":"Mass",
+    "ReferenceUnit":"kg",
+    "FlowType":"Product flow"
+  },
+  {
+    "ProcessFlowId":50,
+    "FlowName":"UO_Transfer to Haz Landfill",
+    "FlowDirection":"Output",
+    "ProcessFlowResult":290924.03125,
+    "FlowPropertyName":"Mass",
+    "ReferenceUnit":"kg",
+    "FlowType":"Product flow"
+  },
+  {
+    "ProcessFlowId":51,
+    "FlowName":"UO_Transfer to Haz Waste Incineration",
+    "FlowDirection":"Output",
+    "ProcessFlowResult":870298.875,
+    "FlowPropertyName":"Mass",
+    "ReferenceUnit":"kg",
+    "FlowType":"Product flow"
+  },
+  {
+    "ProcessFlowId":52,
+    "FlowName":"UO_Transfer to POTW",
+    "FlowDirection":"Output",
+    "ProcessFlowResult":690811.4375,
+    "FlowPropertyName":"Mass",
+    "ReferenceUnit":"kg",
+    "FlowType":"Product flow"
+  },
+  {
+    "ProcessFlowId":53,
+    "FlowName":"UO_Transfer to RFO",
+    "FlowDirection":"Output",
+    "ProcessFlowResult":0,
+    "FlowPropertyName":"Mass",
+    "ReferenceUnit":"kg",
+    "FlowType":"Product flow"
+  },
+  {
+    "ProcessFlowId":54,
+    "FlowName":"UO_Water Content Feedback",
+    "FlowDirection":"Output",
+    "ProcessFlowResult":9356701,
+    "FlowPropertyName":"Imputed Mass",
+    "ReferenceUnit":"kg-Im",
+    "FlowType":"Product flow"
+  }
+]
