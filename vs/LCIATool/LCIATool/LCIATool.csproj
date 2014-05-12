@@ -48,6 +48,9 @@
     <Reference Include="EntityFramework.SqlServer">
       <HintPath>..\packages\EntityFramework.6.1.0\lib\net45\EntityFramework.SqlServer.dll</HintPath>
     </Reference>
+    <Reference Include="ExtensionMethods">
+      <HintPath>..\packages\ExtensionMethods.1.0.1\lib\net40\ExtensionMethods.dll</HintPath>
+    </Reference>
     <Reference Include="Microsoft.AspNet.FriendlyUrls">
       <HintPath>..\packages\Microsoft.AspNet.FriendlyUrls.Core.1.0.2\lib\net45\Microsoft.AspNet.FriendlyUrls.dll</HintPath>
     </Reference>
@@ -207,6 +210,8 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="API\ImpactCategoryController.cs" />
+    <Compile Include="API\IntermediateFlowSumController.cs" />
+    <Compile Include="API\IntermediateFlowController.cs" />
     <Compile Include="API\LCIAComputationController.cs" />
     <Compile Include="API\LCIAMethodController.cs" />
     <Compile Include="API\ProcessController.cs" />
@@ -247,6 +252,7 @@
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
     <Compile Include="Models\ImpactCategoryModel.cs" />
+    <Compile Include="Models\IntermediateFlowModel.cs" />
     <Compile Include="Models\LCIAComputationModel.cs" />
     <Compile Include="Models\LCIAModel.cs">
       <SubType>Code</SubType>
@@ -341,6 +347,7 @@
     <Compile Include="Pages\Default.aspx.designer.cs">
       <DependentUpon>Default.aspx</DependentUpon>
     </Compile>
+    <Compile Include="Pages\Helpers\JSONHelper.cs" />
     <Compile Include="Pages\LCIAComputation.aspx.cs">
       <DependentUpon>LCIAComputation.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
@@ -369,7 +376,6 @@
     <Folder Include="Content\" />
     <Folder Include="Controls\" />
     <Folder Include="Pages\Admin\" />
-    <Folder Include="Pages\Helpers\" />
     <Folder Include="Scripts\" />
   </ItemGroup>
   <ItemGroup>

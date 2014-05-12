@@ -20,7 +20,6 @@ namespace LCIATool.Models.Repository
         public Nullable<int> FlowPropertyID { get; set; }
         public Nullable<double> MeanValue { get; set; }
         public Nullable<double> StDev { get; set; }
-        public string FlowProperty_SQL { get; set; }
         public string FlowReference_SQL { get; set; }
         public Nullable<int> Ind_SQL { get; set; }
     

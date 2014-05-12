@@ -145,5 +145,84 @@ namespace LCIATool.Models.Repository
 
             return _lciaList;
         }
+
+        public IQueryable<IntermediateFlowModel> IntermediateFlow(int balance, int processId)
+        {
+            if (balance == 1)
+            {
+
+                var query = context.ProcessFlows
+                    .Where(e => e.Flow.FlowType.FlowTypeID != 2 && e.Flow.FlowPropertyID != null && (e.Process.ProcessID==processId || processId == 0))
+                    .GroupBy(p => new
+                    {
+                        FlowPropertyName = p.Flow.FlowProperty.Name
+                    })
+                    .SelectMany(pf => pf.Select(p => new IntermediateFlowModel
+                    {
+                        FlowPropertyName = p.Flow.FlowProperty.Name,
+                        ReferenceUnit = p.Flow.FlowProperty.UnitGroup.Name,
+                        FlowDirectionID = p.Direction.Name == "Input" ? +1 : p.Direction.Name == "Output" ? -1 : 0,
+                        ProcessFlowResult = p.Result,
+                        Computation = p.Result * (p.Direction.Name == "Input" ? +1 : p.Direction.Name == "Output" ? -1 : 0)
+                    })).AsQueryable();
+                return query.OrderBy(pFlow => new { pFlow.FlowPropertyName, pFlow.ReferenceUnit });
+
+
+            }
+            else
+            {
+                var query = context.ProcessFlows
+               .Where(e => e.Flow.FlowType.FlowTypeID != 2 && e.Flow.FlowPropertyID != null && (e.Process.ProcessID == processId || processId == 0))
+               .GroupBy(p => new
+               {
+                   FlowPropertyName = p.Flow.FlowProperty.Name
+               })
+               .SelectMany(pf => pf.Select(p => new IntermediateFlowModel
+               {
+                   FlowPropertyName = p.Flow.FlowProperty.Name,
+                   ReferenceUnit = p.Flow.FlowProperty.UnitGroup.Name,
+                   ProcessFlowID = p.ProcessFlowID,
+                   FlowName = p.Flow.Name,
+                   FlowDirection = p.Direction.Name,
+                   ProcessFlowResult = p.Result,
+                   FlowType = p.Flow.FlowType.Type
+               })).AsQueryable();
+                return query.OrderBy(pFlow => new { pFlow.FlowPropertyName, pFlow.ReferenceUnit });
+            }
+        }
+
+        //public IQueryable<IntermediateFlowModel> IntermediateFlowSum(int balance, int processId)
+        //{
+        //    if (balance == 1)
+        //    {
+
+        //        var query = context.ProcessFlows
+        //            .Where(e => e.Flow.FlowType.FlowTypeID != 2 && e.Flow.FlowPropertyID != null && (e.Process.ProcessID==processId || processId == 0))
+        //            .GroupBy(p => new
+        //            {
+        //                p.Result
+        //            })
+        //            .Select (p => new IntermediateFlowModel
+        //            {
+        //                IntermediateFlowSum = p.Key.Result
+        //            });
+        //        return query.Select(c=>c.IntermediateFlowSum).Sum();
+
+
+        //    }
+        //    else
+        //    {
+        //        var query = context.ProcessFlows
+        //       .Where(e => e.Flow.FlowType.FlowTypeID != 2 && e.Flow.FlowPropertyID != null && (e.Process.ProcessID == processId || processId == 0))
+        //       .GroupBy(p => new
+        //       {
+        //           p.Result
+        //       })
+        //        .Select(p => new IntermediateFlowModel
+        //        {
+        //            IntermediateFlowSum = p.Key.Result
+        //        });
+        //        return query;
+        //    }
+        }
     }
-}

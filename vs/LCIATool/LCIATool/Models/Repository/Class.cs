@@ -17,8 +17,8 @@ namespace LCIATool.Models.Repository
         public Class()
         {
             this.Categories = new HashSet<Category>();
-            this.Classifications = new HashSet<Classification>();
             this.Categories1 = new HashSet<Category>();
+            this.Classifications = new HashSet<Classification>();
         }
     
         public int ClassID { get; set; }
@@ -27,7 +27,7 @@ namespace LCIATool.Models.Repository
         public Nullable<int> CategorySystemID_SQL { get; set; }
     
         public virtual ICollection<Category> Categories { get; set; }
-        public virtual ICollection<Classification> Classifications { get; set; }
         public virtual ICollection<Category> Categories1 { get; set; }
+        public virtual ICollection<Classification> Classifications { get; set; }
     }
 }

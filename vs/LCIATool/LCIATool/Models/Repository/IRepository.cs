@@ -23,6 +23,8 @@ namespace LCIATool.Models.Repository
         IQueryable<ImpactCategoryModel> ImpactCategoryDDL();
         IQueryable<LCIAMethodModel> LCIAMethodDDL();
         IQueryable<LCIAComputationModel> LCIAComputation();
+        IQueryable<IntermediateFlowModel> IntermediateFlow(int balance, int processId);
+        //IQueryable<IntermediateFlowModel> IntermediateFlowSum(int balance, int processId);
          
     }
 }
