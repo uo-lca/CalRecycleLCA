@@ -16,7 +16,7 @@ function processFlow() {
         // Web API methods
         baseURI = "http://rachelscanlon.com/api/",
         processesURL = baseURI + "process",
-        intFlowURL = "IntermediateFlows.json",
+        intFlowURL = baseURI + "intermediateflow?balance=0",
         // Current selections
         selectedProcessID = 3,
         processName = "CA Waste Code 222_2010";
@@ -32,12 +32,11 @@ function processFlow() {
         width = 600 - margin.left - margin.right,
         height = 500 - margin.top - margin.bottom;
 
-    var color = d3.scale.ordinal();
 
     var x = d3.scale.linear()
         .rangeRound([0, width]);
 
-    var labelFormat = d3.format("^.2g"); // Format numbers with precision 2;
+    var formatNumber = d3.format(",.0f");
 
     var svg;
     /**
@@ -70,6 +69,7 @@ function processFlow() {
         var link, node, bars, sliders,
             path = sankey.link();
 
+        svg.selectAll("g").remove();
         sankey.nodes(graph.nodes)
             .links(graph.links)
             .layout(32);
@@ -90,7 +90,7 @@ function processFlow() {
 
         link.append("title")
             .text(function (d) {
-                return d.source.name + " → " + d.target.name + "\n" + d3.format(d.value);
+                return d.source.name + " → " + d.target.name + "\n" + formatNumber(d.value) + " " + d.property;
             });
 
         node = svg.append("g").selectAll(".node")
@@ -131,7 +131,7 @@ function processFlow() {
             });
         bars.append("title")
             .text(function (d) {
-                return d.name + "\n" + d3.format(d.value);
+                return d.name + "\n" + formatNumber(d.value);
             });
 
         node.append("text")
@@ -173,10 +173,10 @@ function processFlow() {
         data.forEach( function (element, index) {
             var node, link;
 
-            node = {name: element.FlowName};
+            node = { name: element.FlowName };
             graph.nodes.push(node);
 //            link = {value: +element.ProcessFlowResult};
-            link = {value: 1};
+            link = {value: 1, property: element.FlowPropertyName};
             if (element.FlowDirection == "Input") {
                 link.source = index+1;
                 link.target = 0;
@@ -195,7 +195,8 @@ function processFlow() {
      * Display intermediate product flows for selected process.
      */
     function displayResults() {
-        d3.json(intFlowURL, buildGraph);
+        var paramURL = intFlowURL + "&processId=" + selectedProcessID;
+        d3.json(paramURL, buildGraph);
     }
 
     /**
