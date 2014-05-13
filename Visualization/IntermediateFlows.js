@@ -34,14 +34,13 @@ function processFlow() {
 
 
     var x = d3.scale.linear()
-        .rangeRound([0, width]);
-
-    var formatNumber = d3.format(",.0f");
-
-    var svg;
+        .rangeRound([0, width]),
+        formatNumber = d3.format("^.2g"),
+        svg,
+        color = d3.scale.ordinal();
     /**
-      * sankey variables
-      */
+     * sankey variables
+     */
     var sankey = d3.sankey()
         .nodeWidth(15)
         .nodePadding(10)
@@ -53,26 +52,29 @@ function processFlow() {
      */
     function prepareSvg() {
         svg = d3.select("#chartcontainer")
-        .append("svg")
-        .attr("width", width + margin.left + margin.right)
-        .attr("height", height + margin.top + margin.bottom)
-        .append("g")
-        .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+            .append("svg")
+            .attr("width", width + margin.left + margin.right)
+            .attr("height", height + margin.top + margin.bottom)
+            .append("g")
+            .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
     }
 
     /**
-      * Create or refresh sankey diagram with graph data
-      */
+     * Create or refresh sankey diagram with graph data
+     */
 
     function updateSankey() {
 
-        var link, node, bars, sliders,
+        var link, node, bars,
             path = sankey.link();
 
         svg.selectAll("g").remove();
         sankey.nodes(graph.nodes)
             .links(graph.links)
             .layout(32);
+        color.domain(graph.nodes.map(function (n) {
+            return n.property;
+        }));
 
         link = svg.append("g").selectAll(".link")
             .data(graph.links)
@@ -90,7 +92,7 @@ function processFlow() {
 
         link.append("title")
             .text(function (d) {
-                return d.source.name + " → " + d.target.name + "\n" + formatNumber(d.value) + " " + d.property;
+                return d.source.name + " → " + d.target.name + "\n" + formatNumber(d.displayValue) + " " + d.property;
             });
 
         node = svg.append("g").selectAll(".node")
@@ -122,8 +124,7 @@ function processFlow() {
                 width: sankey.nodeWidth()
             })
             .style("fill", function (d) {
-                //                d.color = color(d.name.replace(/ .*/, ""));
-                d.color = colorbrewer.BuGn[3][1];
+                d.color = color(d.property);
                 return d.color;
             })
             .style("stroke", function (d) {
@@ -159,31 +160,40 @@ function processFlow() {
      * @param {Array} data      JSON data from web API
      */
     function buildGraph(error, data) {
-        var process;	// Current process
+        var process; // Current process
 
         if (error) {
             window.alert("Error loading intermediate flows: " + error);
             return false;
         }
 
-		graph.nodes = [];
+        graph.nodes = [];
         graph.links = [];
 
-        graph.nodes.push({name: processName});
-        data.forEach( function (element, index) {
+        graph.nodes.push({
+            name: processName,
+            property: processName
+        });
+        data.forEach(function (element, index) {
             var node, link;
 
-            node = { name: element.FlowName };
+            node = {
+                name: element.FlowName,
+                property: element.FlowPropertyName
+            };
             graph.nodes.push(node);
-//            link = {value: +element.ProcessFlowResult};
-            link = {value: 1, property: element.FlowPropertyName};
+            //            link = {value: +element.ProcessFlowResult};
+            link = {
+                value: 1,
+                displayValue: element.ProcessFlowResult,
+                property: element.FlowPropertyName
+            };
             if (element.FlowDirection == "Input") {
-                link.source = index+1;
+                link.source = index + 1;
                 link.target = 0;
-            }
-            else {
+            } else {
                 link.source = 0;
-                link.target = index+1;
+                link.target = index + 1;
             }
             graph.links.push(link);
         });
@@ -216,6 +226,8 @@ function processFlow() {
      * Starting point for IntermediateFlows
      */
     function init() {
+
+        color.range(colorbrewer.Set3[12]);
 
         LCA.prepareSelect(processesURL, "#processSelect", "ProcessID",
             onProcessChange, selectedProcessID);
