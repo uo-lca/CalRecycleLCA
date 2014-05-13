@@ -3,16 +3,13 @@
  */
 function processFlow() {
 
-
     // library globals
-    /*global d3, console, window, $, colorbrewer, LCA */
+    /*global d3, window, colorbrewer, LCA */
 
     /**
      * lciaComputation variables
      */
     var // Data loaded from web API
-    processList = [],
-        intFlowList = [],
         // Web API methods
         baseURI = "http://rachelscanlon.com/api/",
         processesURL = baseURI + "process",
@@ -29,13 +26,10 @@ function processFlow() {
         bottom: 30,
         left: 20
     },
-        width = 600 - margin.left - margin.right,
-        height = 500 - margin.top - margin.bottom;
+        width = 700 - margin.left - margin.right,
+        height = 600 - margin.top - margin.bottom;
 
-
-    var x = d3.scale.linear()
-        .rangeRound([0, width]),
-        formatNumber = d3.format("^.2g"),
+    var formatNumber = d3.format("^.2g"),
         svg,
         color = d3.scale.ordinal();
     /**
@@ -88,8 +82,6 @@ function processFlow() {
                 return b.dy - a.dy;
             });
 
-
-
         link.append("title")
             .text(function (d) {
                 return d.source.name + " → " + d.target.name + "\n" + formatNumber(d.displayValue) + " " + d.property;
@@ -115,7 +107,6 @@ function processFlow() {
                     link.attr("d", path);
                 }));
 
-
         bars = node.append("rect")
             .attr("height", function (d) {
                 return d.dy;
@@ -130,10 +121,6 @@ function processFlow() {
             .style("stroke", function (d) {
                 return d3.rgb(d.color).darker(2);
             });
-        bars.append("title")
-            .text(function (d) {
-                return d.name + "\n" + formatNumber(d.value);
-            });
 
         node.append("text")
             .attr("x", -6)
@@ -144,7 +131,7 @@ function processFlow() {
             .attr("text-anchor", "end")
             .attr("transform", null)
             .text(function (d) {
-                return d.name;
+                return d.label;
             })
             .filter(function (d) {
                 return d.x < width / 2;
@@ -160,7 +147,7 @@ function processFlow() {
      * @param {Array} data      JSON data from web API
      */
     function buildGraph(error, data) {
-        var process; // Current process
+        var nodeCount = 0;
 
         if (error) {
             window.alert("Error loading intermediate flows: " + error);
@@ -172,34 +159,36 @@ function processFlow() {
 
         graph.nodes.push({
             name: processName,
-            property: processName
+            property: processName,
+            label: ""
         });
         data.forEach(function (element, index) {
             var node, link;
 
-            node = {
-                name: element.FlowName,
-                property: element.FlowPropertyName
-            };
-            graph.nodes.push(node);
-            //            link = {value: +element.ProcessFlowResult};
-            link = {
-                value: 1,
-                displayValue: element.ProcessFlowResult,
-                property: element.FlowPropertyName
-            };
-            if (element.FlowDirection == "Input") {
-                link.source = index + 1;
-                link.target = 0;
-            } else {
-                link.source = 0;
-                link.target = index + 1;
+            if (element.SankeyWidth > 0) {
+                node = {
+                    name: element.FlowName,
+                    property: element.ReferenceProperty,
+                    label: element.FlowName + " : " + formatNumber(element.Quantity) + " " + element.ReferenceUnit
+                };
+                nodeCount = graph.nodes.push(node);
+                link = {
+                    value: element.SankeyWidth,
+                    displayValue: element.Quantity,
+                    property: element.ReferenceProperty
+                };
+                if (element.FlowDirection === "Input") {
+                    link.source = nodeCount - 1;
+                    link.target = 0;
+                } else {
+                    link.source = 0;
+                    link.target = nodeCount - 1;
+                }
+                graph.links.push(link);
             }
-            graph.links.push(link);
         });
         updateSankey();
     }
-
 
     /**
      * Display intermediate product flows for selected process.
@@ -214,13 +203,10 @@ function processFlow() {
      * Triggers LCIA computation update.
      */
     function onProcessChange() {
-        var paramURL;
-
         selectedProcessID = this.options[this.selectedIndex].value;
         processName = this.options[this.selectedIndex].text;
         displayResults();
     }
-
 
     /**
      * Starting point for IntermediateFlows
