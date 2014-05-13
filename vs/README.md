@@ -1,14 +1,46 @@
 CalRecycleLCA
 =============
+ 
+ * auto-gen TOC:
+{:toc}
 
 CalRecycle Used Oil LCA Online Tool
 
 Web API Specification
 =====================
 
+### Classes
+
+Lists known classification categories, optionally filtered
+
+Parameters (all optional):
+
+ * DataType - only return values for named DataType
+ * Level - 0, 1, 2... only return values with named hierarchical level
+ * *DataSourceID - filter results by data source ID (once implemented)*
+
+Note: Before this will work well, I need to provide a new list of
+classification data to replace both `Class` and
+`Classification` tables.
+
+Note 2: `Category` table can probably go away- just stick
+ParentClassID and HierarchyLevel fields onto `Class` table.  I
+will plan to do this when I supply replacement tables.
+
+Returns:
+
+ - ClassificationID
+ - CategorySystem
+ - DataType.Name (via CategorySystem) AS DataType
+ - ClassID
+ - Class.Name AS ClassName
+ - Class.ExternalClassID
+ - Category.HierarchyLevel AS Level
 
 
-### lcia_impact_categories
+### LciaImpactCategories
+### LCIAImpactCategories (alias)
+### lcia_impact_categories (alias)
 
 
 Lists all Impact Categories.
@@ -18,7 +50,9 @@ Returns:
  - ImpactCategoryID
  - Name
 
-### lcia_methods
+### LciaMethods
+### LCIAMethods (alias)
+### lcia_methods (alias)
 
 Lists all LCIA methods, optionally  within an impact category.
 
@@ -33,7 +67,8 @@ Returns:
  - FlowPropertyID.Name
  - UnitGroup.ReferenceUnit
 
-### processes
+### Processes
+### processes (alias)
 
 Lists all processes in the database
 
@@ -76,29 +111,139 @@ For Flows=2 we need processes that do not match Flows=1:
 	WHERE emcount is null
 
 
-### process_flows
+### Flows
 
-Reports intermediate flows passing through the process.
+Lists all flows.
+
+Parameters:
+
+ * FlowType = Elementary or Intermediate (optional??)
+ * ClassID (optional) only list flows matching ClassID
+
+Returns:
+
+ - FlowID
+ - Flow.Name
+ - CASNumber
+ - ReferenceProperty
+ - ReferenceUnit
+
+
+
+
+### FlowProperties
+
+Reports (and future: allows to edit) flow properties associated with a
+given intermediate flow.
+
+Parameters:
+
+ * FlowID
+
+Returns (from `FlowFlowProperty` table unless otherwise specified):
+
+ * FlowFlowPropertyID
+ * FlowPropertyID
+ * MeanValue
+ * StDev
+ * UnitGroup.ReferenceUnit
+
+
+
+### IntermediateFlows
+
+Reports intermediate flows passing through a process.
 
 Parameters:
 
  * ProcessID
  * (optional) Balance = 0|1 (default 0)
 
+Main Query:
+
+    ( SELECT
+	    pf.ProcessFlowID,
+        f.Name AS FlowName,
+		d.Name AS Direction,
+		CASE 
+         WHEN d.Name = 'Input' THEN +1 
+         WHEN d.Name = 'Output' THEN -1 
+	    END AS DirFlag, 
+		pf.Result AS Quantity,
+		fp.Name AS ReferenceProperty,
+		ug.ReferenceUnit AS ReferenceUnit
+	FROM ProcessFlow pf
+	INNER JOIN Flow f on pf.FlowID = f.FlowID
+	INNER JOIN Direction d on pf.DirectionID = d.DirectionID
+	INNER JOIN FlowType ft on f.FlowTypeID = ft.FlowTypeID
+	INNER JOIN FlowProperty fp on f.FlowPropertyID = fp.FlowPropertyID
+	INNER JOIN UnitGroup ug on fp.UnitGroupID = ug.UnitGroupID
+
+	WHERE ft.FlowTypeID <> 2
+	and pf.ProcessID = @param
+	) Main
+
+selects all non-elementary flows, with ancillary information, for a given
+process ID.
+
+#### Balance = 0 : List Flows for Sankey diagram
+
 Returns:
 
- - ProcessFlowID
- - Flow.Name
- - Flow Direction (Input or Output) (or DirectionID)
- - ProcessFlow.Result
- - FlowProperty.Name (on Flow.FlowPropertyID)
- - UnitGroup.ReferenceUnit (on FlowProperty.UnitGroupID)
- - WHERE FlowType != 'Elementary Flow'
+ * ProcessFlowID
+ * FlowName
+ * FlowDirection
+ * Quantity
+ * ReferenceProperty
+ * ReferenceUnit
+ * SankeyWidth
 
-If Balance=1, leave out ProcessFlowID, Flow.Name; compute sum of
-ProcessFlow.Result, grouping by reference flow property and unit. This is
-tricky because "Input" and "Output" must map to +1 and -1 respectively and
-multiplied by the flow quantities.
+The flow quantities need to be normalized on a by-Reference-Unit basis in
+order to scale properly in the visualization.  To this we need to add a
+`SankeyWidth` column which is derived from the largest flow in
+any given unit: 
+
+    ( SELECT distinct
+		max(Quantity),
+		ReferenceUnit
+	FROM Main
+	GROUP BY ReferenceUnit ) MaxUnit
+
+Now, we return:
+
+    IF Balance == 0:
+
+	SELECT ProcessFlowID,
+		FlowName,
+		FlowDirection,
+		Quantity,
+		ReferenceProperty,
+		ReferenceUnit,
+		Quantity / UnitMax AS SankeyWidth
+	FROM Main
+	INNER JOIN MaxUnit on Main.ReferenceUnit = MaxUnit.ReferenceUnit
+
+#### Balance = 1 : List Net flow results by unit
+
+Returns:
+
+ * ReferenceProperty
+ * ReferenceUnit
+ * NetFlowIn
+
+To do this, we need to multiply the quantities by the direction flag
+created above and sum:
+
+    else // Balance == 1
+
+	SELECT ReferenceProperty,
+		ReferenceUnit,
+		sum( Quantity * DirFlag ) AS NetFlowIn
+	FROM Main
+	GROUP BY ReferenceProperty,ReferenceUnit
+
+I don't know how to do this in plain SQL so someone will have to check it.
+
 
 ### lcia_compute
 
