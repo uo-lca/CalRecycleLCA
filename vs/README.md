@@ -9,7 +9,7 @@ CalRecycle Used Oil LCA Online Tool
 Web API Specification
 =====================
 
-### Classes
+### Classes ###
 
 Lists known classification categories, optionally filtered
 
@@ -37,11 +37,11 @@ Returns:
  - Class.ExternalClassID
  - Category.HierarchyLevel AS Level
 
-#### Status
+#### Status ####
 
 None (has not been reviewed nor assigned to a milestone).
 
-### LciaImpactCategories
+### LciaImpactCategories ###
 
 
 Lists all Impact Categories.
@@ -59,13 +59,13 @@ Current resource name: ImpactCategory
 
 Returns: same as above
 
-Published at (http://rachelscanlon.com/api/impactcategory).
+Published at http://rachelscanlon.com/api/impactcategory
 
-#### Suggested change to spec
+#### Suggested change to spec ####
 
 Multi-level resource name: LCIA/ImpactCategories
 
-### LciaMethods
+### LciaMethods ###
 
 Lists all LCIA methods, optionally  within an impact category.
 
@@ -79,8 +79,9 @@ Returns:
  - Name
  - FlowPropertyID.Name
  - UnitGroup.ReferenceUnit
+
  
-#### Status
+#### Status ####
 
 Implemented in sprint 1. The above spec has changed since then.
 
@@ -93,9 +94,9 @@ Returns:
 - LCIAMethodID
 - Name
 
-Published at (http://rachelscanlon.com/api/lciamethod).
+Published at http://rachelscanlon.com/api/lciamethod.
 
-#### Suggested change to spec above
+#### Suggested change to spec above ####
 
 Resource Name: LCIA/Methods 
 
@@ -105,7 +106,7 @@ Returns:
  - ReferenceProperty (FlowProperty.Name - make returned name consistent with other methods)
  - ReferenceUnit	(UnitGroup.ReferenceUnit)
 
-### Processes
+### Processes ###
 
 Lists all processes in the database
 
@@ -147,13 +148,13 @@ For Flows=2 we need processes that do not match Flows=1:
 	RIGHT JOIN Process on emissions.ProcessID = Process.ProcessID
 	WHERE emcount is null
 
-#### Status
+#### Status ####
 
 Implemented in sprint 1. The above spec has changed since then.
 
 ##### Current Implementation #####
 
-resource name: Process
+Resource name: Process
 
 Parameters: None
 
@@ -164,7 +165,7 @@ Returns:
 
 Published at http://rachelscanlon.com/api/process
 
-### Flows
+### Flows ###
 
 Lists all flows.
 
@@ -181,11 +182,11 @@ Returns:
  - ReferenceProperty
  - ReferenceUnit
 
-#### Status
+#### Status ####
 
 None (has not been reviewed nor assigned to a milestone).
 
-### FlowProperties
+### FlowProperties ###
 
 Reports (and future: allows to edit) flow properties associated with a
 given intermediate flow.
@@ -202,11 +203,11 @@ Returns (from `FlowFlowProperty` table unless otherwise specified):
  * StDev
  * UnitGroup.ReferenceUnit
 
-#### Status
+#### Status ####
 
 None (has not been reviewed nor assigned to a milestone).
 
-### IntermediateFlows
+### IntermediateFlows ###
 
 Reports intermediate flows passing through a process.
 
@@ -242,7 +243,7 @@ Main Query:
 selects all non-elementary flows, with ancillary information, for a given
 process ID.
 
-#### Balance = 0 : List Flows for Sankey diagram
+#### Balance = 0 : List Flows for Sankey diagram ####
 
 Returns:
 
@@ -279,7 +280,7 @@ Now, we return:
 	FROM Main
 	INNER JOIN MaxUnit on Main.ReferenceUnit = MaxUnit.ReferenceUnit
 
-#### Balance = 1 : List Net flow results by unit
+#### Balance = 1 : List Net flow results by unit ####
 
 Returns:
 
