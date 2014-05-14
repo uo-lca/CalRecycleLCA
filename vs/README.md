@@ -51,7 +51,7 @@ Returns:
  - ImpactCategoryID
  - Name
 
-#### Status
+#### Status ####
 
 Implemented in sprint 1. The above spec has changed since then.
 
@@ -61,7 +61,9 @@ Returns: same as above
 
 Published at (http://rachelscanlon.com/api/impactcategory).
 
-Sabina suggests creating multi-level resource names (e.g., LCIA/ImpactCategories).
+#### Suggested change to spec
+
+Multi-level resource name: LCIA/ImpactCategories
 
 ### LciaMethods
 
@@ -84,11 +86,14 @@ Implemented in sprint 1. The above spec has changed since then.
 
 Current resource name: LCIAMethod
 
-Parameters: Same as above. (pa
+Parameters: Same as above.
 
-Returns: missing fields.
+Returns: 
 
-Published at (http://rachelscanlon.com/api/lciamethod?impactCategoryid=10).
+- LCIAMethodID
+- Name
+
+Published at (http://rachelscanlon.com/api/lciamethod).
 
 #### Suggested change to spec above
 
@@ -96,12 +101,11 @@ Resource Name: LCIA/Methods
 
 Returns:
  - LCIAMethodID
- - LCIAMethodName
- - FlowPropertyName
- - FlowPropertyUnit	(UnitGroup.ReferenceUnit)
+ - Name
+ - ReferenceProperty (FlowProperty.Name - make returned name consistent with other methods)
+ - ReferenceUnit	(UnitGroup.ReferenceUnit)
 
 ### Processes
-### processes (alias)
 
 Lists all processes in the database
 
@@ -143,6 +147,22 @@ For Flows=2 we need processes that do not match Flows=1:
 	RIGHT JOIN Process on emissions.ProcessID = Process.ProcessID
 	WHERE emcount is null
 
+#### Status
+
+Implemented in sprint 1. The above spec has changed since then.
+
+##### Current Implementation #####
+
+resource name: Process
+
+Parameters: None
+
+Returns: 
+
+- ProcessID
+- Name
+
+Published at http://rachelscanlon.com/api/process
 
 ### Flows
 
@@ -161,8 +181,9 @@ Returns:
  - ReferenceProperty
  - ReferenceUnit
 
+#### Status
 
-
+None (has not been reviewed nor assigned to a milestone).
 
 ### FlowProperties
 
@@ -181,7 +202,9 @@ Returns (from `FlowFlowProperty` table unless otherwise specified):
  * StDev
  * UnitGroup.ReferenceUnit
 
+#### Status
 
+None (has not been reviewed nor assigned to a milestone).
 
 ### IntermediateFlows
 
@@ -277,6 +300,11 @@ created above and sum:
 
 I don't know how to do this in plain SQL so someone will have to check it.
 
+#### Status ####
+
+Implemented in sprint 2.
+
+Published URL: http://rachelscanlon.com/api/intermediateflow
 
 ### lcia_compute
 
@@ -317,3 +345,47 @@ Reference query (null geograpy):
 Geography-specific query requires a hierarchical "is parent of" test to
 determine the best LCIA factor for a given process-flow geography
 specification. [future]
+
+#### Status ####
+
+Implemented in sprint 1. Above spec has changed since then.
+
+##### Current Implementation #####
+
+Resource name: LCIAComputation
+ 
+ Parameters:
+
+ * LCIAMethodID (optional)
+ * ProcessID    (optional)
+ * ImpactCategoryID (optional)
+
+Returns:
+
+ - ProcessName 
+ - FlowID
+ - Flow
+ - Direction
+ - Quantity
+ - STDev
+ - Factor
+ - LCIAResult
+
+Published URL : http://rachelscanlon.com/api/LCIAComputation
+
+##### Suggested Change to Spec #####
+
+Resource Name: LCIA/Scores
+
+Parameters: same as spec
+LCIAMethodID should be required because flow unit is derived from method.
+If not required, then more fields would need to be returned.
+
+Returns:
+
+ - FlowID
+ - FlowName
+ - Factor
+ - Direction
+ - Quantity
+ - LCIAResult
