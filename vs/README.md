@@ -54,7 +54,9 @@ Returns:
 #### Status
 
 Implemented in sprint 1. The above spec has changed since then.
+
 Current resource name: ImpactCategory
+
 Returns: same as above
 
 Published at (http://rachelscanlon.com/api/impactcategory).
@@ -62,8 +64,6 @@ Published at (http://rachelscanlon.com/api/impactcategory).
 Sabina suggests creating multi-level resource names (e.g., LCIA/ImpactCategories).
 
 ### LciaMethods
-### LCIAMethods (alias)
-### lcia_methods (alias)
 
 Lists all LCIA methods, optionally  within an impact category.
 
@@ -77,6 +77,28 @@ Returns:
  - Name
  - FlowPropertyID.Name
  - UnitGroup.ReferenceUnit
+ 
+#### Status
+
+Implemented in sprint 1. The above spec has changed since then.
+
+Current resource name: LCIAMethod
+
+Parameters: Same as above. (pa
+
+Returns: missing fields.
+
+Published at (http://rachelscanlon.com/api/lciamethod?impactCategoryid=10).
+
+#### Suggested change to spec above
+
+Resource Name: LCIA/Methods 
+
+Returns:
+ - LCIAMethodID
+ - LCIAMethodName
+ - FlowPropertyName
+ - FlowPropertyUnit	(UnitGroup.ReferenceUnit)
 
 ### Processes
 ### processes (alias)
