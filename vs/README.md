@@ -37,10 +37,11 @@ Returns:
  - Class.ExternalClassID
  - Category.HierarchyLevel AS Level
 
+#### Status
+
+None (has not been reviewed nor assigned to a milestone).
 
 ### LciaImpactCategories
-### LCIAImpactCategories (alias)
-### lcia_impact_categories (alias)
 
 
 Lists all Impact Categories.
@@ -49,6 +50,16 @@ Returns:
 
  - ImpactCategoryID
  - Name
+
+#### Status
+
+Implemented in sprint 1. The above spec has changed since then.
+Current resource name: ImpactCategory
+Returns: same as above
+
+Published at (http://rachelscanlon.com/api/impactcategory).
+
+Sabina suggests creating multi-level resource names (e.g., LCIA/ImpactCategories).
 
 ### LciaMethods
 ### LCIAMethods (alias)
