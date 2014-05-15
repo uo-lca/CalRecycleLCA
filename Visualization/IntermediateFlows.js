@@ -4,18 +4,13 @@
 function processFlow() {
 
     // library globals
-    /*global d3, window, colorbrewer, LCA */
+    /*global d3, window, colorbrewer, LCA, console */
 
     /**
      * lciaComputation variables
      */
-    var // Data loaded from web API
-        // Web API methods
-        baseURI = "http://rachelscanlon.com/api/",
-        processesURL = baseURI + "process",
-        intFlowURL = baseURI + "intermediateflow?balance=0",
-        // Current selections
-        selectedProcessID = 3,
+    // Current selections
+    var selectedProcessID = 3,
         processName = "CA Waste Code 222_2010";
     /**
      * d3 variables
@@ -150,7 +145,8 @@ function processFlow() {
         var nodeCount = 0;
 
         if (error) {
-            window.alert("Error loading intermediate flows: " + error);
+            window.alert("Error getting intermediate flows.");
+            console.error();
             return false;
         }
 
@@ -162,7 +158,7 @@ function processFlow() {
             property: processName,
             label: ""
         });
-        data.forEach(function (element, index) {
+        data.forEach(function (element) {
             var node, link;
 
             if (element.SankeyWidth > 0) {
@@ -194,7 +190,8 @@ function processFlow() {
      * Display intermediate product flows for selected process.
      */
     function displayResults() {
-        var paramURL = intFlowURL + "&processId=" + selectedProcessID;
+        var intFlowURL = LCA.baseURI + "intermediateflow?balance=0",
+            paramURL = intFlowURL + "&processId=" + selectedProcessID;
         d3.json(paramURL, buildGraph);
     }
 
@@ -212,6 +209,9 @@ function processFlow() {
      * Starting point for IntermediateFlows
      */
     function init() {
+        var processesURL;
+
+        processesURL = LCA.baseURI + "process";
 
         color.range(colorbrewer.Set3[12]);
 
@@ -222,5 +222,5 @@ function processFlow() {
         displayResults();
     }
 
-    init();
+    LCA.init(init);
 }

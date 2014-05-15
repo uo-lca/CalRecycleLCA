@@ -16,6 +16,13 @@ User selects LCIA Method, Impact Category and Process from drop down selection l
 
 User selects Process from drop down selection list. Front end queries IntermediateFlows web API method with selected processid parameter. A sankey diagram is displayed. The center node represents the selected process. Each intermediate flow is represented by a node and a link to/from the process. Input flows are displayed to the left of the process, while output flows are displayed on the right.
 
+### LCA
+
+LCA.js and LCA.css contain shared code.
+
 ### How to Publish
 
-Copy Visualization folder to a web server host. In IIS, create a web app that points to the Visualization folder.
+Copy Visualization folder to a web server host. 
+In IIS, create a web app that points to the Visualization folder.
+
+The base URI for the LCA Tool web API is set at the top of LCA.js. 

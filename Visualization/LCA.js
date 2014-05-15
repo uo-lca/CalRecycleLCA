@@ -1,8 +1,30 @@
+/**
+ * Shared module for Used Oil LCA Visualization
+ */
 // library globals
-/*global d3, console, window, $, colorbrewer */
+/*global d3, window, console */
 
 var LCA = {
-    version: "1.1"
+    baseURI: "http://rachelscanlon.com//api/"
+};
+
+/**
+ * Initialize LCA module object
+ * @param {function} callback	Function to call after module is sucessfully initialized
+ */
+LCA.init = function (callback) {
+    // Load configurable settings
+    // IIS won't allow this. Hard code setting above.
+    //d3.json("Settings.json", function (error, settings) {
+    //    if (error) {
+    //        window.alert("Error loading Settings.json.");
+    //        console.error(error);
+    //    } else {
+    //        LCA.baseURI = settings.WebAPI.BaseURI;
+    //        callback.call();
+    //    }
+    //});
+    callback.call();
 };
 
 /**
@@ -26,7 +48,9 @@ LCA.prepareSelect = function (jsonURL, selectID, oidName, changeHandler, initial
         var selectOptions;
 
         if (error) {
-            window.alert(error);
+            window.alert("Error executing GET on " + jsonURL);
+            console.error(error);
+            return false;
         }
         jsonData.sort(LCA.compareNames);
 
@@ -45,8 +69,8 @@ LCA.prepareSelect = function (jsonURL, selectID, oidName, changeHandler, initial
         //
         // Initialize selection
         //
-        selectOptions.filter(function (d, i) {
-            return d[oidName] == initialValue;
+        selectOptions.filter(function (d) {
+            return d[oidName] === initialValue;
         })
             .attr("selected", true);
     });
