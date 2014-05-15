@@ -61,9 +61,17 @@ Returns: same as above
 
 Published at http://rachelscanlon.com/api/impactcategory
 
-#### Suggested change to spec ####
+##### Issues #####
 
-Multi-level resource name: LCIA/ImpactCategories
+Spec resource name differs from implemented resource name. Need to decide what is our resource naming convention.
+
+Question: Would it make sense to group LCIA resources like this:
+
+- LCIA/ImpactCategories
+- LCIA/Methods
+
+etc.
+
 
 ### LciaMethods ###
 
@@ -96,15 +104,12 @@ Returns:
 
 Published at http://rachelscanlon.com/api/lciamethod.
 
-#### Suggested change to spec above ####
+##### Issues #####
 
-Resource Name: LCIA/Methods 
+Same naming convention issue as previous resource.
 
-Returns:
- - LCIAMethodID
- - Name
- - ReferenceProperty (FlowProperty.Name - make returned name consistent with other methods)
- - ReferenceUnit	(UnitGroup.ReferenceUnit)
+The 2 new output fields are not attributes of LCIA Method. 
+Units are needed for the LCIA Computation visualization. Not sure this is the best way to provide them.
 
 ### Processes ###
 
@@ -164,6 +169,11 @@ Returns:
 - Name
 
 Published at http://rachelscanlon.com/api/process
+
+##### Issues #####
+
+Naming convention : should resource name be singular or plural?
+
 
 ### Flows ###
 
@@ -374,19 +384,12 @@ Returns:
 
 Published URL : http://rachelscanlon.com/api/LCIAComputation
 
-##### Suggested Change to Spec #####
+##### Issues #####
 
-Resource Name: LCIA/Scores
+Same naming convention issues as above.
 
-Parameters: same as spec
-LCIAMethodID should be required because flow unit is derived from method.
-If not required, then more fields would need to be returned.
+Should parameters be optional? If so, more return fields are needed. 
+If LCIAMethodID is not provided, how can the client determine which results apply to which methods?
 
-Returns:
+Visualization needs unit - that is a flow property. There is currently no web api resource for Flow Properties.
 
- - FlowID
- - FlowName
- - Factor
- - Direction
- - Quantity
- - LCIAResult
