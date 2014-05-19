@@ -41,7 +41,7 @@ Returns:
 
 None (has not been reviewed nor assigned to a milestone).
 
-### LciaImpactCategories ###
+### ImpactCategory ###
 
 
 Lists all Impact Categories.
@@ -53,27 +53,20 @@ Returns:
 
 #### Status ####
 
-Implemented in sprint 1. The above spec has changed since then.
-
-Current resource name: ImpactCategory
-
-Returns: same as above
-
-Published at http://rachelscanlon.com/api/impactcategory
+Published at http://kbcalr.isber.ucsb.edu/api/impactcategory
 
 ##### Issues #####
-
-Spec resource name differs from implemented resource name. Need to decide what is our resource naming convention.
 
 Question: Would it make sense to group LCIA resources like this:
 
 - LCIA/ImpactCategories
 - LCIA/Methods
 
-etc.
+##### Resolution #####
 
+We certainly could, but this would make more sense as the project grows or we have some resources that are not LCIA.
 
-### LciaMethods ###
+### LCIAMethod ###
 
 Lists all LCIA methods, optionally  within an impact category.
 
@@ -85,24 +78,10 @@ Returns:
 
  - LCIAMethodID
  - Name
- - FlowPropertyID.Name
- - UnitGroup.ReferenceUnit
-
  
 #### Status ####
 
-Implemented in sprint 1. The above spec has changed since then.
-
-Current resource name: LCIAMethod
-
-Parameters: Same as above.
-
-Returns: 
-
-- LCIAMethodID
-- Name
-
-Published at http://rachelscanlon.com/api/lciamethod.
+Published at http://kbcalr.isber.ucsb.edu/api/lciamethod
 
 ##### Issues #####
 
@@ -110,6 +89,16 @@ Same naming convention issue as previous resource.
 
 The 2 new output fields are not attributes of LCIA Method. 
 Units are needed for the LCIA Computation visualization. Not sure this is the best way to provide them.
+
+These fields were
+
+FlowPropertyID.Name
+UnitGroup.ReferenceUnit
+
+##### Resolution #####
+
+I took these out of the for the time being because they are not needed for the dropdownlist or anything else.  
+We can revisit the best way to provide these values to the visualization when we have a direct need for them.
 
 ### Processes ###
 
@@ -155,25 +144,19 @@ For Flows=2 we need processes that do not match Flows=1:
 
 #### Status ####
 
-Implemented in sprint 1. The above spec has changed since then.
+Updated in sprint 2.
 
-##### Current Implementation #####
-
-Resource name: Process
-
-Parameters: None
-
-Returns: 
-
-- ProcessID
-- Name
-
-Published at http://rachelscanlon.com/api/process
+Example Published URL: http://kbcalr.isber.ucsb.edu/api/process?flows=1
 
 ##### Issues #####
 
 Naming convention : should resource name be singular or plural?
 
+##### Resolution ##### (To be implemented)
+
+Although there is no absolute rule in terms of best practices it is more accepted that plural will be used for API's returning a collection.  
+Especially since (in the future) you may pass an id which would return a single item in that collection.  
+(http://kbcalr.isber.ucsb.edu/api/lciamethods?impactCategoryID=4 vs http://kbcalr.isber.ucsb.edu/api/lciamethod?impactCategoryID=4)
 
 ### Flows ###
 
@@ -309,23 +292,16 @@ created above and sum:
 	FROM Main
 	GROUP BY ReferenceProperty,ReferenceUnit
 
-I don't know how to do this in plain SQL so someone will have to check it.
-
 #### Status ####
 
 Implemented in sprint 2.
 
-Published URL: http://rachelscanlon.com/api/intermediateflow
+Example Published URL: http://kbcalr.isber.ucsb.edu/api/intermediateflow?balance=0
 
 ### lcia_compute
 
 Computes LCIA score for the selected process using the selected LCIA
 method. 
-
-Parameters:
-
- * LCIAMethodID
- * ProcessID
 
 Returns:
 
@@ -382,7 +358,7 @@ Returns:
  - Factor
  - LCIAResult
 
-Published URL : http://rachelscanlon.com/api/LCIAComputation
+Published URL : http://kbcalr.isber.ucsb.edu/api/lciacomputation
 
 ##### Issues #####
 
@@ -392,4 +368,17 @@ Should parameters be optional? If so, more return fields are needed.
 If LCIAMethodID is not provided, how can the client determine which results apply to which methods?
 
 Visualization needs unit - that is a flow property. There is currently no web api resource for Flow Properties.
+
+##### Resolution #####
+
+As for Process - Although there is no absolute rule in terms of best practices it is more accepted that plural will be used for API's returning a collection.  
+Especially since (in the future) you may pass an id which would return a single item in that collection.  
+(http://kbcalr.isber.ucsb.edu/api/lciamethods?impactCategoryID=4 vs http://kbcalr.isber.ucsb.edu/api/lciamethod?impactCategoryID=4) - To be implemented
+
+Should parameters be optional? If so, more return fields are needed. 
+If LCIAMethodID is not provided, how can the client determine which results apply to which methods? - To be discussed in a meeting
+
+Visualization needs unit - that is a flow property. There is currently no web api resource for Flow Properties. - To be discussed in a meeting
+
+
 
