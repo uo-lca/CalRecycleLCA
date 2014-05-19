@@ -21,7 +21,7 @@ fieldset label {
 fieldset p {
     display: table-row;
 }
-fieldset #impactScore {
+#impactScore {
     display: table-cell;
     padding: 5px;
 }
@@ -67,7 +67,7 @@ text {
 
 .bar.text {
   font: 10px sans-serif;
-  text-anchor: left;
+  text-anchor: start;
 }
 
 .connect.line  {

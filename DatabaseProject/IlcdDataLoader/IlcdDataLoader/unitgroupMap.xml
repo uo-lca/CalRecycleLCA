@@ -1,0 +1,37 @@
+﻿<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+            xmlns:sql="urn:schemas-microsoft-com:mapping-schema">
+<xsd:annotation>
+  <xsd:appinfo>
+    <sql:relationship name="OrderOD"
+          parent="Ord"
+          parent-key="OrderID"
+          child="OrderDetail"
+          child-key="OrderID" />
+
+    <sql:relationship name="ODProduct"
+          parent="OrderDetail"
+          parent-key="ProductID"
+          child="Product"
+          child-key="ProductID" 
+          inverse="true"/>
+  </xsd:appinfo>
+</xsd:annotation>
+
+  <xsd:element name="Order" sql:relation="Ord" 
+                            sql:key-fields="OrderID" >
+   <xsd:complexType>
+     <xsd:sequence>
+        <xsd:element name="Product" sql:relation="Product" 
+                     sql:key-fields="ProductID"
+                     sql:relationship="OrderOD ODProduct">
+          <xsd:complexType>
+             <xsd:attribute name="ProductID" type="xsd:int" />
+             <xsd:attribute name="ProductName" type="xsd:string" />
+          </xsd:complexType>
+        </xsd:element>
+     </xsd:sequence>
+        <xsd:attribute name="OrderID"   type="xsd:integer" /> 
+        <xsd:attribute name="CustomerID"   type="xsd:string" />
+    </xsd:complexType>
+  </xsd:element>
+</xsd:schema>

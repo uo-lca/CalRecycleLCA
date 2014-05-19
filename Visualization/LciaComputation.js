@@ -5,7 +5,7 @@ function lciaComputation() {
 
 
     // library globals
-    /*global d3, console, window, $, colorbrewer */
+    /*global d3, console, window, $, colorbrewer, LCA */
 
     /**
      * lciaComputation variables
@@ -16,11 +16,10 @@ function lciaComputation() {
         methodList = [],
         lciaResultData = [],
         // Web API methods
-        baseURI = "http://rachelscanlon.com/api/",
-        processesURL = baseURI + "process",
-        impactCategoriesURL = baseURI + "impactcategory",
-        methodsURL = baseURI + "lciamethod",
-        lciaResultsURL = baseURI + "LCIAComputation",
+        processesURL,
+        impactCategoriesURL,
+        methodsURL,
+        lciaResultsURL,
         // Current selections
         selectedProcessID = 2,
         selectedImpactCategoryID = 10,
@@ -93,7 +92,9 @@ function lciaComputation() {
             var selectOptions;
 
             if (error) {
-                window.alert("Unable to refresh LCIA Methods. " + error);
+                window.alert("Unable to query LCIA Methods.");
+                console.error(error);
+                return false;
             } else {
                 jsonData.sort(compareNames);
 
@@ -176,47 +177,6 @@ function lciaComputation() {
      */
     function compareLciaResults(a, b) {
         return d3.descending(a.LCIAResult, b.LCIAResult);
-    }
-
-    /**
-     * Prepare select element. Load with data and initialize selection
-     * @param {string} jsonURL          URL for JSON data (web API endpoint or file)
-     * @param {string} selectID         SELECT HTML element id
-     * @param {string} oidName          Property name of object ID field.
-     * @param {function} changeHandler  Function for handling selection update.
-     * @param {number} initialValue     Default value (selected object ID).
-     */
-    function prepareSelect(jsonURL, selectID, oidName, changeHandler, initialValue) {
-
-        d3.json(jsonURL, function (error, jsonData) {
-            var selectOptions;
-
-            if (error) {
-                window.alert(error);
-            }
-            jsonData.sort(compareNames);
-
-            selectOptions = d3.select(selectID)
-                .on("change", changeHandler)
-                .selectAll("option")
-                .data(jsonData)
-                .enter()
-                .append("option")
-                .attr("value", function (d) {
-                    return d[oidName];
-                })
-                .text(function (d) {
-                    return d.Name;
-                });
-            //
-            // Initialize selection
-            //
-            selectOptions.filter(function (d, i) {
-                return d[oidName] == initialValue;
-            })
-                .attr("selected", true);
-        });
-
     }
 
     /**
@@ -330,7 +290,9 @@ function lciaComputation() {
 
 
         if (error) {
-            window.alert(error);
+            window.alert("Error executing LCIA Computation.");
+            console.error(error);
+            return false;
         }
         impactScore = 0;
         lciaResultData = results;
@@ -392,17 +354,22 @@ function lciaComputation() {
      * Starting point for lciaComputation
      */
     function init() {
-        var filteredMethodsURL = methodsURL + "?impactCategoryid=" + selectedImpactCategoryID;
+        var filteredMethodsURL;
 
-        prepareSelect(processesURL, "#processSelect", "ProcessID",
-            onProcessChange, selectedProcessID);
-        prepareSelect(impactCategoriesURL, "#impactCategorySelect", "ImpactCategoryID",
+        processesURL = LCA.baseURI + "process";
+        impactCategoriesURL = LCA.baseURI + "impactcategory";
+        methodsURL = LCA.baseURI + "lciamethod";
+        lciaResultsURL = LCA.baseURI + "LCIAComputation";
+        filteredMethodsURL = methodsURL + "?impactCategoryid=" + selectedImpactCategoryID;
+
+        LCA.prepareSelect(processesURL, "#processSelect", "ProcessID", onProcessChange, selectedProcessID);
+        LCA.prepareSelect(impactCategoriesURL, "#impactCategorySelect", "ImpactCategoryID",
             onImpactCategoryChange, selectedImpactCategoryID);
-        prepareSelect(filteredMethodsURL, "#lciaMethodSelect", "LCIAMethodID",
+        LCA.prepareSelect(filteredMethodsURL, "#lciaMethodSelect", "LCIAMethodID",
             onMethodChange, selectedMethodID);
         prepareSvg();
         displayResults();
     }
 
-    init();
+    LCA.init(init);
 }
