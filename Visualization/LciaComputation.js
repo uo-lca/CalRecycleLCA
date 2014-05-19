@@ -356,7 +356,7 @@ function lciaComputation() {
     function init() {
         var filteredMethodsURL;
 
-        processesURL = LCA.baseURI + "process";
+        processesURL = LCA.baseURI + "process?flows=1";
         impactCategoriesURL = LCA.baseURI + "impactcategory";
         methodsURL = LCA.baseURI + "lciamethod";
         lciaResultsURL = LCA.baseURI + "LCIAComputation";
