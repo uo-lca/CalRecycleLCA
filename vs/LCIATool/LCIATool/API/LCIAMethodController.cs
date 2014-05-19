@@ -17,15 +17,15 @@ namespace LCIATool.API
         static IRepository repository = new Repository();
         [System.Web.Http.AcceptVerbs("GET", "POST")]
         [System.Web.Http.HttpGet]
-        public IQueryable<LCIAMethodModel> LCIAMethodDDL()
+        public IQueryable<LCIAMethodModel> LCIAMethodDDL(int impactCategoryID=0)
         {
-            int impactCategoryID = 0;
+            //int impactCategoryID = 0;
 
-            //grab the impactCategoryid from the querystring and assign them to a local variable
-            if (HttpContext.Current.Request.QueryString["impactCategoryid"] != null)
-            {
-            impactCategoryID = Convert.ToInt32(HttpContext.Current.Request.QueryString["impactCategoryid"].ToString());
-            }
+            ////grab the impactCategoryid from the querystring and assign them to a local variable
+            //if (HttpContext.Current.Request.QueryString["impactCategoryId"] != null)
+            //{
+            //impactCategoryID = Convert.ToInt32(HttpContext.Current.Request.QueryString["impactCategoryId"].ToString());
+            //}
 
             if (impactCategoryID == 0)
             {

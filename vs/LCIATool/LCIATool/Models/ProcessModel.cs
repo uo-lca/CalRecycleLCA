@@ -9,7 +9,7 @@ namespace LCIATool.Models
     public class ProcessModel
     {
 
-        public int ProcessID { get; set; }
+        public int? ProcessID { get; set; }
         public string ProcessUUID { get; set; }
         public string ProcessVersion { get; set; }
         public string Name { get; set; }

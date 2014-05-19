@@ -19,12 +19,12 @@ namespace LCIATool.Models.Repository
         IQueryable<Direction> Directions { get; }
         IQueryable<ImpactCategory> ImpactCategories { get; }
 
-        IQueryable<ProcessModel> ProcessDDL();
+        IQueryable<ProcessModel> ProcessDDL(int flows);
         IQueryable<ImpactCategoryModel> ImpactCategoryDDL();
         IQueryable<LCIAMethodModel> LCIAMethodDDL();
         IQueryable<LCIAComputationModel> LCIAComputation();
         IQueryable<IntermediateFlowModel> IntermediateFlow(int balance, int processId);
-        //IQueryable<IntermediateFlowModel> IntermediateFlowSum(int balance, int processId);
+        double IntermediateFlowSum(int balance, int processId);
          
     }
 }

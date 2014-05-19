@@ -30,8 +30,8 @@ namespace LCIATool.App_Start
 
             config.Routes.MapHttpRoute(
             name: "DefaultApi",
-            routeTemplate: "api/{controller}/{id}",
-            defaults: new { id = RouteParameter.Optional }
+            routeTemplate: "api/{controller}/{id}/{impactCategoryId}",
+            defaults: new { id = RouteParameter.Optional, impactCategoryId = RouteParameter.Optional }
             );
 
         }
