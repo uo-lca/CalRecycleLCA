@@ -16,5 +16,8 @@ namespace LCIATool.Models
         public float Magnitude { get; set; }
         public float Result { get; set; }
         public float STDev { get; set; }
+
+        public int? ProcessID { get; set; }
+        public int emcounts { get; set; }
     }
 }

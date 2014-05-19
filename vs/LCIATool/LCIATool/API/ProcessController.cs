@@ -16,10 +16,10 @@ namespace LCIATool.API
          static IRepository repository = new Repository();
          [System.Web.Http.AcceptVerbs("GET", "POST")]
          [System.Web.Http.HttpGet]
-         public IQueryable<ProcessModel> ProcessDDL()
+         public IQueryable<ProcessModel> ProcessDDL(int flows = 0)
          {
              //gets all processes for the dropdownlist by calling the function within the interface.
-             var processes = repository.ProcessDDL();
+             var processes = repository.ProcessDDL(flows);
              return processes;
          }
     }

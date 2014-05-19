@@ -70,18 +70,81 @@ namespace LCIATool.Models.Repository
             .AsQueryable<ImpactCategoryModel>();
         }
 
-        public IQueryable<ProcessModel> ProcessDDL()
-        {
-            //returns a list of Processes as IQueryable<ProcessModel> type
-            //with just the fields needed for the dropdownlist
-            return context.Processes
-            .Select(p => new ProcessModel
-            {
-                ProcessID = p.ProcessID,
-                Name = p.Name
+        //public IQueryable<ProcessModel> ProcessDDL()
+        //{
+        //    //returns a list of Processes as IQueryable<ProcessModel> type
+        //    //with just the fields needed for the dropdownlist
+        //    return context.Processes
+        //    .Select(p => new ProcessModel
+        //    {
+        //        ProcessID = p.ProcessID,
+        //        Name = p.Name
 
-            })
-            .AsQueryable<ProcessModel>();
+        //    })
+        //    .AsQueryable<ProcessModel>();
+        //}
+
+        public IQueryable<ProcessModel> ProcessDDL(int flows)
+        {
+            if (flows == 1)
+            {
+                var processFlows = context.ProcessFlows
+         .Where(e => e.Flow.FlowType.FlowTypeID == 2)
+             .GroupBy(p => new
+                   {
+                       ProcessID = p.ProcessID,
+                       ProcessName = p.Process.Name
+
+                   })
+    .SelectMany(cl => cl.Select(p => new ProcessModel
+                   {
+                       ProcessID = p.ProcessID,
+                       Name = p.Process.Name
+                   }).Distinct()).AsQueryable();
+                return processFlows;
+            }
+            else if (flows == 2)
+            {
+                var processFlows = context.ProcessFlows
+             .Where(e => e.Flow.FlowType.FlowTypeID == 2)
+             .OrderBy(e => e.ProcessID)
+              .GroupBy(r => new { r.ProcessID })
+              .Select(r => new ProcessFlowModel
+              {
+                  ProcessID = r.Key.ProcessID,
+                  emcounts = r.GroupBy(g => g.ProcessFlowID).Count()
+              }).AsQueryable();
+
+                var results = (from processes in context.Processes
+                               join pFlows in processFlows
+                                   on processes.ProcessID equals pFlows.ProcessID into joined
+                               from pFlows in joined.DefaultIfEmpty()
+                               where pFlows.emcounts == null
+                               select new ProcessModel
+                               {
+                                   ProcessID = processes.ProcessID,
+                                   Name = processes.Name
+                               }).AsQueryable();
+
+                return results;
+
+            }
+            else
+            {
+                //returns a list of Processes as IQueryable<ProcessModel> type
+                    //with just the fields needed for the dropdownlist
+                    return context.Processes
+                    .Select(p => new ProcessModel
+                    {
+                        ProcessID = p.ProcessID,
+                        Name = p.Name
+
+                    })
+                    .AsQueryable<ProcessModel>();
+            }
+           
+
+
         }
 
         public IQueryable<LCIAMethodModel> LCIAMethodDDL()
@@ -92,7 +155,7 @@ namespace LCIATool.Models.Repository
             .Select(lm => new LCIAMethodModel
             {
                 LCIAMethodID = lm.LCIAMethodID,
-                Name = lm.Name, 
+                Name = lm.Name,
                 ImpactCategoryID = lm.ImpactCategoryID
 
 
@@ -152,77 +215,100 @@ namespace LCIATool.Models.Repository
             {
 
                 var query = context.ProcessFlows
-                    .Where(e => e.Flow.FlowType.FlowTypeID != 2 && e.Flow.FlowPropertyID != null && (e.Process.ProcessID==processId || processId == 0))
+                    .Where(e => e.Flow.FlowType.FlowTypeID != 2 && e.Flow.FlowPropertyID != null && (e.Process.ProcessID == processId || processId == 0))
                     .GroupBy(p => new
                     {
-                        FlowPropertyName = p.Flow.FlowProperty.Name
+                        ReferenceProperty = p.Flow.FlowProperty.Name,
+                        ReferenceUnit = p.Flow.FlowProperty.UnitGroup.ReferenceUnit
                     })
                     .SelectMany(pf => pf.Select(p => new IntermediateFlowModel
                     {
-                        FlowPropertyName = p.Flow.FlowProperty.Name,
+                        ReferenceProperty = p.Flow.FlowProperty.Name,
                         ReferenceUnit = p.Flow.FlowProperty.UnitGroup.Name,
-                        FlowDirectionID = p.Direction.Name == "Input" ? +1 : p.Direction.Name == "Output" ? -1 : 0,
-                        ProcessFlowResult = p.Result,
-                        Computation = p.Result * (p.Direction.Name == "Input" ? +1 : p.Direction.Name == "Output" ? -1 : 0)
+                        Quantity = p.Result,
+                        NetFlowIn = p.Result * (p.Direction.Name == "Input" ? +1 : p.Direction.Name == "Output" ? -1 : 0)
                     })).AsQueryable();
-                return query.OrderBy(pFlow => new { pFlow.FlowPropertyName, pFlow.ReferenceUnit });
+                return query.OrderBy(pFlow => new { pFlow.ReferenceProperty, pFlow.ReferenceUnit });
 
 
             }
             else
             {
+                //get all intermediate flows
                 var query = context.ProcessFlows
                .Where(e => e.Flow.FlowType.FlowTypeID != 2 && e.Flow.FlowPropertyID != null && (e.Process.ProcessID == processId || processId == 0))
                .GroupBy(p => new
                {
-                   FlowPropertyName = p.Flow.FlowProperty.Name
+                   ReferenceUnit = p.Flow.FlowProperty.UnitGroup.ReferenceUnit
                })
                .SelectMany(pf => pf.Select(p => new IntermediateFlowModel
                {
-                   FlowPropertyName = p.Flow.FlowProperty.Name,
-                   ReferenceUnit = p.Flow.FlowProperty.UnitGroup.Name,
                    ProcessFlowID = p.ProcessFlowID,
                    FlowName = p.Flow.Name,
                    FlowDirection = p.Direction.Name,
-                   ProcessFlowResult = p.Result,
-                   FlowType = p.Flow.FlowType.Type
+                   ReferenceProperty = p.Flow.FlowProperty.Name,
+                   ReferenceUnit = p.Flow.FlowProperty.UnitGroup.ReferenceUnit,
+                   Quantity = p.Result,
+                   FlowType = p.Flow.FlowType.Type,
+                   MaxUnit = null,
+                   SankeyWidth = null
                })).AsQueryable();
-                return query.OrderBy(pFlow => new { pFlow.FlowPropertyName, pFlow.ReferenceUnit });
+                //return query.OrderBy(pFlow => new { pFlow.FlowPropertyName, pFlow.ReferenceUnit });
+
+
+
+
+                //Normalize the flow quantities on a by-Reference-Unit basis in order to scale properly in the visualization. 
+                //To this we need to add a SankeyWidth column which is derived from the largest flow in any given unit
+                var maxUnit = context.ProcessFlows
+                .Where(e => e.Flow.FlowType.FlowTypeID != 2 && e.Flow.FlowPropertyID != null)
+               .GroupBy(referenceunit => new
+               {
+                   refUnit = referenceunit.Flow.FlowProperty.UnitGroup.ReferenceUnit
+               }
+               )
+               .Select(
+                    maxUnitGroup =>
+                        new MaxUnitModel
+                        {
+                            ReferenceUnit = maxUnitGroup.Key.refUnit,
+                            ProcessFlowResult = maxUnitGroup.Max(res => res.Result),
+                        }).AsQueryable();
+
+
+
+                //Join the two linq queries 
+                var results = query.Join(maxUnit,
+                    main => main.ReferenceUnit,
+                    mUnit => mUnit.ReferenceUnit,
+                    (main, mUnit) => new IntermediateFlowModel
+                        {
+                            ProcessFlowID = main.ProcessFlowID,
+                            FlowName = main.FlowName,
+                            FlowDirection = main.FlowDirection,
+                            ReferenceProperty = main.ReferenceProperty,
+                            ReferenceUnit = main.ReferenceUnit,
+                            Quantity = main.Quantity,
+                            FlowType = main.FlowType,
+                            MaxUnit = mUnit.ProcessFlowResult,
+                            SankeyWidth = (main.Quantity / mUnit.ProcessFlowResult)
+                        }
+                 ).AsQueryable();
+
+                return results;
+
             }
         }
 
-        //public IQueryable<IntermediateFlowModel> IntermediateFlowSum(int balance, int processId)
-        //{
-        //    if (balance == 1)
-        //    {
+        public double IntermediateFlowSum(int balance, int processId)
+        {
+            IQueryable<IntermediateFlowModel> list = IntermediateFlow(balance, processId);
 
-        //        var query = context.ProcessFlows
-        //            .Where(e => e.Flow.FlowType.FlowTypeID != 2 && e.Flow.FlowPropertyID != null && (e.Process.ProcessID==processId || processId == 0))
-        //            .GroupBy(p => new
-        //            {
-        //                p.Result
-        //            })
-        //            .Select (p => new IntermediateFlowModel
-        //            {
-        //                IntermediateFlowSum = p.Key.Result
-        //            });
-        //        return query.Select(c=>c.IntermediateFlowSum).Sum();
+            double sum = Convert.ToDouble(list.Sum(od => od.Quantity));
+            return sum;
 
-
-        //    }
-        //    else
-        //    {
-        //        var query = context.ProcessFlows
-        //       .Where(e => e.Flow.FlowType.FlowTypeID != 2 && e.Flow.FlowPropertyID != null && (e.Process.ProcessID == processId || processId == 0))
-        //       .GroupBy(p => new
-        //       {
-        //           p.Result
-        //       })
-        //        .Select(p => new IntermediateFlowModel
-        //        {
-        //            IntermediateFlowSum = p.Key.Result
-        //        });
-        //        return query;
-        //    }
+            //int cnt = list.Count();
+            //return cnt;
         }
     }
+}

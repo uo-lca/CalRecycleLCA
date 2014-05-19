@@ -191,6 +191,8 @@
       <LastGenOutput>LCAModel.cs</LastGenOutput>
     </Content>
     <None Include="Properties\PublishProfiles\LCIATool.pubxml" />
+    <None Include="Properties\PublishProfiles\LCIAToolFTP.pubxml" />
+    <None Include="Properties\PublishProfiles\LCIAToolWebDeploy.pubxml" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>
@@ -252,6 +254,7 @@
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
     <Compile Include="Models\ImpactCategoryModel.cs" />
+    <Compile Include="Models\IntermediateFlowMaxUnitModel.cs" />
     <Compile Include="Models\IntermediateFlowModel.cs" />
     <Compile Include="Models\LCIAComputationModel.cs" />
     <Compile Include="Models\LCIAModel.cs">
@@ -260,6 +263,7 @@
     <Compile Include="Models\LCIAMethodModel.cs">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="Models\MaxUnitModel.cs" />
     <Compile Include="Models\ProcessModel.cs">
       <SubType>Code</SubType>
     </Compile>

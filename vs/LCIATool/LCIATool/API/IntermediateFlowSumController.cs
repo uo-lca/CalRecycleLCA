@@ -14,28 +14,28 @@ namespace LCIATool.API
     {
         static IRepository repository = new Repository();
 
-        //[System.Web.Http.AcceptVerbs("GET", "POST")]
-        //[System.Web.Http.HttpGet]
-        //public IQueryable<IntermediateFlowModel> IntermediateFlowSum()
-        //{
-        //    int balance = 0;
-        //    int processId = 0;
+        [System.Web.Http.AcceptVerbs("GET", "POST")]
+        [System.Web.Http.HttpGet]
+        public double IntermediateFlowSum()
+        {
+            int balance = 0;
+            int processId = 0;
 
-        //    //grab the values from the querystring and assign each to a local variable
-        //    if (HttpContext.Current.Request.QueryString["processId"] != null)
-        //    {
-        //        processId = Convert.ToInt32(HttpContext.Current.Request.QueryString["processId"].ToString());
-        //    }
+            //grab the values from the querystring and assign each to a local variable
+            if (HttpContext.Current.Request.QueryString["processId"] != null)
+            {
+                processId = Convert.ToInt32(HttpContext.Current.Request.QueryString["processId"].ToString());
+            }
 
-        //    if (HttpContext.Current.Request.QueryString["balance"] != null)
-        //    {
-        //        balance = Convert.ToInt32(HttpContext.Current.Request.QueryString["balance"].ToString());
-        //    }
+            if (HttpContext.Current.Request.QueryString["balance"] != null)
+            {
+                balance = Convert.ToInt32(HttpContext.Current.Request.QueryString["balance"].ToString());
+            }
 
-        //    //We return the records which correspond to what is sent in the querystring of the api call.
-        //    //if the parameter is not sent for any of the above omit it from the query.
-        //    //var intermediateFlowSum = repository.IntermediateFlowSum(balance, processId);
-        //    //return intermediateFlowSum;
-        //}
+            //We return the records which correspond to what is sent in the querystring of the api call.
+            //if the parameter is not sent for any of the above omit it from the query.
+            var intermediateFlowSum = repository.IntermediateFlowSum(balance, processId);
+            return intermediateFlowSum;
+        }
     }
 }
