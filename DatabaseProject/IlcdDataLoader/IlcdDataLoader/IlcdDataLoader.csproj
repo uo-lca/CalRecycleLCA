@@ -59,11 +59,9 @@
     </COMReference>
   </ItemGroup>
   <ItemGroup>
-    <None Include="MapUnitGroupDataSet.xml">
-      <SubType>Designer</SubType>
-    </None>
     <Content Include="unitgroupMap.xml">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <SubType>Designer</SubType>
     </Content>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
