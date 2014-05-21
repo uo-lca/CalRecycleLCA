@@ -59,6 +59,7 @@
     </COMReference>
   </ItemGroup>
   <ItemGroup>
+    <Content Include="SQL_UnitGroupDataSet.xml" />
     <Content Include="unitgroupMap.xml">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       <SubType>Designer</SubType>

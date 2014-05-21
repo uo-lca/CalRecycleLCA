@@ -1,0 +1,385 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- ILCD Format Version 1.1 Schemas Build 983 -->
+<!--
+Copyright (c) 1995-2009, European Commission. All rights reserved.
+
+This file is part of the ILCD data format. The license conditions for the ILCD data format can be
+found in the file ILCD_format_and_editor_license.txt included in this distribution. The license is
+also available at http://lca.jrc.ec.europa.eu/eplca/doc/ILCD_format_and_editor_license.txt.
+-->
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:ilcd="http://lca.jrc.it/ILCD"
+           xmlns:common="http://lca.jrc.it/ILCD/Common"
+           xmlns="http://lca.jrc.it/ILCD/UnitGroup"
+           xmlns:unitgroup="http://lca.jrc.it/ILCD/UnitGroup"
+           xmlns:edoc="http://www.iai.fzk.de/lca/edoc"
+           xmlns:sql="urn:schemas-microsoft-com:mapping-schema"
+           targetNamespace="http://lca.jrc.it/ILCD/UnitGroup"
+           elementFormDefault="qualified"
+           version="1.1">
+   <xsd:import namespace="http://lca.jrc.it/ILCD/Common"
+              schemaLocation="ILCD_Common_Groups.xsd"/>
+  <xsd:annotation>
+    <xsd:appinfo>
+      <sql:relationship name="UnitConversion_UnitGroup"
+            parent="UnitGroup"
+            parent-key="UnitGroupUUID"
+            child="UnitConversion"
+            child-key="UnitGroupUUID" />
+    </xsd:appinfo>
+  </xsd:annotation>
+   <xsd:complexType name="AdministrativeInformationType" mixed="false" >
+      <xsd:sequence>
+         <xsd:element name="dataEntryBy" type="DataEntryByType" minOccurs="0" sql:mapped="false">
+            <xsd:annotation>
+               <xsd:appinfo>
+                  <ilcd:element id="5-37-164" name="dataEntryBy"/>
+                  <ilcd:display-name>Data entry by</ilcd:display-name>
+                  <ilcd:iso-field-id/>
+                  <ilcd:iso-field-name/>
+                  <ilcd:field-requirement>r</ilcd:field-requirement>
+               </xsd:appinfo>
+               <xsd:documentation>Staff or entity, that documented the generated data set, entering the information into the database; plus administrative information linked to the data entry activity.</xsd:documentation>
+            </xsd:annotation>
+         </xsd:element>
+         <xsd:element name="publicationAndOwnership" type="PublicationAndOwnershipType" minOccurs="0" sql:mapped="false">
+            <xsd:annotation>
+               <xsd:appinfo>
+                  <ilcd:element id="5-37-166" name="publicationAndOwnership"/>
+                  <ilcd:display-name>Publication and ownership</ilcd:display-name>
+                  <ilcd:iso-field-id/>
+                  <ilcd:iso-field-name/>
+                  <ilcd:field-requirement>r</ilcd:field-requirement>
+               </xsd:appinfo>
+               <xsd:documentation>Information related to publication and version management of the data set including copyright and access restrictions.</xsd:documentation>
+            </xsd:annotation>
+         </xsd:element>
+         <xsd:element ref="common:other" minOccurs="0" maxOccurs="1" sql:mapped="false"/>
+      </xsd:sequence>
+      <xsd:anyAttribute namespace="##other" processContents="lax"/>
+   </xsd:complexType>
+   <xsd:complexType name="ComplianceDeclarationsType" mixed="false">
+      <xsd:sequence>
+         <xsd:element name="compliance" type="ComplianceType" minOccurs="1" maxOccurs="unbounded" sql:mapped="false">
+            <xsd:annotation>
+               <xsd:appinfo>
+                  <ilcd:element id="1-3-22-1" name="compliance"/>
+                  <ilcd:display-name>Compliance</ilcd:display-name>
+                  <ilcd:iso-field-id>0</ilcd:iso-field-id>
+                  <ilcd:iso-field-name/>
+                  <ilcd:field-requirement>r</ilcd:field-requirement>
+               </xsd:appinfo>
+               <xsd:documentation>one compliance declaration</xsd:documentation>
+            </xsd:annotation>
+         </xsd:element>
+         <xsd:element ref="common:other" minOccurs="0" maxOccurs="1"/>
+      </xsd:sequence>
+      <xsd:anyAttribute namespace="##other" processContents="lax"/>
+   </xsd:complexType>
+   <xsd:complexType name="ComplianceType" mixed="false">
+      <xsd:sequence>
+         <xsd:group ref="common:ComplianceGroup"/>
+         <xsd:element ref="common:other" minOccurs="0" maxOccurs="1" sql:mapped="false"/>
+      </xsd:sequence>
+      <xsd:anyAttribute namespace="##other" processContents="lax"/>
+   </xsd:complexType>
+   <xsd:complexType name="DataEntryByType" mixed="false">
+      <xsd:sequence>
+         <xsd:group ref="common:DataEntryByGroup1"/>
+         <xsd:element ref="common:other" minOccurs="0" maxOccurs="1" sql:mapped="false"/>
+      </xsd:sequence>
+      <xsd:anyAttribute namespace="##other" processContents="lax"/>
+   </xsd:complexType>
+   <xsd:complexType name="DataSetInformationType" mixed="false">
+      <xsd:sequence>
+         <xsd:element ref="common:UUID" sql:field="UnitGroupUUID">
+         </xsd:element>
+         <xsd:element ref="common:name" sql:field="Name">
+         </xsd:element>
+         <xsd:element name="classificationInformation" type="common:ClassificationInformationType"
+                     minOccurs="0">
+            <xsd:annotation>
+               <xsd:appinfo>
+                  <ilcd:element id="5-33-138-308" name="classificationInformation"/>
+                  <ilcd:display-name>Classification Information</ilcd:display-name>
+                  <ilcd:iso-field-id>0</ilcd:iso-field-id>
+                  <ilcd:iso-field-name/>
+                  <ilcd:field-motivation>u</ilcd:field-motivation>
+                  <ilcd:field-requirement>r</ilcd:field-requirement>
+               </xsd:appinfo>
+               <xsd:documentation>Hierachical classification of the Unit groups; foreseen to be used to structure the Unit group content of the database. (Note: This entry is NOT required
+            for the identification of the Unit group data set. It should nevertheless be avoided to use identical names for Unit groups in the same class.</xsd:documentation>
+            </xsd:annotation>
+         </xsd:element>
+         <xsd:element ref="common:generalComment" minOccurs="0" maxOccurs="100">
+            <xsd:annotation>
+               <xsd:appinfo>
+                  <ilcd:element id="5-33-138-309" name="generalComment"/>
+                  <ilcd:display-name>General comment</ilcd:display-name>
+                  <ilcd:iso-field-id>0</ilcd:iso-field-id>
+                  <ilcd:iso-field-name/>
+                  <ilcd:field-motivation>r</ilcd:field-motivation>
+                  <ilcd:field-requirement>o</ilcd:field-requirement>
+               </xsd:appinfo>
+               <xsd:documentation>Free text for general information about the data set. E.g. coverage of different unit systems, information sources used, etc.</xsd:documentation>
+            </xsd:annotation>
+         </xsd:element>
+         <xsd:element ref="common:other" minOccurs="0" maxOccurs="1"/>
+      </xsd:sequence>
+      <xsd:anyAttribute namespace="##other" processContents="lax"/>
+   </xsd:complexType>
+   <xsd:complexType name="ModellingAndValidationType" mixed="false">
+      <xsd:sequence>
+         <xsd:element name="complianceDeclarations" type="ComplianceDeclarationsType" minOccurs="0">
+            <xsd:annotation>
+               <xsd:appinfo>
+                  <ilcd:element id="5-35-158" name="complianceDeclarations"/>
+                  <ilcd:display-name>Compliance declarations</ilcd:display-name>
+                  <ilcd:iso-field-id/>
+                  <ilcd:iso-field-name/>
+                  <ilcd:field-requirement>r</ilcd:field-requirement>
+               </xsd:appinfo>
+               <xsd:documentation>Statements on compliance of several data set aspects with compliance requirements as defined by the referenced compliance system (e.g. an EPD scheme, handbook of a national or international data network such as the ILCD, etc.).</xsd:documentation>
+            </xsd:annotation>
+         </xsd:element>
+         <xsd:element ref="common:other" minOccurs="0" maxOccurs="1"/>
+      </xsd:sequence>
+      <xsd:anyAttribute namespace="##other" processContents="lax"/>
+   </xsd:complexType>
+   <xsd:complexType name="PublicationAndOwnershipType" mixed="false">
+      <xsd:sequence>
+         <xsd:group ref="common:PublicationAndOwnershipGroup1"/>
+         <xsd:element ref="common:referenceToOwnershipOfDataSet" minOccurs="0">
+            <xsd:annotation>
+               <xsd:appinfo>
+                  <ilcd:element id="1-5-30-115" name="referenceToOwnershipOfDataSet"/>
+                  <ilcd:display-name>Owner of data set</ilcd:display-name>
+                  <ilcd:iso-field-id>0</ilcd:iso-field-id>
+                  <ilcd:iso-field-name/>
+                  <ilcd:field-motivation>r</ilcd:field-motivation>
+                  <ilcd:field-requirement>r</ilcd:field-requirement>
+               </xsd:appinfo>
+               <xsd:documentation>"Contact data set" of the person or entity who owns this data set. (Note: this is not necessarily the publisher of the data set.)</xsd:documentation>
+            </xsd:annotation>
+         </xsd:element>
+         <xsd:element ref="common:other" minOccurs="0" maxOccurs="1"/>
+      </xsd:sequence>
+      <xsd:anyAttribute namespace="##other" processContents="lax"/>
+   </xsd:complexType>
+   <xsd:complexType name="QuantitativeReferenceType" mixed="false">
+      <xsd:sequence>
+         <xsd:element name="referenceToReferenceUnit" type="common:Int5">
+            <xsd:annotation>
+               <xsd:appinfo>
+                  <ilcd:element id="5-33-140-310" name="referenceToReferenceUnit"/>
+                  <ilcd:display-name>Reference unit</ilcd:display-name>
+                  <ilcd:iso-field-id>0</ilcd:iso-field-id>
+                  <ilcd:iso-field-name/>
+                  <ilcd:field-motivation>r</ilcd:field-motivation>
+                  <ilcd:field-requirement>r</ilcd:field-requirement>
+               </xsd:appinfo>
+               <xsd:documentation>The Unit group's unit in which the data set is expressed (data set internal reference).</xsd:documentation>
+            </xsd:annotation>
+         </xsd:element>
+         <xsd:element ref="common:other" minOccurs="0" maxOccurs="1"/>
+      </xsd:sequence>
+      <xsd:anyAttribute namespace="##other" processContents="lax"/>
+   </xsd:complexType>
+   <xsd:complexType name="UnitGroupDataSetType" mixed="false">
+      <xsd:sequence>
+         <xsd:element name="unitGroupInformation" type="UnitGroupInformationType" sql:relation="UnitGroup"
+                            sql:key-fields="UnitGroupID" >
+            <xsd:annotation>
+               <xsd:appinfo>
+                  <ilcd:element id="5-33" name="unitGroupInformation"/>
+                  <ilcd:display-name>Unit group information</ilcd:display-name>
+                  <ilcd:iso-field-id/>
+                  <ilcd:iso-field-name/>
+               </xsd:appinfo>
+               <xsd:documentation/>
+            </xsd:annotation>
+         </xsd:element>
+         <xsd:element name="modellingAndValidation" type="ModellingAndValidationType" minOccurs="0">
+            <xsd:annotation>
+               <xsd:appinfo>
+                  <ilcd:element id="5-35" name="modellingAndValidation"/>
+                  <ilcd:display-name>Modelling and validation</ilcd:display-name>
+                  <ilcd:iso-field-id/>
+                  <ilcd:iso-field-name/>
+                  <ilcd:field-requirement>r</ilcd:field-requirement>
+               </xsd:appinfo>
+               <xsd:documentation>Sections used to a very limited degree; covers the five sub-sections 1) LCI method and allocation (not used for unit groups), 2) Data sources, treatment
+            and representativeness (not used for unit groups), 3) Completeness (not used for unit groups), 4) Validation (not used for unit groups), and 5)
+            Compliance.</xsd:documentation>
+            </xsd:annotation>
+         </xsd:element>
+         <xsd:element name="administrativeInformation" type="AdministrativeInformationType"
+                     minOccurs="0">
+            <xsd:annotation>
+               <xsd:appinfo>
+                  <ilcd:element id="5-37" name="administrativeInformation"/>
+                  <ilcd:display-name>Administrative information</ilcd:display-name>
+                  <ilcd:iso-field-id/>
+                  <ilcd:iso-field-name/>
+                  <ilcd:field-requirement>r</ilcd:field-requirement>
+               </xsd:appinfo>
+               <xsd:documentation>Information on data set management and administration.</xsd:documentation>
+            </xsd:annotation>
+         </xsd:element>
+         <xsd:element name="units" type="UnitsType" minOccurs="0">
+            <xsd:annotation>
+               <xsd:appinfo>
+                  <ilcd:element id="5-39" name="units"/>
+                  <ilcd:display-name>Units</ilcd:display-name>
+                  <ilcd:iso-field-id/>
+                  <ilcd:iso-field-name/>
+                  <ilcd:field-requirement>r</ilcd:field-requirement>
+               </xsd:appinfo>
+               <xsd:documentation>List of units that belong to this Unit group and are interconvertible among each other with a fixed factor, such as this can be done e.g. for kg, g,
+            ounces, pounds etc. of the Unit group "Units of mass".</xsd:documentation>
+            </xsd:annotation>
+         </xsd:element>
+         <xsd:element ref="common:other" minOccurs="0" maxOccurs="1"/>
+      </xsd:sequence>
+      <xsd:attribute name="version" type="common:SchemaVersion" use="required"/>
+      <xsd:anyAttribute namespace="##other" processContents="lax"/>
+   </xsd:complexType>
+   <xsd:complexType name="UnitGroupInformationType" mixed="false">
+      <xsd:sequence>
+         <xsd:element name="dataSetInformation" type="DataSetInformationType">
+            <xsd:annotation>
+               <xsd:appinfo>
+                  <ilcd:element id="5-33-138" name="dataSetInformation"/>
+                  <ilcd:display-name>Data set information</ilcd:display-name>
+                  <ilcd:iso-field-id/>
+                  <ilcd:iso-field-name/>
+               </xsd:appinfo>
+               <xsd:documentation/>
+            </xsd:annotation>
+            <xsd:unique name="nameLangUniqueConstraint">
+               <xsd:selector xpath="common:name"/>
+               <xsd:field xpath="@xml:lang"/>
+            </xsd:unique>
+            <xsd:unique name="generalCommentLangUniqueConstraint">
+               <xsd:selector xpath="common:generalComment"/>
+               <xsd:field xpath="@xml:lang"/>
+            </xsd:unique>
+         </xsd:element>
+         <xsd:element name="quantitativeReference" type="QuantitativeReferenceType" minOccurs="0">
+            <xsd:annotation>
+               <xsd:appinfo>
+                  <ilcd:element id="5-33-140" name="quantitativeReference"/>
+                  <ilcd:display-name>Quantitative reference</ilcd:display-name>
+                  <ilcd:iso-field-id/>
+                  <ilcd:iso-field-name/>
+                  <ilcd:field-requirement>r</ilcd:field-requirement>
+               </xsd:appinfo>
+               <xsd:documentation>This section identifies the quantitative reference of this data set, i.e. the "reference unit" in which the data set is expressed. It is the basis for the
+            conversion to other units in the data set (e.g. for mass-related units "kg" as basis for conversion to and among "g", "ounces", "short tons", etc.).</xsd:documentation>
+            </xsd:annotation>
+         </xsd:element>
+         <xsd:element ref="common:other" minOccurs="0" maxOccurs="1"/>
+      </xsd:sequence>
+      <xsd:anyAttribute namespace="##other" processContents="lax"/>
+   </xsd:complexType>
+   <xsd:complexType name="UnitsType" mixed="false">
+      <xsd:sequence>
+         <xsd:element name="unit" type="UnitType" maxOccurs="unbounded">
+            <xsd:annotation>
+               <xsd:appinfo>
+                  <ilcd:element id="5-39-168" name="unit"/>
+                  <ilcd:display-name>Unit</ilcd:display-name>
+                  <ilcd:iso-field-id/>
+                  <ilcd:iso-field-name/>
+                  <ilcd:field-requirement>r</ilcd:field-requirement>
+               </xsd:appinfo>
+               <xsd:documentation/>
+            </xsd:annotation>
+            <xsd:unique name="unitGeneralCommentLangUniqueConstraint">
+               <xsd:selector xpath="unitgroup:generalComment"/>
+               <xsd:field xpath="@xml:lang"/>
+            </xsd:unique>
+         </xsd:element>
+         <xsd:element ref="common:other" minOccurs="0" maxOccurs="1"/>
+      </xsd:sequence>
+      <xsd:anyAttribute namespace="##other" processContents="lax"/>
+   </xsd:complexType>
+   <xsd:complexType name="UnitType" mixed="false">
+      <xsd:sequence>
+         <xsd:element name="name" type="common:String">
+            <xsd:annotation>
+               <xsd:appinfo>
+                  <ilcd:element id="5-39-168-323" name="name"/>
+                  <ilcd:display-name>Name of unit</ilcd:display-name>
+                  <ilcd:iso-field-id>1.1.3.3, 1.2.11.1, 1.2.12.2</ilcd:iso-field-id>
+                  <ilcd:iso-field-name>Unit, Unit, Unit</ilcd:iso-field-name>
+                  <ilcd:field-requirement>r</ilcd:field-requirement>
+               </xsd:appinfo>
+               <xsd:documentation>Name of the individual unit.</xsd:documentation>
+            </xsd:annotation>
+         </xsd:element>
+         <xsd:element name="meanValue" type="common:Real">
+            <xsd:annotation>
+               <xsd:appinfo>
+                  <ilcd:element id="5-39-168-325" name="meanValue"/>
+                  <ilcd:display-name>Mean value (of unit)</ilcd:display-name>
+                  <ilcd:iso-field-id>0</ilcd:iso-field-id>
+                  <ilcd:iso-field-name/>
+                  <ilcd:field-motivation>t</ilcd:field-motivation>
+                  <ilcd:field-requirement>r</ilcd:field-requirement>
+               </xsd:appinfo>
+               <xsd:documentation>Mean value of this unit in relationship to the reference unit of this Unit group (see field "Reference unit" in the "Quantitative reference" section).
+            [Notes and Examples: This vale is i.e. the linear conversion factor for this unit. E.g., if the Unit group would be "Units of mass" and the selected reference unit
+            "kg", then the value stated here for an additional unit "g" would be 0.001, as 1 g is 0.001 times 1 kg. It is recommended to report only significant digits of the
+            value.]</xsd:documentation>
+            </xsd:annotation>
+         </xsd:element>
+         <xsd:element name="generalComment" type="common:StringMultiLang" minOccurs="0"
+                     maxOccurs="100">
+            <xsd:annotation>
+               <xsd:appinfo>
+                  <ilcd:element id="5-39-168-326" name="generalComment"/>
+                  <ilcd:display-name>Comment</ilcd:display-name>
+                  <ilcd:iso-field-id>0</ilcd:iso-field-id>
+                  <ilcd:iso-field-name/>
+                  <ilcd:field-motivation>r</ilcd:field-motivation>
+                  <ilcd:field-requirement>o</ilcd:field-requirement>
+               </xsd:appinfo>
+               <xsd:documentation>General comment on each single unit, typically giving the long name and unit system from which this unit stems, and (if necessary) referring to specifc
+            data sources used, or for workflow purposes about status of "finalisation" of an entry etc.</xsd:documentation>
+            </xsd:annotation>
+         </xsd:element>
+         <xsd:element ref="common:other" minOccurs="0" maxOccurs="1"/>
+      </xsd:sequence>
+      <xsd:attribute name="dataSetInternalID" type="common:Int5">
+         <xsd:annotation>
+            <xsd:appinfo>
+               <ilcd:element id="5-39-168-324" name="dataSetInternalID"/>
+               <ilcd:display-name>Data set internal ID</ilcd:display-name>
+               <ilcd:iso-field-id>0</ilcd:iso-field-id>
+               <ilcd:iso-field-name/>
+               <ilcd:field-motivation>t</ilcd:field-motivation>
+               <ilcd:field-requirement>r</ilcd:field-requirement>
+            </xsd:appinfo>
+            <xsd:documentation>Automated entry: internal ID, used in the "Quantitative reference" section to identify the reference unit.</xsd:documentation>
+         </xsd:annotation>
+      </xsd:attribute>
+      <xsd:anyAttribute namespace="##other" processContents="lax"/>
+   </xsd:complexType>
+   <xsd:element name="unitGroupDataSet" type="UnitGroupDataSetType">
+      <xsd:annotation>
+         <xsd:appinfo>
+            <ilcd:element id="5" name="unitGroupDataSet"/>
+            <ilcd:display-name>Unit group data set</ilcd:display-name>
+            <ilcd:iso-field-name>Unit Group Dataset</ilcd:iso-field-name>
+         </xsd:appinfo>
+      </xsd:annotation>
+      <xsd:key name="UnitGroupInternalID">
+         <xsd:selector xpath="unitgroup:units/unitgroup:unit"/>
+         <xsd:field xpath="@dataSetInternalID"/>
+      </xsd:key>
+      <xsd:keyref name="ReferenceToReferenceUnit" refer="UnitGroupInternalID">
+         <xsd:selector xpath="unitgroup:unitGroupInformation/unitgroup:quantitativeReference/unitgroup:referenceToReferenceUnit"/>
+         <xsd:field xpath="."/>
+      </xsd:keyref>
+   </xsd:element>
+</xsd:schema>
