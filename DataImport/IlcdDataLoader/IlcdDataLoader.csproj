@@ -32,7 +32,15 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="EntityFramework, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\packages\EntityFramework.6.1.1-beta1\lib\net45\EntityFramework.dll</HintPath>
+    </Reference>
+    <Reference Include="EntityFramework.SqlServer">
+      <HintPath>..\packages\EntityFramework.6.1.1-beta1\lib\net45\EntityFramework.SqlServer.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
+    <Reference Include="System.ComponentModel.DataAnnotations" />
     <Reference Include="System.Core" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
@@ -42,6 +50,47 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="IlcdXDoc.cs" />
+    <Compile Include="Models\Category.cs" />
+    <Compile Include="Models\CategorySystem.cs" />
+    <Compile Include="Models\Class.cs" />
+    <Compile Include="Models\Classification.cs" />
+    <Compile Include="Models\DataProvider.cs" />
+    <Compile Include="Models\DataType.cs" />
+    <Compile Include="Models\Direction.cs" />
+    <Compile Include="Models\Flow.cs" />
+    <Compile Include="Models\FlowFlowProperty.cs" />
+    <Compile Include="Models\FlowProperty.cs" />
+    <Compile Include="Models\FlowType.cs" />
+    <Compile Include="Models\ImpactCategory.cs" />
+    <Compile Include="Models\IndicatorType.cs" />
+    <Compile Include="Models\LCAToolDbContext.cs" />
+    <Compile Include="Models\LCIA.cs" />
+    <Compile Include="Models\LCIAMethod.cs" />
+    <Compile Include="Models\Mapping\CategoryMap.cs" />
+    <Compile Include="Models\Mapping\CategorySystemMap.cs" />
+    <Compile Include="Models\Mapping\ClassificationMap.cs" />
+    <Compile Include="Models\Mapping\ClassMap.cs" />
+    <Compile Include="Models\Mapping\DataProviderMap.cs" />
+    <Compile Include="Models\Mapping\DataTypeMap.cs" />
+    <Compile Include="Models\Mapping\DirectionMap.cs" />
+    <Compile Include="Models\Mapping\FlowFlowPropertyMap.cs" />
+    <Compile Include="Models\Mapping\FlowMap.cs" />
+    <Compile Include="Models\Mapping\FlowPropertyMap.cs" />
+    <Compile Include="Models\Mapping\FlowTypeMap.cs" />
+    <Compile Include="Models\Mapping\ImpactCategoryMap.cs" />
+    <Compile Include="Models\Mapping\IndicatorTypeMap.cs" />
+    <Compile Include="Models\Mapping\LCIAMap.cs" />
+    <Compile Include="Models\Mapping\LCIAMethodMap.cs" />
+    <Compile Include="Models\Mapping\ProcessFlowMap.cs" />
+    <Compile Include="Models\Mapping\ProcessMap.cs" />
+    <Compile Include="Models\Mapping\SourceMap.cs" />
+    <Compile Include="Models\Mapping\UnitConversionMap.cs" />
+    <Compile Include="Models\Mapping\UnitGroupMap.cs" />
+    <Compile Include="Models\Process.cs" />
+    <Compile Include="Models\ProcessFlow.cs" />
+    <Compile Include="Models\Source.cs" />
+    <Compile Include="Models\UnitConversion.cs" />
+    <Compile Include="Models\UnitGroup.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Properties\Settings.Designer.cs">
@@ -49,12 +98,14 @@
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
       <DependentUpon>Settings.settings</DependentUpon>
     </Compile>
+    <Compile Include="UnitGroupXDoc.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config">
       <SubType>Designer</SubType>
     </None>
     <None Include="IlcdXDoc.cd" />
+    <None Include="packages.config" />
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
