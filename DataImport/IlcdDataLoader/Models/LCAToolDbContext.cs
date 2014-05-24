@@ -1,6 +1,7 @@
 using System.Data.Entity;
 using System.Data.Entity.Infrastructure;
 using IlcdDataLoader.Models.Mapping;
+using System.Collections.Generic;
 
 namespace IlcdDataLoader.Models
 {
@@ -60,5 +61,7 @@ namespace IlcdDataLoader.Models
             modelBuilder.Configurations.Add(new UnitConversionMap());
             modelBuilder.Configurations.Add(new UnitGroupMap());
         }
+
+        public Dictionary<string, int> UnitGroupIDs { get; set; }
     }
 }
