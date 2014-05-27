@@ -249,7 +249,8 @@ namespace LCIATool.Models.Repository
                    ReferenceProperty = p.Flow.FlowProperty.Name,
                    ReferenceUnit = p.Flow.FlowProperty.UnitGroup.ReferenceUnit,
                    Quantity = p.Result,
-                   FlowType = p.Flow.FlowType.Type,
+                   FlowType = p.Flow.FlowType.Name,
+                   FlowTypeID = p.Flow.FlowType.FlowTypeID,
                    MaxUnit = null,
                    SankeyWidth = null
                })).AsQueryable();
@@ -260,11 +261,11 @@ namespace LCIATool.Models.Repository
 
                 //Normalize the flow quantities on a by-Reference-Unit basis in order to scale properly in the visualization. 
                 //To this we need to add a SankeyWidth column which is derived from the largest flow in any given unit
-                var maxUnit = context.ProcessFlows
-                .Where(e => e.Flow.FlowType.FlowTypeID != 2 && e.Flow.FlowPropertyID != null)
+                var maxUnit = query
+                .Where(e => e.FlowTypeID != 2 )
                .GroupBy(referenceunit => new
                {
-                   refUnit = referenceunit.Flow.FlowProperty.UnitGroup.ReferenceUnit
+                   refUnit = referenceunit.ReferenceUnit
                }
                )
                .Select(
@@ -272,7 +273,7 @@ namespace LCIATool.Models.Repository
                         new MaxUnitModel
                         {
                             ReferenceUnit = maxUnitGroup.Key.refUnit,
-                            ProcessFlowResult = maxUnitGroup.Max(res => res.Result),
+                            ProcessFlowResult = maxUnitGroup.Max(res => res.Quantity),
                         }).AsQueryable();
 
 
@@ -290,6 +291,7 @@ namespace LCIATool.Models.Repository
                             ReferenceUnit = main.ReferenceUnit,
                             Quantity = main.Quantity,
                             FlowType = main.FlowType,
+                            FlowTypeID = main.FlowTypeID,
                             MaxUnit = mUnit.ProcessFlowResult,
                             SankeyWidth = (main.Quantity / mUnit.ProcessFlowResult)
                         }

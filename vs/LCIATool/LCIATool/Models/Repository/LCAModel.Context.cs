@@ -27,7 +27,6 @@ namespace LCIATool.Models.Repository
     
         public virtual DbSet<DataProvider> DataProviders { get; set; }
         public virtual DbSet<Direction> Directions { get; set; }
-        public virtual DbSet<FlowType> FlowTypes { get; set; }
         public virtual DbSet<ImpactCategory> ImpactCategories { get; set; }
         public virtual DbSet<IndicatorType> IndicatorTypes { get; set; }
         public virtual DbSet<LCIA> LCIAs { get; set; }
@@ -44,5 +43,6 @@ namespace LCIATool.Models.Repository
         public virtual DbSet<LCIAMethod> LCIAMethods { get; set; }
         public virtual DbSet<Process> Processes { get; set; }
         public virtual DbSet<ProcessFlow> ProcessFlows { get; set; }
+        public virtual DbSet<FlowType> FlowTypes { get; set; }
     }
 }

@@ -32,9 +32,9 @@ namespace LCIATool.Models.Repository
         public string ReferenceFlowProperty_SQL { get; set; }
     
         public virtual FlowProperty FlowProperty { get; set; }
-        public virtual FlowType FlowType { get; set; }
         public virtual ICollection<FlowFlowProperty> FlowFlowProperties { get; set; }
         public virtual ICollection<Process> Processes { get; set; }
         public virtual ICollection<ProcessFlow> ProcessFlows { get; set; }
+        public virtual FlowType FlowType { get; set; }
     }
 }

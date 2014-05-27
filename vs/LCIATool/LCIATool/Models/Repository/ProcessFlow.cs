@@ -30,7 +30,7 @@ namespace LCIATool.Models.Repository
         public string Geography { get; set; }
     
         public virtual Direction Direction { get; set; }
-        public virtual Process Process { get; set; }
         public virtual Flow Flow { get; set; }
+        public virtual Process Process { get; set; }
     }
 }

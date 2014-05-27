@@ -7,7 +7,6 @@
       <Diagram DiagramId="43bc9d11113842cb888e77920533948f" Name="Diagram1">
         <EntityTypeShape EntityType="LCAToolDevModel.DataProvider" Width="1.5" PointX="0.75" PointY="2.125" IsExpanded="true" />
         <EntityTypeShape EntityType="LCAToolDevModel.Direction" Width="1.5" PointX="6" PointY="12.5" IsExpanded="true" />
-        <EntityTypeShape EntityType="LCAToolDevModel.FlowType" Width="1.5" PointX="0.75" PointY="5.625" IsExpanded="true" />
         <EntityTypeShape EntityType="LCAToolDevModel.ImpactCategory" Width="1.5" PointX="0.75" PointY="12.125" IsExpanded="true" />
         <EntityTypeShape EntityType="LCAToolDevModel.IndicatorType" Width="1.5" PointX="9.75" PointY="12.125" IsExpanded="true" />
         <EntityTypeShape EntityType="LCAToolDevModel.LCIA" Width="1.5" PointX="5.375" PointY="8.5" IsExpanded="true" />
@@ -34,7 +33,6 @@
         <AssociationConnector Association="LCAToolDevModel.FK_Classification_Class" />
         <AssociationConnector Association="LCAToolDevModel.FK_ProcessFlow_Direction" />
         <AssociationConnector Association="LCAToolDevModel.FK_Flow_FlowProperty" />
-        <AssociationConnector Association="LCAToolDevModel.FK_Flow_FlowType" />
         <AssociationConnector Association="LCAToolDevModel.FK_FlowPropertyVersion_Flow" />
         <AssociationConnector Association="LCAToolDevModel.FK_Process_Flow" />
         <AssociationConnector Association="LCAToolDevModel.FK_ProcessFlow_Flow" />
@@ -44,6 +42,8 @@
         <AssociationConnector Association="LCAToolDevModel.FK_LCIAMethod_IndicatorType" />
         <AssociationConnector Association="LCAToolDevModel.FK_LCIA_LCIAMethod" />
         <AssociationConnector Association="LCAToolDevModel.FK_ProcessFlow_Process" />
+        <EntityTypeShape EntityType="LCAToolDevModel.FlowType" Width="1.5" PointX="0.75" PointY="4.875" />
+        <AssociationConnector Association="LCAToolDevModel.FK_Flow_FlowType" />
       </Diagram>
     </edmx:Diagrams>
   </edmx:Designer>
