@@ -55,6 +55,7 @@
     <Compile Include="Models\Category.cs" />
     <Compile Include="Models\CategorySystem.cs" />
     <Compile Include="Models\Class.cs" />
+    <Compile Include="Models\DbContextWrapper.cs" />
     <Compile Include="Models\Classification.cs" />
     <Compile Include="Models\DataProvider.cs" />
     <Compile Include="Models\DataType.cs" />
@@ -105,6 +106,7 @@
     <None Include="App.config">
       <SubType>Designer</SubType>
     </None>
+    <None Include="ClassDiagram1.cd" />
     <None Include="packages.config" />
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>

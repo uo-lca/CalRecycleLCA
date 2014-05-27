@@ -61,7 +61,5 @@ namespace IlcdDataLoader.Models
             modelBuilder.Configurations.Add(new UnitConversionMap());
             modelBuilder.Configurations.Add(new UnitGroupMap());
         }
-
-        public Dictionary<string, int> UnitGroupIDs { get; set; }
     }
 }

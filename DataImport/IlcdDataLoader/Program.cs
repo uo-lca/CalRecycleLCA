@@ -7,6 +7,9 @@ using System.Threading.Tasks;
 
 namespace IlcdDataLoader {
     class Program {
+        /// <summary>
+        /// Directory holding ILCD data files.
+        /// </summary>
         static string _IlcdDirName = "C:\\ILCD_Data\\ILCD";
 
 
