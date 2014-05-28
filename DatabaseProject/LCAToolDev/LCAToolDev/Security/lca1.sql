@@ -1,4 +1,0 @@
-﻿CREATE USER [lca1];
-
-
-

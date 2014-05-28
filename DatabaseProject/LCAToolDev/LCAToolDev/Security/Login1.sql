@@ -1,1 +1,0 @@
-﻿CREATE LOGIN [lca1] WITH PASSWORD = 'lca1'
