@@ -17,6 +17,8 @@ namespace LCIATool.Models
         [JsonIgnore]
         public string FlowType { get; set; }
         public int? ProcessFlowID { get; set; }
+        [JsonIgnore]
+        public int? FlowTypeID { get; set; }
         public int? FlowDirectionID { get; set; }
         public int? FlowPropertyID { get; set; }
         public double? Quantity { get; set; }

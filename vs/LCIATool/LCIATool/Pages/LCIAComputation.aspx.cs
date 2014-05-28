@@ -86,7 +86,7 @@ namespace LCIATool.Pages
                              {
                                  p.Name,
                                  lciamethodname= lm.Name,
-                                 ft.Type,
+                                 FlowType = ft.Name,
                                  pf.Result,
                                  p.Geography,
                                  l.Factor
@@ -95,7 +95,7 @@ namespace LCIATool.Pages
                              {
                                  Process = g.Key.Name,
                                  LCIAMethod = g.Key.lciamethodname,
-                                 FlowType = g.Key.Type,
+                                 FlowType = g.Key.FlowType,
                                  Result = g.Key.Result,
                                  Geography = g.Key.Geography,
                                  Factor = g.Key.Factor,
