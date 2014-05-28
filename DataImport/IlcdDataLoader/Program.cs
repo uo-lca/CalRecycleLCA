@@ -6,9 +6,12 @@ using System.Text;
 using System.Threading.Tasks;
 
 namespace IlcdDataLoader {
+    /// <summary>
+    /// Program to batch load ILCD data files into a new database
+    /// </summary>
     class Program {
         /// <summary>
-        /// Directory holding ILCD data files.
+        /// Directory holding ILCD data files. Default setting can be overwritten by argument.
         /// </summary>
         static string _IlcdDirName = "C:\\ILCD_Data\\ILCD";
 

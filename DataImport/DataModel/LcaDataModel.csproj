@@ -4,16 +4,15 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{71FB8558-57C0-4E37-BE09-5309E69E874D}</ProjectGuid>
-    <OutputType>Exe</OutputType>
+    <ProjectGuid>{B7F4D17F-6156-457C-8425-8CE5F683CAC5}</ProjectGuid>
+    <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>IlcdDataLoader</RootNamespace>
-    <AssemblyName>IlcdDataLoader</AssemblyName>
+    <RootNamespace>LcaDataModel</RootNamespace>
+    <AssemblyName>LcaDataModel</AssemblyName>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-    <PlatformTarget>AnyCPU</PlatformTarget>
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
@@ -23,7 +22,6 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-    <PlatformTarget>AnyCPU</PlatformTarget>
     <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
     <OutputPath>bin\Release\</OutputPath>
@@ -32,16 +30,17 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="EntityFramework, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\packages\EntityFramework.6.1.1-beta1\lib\net45\EntityFramework.dll</HintPath>
+    <Reference Include="EntityFramework">
+      <HintPath>..\packages\EntityFramework.6.1.0\lib\net45\EntityFramework.dll</HintPath>
     </Reference>
     <Reference Include="EntityFramework.SqlServer">
-      <HintPath>..\packages\EntityFramework.6.1.1-beta1\lib\net45\EntityFramework.SqlServer.dll</HintPath>
+      <HintPath>..\packages\EntityFramework.6.1.0\lib\net45\EntityFramework.SqlServer.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.ComponentModel.DataAnnotations" />
     <Reference Include="System.Core" />
+    <Reference Include="System.Runtime.Serialization" />
+    <Reference Include="System.Security" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
@@ -49,34 +48,41 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="DbContextWrapper.cs" />
-    <Compile Include="GlobalSuppressions.cs" />
-    <Compile Include="IlcdImporter.cs" />
-    <Compile Include="IlcdData.cs" />
-    <Compile Include="Program.cs" />
+    <Compile Include="Category.cs" />
+    <Compile Include="CategorySystem.cs" />
+    <Compile Include="Class.cs" />
+    <Compile Include="Classification.cs" />
+    <Compile Include="DataProvider.cs" />
+    <Compile Include="DataType.cs" />
+    <Compile Include="Direction.cs" />
+    <Compile Include="EntityDataModel.cs" />
+    <Compile Include="Flow.cs" />
+    <Compile Include="FlowFlowProperty.cs" />
+    <Compile Include="FlowProperty.cs" />
+    <Compile Include="FlowType.cs" />
+    <Compile Include="Fragment.cs" />
+    <Compile Include="FragmentEdge.cs" />
+    <Compile Include="FragmentEmission.cs" />
+    <Compile Include="FragmentNode.cs" />
+    <Compile Include="FragmentScore.cs" />
+    <Compile Include="FragmentStage.cs" />
+    <Compile Include="ImpactCategory.cs" />
+    <Compile Include="IndicatorType.cs" />
+    <Compile Include="LCIA.cs" />
+    <Compile Include="LCIAMethod.cs" />
+    <Compile Include="Param.cs" />
+    <Compile Include="Process.cs" />
+    <Compile Include="ProcessFlow.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Properties\Settings.Designer.cs">
-      <AutoGen>True</AutoGen>
-      <DesignTimeSharedInput>True</DesignTimeSharedInput>
-      <DependentUpon>Settings.settings</DependentUpon>
-    </Compile>
+    <Compile Include="ScenarioSet.cs" />
+    <Compile Include="Source.cs" />
+    <Compile Include="sysdiagram.cs" />
+    <Compile Include="UnitConversion.cs" />
+    <Compile Include="UnitGroup.cs" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="App.config">
-      <SubType>Designer</SubType>
-    </None>
-    <None Include="ClassDiagram1.cd" />
+    <None Include="App.config" />
     <None Include="packages.config" />
-    <None Include="Properties\Settings.settings">
-      <Generator>SettingsSingleFileGenerator</Generator>
-      <LastGenOutput>Settings.Designer.cs</LastGenOutput>
-    </None>
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\DataModel\LcaDataModel.csproj">
-      <Project>{b7f4d17f-6156-457c-8425-8ce5f683cac5}</Project>
-      <Name>LcaDataModel</Name>
-    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

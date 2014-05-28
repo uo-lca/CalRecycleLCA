@@ -4,10 +4,10 @@ using System.Linq;
 using System.Xml.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using IlcdDataLoader.Models;
 using System.Runtime.CompilerServices;
 using System.Diagnostics;
 using System.Data.Entity.Infrastructure;
+using LcaDataModel;
 
 namespace IlcdDataLoader {
     /// <summary>

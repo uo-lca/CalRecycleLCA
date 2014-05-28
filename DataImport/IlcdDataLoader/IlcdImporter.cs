@@ -5,7 +5,7 @@ using System.Linq;
 using System.Xml.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using IlcdDataLoader.Models;
+using LcaDataModel;
 
 namespace IlcdDataLoader {
     /// <summary>
@@ -15,7 +15,7 @@ namespace IlcdDataLoader {
         /// <summary>
         /// Wrapper for the app's DbContext
         /// </summary>
-        private DbContextWrapper _DbContext = new DbContextWrapper(new LCAToolDbContext());
+        private DbContextWrapper _DbContext = new DbContextWrapper(new EntityDataModel());
 
         /// <summary>
         /// Object to handle loading ILCD data file.
