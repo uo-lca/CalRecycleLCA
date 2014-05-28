@@ -5,7 +5,7 @@
 /*global d3, window, console */
 
 var LCA = {
-    baseURI: "http://rachelscanlon.com//api/"
+    baseURI: "http://kbcalr.isber.ucsb.edu/api/"
 };
 
 /**
