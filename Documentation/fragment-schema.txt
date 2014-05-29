@@ -1,0 +1,699 @@
+==========
+Fri May 16 11:03:06 PDT 2014
+
+Life Cycle Inventory Fragments
+
+ = Flow-property-aware
+ = linear; reducible
+ = fully parametric
+
+# Filesystem Layout:
+
+The database exists as a formal data model stored within the project.  It
+is implemented from the spec using Entity Framework and then populated from
+data found in the file system of the server.  In this way the database can
+be constructed from scratch.
+
+The source data files are stored in a data directory on the server.  There
+are [will be] three common subdirectories and a number of project-specific
+data directories storing ILCD-formatted XML data.  
+
+The data directories include:
+
+ $DATA_ROOT/append/ - CSV-formatted files with records to append to
+ 		      tables automatically-generated from ILCD data.
+
+ $DATA_ROOT/fragments/ - Files that make reference to ILCD data to
+ 		       	 construct fragments that encode the model. Also
+ 		       	 UUID-referenced. 
+
+ $DATA_ROOT/scenarios/ - Files that make reference to fragments and ILCD
+ 		         data to describe different modeling scenarios.
+
+ $DATA_ROOT/<source name>/ - Source data stored as ILCD archives.
+
+ILCD-formatted data archives have the following structure: an ILCD
+subfolder containing seven subfolders, one for each established ILCD data
+type.  Only 'UnitGroup', 'FlowProperty', 'Flow', 'Process', and
+'LCIAMethod' are used in the current tool.  The directory names are
+(unfortunately) the lower-cased pluralizations of the data types, e.g.:
+
+ $DATA_ROOT/<source name>/ILCD/processes/
+
+Data within these data type folders takes the form of <UUID>.xml, where
+<UUID> is the standard 8-4-4-4-12 lower-case UUID format.
+
+The ILCD folder also contains an optional XML file containing
+classification category information; for the time being this data is
+handled outside of the tool and imported via the append directory.
+
+Records in files in the non-ILCD folders will all be in CSV format.  All
+will make reference to ILCD data by UUID, so upon import UUID-referenced
+fields will need to be translated into internal IDs.
+
+Data updates will be accomplished by introducing new data to these three
+directories and then re-indexing them.  Alternatively, a new data source
+can be introduced and indexed.
+
+
+# Database Schema:
+
+Key:
+
+ * Field Name as exists in current implementation
+ X Field Name to be removed from current implementation
+ + Field Name to be added to current implementation
+ % Field Name to be renamed from current implementation
+
+Tables can be specified as 'New Table' or 'REMOVE TABLE'
+
+The following tables are required:
+
+## User Info
+
+   Consult with CalRecycle on implementing users and user  privileges.
+
+   User - New Table
+    * UserID
+    * Name
+    * CanLogin (bool)
+    * CanEditScenarios 
+    * CanEditFragments
+    * CanEditBackground (incl. base scenarios)
+    * CanAppend
+    * etc
+
+    Those are given in increasing order of privilege.
+
+    User 0 is default w all privileges
+
+## Type Enumerations
+   
+   manually generated and stored in the Data Model.
+
+   DataType (enumeration)
+    * DataTypeID
+    * Name [ Flow | Process | FlowProperty | UnitGroup | LCIAMethod 
+      	    | Contact | Source | Fragment ]
+
+    Data types described in the ILCD documentation, used mainly for
+    handling classification information.  'Fragment' represents the
+    extension described for the current tool.
+
+   Direction (enumeration)
+    * DirectionID [1 | 2]
+    * Name [Input | Output]
+
+   Dummy - REMOVE TABLE
+
+   FlowType (enumeration)
+    * FlowTypeID
+    % Name (was Type) [ IntermediateFlow | Elementary Flow ]
+
+    All product, waste, and accounting flows are Intermediate flows.  All
+    interchanges with the natural world are Elementary flows.
+
+   ImpactCategory (enumeration)
+    * ImpactCategoryID
+    * Name 
+
+    Impact Categories represented in ILCD LCIA Methods.
+
+   IndicatorType (enumeration)
+    * IndicatorTypeID
+    * Name
+
+    Indicator types represented in ILCD LCIA methods.
+
+   NodeType (enumeration) - New Table
+    * NodeTypeID [1 | 2 | 3 | 4]
+    * Name: [Process | Fragment | InputOutput | Background]
+
+    A Node's NodeType specifies how the node resolves its reference flow:
+    to a database process, to a subfragment, to an external input/output,
+    or to a background process.
+
+   ParamType (enumeration) - New Table
+    * ParamTypeID: [1 | 2 | 3 
+      	     | 4 
+	     | 5
+	     | 6 | 7 
+	     | 8 | 9
+	     | 10 ]
+
+    * Name: [Dependency | Conservation | Distribution
+      	     | FlowProperty 
+	     | CompositionProperty 
+	     | ProcessDissipation | NodeDissipation
+	     | ProcessEmission | NodeEmission
+	     | LCIAFactor ]
+
+    Different parameter types must be handled at different points in the
+    tree traversal / LCIA computation.  
+
+
+## Standard ILCD-based Tables
+
+   generated from auto-load of ILCD archives
+
+   DataProvider
+    * DataProviderID
+    X DataProviderUUID - REMOVE
+    * Name
+    + DirName
+
+    A list of ILCD archives accessed by the tool.  One DataProvider is
+    created for each source directory in the data folder (excepting the
+    'fragments' directory and the 'scenarios' directory). Each archive is
+    assumed to represent a different inventory data provider.
+
+    DataProviderID 1 should correspond to the 'append' directory- which can
+    be used to load additional ILCD data sets.
+
+    Do we want the non-ILCD folders to be included? 
+
+    (DataProviderID 2 should correspond to the 'fragments' directory.
+     DataProviderID 3 should correspond to the 'scenarios' directory.)
+
+    Generated prior to ILCD import.
+
+   ILCDEntity (Rename from MasterLCAModels)
+    * UUID
+    * Version - ILCD version of source data file
+    + DataProviderID
+    * DataTypeID
+    X URI - REMOVE
+    X OldIndex - REMOVE
+    
+    Lookup table mapping UUIDs to sources in the file system.  Generated
+    during ILCD import.
+
+   UnitGroup
+    * UnitGroupID
+    * UnitGroupUUID
+    X Version - REMOVE - move to UUIDs.Version
+    * Name
+    * ReferenceUnit
+    X CreatedOn - REMOVE
+    X CreatedBy - REMOVE
+    X UpdatedOn - REMOVE
+    X UpdatedBy - REMOVE
+    X Voided - REMOVE
+
+   UnitConversion
+    * UnitConversionID
+    X UnitConversionUUID - REMOVE
+    * UnitGroupID
+    * Unit
+    * Conversion
+    X Ind-sql - REMOVE
+    X CreatedOn - REMOVE
+    X CreatedBy - REMOVE
+    X UpdatedOn - REMOVE
+    X UpdatedBy - REMOVE
+    X Voided - REMOVE
+
+    Gives a list of conversion factors relative to the ReferenceUnit- 
+    Conversion for ReferenceUnit assumed to be 1 / ignored.
+
+   FlowProperty
+    * FlowPropertyID
+    * FlowPropertyUUID - UUID of source data file
+    X FlowPropertyVersion - REMOVE - move to UUIDs.Version
+    * Name
+    * UnitGroupID
+    X UnitGroup_SQL - REMOVE
+
+   Flow
+    * FlowID
+    * FlowUUID - UUID of source data file
+    X FlowVersion - REMOVE - move to UUIDs.Version
+    * Name
+    * CASNumber
+    * FlowTypeID
+    * ReferenceFlowProperty (was FlowPropertyID) (FK to FlowPropertyID)
+    X FlowType_SQL - REMOVE
+    X ReferenceFlowProperty_SQL - REMOVE
+
+   FlowFlowProperty
+    % FlowFlowPropertyID (was FlowPropertyVersionID)
+    X FlowPropertyVersionUUID - REMOVE
+    * FlowID
+    * FlowPropertyID
+    * MeanValue
+    * StDev
+    X FlowProperty-SQL - REMOVE
+    X FlowReference-SQL - REMOVE
+    X Ind-SQL - REMOVE
+
+   FlowPropertyEmission - New Table
+    * FlowPropertyEmissionID
+    * FlowPropertyID
+    * EmissionID (FK to Flow.FlowID; FlowType must be Elementary)
+
+    How various flow properties map to environmental emissions.
+
+   LCIAMethod
+    * LCIAMethodID
+    * LCIAMethodUUID
+    X LCIAMethodVersion - REMOVE - move to UUIDs.Version
+    * Name
+    * Methodology
+    * ImpactCategoryID
+    * ImpactIndicator
+    * ReferenceYear
+    * Duration
+    * ImpactLocation
+    * IndicatorTypeID
+    * Normalization
+    * Weighting
+    * UseAdvice
+    X SourceID - REMOVE
+    % ReferenceQuantity (was FlowPropertyID) (FK to FlowPropertyID)
+    X Source - REMOVE
+    X ReferenceQuantity - REMOVE
+
+   LCIA
+    * LCIAID
+    * LCIAMethodID
+    X LCIAUUID - REMOVE
+    * FlowID
+    * DirectionID
+    * Geography (was Location)
+    * Factor
+    X Flow-SQL - REMOVE
+    X Direction-SQL - REMOVE
+
+   Process
+    * ProcessID - internal primary key
+    * ProcessUUID - UUID of source file
+    X ProcessVersion - REMOVE - move to UUIDs.Version
+    * Name
+    * Year
+    * Geography
+    X ReferenceFlow-SQL - REMOVE
+    * ReferenceType (could be enumeration)
+    * ProcessType (could be enumeration)
+    X Diagram - REMOVE
+    * ReferenceFlowID (was FlowID) (FK to Flow.FlowID)
+
+   ProcessFlow
+    * ProcessFlowID
+    X ProcessUUID - REMOVE
+    * ProcessID
+    * Geography
+    * FlowID
+    * DirectionID
+    * Type
+    * VarName
+    * Magnitude
+    * Result
+    * StDev
+    X Flow-SQL - REMOVE
+    X Direction-SQL - REMOVE
+    X Ind-SQL - REMOVE
+
+   ProcessDissipation - New Table
+    * ProcessDissipationID
+    * ProcessID
+    * FlowPropertyEmissionID
+    * EmissionFactor (0-1)
+
+    This is an extension of the ILCD process type to include environmental
+    dissipation of flow constituents.  A ProcessDissipation record
+    generates an emission when LCIA computation is performed on the process
+    and the following query is non-null:
+
+    SELECT fe.EmissionID AS FlowID,
+    	   pd.EmissionFactor * ffp.MeanValue * pf.Result AS Quantity
+	   "Output" AS Direction
+	   pf.Geography AS Geography
+    FROM ProcessFlow pf
+    INNER JOIN Direction d on pf.DirectionID = d.DirectionID
+    INNER JOIN FlowFlowProperty ffp ON pf.FlowID = ffp.FlowID
+    INNER JOIN ProcessDissipation pd ON ffp.FlowPropertyID = pd.FlowPropertyID
+    INNER JOIN FlowPropertyEmission fe ON pd.FlowPropertyEmissionID = fe.FlowPropertyEmissionID
+    WHERE pf.ProcessID = @ProcessID
+      AND pd.ProcessID = @ProcessID  ???? record must match two constraints 
+      AND d.Direction = 'Input' 
+
+    i.e. if there exists a FlowFlowProperty record pairing a process input
+    flow and the identified flow property. It is a usage error to use this
+    method on a process with multiple inputs or ambiguous inputs (all
+    matching FlowFlowProperty records will generate emissions).
+
+    This happens automatically when LCIA is conducted of a process.  When
+    computing a node, it's more complicated because of the need to account
+    for scenario settings.
+
+    nodes can issue sensitivities to parameters encoded in
+    ProcessDissipation; they can't generate new emissions.
+
+
+   Source - REMOVE TABLE
+
+
+## Classification Tables
+
+   should ultimately be generated automatically; for now generated manually
+   in Matlab
+
+   CategorySystem
+    * CategorySystemID
+    % Name (was CategorySystem )
+    X URI (obsolete?) - REMOVE
+    * DataTypeID 
+    * Delimiter
+    X DataType-SQL - REMOVE
+
+    Each CategorySystem may have only one CategorySystemID per DataTypeID. 
+
+   old Category - REMOVE TABLE -- rename old Class to Category
+
+   Category - renamed from Class
+    * CategoryID
+    * ExternalClassID
+    * Name
+    % CategorySystemID (was CategorySystemID-SQL)
+    + ParentClassID - Move from Category table
+    + HierarchyLevel - Move from Category table
+
+    Record of all the various classifications that can be assigned to data
+    entities.  The CategorySystem and Class tables are generated by loading
+    XML files based on the ILCD-Categories schema (two are provided in the
+    data directory: ILCDClassification-local.xml and
+    ILCDFlowCategorization-local.xml; and each ILCD archive can contain its
+    own categorization info in the ILCD folder.
+
+   Classification - THIS TABLE WILL BE RE-GENERATED EXTERNALLY
+    * ClassificationID
+    % ILCDEntityID ?? UUID ? (was ClassificationUUID) (FK to ILCDEntities)
+    X CategorySystemID - REMOVE
+    % CategoryID (was ClassID)
+    X ClassID-SQL - REMOVE
+    X CategorySystem-SQL - REMOVE
+
+    Mapping of UUIDs to Class information.  A single data entity (UUID) can
+    have multiple ClassIDs, even within the same Category System.  A data
+    entity will have one ClassID for each hierarchical level in its
+    categorization.  These should be scraped from the XML files on import;
+    but for now I can do this in Matlab.
+
+## Append data
+
+   New records are appended to Standard tables by loading data files in the
+   'append' subdirectory (this is necessary because some FlowFlowProperty
+   records need to be manually generated, and the ProcessDissipation
+   extension also needs to be manually generated).
+ 
+    - file stored in the 'append' subdirectory named <TableName>.csv
+    - same fields as <TableName>, except internal IDs replaced with UUIDs.
+    - After append completes, rename file to <TableName>-appended.csv 
+
+## Fragment Definition Tables
+
+   generated from auto-load of fragment data files in the 'fragments'
+   subdirectory.  These tables refer to one another and so can only be
+   imported in bulk, as a group.
+
+   
+
+   Fragment
+    * FragmentID
+    * Name
+    + RootNode (FK to FragmentNode.FragmentNodeID)
+    + ReferenceFlow (FK to FlowID)
+    X Background - REMOVE
+   
+   Background - New Table
+    * BackgroundID
+    * FlowID
+    * ScenarioID (or null)
+    * NodeTypeID (only Process or Fragment allowed)
+
+   BackgroundProcess - New Table
+    * BackgroundProcessID
+    * BackgroundID
+    * ProcessID
+
+   BackgroundFragment - New Table
+    * BackgroundFragmentID
+    * BackgroundID
+    * FragmentID
+
+   FragmentStage
+    * FragmentStageID
+    * FragmentID
+    * StageName
+
+    Fragment nodes can be assigned to stages for contribution analysis.  By
+    default, every node acts as a distinct stage; however, if stages are
+    defined then nodes are grouped by stage for contribution analysis.  A
+    given FragmentStageID's scope is limited to a single fragment.
+
+   FragmentNode
+    * FragmentNodeID
+    * FragmentID (FK to Fragment)
+    * Name
+    % FragmentStageID (was StageID) (FK to FragmentStage: FragmentID must match)
+    + ReferenceProperty (FK to FlowPropertyID)
+    + NodeTypeID (FK to NodeType)
+    X ProcessID - REMOVE - move to FragmentNodeProcess
+    X ScenarioID - REMOVE
+    X ParamID - REMOVE
+    X Weight - REMOVE
+
+    The first of two core tables for fragment definition.  The node
+    represents a locus of industrial activity.
+
+   FragmentNodeProcess - New Table
+    * FragmentNodeProcessID
+    * FragmentNodeID
+    * ProcessID (FK to ProcessFlow.ProcessID)
+
+    Mapping of nodes with type "Process" to ProcessIDs
+
+   FragmentNodeFragment - New Table
+    * FragmentNodeFragmentID
+    * FragmentNodeID
+    * SubfragmentID
+
+    Mapping of nodes with type "Fragment" to FragmentIDs
+
+   FragmentEdge
+    * FragmentEdgeID
+    * FragmentID (FK to Fragment)
+    % Origin (was FragmentNodeID) (FK to FragmentNodeID)
+    * FlowID (FK to Flow; FlowType must not be Elementary)
+    * DirectionID (FK to Direction, w.r.t. origin node)
+    * Terminus (FK to FragmentNodeID: FragmentID must match)
+    X ScenarioID - REMOVE
+    X ParamID - REMOVE
+    * Quantity (or NULL if Origin NodeType is Fragment)
+
+    The second core table for fragment definition.  The edge represents a
+    particular intermediate flow or industrial product.
+
+## Scenarios and Parameters
+
+   Report scenarios generated from auto-load of scenario data files in the
+   'scenarios' subdirectory; user scenarios subsequently generated by users
+   customizing their own scenarios.
+
+   ScenarioGroup - rename from ScenarioSet
+    % ScenarioGroupID (was ScenarioSetID)
+    + OwnerID (FK to UserID)
+    * Name
+    + Visibility - public or private, or some other specification.
+
+    A scenario group is a set of scenarios owned by a single user that are
+    all useful to compare against one another.  All scenarios in a given
+    scenario group are computed together.
+
+   Scenario
+    * ScenarioID
+    % ScenarioGroupID (was ScenarioSetID) (FK to ScenarioGroup)
+    * Name
+
+   NodeDissipation - New Table
+    * NodeDissipationID
+    * FragmentNodeID (FK to FragmentNode)
+    * FlowPropertyID (FK to FlowFlowProperty - substance being dissipated)
+    * EmissionFactor (0-1)
+
+    NodeDissipation accounts for the emission of flow constituents
+    (represented by flow properties) due to the operation of a node.  Table
+    records are created during scenario (or fragment) definition when users
+    (or designers) indicate that ProcessDissipation factors are to be
+    customized for a given node.
+
+   NodeEmission - Rename from FragmentEmission
+    % NodeEmissionID (was FragmentEmissionID)
+    % FragmentNodeID (was NodeID) (FK to FragmentNodeID)
+    * FlowID (FK to Flow; FlowType must be Elementary)
+    * DirectionID (FK to Direction)
+    X ScenarioID - REMOVE
+    X ParamID - REMOVE
+    * Quantity
+   
+    NodeEmission accounts for emissions arising from process operation that
+    are not sensitive to flow composition (i.e. traditional LCA emissions)
+    and that are customized from ProcessFlow factors for a specific node.
+    Table records are created during scenario (or fragment) definition when
+    users (or designers) indicate that ProcessFlow factors are to be
+    customized for a given node.
+
+   Param
+    * ParamID
+    + ParamTypeID 
+    X ScenarioSetID - REMOVE
+    * Name
+    X FlowID - REMOVE
+    X ParamDefault - REMOVE
+    * Min -- determined at invocation (in frontend) except for types 5, 6, 
+      	     7, where it is always 0.
+    + Typ -- default value of the parameter in scenario- always 0 except
+      	     for types 5, 6, 7, where it is set to the baseline 
+	     EmissionFactor or FlowFlowProperty value.
+    * Max -- determined at invocation (in frontend) except for types 5, 6,
+      	     7, where it is always 1.
+    X Scale - REMOVE
+
+   ScenarioParam - New Table
+    * ScenarioID
+    * ParamID
+    * Value
+
+   DependencyParam - New Table
+    * DependencyParamID
+    * ParamID (FK to Param, ParamTypeID must be 1, 2, or 3)
+    * FragmentEdgeID
+
+   DistributionParam - New Table
+    * DistributionParamID
+    * DependencyParamID (FK to DependencyParam, ParamTypeID must be 2)
+    * ConservationParamID (FK to DependencyParam, ParamTypeID must be 3)
+
+   FlowPropertyParam - New Table
+    * FlowPropertyParamID
+    * ParamID (FK to Param, ParamTypeID must be 4)
+    * FlowFlowPropertyID
+
+   CompositionParam - New Table
+    * CompositionParamID
+    * ParamID (FK to Param, ParamTypeID must be 5)
+    * FlowFlowPropertyID
+
+    Note: types 4 and 5 both link to FlowFlowPropertyIDs but are used
+    differently during fragment computation.
+
+   ProcessDissipationParam - New Table
+    * ProcessDissipationParamID
+    * ParamID (FK to Param, ParamTypeID must be 6)
+    * ProcessDissipationID
+
+   NodeDissipationParam - New Table
+    * NodeDissipationParamID
+    * ParamID (FK to Param, ParamTypeID must be 7)
+    * NodeDissipationID
+
+   ProcessEmissionParam - New Table
+    * ProcessEmissionParamID
+    * ParamID (FK to Param, ParamTypeID must be 8)
+    * ProcessFlowID
+
+   NodeEmissionParam - New Table
+    * NodeEmissionParamID
+    * ParamID (FK to Param, ParamTypeID must be 9)
+    * NodeEmissionID
+
+   CharacterizationParam - New Table
+    * CharacterizationParamID
+    * ParamID  (FK to Param, ParamTypeID must be 10)
+    * LCIAID
+
+    A single parameter value can be linked to multiple points in the model-
+    but they must all be of the same type (a param with type 1 cannot be
+    used to specify a FlowFlowProperty sensitivity)
+
+    The lookup table used depends on the param type.
+
+    Distribution + conservation params are complicated because adjusting a
+    distribution param requires an equal and opposite adjustment to the
+    corresponding conservation param (this is handled in the front-end) 
+
+   CompositionModel - New Table
+    * CompositionModelID
+    * FlowID
+    * Name
+
+    List of intermediate flows for which composition parameters are relevant.
+
+   CompositionData - New Table
+    * CompositionDataID
+    * CompositionModelID
+    * FlowFlowPropertyID
+    * Value
+
+    List of flow-flow property values that are relevant to a given
+    composition model.  These are stored as sets and can be easily invoked
+    by a user (or designer) to generate and populate a corresponding set of
+    ParamInstances in a scenario.
+
+
+
+## Cached Computation Results
+
+  Generated upon load or upon modification of a scenario.  When a scenario
+  is modified (new parameter added, parameter removed, default
+  parameterization changed), all affected cached entries should be deleted
+  and recomputed, including records in NodeCache matching the ScenarioID,
+  and all their descendents in ScoreCache.  
+
+  The same applies when any Background record with a non-null ScenarioID is
+  updated.  If any scenario-generic background record is changed, I am
+  afraid the entire cache table must be wiped and recomputed, because of
+  the difficulty of determining which node scores depend on a given
+  background process.
+
+  Recomputation for a given scenario can be triggered by traversing the
+  fragment with FragmentID 1, which always corresponds to the top-level
+  fragment, with the ScenarioID specified as argument.  That will activate
+  recursion to all subfragments touched by the scenario-- necessitating the
+  recomputation of all relevant entries in the cache tables.  
+
+  Cache tables can be compared across implementations (i.e. Matlab, SQL) to
+  validate the computations.
+
+   NodeCache (Renamed from FragmentScore)
+    % NodeCacheID (was FragmentScoreID)
+    % FragmentNodeID (was FragmentID) (FK to FragmentNodeID)
+    * ScenarioID
+    X LCIAMethodID - moved to ScoreCache
+    X FragmentNodeStageID - REMOVE
+    X ParamID - REMOVE
+    X ImpactScore - moved to ScoreCache
+    + NodeWeight - relative to the Root node of the parent fragment
+      (computed during traversal) 
+
+    Size of NodeCache table = # of nodes x # of scenarios 
+
+   ScoreCache - New Table
+    * ScoreCacheID
+    * NodeCacheID (was FragmentScoreID)
+    * LCIAMethodID
+    * ImpactScore - for a unit activity (computed during LCIA)
+
+    size of ScoreCache table = #(nodes) x #(scenarios) x #(LCIA  methods)
+
+   BackgroundCache - New Table
+    * BackgroundCacheID
+    * BackgroundID
+    * LCIAMethodID
+    * Score
+
+
+  Sensitivities should be computed on the fly.  If performance is slow, we
+  can add a boolean table indicating whether a given FragmentNodeID +
+  ScenarioID is sensitive to a given ParamID, thus simplifying the
+  traversal process.

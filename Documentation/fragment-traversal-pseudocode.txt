@@ -1,0 +1,192 @@
+### Fragment Traversal with Parameters
+
+Traverse(ScenarioID)
+{
+  // The top-level entry for fragment traversal.
+  // first things first: don't re-compute if there is cached data
+
+  if ~isempty( SELECT * FROM NodeCache WHERE FragmentID = @FragmentID AND
+  ScenarioID = @ScenarioID) 
+    return // do not re-compute 
+
+  // traverse the fragment, using the appropriate edge weights
+
+  // Param_Traversal returns node and edge tables decorated with
+  // param data- 
+  [n, e] = Param_Traversal(ScenarioID)
+  
+  // take the param values as defaults:
+  // update e to set Quantity field equal to Value wherever it is non-null
+  UPDATE e ...
+  // update n to set MeanValue field equal to Value wherever it is non-null
+  UPDATE n ...
+
+  FragmentNode RootNode = SELECT RootNode FROM Fragment
+  	      	          WHERE FragmentID=@FragmentID
+  float activity = 1
+  
+  // traverse the tree recursively, writing cache values as you go
+  node_recurse(n, e, ScenarioID, RootNode, activity);
+  // DONE.
+}
+
+
+[nodes,edges]=Param_Traversal(ScenarioID)
+{
+  // This function returns modified nodes and edges tables that contain
+  // parameterization info relevant to the current Fragment and ScenarioID
+  // separate function because it is also needed for sensitivity analysis
+
+  /* STEP 1 */
+  // first, pull all params of type 1-4 belonging to the named scenario 
+
+  ParamList params = ScenarioParam.* WHERE ScenarioID = @ScenarioID
+  	    	     		     AND FragmentID = @FragmentID
+  edge_params = INNER JOIN params->Param->DependencyParam // types 1, 2, 3
+  fp_params = INNER JOIN params->Param->FlowPropertyParam // type 4
+ 
+
+  // generate scenario-specific edge table.  The idea is that we use the
+  // edge weights specified in the default FragmentEdge table, unless they
+  // have been overridden by scenario params
+  e = Edges // base edge table is fragment property
+
+  // determine which edge records are parameterized under the current
+  // scenarioID :
+  edges = SELECT
+      FragmentEdgeID,
+      Origin,
+      FlowID,
+      DirectionID,
+      Terminus,
+      Quantity,
+      edge_params.ParamID,
+      edge_params.Value,
+      edge_params.ParamTypeID
+      FROM e LEFT OUTER JOIN edge_params ON FragmentEdgeID
+
+  /* STEP 2 */
+  // for each node, we need to find a FlowFlowProperty record that matches
+  // the Flow feeding the node and the FlowProperty listed as the node's
+  // reference property.  This is true regardless of parameterization
+
+  // Determine root node:
+
+  FragmentNode RootNode = SELECT RootNode FROM Fragment
+  	      	          WHERE FragmentID=@FragmentID
+
+  n = SELECT 
+      FragmentNodeID,
+      nt.Name AS NodeType,
+      ReferenceProperty,
+      e.FlowID AS InputFlow
+      FROM Nodes // base node table is fragment property
+      INNER JOIN NodeType nt ON Nodes.NodeTypeID = nt.NodeTypeID
+      LEFT OUTER JOIN e ON Nodes.FragmentNodeID = e.Terminus
+
+  // the Root Node is not listed as terminus in the edge table; so its
+  // FlowID field should be null-- set it to the fragment reference flow (a
+  // fragment property drawn from Fragment table)
+  UPDATE n.InputFlow = ReferenceFlow WHERE FragmentNodeID = RootNode
+
+  // next, match each node's input flow and reference property to an
+  // entry in the FlowFlowProperty table.
+  n = SELECT * 
+      FROM n LEFT OUTER JOIN FlowFlowProperty ffp 
+      	ON n.InputFlow = ffp.FlowID
+ 	WHERE ffp.FlowPropertyID = n.ReferenceProperty
+
+  // finally, determine which nodes are affected by type 4 params
+  nodes = SELECT
+      FragmentNodeID,
+      NodeType,
+      ReferenceProperty,
+      InputFlow,
+      MeanValue,
+      fp_params.ParamID,
+      fp_params.Value,
+      fp_params.ParamTypeID
+      FROM n LEFT OUTER JOIN fp_params 
+	ON n.FlowFlowPropertyID = fp_params.FlowFlowPropertyID
+
+  return(nodes,edges)
+}
+
+Fragment.node_recurse(n, e, ScenarioID, current_node, activity)
+{
+  the_node = SELECT * FROM n WHERE FragmentNodeID = current_node
+
+  // "enter" the node -- handle reference property conversion
+  // (params of type 4 have effect here)
+  if the_node.InputFlow == 0 
+    // special case: very top-level fragment with no input
+    node_conv = 1;
+  else
+    node_conv = the_node.MeanValue
+
+  activity = activity * node_conv % node activity level unit conversion
+
+  SetNodeCache( current_node, ScenarioID, activity )
+  
+  // now descend into node's children
+  switch the_node.NodeType
+    case 'Process'
+    {
+      // dependencies are encoded in the edge table
+      dependencies = SELECT * FROM e WHERE Origin = current_node
+      for i in dependencies
+      { 
+        node_recurse(n, e, ScenarioID, i.Terminus, activity * i.Quantity)
+      }
+    }
+    case 'Fragment'
+    { 
+      // dependencies are inputs and outputs from subfragment
+      the_node = SELECT * FROM the_node INNER JOIN FragmentNodeFragment fnf
+      	       	 ON the_node.FragmentNodeID = fnf.FragmentNodeID
+      
+      F = new Fragment(the_node.SubfragmentID)
+
+      // traverse the subfragment
+      F.Traverse(ScenarioID)
+
+      // extract inputs and outputs from the subfragment
+      IOFlows = F.InputOutput(ScenarioID)
+
+      // IOFlows is a list of edges.  For every edge that has a
+      // corresponding entry in our local edge table, follow it.  
+
+      dependencies = SELECT 
+      		     e.FragmentEdgeID,
+      		     e.Origin,
+      		     IOFlows.FlowID AS FlowID,
+      		     IOFlows.DirectionID AS DirectionID,
+      		     e.Terminus AS Terminus,
+      		     IOFlows.Quantity AS Quantity,
+      		    FROM e 
+      	       INNER JOIN IOFlows ON e.Origin = IOFlows.FragmentNodeID
+
+      // An IOFlow that does not have a corresponding edge entry, or
+      // conversely an edge that does not have a corresponding IOFlow, is
+      // an error condition.
+      // THIS CAN ONLY HAPPEN if the subfragment was modified to add or
+      // remove inputs or outputs SINCE the parent fragment was
+      // defined.  
+
+      catch_unmatched_dependencies();
+
+      for i in dependencies
+      { 
+        node_recurse(n, e, ScenarioID, i.Terminus, activity * i.Quantity)
+      }
+
+    }
+    case Background
+      // nothing to do -- cache value specifies bg activity level
+
+    case InputOutput
+      // nothing to do -- cache value specifies input/output quantity
+
+  end // switch NodeType
+}
+

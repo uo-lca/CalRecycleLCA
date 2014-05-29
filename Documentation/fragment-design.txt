@@ -1,0 +1,357 @@
+==========
+Fri May 23 14:45:42 -0700 2014
+
+Design specification for the back-end component of the fragment computation
+tool.
+
+Database Design
+
+ see fragment-schema.txt
+
+# Application Design
+
+ * Introduction to Fragments
+
+   A life cycle inventory model describes a network of dependency
+   relationships among a set of industrial processes.  For example, doing
+   laundry depends on operation of a washing machine and a dryer, which in
+   turn requires heated water, detergent, electricity, and fabric softener
+   or other chemicals.  Heated water, in turn, depends on a water supply
+   and the combustion of natural gas for heat; the natural gas supply
+   depends on extraction, processing, and distribution of natural gas; and
+   so on.
+
+   Life cycle impact assessment is the term for assigning impact scores to
+   a set of environmental emissions implicated by a given life cycle
+   inventory model.  The process works by matching individual emissions
+   with scores for a given impact method, and adding up the total score.
+
+   A life cycle inventory fragment is a term for a subset of a life cycle
+   inventory model described as a "tree," e.g. having one root node and a
+   branching pattern that does not include any loops.  Fragments can be
+   nested inside one another, enabling a modular, hierarchical model
+   design.  
+
+   The purpose of this program is to (1) provide graphical depictions of
+   fragment models that allow a user to view and explore them, and (2)
+   compute life cycle impact scores to support contribution, sensitivity,
+   and scenario analysis of the fragments.
+
+ * ILCD Data Structure
+
+   ILCD Data are encoded into the DB with the following Data tables:
+    - DataProvider
+    - ILCDEntity 
+    - UnitGroup
+    - UnitConversion
+    - FlowProperty
+    - Flow
+    - FlowFlowProperty
+    * FlowPropertyEmission
+    - LCIAMethod
+    - LCIA
+    - Process
+    - ProcessFlow
+    * ProcessDissipation
+
+    - CategorySystem
+    - Class
+    - Classification
+
+   and the following Type Enumeration tables:
+    - DataType
+    - Direction
+    - FlowType
+    - ImpactCategory
+    - IndicatorType
+
+
+ * Fragment Structure
+
+   A fragment is a network of nodes and edges laid out as a tree.  The
+   fragment data structure is encoded in the following Data Tables:
+    - Background
+    - Fragment
+    - FragmentStage
+    - FragmentNode  
+    - FragmentNodeProcess
+    - FragmentNodeFragment
+    - FragmentEdge
+   
+   and the following Type Enumeration table:
+    - NodeType
+
+ * Scenario Structure
+
+   A scenario is a set of variations from the base version of the fragment
+   model.  A scenario is specified as a list of parameters; each parameter
+   is specified as a list of parameter instances.  Parameters have several
+   different types, each of which affects the LCIA computation in a
+   different way.  A set of related scenarios is called a Scenario Group.
+   A scenario group belongs to a single user; however, that scenario group
+   can also be marked as publicly viewable.
+
+   Scenarios and Parameters are encoded in the following Data Tables:
+    - User
+    - ScenarioGroup
+    - Scenario
+
+    - NodeDissipation
+    - NodeEmission
+
+    - Param
+    - ScenarioParam
+    
+    - DependencyParam
+    - DistributionParam
+    - FlowPropertyParam
+    - CompositionParam
+    - ProcessDissipationParam
+    - NodeDissipationParam
+    - ProcessEmissionParam
+    - NodeEmissionParam
+    - CharacterizationParam
+    
+    - CompositionModel
+    - CompositionData
+
+   and the following Type Enumeration table:
+    - ParamType
+
+ * Fragment Computation
+
+   A fragment is "computed" for a given scenario and a given LCIA Method.
+   The parameterization identified in the named scenario is adopted, and
+   then an impact score is computed for each node of the fragment under the
+   named LCIA Method.  The node scores are cached in the database.
+   Computing a fragment may require recursion into sub-fragments; after the
+   recursion is complete, the sub-fragments' scores are expected to be
+   stored in the cache table.
+
+   The computation results are stored in the following tables:
+    - NodeCache - stores node weights per scenario
+    - ScoreCache - stores LCIA results per node * scenario
+    - BackgroundCache - stores LCIA results for background processes
+
+   The computation process requires three successive steps:
+    1. Fragment traversal, including recursion into sub-fragments
+    2. Node score computation, including recursion into sub-fragments
+    3. Fragment score computation, by adding up weighted node scores
+
+ * Background and Foreground Processes
+
+   Nominally fragments include processes that occur within some limited
+   scope; but most such processes depend on other upstream processes that
+   exist outside their immediate scope (such as electricity production).
+   The Background table matches intermediate flows satisfied by background
+   processes to inventory entries that resolve the flows.  
+
+   Users can adjust these relationships in scenarios.  If a user overrides
+   a particular background relationship, then all fragments with
+   corresponding flows that resolve to background processes will
+   automatically resolve to the override process instead of the default.
+   This allows, for instance, a user to choose a different process for
+   diesel fuel production for all transport processes at a stroke (provided
+   that diesel fuel production for transport is a background process).  
+
+ * Fragment Traversal
+
+   The most complex portion of fragment computation is fragment traversal.
+   In this process, the activity levels for all nodes in a fragment are
+   determined with respect to a unit activity level of the fragment's root
+   node.  Computing these activity levels requires traversing each edge of
+   the fragment in sequence and storing a cumulative product, which
+   corresponds to the activity level of the current node.  Once the
+   activity level of a node is known, that node can be "resolved" to a
+   particular inventory model, which is used to compute LCIA scores for
+   that node.  
+
+   The results of traversal will in general be different for every
+   scenario.  Traversal results can vary based on some parameter types but
+   not others.  In LCA computation terms, fragment traversal depends on
+   parameters that modify the A matrix, but not parameters that modify the
+   B or E matrices.  Under the ParamType enumeration, these parameters
+   include Dependency, Distribution, Conservation, and [some] FlowProperty
+   types (ParamTypeIDs 1, 2, 3, 4).  The results of fragment traversal are
+   cached in [NodeCache.NodeWeight].
+
+   Composition, dissipation, and emission param types (ParamTypeIDs 5, 6,
+   7, 8, 9) affect only the B matrix, and LCIA factor params (ParamTypeID
+   10) affect only the E matrix.
+
+   Internally to a fragment, traversal returns an array of FragmentNodeIDs
+   and corresponding activity levels (where the activity level of the root
+   node is always 1).  Externally to a fragment, traversal returns a vector
+   of FragmentNodeIDs corresponding to fragment inputs and outputs, and
+   their quantities with respect to a unit activity level of the root
+   node. 
+
+ * Nodes and Dependency Resolution
+
+   The 'NodeType' property of a node determines how node activity levels
+   are resolved to LCIA scores.  A node in a fragment can have four
+   different types.
+
+   1. Process - This indicates that the node is modeled as an ILCD unit
+      process stored in the database.  Computation of impacts simply
+      requires LCIA computation for the process, and weighting by the
+      activity level.  This is the recursive "base case".
+
+   2. Fragment - This indicates that the node is modeled as a sub-fragment.
+      In this case, the algorithm must recurse into the sub-fragment to
+      determine and add up the impacts of that fragment's nodes.
+
+   3. InputOutput - This indicates that the node represents the consumption
+      of an external input or the generation of an external output.  This
+      resolution does not generate any impacts from the perspective of the
+      fragment; however, if the fragment is itself a sub-fragment of
+      another "parent" fragment, then the inputs and outputs may be
+      followed through the parent fragment after recursion completes.
+
+   4. Background - This indicates that the node is modeled by a background
+      process.  Background processes are common to all nodes and fragments
+      and can themselves resolve to either processes or subfragments.
+      However: a fragment used to resolve a background flow may not itself
+      depend on any other background processes.  (in the future,
+      co-dependence of background processes could be handled with a matrix
+      inversion step, a la traditional LCA).
+
+      If a background dependency cannot be resolved, it is treated as an
+      InputOutput.
+
+ * Fragment LCIA Computation
+
+   Each node score can be computed with respect to a given scenario, based
+   on node type resolution as described above.  After fragment traversal is
+   complete, these node scores can be paired with node weights and summed
+   to determine the fragment score.  Easy as pie.
+
+ * Fragment Sensitivity Computation
+
+   Sensitivity measures how much the LCIA score changes with respect to a
+   changing parameter.  Sensitivity is computed using another fragment
+   traversal algorithm that accepts a ParamID as an argument.  As with LCIA
+   score computation, the sensitivity of a fragment is equal to the
+   weighted sum of the sensitivity of each node in the fragment, and so
+   requires recursion into sub-fragments.  
+
+   Under the current plan, the user will specify which parameters for which
+   he/she wishes to know the sensitivity.  Then upon each fragment view,
+   the sensitivity will be computed on the fly for each parameter and for
+   each LCIA method, requiring a combinatorial number of traversals and
+   recursions.  Because the model is not very complex, it is not
+   anticipated to take longer than a fraction of a second to perform these
+   computations, so they will be done on the fly.  However, it may be
+   necessary to pre-compute and cache these sensitivity values, if
+   computation is too sluggish or if the user requests a large number of
+   sensitivity parameters.
+
+ * All other components of interaction with the model will be handled from
+   the front-end.  No other back-end computations are currently foreseen.
+
+# Fragment Computation Specification
+
+A fragment should be implemented as an object.  Computing a fragment
+requires:
+
+   1. generating a fragment object in the application space with an internal
+   set of nodes and edges.
+
+   2. traversing the fragment with respect to a given scenario, to determine
+   NodeWeight values.
+
+      2a. This requires the first stage of recursion, recursive traversal
+      of sub-fragments, to determine inputs and outputs.  This computation
+      is affected by ParamTypeIDs 1, 2, 3, and 4. The results of this
+      computation are cached in NodeCache.NodeWeight.
+
+   3. computing and caching ImpactScore values for each node in the fragment,
+   with respect to the current scenario, for all selected LCIA methods.
+
+      3a. This requires recursion into sub-fragments to determine their
+      ScoreCache.ImpactScore values.  This computation is affected by
+      ParamTypeIDs 5, 6, 7, 8, 9, 10.
+
+   4. Computing the sum of LCIA scores, weighted by node weights, from cached
+   ImpactScore and NodeWeight values.
+ 
+   There are two choices over how to proceed.  In the simpler case, LCIA
+   computation is now complete; the algorithm returns with a list of
+   fragment inputs and outputs; and the frontend can request LCIA scores
+   using a separate REST API call- that call can be answered immediately
+   because Scores and Weights are cached.  Under this simpler case, a
+   sensitivity computation would require a separate API call, meaning the
+   whole recursive traversal process must be repeated for some sensitivity
+   computations because it is not always easy to tell which nodes are
+   affected by a parameter.
+
+   In the more complex case, the API call specifies parameters of interest
+   as well as the scenario and LCIA methods.  This allows sensitivities to
+   be computed without necessitating another [redundant] recursive
+   traversal.
+
+   At present, we will assume the recursive traversal is quick enough (and
+   that the user will not require too many sensitivity values at once) that
+   it is not too costly to repeat it.
+
+   5. In either case, after the computation is finished and the result is
+   returned, the fragment objects are removed from memory and the API call
+   terminates, remaining fully RESTful.
+
+What follows is (will be) a precise (though pseudocode) specification of
+the fragment computation process.
+
+Please forgive the notation.  Ultimately it should reflect the C#
+implementation, so feel free to edit.
+
+
+## Fragment Constructor
+
+   F = new Fragment(FragmentID)
+
+
+## Fragment Properties
+
+   // DB data specific to the fragment
+
+   string Name = Fragment.Name WHERE FragmentID = @FragmentID
+   FragmentNode RootNode = Fragment.RootNode WHERE FragmentID = @FragmentID
+   Flow ReferenceFlow = Fragment.ReferenceFlow WHERE FragmentID = @FragmentID
+
+   StageList Stages = FragmentStage.* WHERE FragmentID = @FragmentID
+
+   FragmentNode Nodes = FragmentNode.* WHERE FragmentID = @FragmentID
+ 
+   FragmentEdge Edges = FragmentEdge.* WHERE FragmentID = @FragmentID
+
+## Fragment Methods
+
+  (private) Traverse(ScenarioID)
+   Traverse the fragment and compute NodeWeight values.  If cached values
+   exist, do not recompute.
+
+  (private) [nodes, edges] = Param_Traverse(ScenarioID)
+   constructs node and edge tables decorated with parameterization info for
+   use during traversal and sensitivity analysis
+
+  (private) node_recurse(ScenarioID)
+   recursively follows node / edge tables to traverse the fragment
+
+
+  (private) ActivityLevels(ScenarioID)
+
+   reports the cached NodeWeight values for the given 
+   FragmentID / ScenarioID pair
+
+  (public) IOFlows = InputOutput(ScenarioID)
+
+   returns a table with fields FragmentNodeID, FlowID, Direction, and
+   Quantity, reporting all nodes of type InputOutput for the Fragment under
+   the given ScenarioID.  Draws data from the cache table.
+
+   This must be returned to the parent fragment during traversal
+
+### Fragment Traversal with Parameters
+
+See fragment-traversal-pseudocode.txt
+
