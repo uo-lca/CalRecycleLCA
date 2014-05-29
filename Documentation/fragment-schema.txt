@@ -191,7 +191,7 @@ The following tables are required:
    UnitGroup
     * UnitGroupID
     * UnitGroupUUID
-    X Version - REMOVE - move to UUIDs.Version
+    X Version - REMOVE - move to ILCDEntity.Version
     * Name
     * ReferenceUnit
     X CreatedOn - REMOVE
@@ -219,7 +219,7 @@ The following tables are required:
    FlowProperty
     * FlowPropertyID
     * FlowPropertyUUID - UUID of source data file
-    X FlowPropertyVersion - REMOVE - move to UUIDs.Version
+    X FlowPropertyVersion - REMOVE - move to ILCDEntity.Version
     * Name
     * UnitGroupID
     X UnitGroup_SQL - REMOVE
@@ -227,7 +227,7 @@ The following tables are required:
    Flow
     * FlowID
     * FlowUUID - UUID of source data file
-    X FlowVersion - REMOVE - move to UUIDs.Version
+    X FlowVersion - REMOVE - move to ILCDEntity.Version
     * Name
     * CASNumber
     * FlowTypeID
@@ -256,7 +256,7 @@ The following tables are required:
    LCIAMethod
     * LCIAMethodID
     * LCIAMethodUUID
-    X LCIAMethodVersion - REMOVE - move to UUIDs.Version
+    X LCIAMethodVersion - REMOVE - move to ILCDEntity.Version
     * Name
     * Methodology
     * ImpactCategoryID
@@ -287,7 +287,7 @@ The following tables are required:
    Process
     * ProcessID - internal primary key
     * ProcessUUID - UUID of source file
-    X ProcessVersion - REMOVE - move to UUIDs.Version
+    X ProcessVersion - REMOVE - move to ILCDEntity.Version
     * Name
     * Year
     * Geography
@@ -387,7 +387,7 @@ The following tables are required:
 
    Classification - THIS TABLE WILL BE RE-GENERATED EXTERNALLY
     * ClassificationID
-    % ILCDEntityID ?? UUID ? (was ClassificationUUID) (FK to ILCDEntities)
+    % UUID ? (was ClassificationUUID) (FK to ILCDEntity.UUID)
     X CategorySystemID - REMOVE
     % CategoryID (was ClassID)
     X ClassID-SQL - REMOVE
