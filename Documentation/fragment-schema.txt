@@ -352,6 +352,12 @@ The following tables are required:
 
    Source - REMOVE TABLE
 
+### Indices, constraints
+
+    + Every table needs a primary key
+    + Unique index on UUID columns
+	
+
 
 ## Classification Tables
 
