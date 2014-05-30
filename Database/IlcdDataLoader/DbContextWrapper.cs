@@ -3,11 +3,12 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Data.Entity;
 using System.Data.Entity.Infrastructure;
 using LcaDataModel;
 
 
-namespace IlcdDataLoader {
+namespace LcaDataLoader {
     class DbContextWrapper : IDisposable {
 
         EntityDataModel _DbContext;
@@ -89,5 +90,7 @@ namespace IlcdDataLoader {
                 _DbContext.UnitConversions.Add(unitConversion);
             }
         }
+
+        
     }
 }

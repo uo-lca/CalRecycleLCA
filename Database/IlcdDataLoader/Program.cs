@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace IlcdDataLoader {
+namespace LcaDataLoader {
     /// <summary>
     /// Program to batch load ILCD data files into a new database
     /// </summary>
