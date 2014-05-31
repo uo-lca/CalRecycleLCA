@@ -1,9 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data.Entity;
 using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using LcaDataModel;
 
 namespace LcaDataLoader {
     /// <summary>
@@ -13,24 +15,66 @@ namespace LcaDataLoader {
         /// <summary>
         /// Directory holding ILCD data files. Default setting can be overwritten by argument.
         /// </summary>
-        static string _IlcdDirName = "C:\\ILCD_Data\\ILCD";
-
+        static string _IlcdDirName = "C:\\CalRecycleLCA-DATA_ROOT\\Full UO LCA Flat Export BK 2014_05_05\\ILCD";
+        static string _logFileName = "C:\\CalRecycleLCA-DATA_ROOT\\LcaDataLoaderLog.txt";
+        static StreamWriter _LogWriter = null;
 
         static void ParseArguments(string[] args) {
             if (args.Length > 0) {
                 _IlcdDirName = args[0];
             }
+            if (args.Length > 1) {
+                _logFileName = args[1];
+            }
         }
 
-        static void Main(string[] args) {
-            ParseArguments(args);
-            if (Directory.Exists(_IlcdDirName)) {
-                IlcdImporter ilcdImporter = new IlcdImporter();
-                ilcdImporter.LoadAll(_IlcdDirName);
+        static void StartLogging() {
+            try {
+                // Attempt to open output file.
+                _LogWriter = new StreamWriter(_logFileName);
+                // Redirect standard output from the console to the output file.
+                Console.SetOut(_LogWriter);
             }
-            else {
-                Console.WriteLine("ERROR: ILCD folder, {0}, does not exist.", _IlcdDirName);
+            catch (IOException e) {
+                TextWriter errorWriter = Console.Error;
+                errorWriter.WriteLine(e.Message);
             }
+        }
+
+        static void StopLogging() {
+            _LogWriter.Close();
+            // Recover the standard output stream so that a  
+            // completion message can be displayed.
+            StreamWriter standardOutput = new StreamWriter(Console.OpenStandardOutput());
+            standardOutput.AutoFlush = true;
+            Console.SetOut(standardOutput);
+        }
+
+
+        static int Main(string[] args) {
+            int exitCode = 0;
+            try {
+                ParseArguments(args);
+                StartLogging();
+                Database.SetInitializer<EntityDataModel>(new DbInitializer());
+                if (Directory.Exists(_IlcdDirName)) {
+                    IlcdImporter ilcdImporter = new IlcdImporter();
+                    ilcdImporter.LoadAll(_IlcdDirName);
+                    Console.WriteLine("SUCCESS: Loaded ILCD archive from {0}.", _IlcdDirName);
+                }
+                else {
+                    Console.WriteLine("ERROR: ILCD folder, {0}, does not exist.", _IlcdDirName);
+                    exitCode = 1;
+                }
+            }
+            catch (Exception e) {
+                Console.WriteLine("ERROR: Exception Message = {0}", e.Message);
+                exitCode = 1;
+            }
+            finally {
+                StopLogging();
+            }
+            return exitCode;
         }
     }
 }

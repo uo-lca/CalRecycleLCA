@@ -49,6 +49,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="DbInitializer.cs" />
     <Compile Include="DbContextWrapper.cs" />
     <Compile Include="IlcdImporter.cs" />
     <Compile Include="IlcdData.cs" />

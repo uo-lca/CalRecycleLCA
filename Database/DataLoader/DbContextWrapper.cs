@@ -91,6 +91,23 @@ namespace LcaDataLoader {
             }
         }
 
+        public static void Seed(EntityDataModel dbContext) {
+            if (dbContext.DataProviders.Count() == 0) {
+                dbContext.DataProviders.Add(
+                    new DataProvider { Name = "append" }
+                );
+                dbContext.DataProviders.Add(
+                    new DataProvider { Name = "fragments" }
+                );
+                dbContext.DataProviders.Add(
+                    new DataProvider { Name = "scenarios" }
+                );
+                dbContext.SaveChanges();
+            }
+            else {
+                // write warning.
+            }
+        }
         
     }
 }

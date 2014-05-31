@@ -65,11 +65,12 @@
     <Compile Include="FragmentNode.cs" />
     <Compile Include="FragmentScore.cs" />
     <Compile Include="FragmentStage.cs" />
+    <Compile Include="GlobalSuppressions.cs" />
     <Compile Include="ImpactCategory.cs" />
     <Compile Include="IndicatorType.cs" />
     <Compile Include="LCIA.cs" />
     <Compile Include="LCIAMethod.cs" />
-    <Compile Include="Model1.cs" />
+    <Compile Include="EnitytDataModel.cs" />
     <Compile Include="NodeType.cs" />
     <Compile Include="Param.cs" />
     <Compile Include="ParamType.cs" />
