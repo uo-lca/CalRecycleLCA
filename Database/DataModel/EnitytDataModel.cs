@@ -29,6 +29,7 @@ namespace LcaDataModel {
         public virtual DbSet<IndicatorType> IndicatorTypes { get; set; }
         public virtual DbSet<LCIA> LCIAs { get; set; }
         public virtual DbSet<LCIAMethod> LCIAMethods { get; set; }
+        public virtual DbSet<NodeType> NodeTypes { get; set; }
         public virtual DbSet<Param> Params { get; set; }
         public virtual DbSet<Process> Processes { get; set; }
         public virtual DbSet<ProcessFlow> ProcessFlows { get; set; }
@@ -37,7 +38,9 @@ namespace LcaDataModel {
         public virtual DbSet<sysdiagram> sysdiagrams { get; set; }
         public virtual DbSet<UnitConversion> UnitConversions { get; set; }
         public virtual DbSet<UnitGroup> UnitGroups { get; set; }
+        public virtual DbSet<User> Users { get; set; }
         public virtual DbSet<FragmentNode> FragmentNodes { get; set; }
+        public virtual DbSet<ParamType> ParamTypes { get; set; }
 
         protected override void OnModelCreating(DbModelBuilder modelBuilder) {
             modelBuilder.Entity<Category>()
@@ -174,7 +177,7 @@ namespace LcaDataModel {
                 .IsUnicode(false);
 
             modelBuilder.Entity<FlowType>()
-                .Property(e => e.Type)
+                .Property(e => e.Name)
                 .IsUnicode(false);
 
             modelBuilder.Entity<Fragment>()
@@ -252,6 +255,10 @@ namespace LcaDataModel {
 
             modelBuilder.Entity<LCIAMethod>()
                 .Property(e => e.ReferenceQuantity)
+                .IsUnicode(false);
+
+            modelBuilder.Entity<NodeType>()
+                .Property(e => e.Name)
                 .IsUnicode(false);
 
             modelBuilder.Entity<Param>()
@@ -371,7 +378,15 @@ namespace LcaDataModel {
                 .Property(e => e.ReferenceUnit)
                 .IsUnicode(false);
 
+            modelBuilder.Entity<User>()
+                .Property(e => e.Name)
+                .IsUnicode(false);
+
             modelBuilder.Entity<FragmentNode>()
+                .Property(e => e.Name)
+                .IsUnicode(false);
+
+            modelBuilder.Entity<ParamType>()
                 .Property(e => e.Name)
                 .IsUnicode(false);
         }

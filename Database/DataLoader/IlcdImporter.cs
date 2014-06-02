@@ -7,9 +7,9 @@ using System.Text;
 using System.Threading.Tasks;
 using LcaDataModel;
 
-namespace IlcdDataLoader {
+namespace LcaDataLoader {
     /// <summary>
-    /// Use IlcdDataLoader to load ILCD data from a directory to the LCA Tool database.
+    /// Use LcaDataLoader to load ILCD data from a directory to the LCA Tool database.
     /// </summary>
     class IlcdImporter : IDisposable {
         /// <summary>

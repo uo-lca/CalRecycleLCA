@@ -6,19 +6,12 @@ namespace LcaDataModel
     using System.ComponentModel.DataAnnotations.Schema;
     using System.Data.Entity.Spatial;
 
-    [Table("FlowType")]
-    public partial class FlowType
+    [Table("ParamType")]
+    public partial class ParamType
     {
-        public FlowType()
-        {
-            Flows = new HashSet<Flow>();
-        }
+        public int ParamTypeID { get; set; }
 
-        public int FlowTypeID { get; set; }
-
-        [StringLength(100)]
+        [StringLength(250)]
         public string Name { get; set; }
-
-        public virtual ICollection<Flow> Flows { get; set; }
     }
 }

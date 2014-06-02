@@ -30,7 +30,11 @@ namespace LcaDataModel
         [StringLength(100)]
         public string ReferenceUnit { get; set; }
 
+        
+
         public int CreatedBy { get; set; }
+
+        
 
         public int UpdatedBy { get; set; }
 

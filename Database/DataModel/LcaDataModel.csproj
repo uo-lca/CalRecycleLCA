@@ -55,7 +55,6 @@
     <Compile Include="DataProvider.cs" />
     <Compile Include="DataType.cs" />
     <Compile Include="Direction.cs" />
-    <Compile Include="EntityDataModel.cs" />
     <Compile Include="Flow.cs" />
     <Compile Include="FlowFlowProperty.cs" />
     <Compile Include="FlowProperty.cs" />
@@ -66,11 +65,15 @@
     <Compile Include="FragmentNode.cs" />
     <Compile Include="FragmentScore.cs" />
     <Compile Include="FragmentStage.cs" />
+    <Compile Include="GlobalSuppressions.cs" />
     <Compile Include="ImpactCategory.cs" />
     <Compile Include="IndicatorType.cs" />
     <Compile Include="LCIA.cs" />
     <Compile Include="LCIAMethod.cs" />
+    <Compile Include="EnitytDataModel.cs" />
+    <Compile Include="NodeType.cs" />
     <Compile Include="Param.cs" />
+    <Compile Include="ParamType.cs" />
     <Compile Include="Process.cs" />
     <Compile Include="ProcessFlow.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -79,6 +82,7 @@
     <Compile Include="sysdiagram.cs" />
     <Compile Include="UnitConversion.cs" />
     <Compile Include="UnitGroup.cs" />
+    <Compile Include="User.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />

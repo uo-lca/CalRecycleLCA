@@ -24,7 +24,11 @@ namespace LcaDataModel
         [Column("Ind-sql")]
         public int? Ind_sql { get; set; }
 
+        
+
         public int CreatedBy { get; set; }
+
+        
 
         public int UpdatedBy { get; set; }
 

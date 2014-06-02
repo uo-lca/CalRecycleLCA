@@ -3,11 +3,12 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Data.Entity;
 using System.Data.Entity.Infrastructure;
 using LcaDataModel;
 
 
-namespace IlcdDataLoader {
+namespace LcaDataLoader {
     class DbContextWrapper : IDisposable {
 
         EntityDataModel _DbContext;
@@ -89,5 +90,24 @@ namespace IlcdDataLoader {
                 _DbContext.UnitConversions.Add(unitConversion);
             }
         }
+
+        public static void Seed(EntityDataModel dbContext) {
+            if (dbContext.DataProviders.Count() == 0) {
+                dbContext.DataProviders.Add(
+                    new DataProvider { Name = "append" }
+                );
+                dbContext.DataProviders.Add(
+                    new DataProvider { Name = "fragments" }
+                );
+                dbContext.DataProviders.Add(
+                    new DataProvider { Name = "scenarios" }
+                );
+                dbContext.SaveChanges();
+            }
+            else {
+                // write warning.
+            }
+        }
+        
     }
 }

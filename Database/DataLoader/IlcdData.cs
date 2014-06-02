@@ -9,7 +9,7 @@ using System.Diagnostics;
 using System.Data.Entity.Infrastructure;
 using LcaDataModel;
 
-namespace IlcdDataLoader {
+namespace LcaDataLoader {
     /// <summary>
     /// Use IlcdData to import new ILCD data in an XDocument to a record in the database. 
     /// </summary>
