@@ -49,6 +49,8 @@ namespace LcaDataLoader {
         /// <param name="dirName">Full path name of directory</param>
         public void LoadAll(string dirName) {
             LoadDataType(Path.Combine(dirName, "unitgroups"));
+            LoadDataType(Path.Combine(dirName, "flowproperties"));
+            LoadDataType(Path.Combine(dirName, "flows"));
         }
 
         /// <summary>
@@ -56,15 +58,22 @@ namespace LcaDataLoader {
         /// </summary>
         /// <param name="dirName">Full path name of directory for the data type</param>
         public void LoadDataType(string dirName) {
+            int importCounter = 0;
             if (Directory.Exists(dirName)) {
                 string[] files = Directory.GetFiles(dirName, "*.xml");
                 foreach (string s in files) {
                     _IlcdData.LoadedDocument = XDocument.Load(s);
-                    _IlcdData.Save(_DbContext);
+                    if (_IlcdData.Save(_DbContext)) {
+                        importCounter++;
+                    }
+                    else {
+                        Console.WriteLine("WARNING: Data in file {0} was not imported.", s);
+                    }
                 }
+                Console.WriteLine("INFO: {0} of {1} files imported from {2}.", importCounter, files.Length, dirName);
             }
             else {
-                Console.WriteLine("ILCD data type folder, {0}, does not exist.", dirName);
+                Console.WriteLine("WARNING: ILCD data type folder, {0}, does not exist.", dirName);
             }
         }
     }

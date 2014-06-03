@@ -36,6 +36,20 @@ namespace LcaDataLoader {
         }
 
         /// <summary>
+        /// Find descendant element with given name and return value of attribute with given name
+        /// </summary>
+        /// <returns>Attribute value as a string</returns>
+        public string GetElementAttributeValue(XName elementName, XName attName) {
+            string attValue;
+            attValue = LoadedDocument.Root
+                       .Descendants(elementName)
+                       .Attributes(attName)
+                       .Select(s => s.Value)
+                       .First();
+            return attValue;
+        }
+
+        /// <summary>
         /// Generate element name with common namespace prefix
         /// </summary>
         /// <returns>Element name</returns>
@@ -79,30 +93,86 @@ namespace LcaDataLoader {
                     }).ToList();
         }
 
-        private void SaveUnitGroup(DbContextWrapper ilcdDb) {
+        private bool SaveUnitGroup(DbContextWrapper ilcdDb) {
+            bool isSaved = false;
             UnitGroup unitGroup = new UnitGroup();
             unitGroup.UnitGroupUUID = GetCommonUUID();
             unitGroup.Version = GetCommonVersion();
             unitGroup.Name = GetCommonName();
-            ilcdDb.AddUnitGroup(unitGroup);
-            if ( ilcdDb.SaveChanges() > 0) {
-                ilcdDb.AddUnitConversions( CreateUnitConversionList(unitGroup));
-                ilcdDb.SaveChanges();
+            if (ilcdDb.AddUnitGroup(unitGroup)) {
+
+                    ilcdDb.AddUnitConversions(CreateUnitConversionList(unitGroup));
+                    isSaved = true;
             }
+            return isSaved;
+        }
+
+        private bool SaveFlowProperty(DbContextWrapper ilcdDb) {
+            bool isSaved = false;
+            string ugUUID;
+            int? ugID = null;
+            FlowProperty flowProperty = new FlowProperty();
+            flowProperty.FlowPropertyUUID = GetCommonUUID();
+            flowProperty.FlowPropertyVersion = GetCommonVersion();
+            flowProperty.Name = GetCommonName();
+            ugUUID = GetElementAttributeValue(ElementName("referenceToReferenceUnitGroup"), "refObjectId");
+            ugID = ilcdDb.GetID(ugUUID);
+            if (ugID == null) {
+                Console.WriteLine("WARNING: Unable to find unit group matching flow property refObjectId = {0}", ugUUID);
+            }
+            else {
+                flowProperty.UnitGroupID = ugID;
+            }
+
+            if (ilcdDb.AddFlowProperty(flowProperty) ) {
+                isSaved = true;
+            }
+            
+            return isSaved;
+        }
+
+        private bool SaveFlow(DbContextWrapper ilcdDb) {
+            bool isSaved = false;
+            string fpUUID;
+            int? fpID = null;
+            Flow flow = new Flow();
+            flow.FlowUUID = GetCommonUUID();
+            flow.FlowVersion = GetCommonVersion();
+            // TODO : generate name from classification/category
+            flow.Name = GetElementValue(ElementName("baseName"));
+            flow.CASNumber = GetElementValue(ElementName("CASNumber"));
+            flow.FlowTypeID = ilcdDb.GetFlowTypeID(GetElementValue(ElementName("typeOfDataSet")));
+            fpUUID = GetElementAttributeValue(ElementName("referenceToFlowPropertyDataSet"), "refObjectId");
+            fpID = ilcdDb.GetID(fpUUID);
+            if (fpID == null) {
+                Console.WriteLine("WARNING: Unable to find flow property matching flow refObjectId = {0}", fpUUID);
+            }
+            else {
+                flow.FlowPropertyID = fpID;
+            }
+
+            if (ilcdDb.AddFlow(flow)) {
+                isSaved = true;
+            }
+
+            return isSaved;
         }
 
         /// <summary>
         /// Import data from LoadedDocument to database.
         /// </summary>
-        public void Save(DbContextWrapper ilcdDb) {
+        public bool Save(DbContextWrapper ilcdDb) {
             Debug.Assert(LoadedDocument != null, "LoadedDocument must be set before calling Save.");
             string nsString = LoadedDocument.Root.Name.Namespace.ToString();
             switch (nsString) {
                 case "http://lca.jrc.it/ILCD/UnitGroup":
-                    SaveUnitGroup(ilcdDb);
-                    break;
-
+                    return SaveUnitGroup(ilcdDb);
+                case "http://lca.jrc.it/ILCD/FlowProperty":
+                    return SaveFlowProperty(ilcdDb);
+                case "http://lca.jrc.it/ILCD/Flow":
+                    return SaveFlow(ilcdDb);
             }
+            return false;
         }
 
     }
