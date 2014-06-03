@@ -432,21 +432,14 @@ The following tables are required:
     + ReferenceFlow (FK to FlowID)
     X Background - REMOVE
    
-   Background - New Table
+   Background - New Table ### PLEASE REVIEW
     * BackgroundID
     * FlowID
-    * ScenarioID (or null)
     * NodeTypeID (only Process or Fragment allowed)
+    * TargetID (NOT foreign key- interpret as ProcessID or FragmentID)
 
-   BackgroundProcess - New Table
-    * BackgroundProcessID
-    * BackgroundID
-    * ProcessID
-
-   BackgroundFragment - New Table
-    * BackgroundFragmentID
-    * BackgroundID
-    * FragmentID
+    Maps flows to background processes / fragments.  Can be overridden in
+    scenarios (in ScenarioBackground table)
 
    FragmentStage
     * FragmentStageID
@@ -521,6 +514,15 @@ The following tables are required:
     * ScenarioID
     % ScenarioGroupID (was ScenarioSetID) (FK to ScenarioGroup)
     * Name
+
+   ScenarioBackground - New Table ### PLEASE REVIEW
+    * ScenarioBackgroundID
+    * ScenarioID
+    * FlowID
+    * NodeTypeID (only Process or Fragment allowed)
+    * TargetID (NOT a foreign key- interpret as ProcessID or FragmentID)
+
+    Contains scenario-specific overrides for Background mappings.
 
    NodeDissipation - New Table
     * NodeDissipationID
@@ -699,6 +701,11 @@ The following tables are required:
     * LCIAMethodID
     * Score
 
+   ScenarioBackgroundCache - New Table
+    * ScenarioBackgroundCacheID
+    * ScenarioBackgroundID
+    * LCIAMethodID
+    * Score
 
   Sensitivities should be computed on the fly.  If performance is slow, we
   can add a boolean table indicating whether a given FragmentNodeID +
