@@ -193,7 +193,7 @@ The following tables are required:
     * UnitGroupUUID
     X Version - REMOVE - move to ILCDEntity.Version
     * Name
-    * ReferenceUnit
+    % ReferenceUnitConversionID (was ReferenceUnit) (FK to UnitConversionID)
     X CreatedOn - REMOVE
     X CreatedBy - REMOVE
     X UpdatedOn - REMOVE
@@ -205,6 +205,7 @@ The following tables are required:
     X UnitConversionUUID - REMOVE
     * UnitGroupID
     * Unit
+    + LongName
     * Conversion
     X Ind-sql - REMOVE
     X CreatedOn - REMOVE
