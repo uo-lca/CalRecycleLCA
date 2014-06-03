@@ -92,9 +92,9 @@ The following tables are required:
    manually generated and stored in the Data Model.
 
    DataType (enumeration)
-    * DataTypeID
-    * Name [ Flow | Process | FlowProperty | UnitGroup | LCIAMethod 
-      	    | Contact | Source | Fragment ]
+    * DataTypeID 
+    * Name [ Flow | FlowProperty | Process  | UnitGroup | Source 
+      	    | LCIAMethod | Contact | Fragment ]
 
     Data types described in the ILCD documentation, used mainly for
     handling classification information.  'Fragment' represents the
@@ -382,7 +382,7 @@ The following tables are required:
     * ExternalClassID
     * Name
     % CategorySystemID (was CategorySystemID-SQL)
-    + ParentClassID - Move from Category table
+    + ParentCategoryID - Move from Category table
     + HierarchyLevel - Move from Category table
 
     Record of all the various classifications that can be assigned to data
@@ -569,6 +569,7 @@ The following tables are required:
     X Scale - REMOVE
 
    ScenarioParam - New Table
+    * ScenarioParamID
     * ScenarioID
     * ParamID
     * Value
