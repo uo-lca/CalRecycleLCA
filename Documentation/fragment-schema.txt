@@ -92,9 +92,9 @@ The following tables are required:
    manually generated and stored in the Data Model.
 
    DataType (enumeration)
-    * DataTypeID
-    * Name [ Flow | Process | FlowProperty | UnitGroup | LCIAMethod 
-      	    | Contact | Source | Fragment ]
+    * DataTypeID 
+    * Name [ Flow | FlowProperty | Process  | UnitGroup | Source 
+      	    | LCIAMethod | Contact | Fragment ]
 
     Data types described in the ILCD documentation, used mainly for
     handling classification information.  'Fragment' represents the
@@ -382,7 +382,7 @@ The following tables are required:
     * ExternalClassID
     * Name
     % CategorySystemID (was CategorySystemID-SQL)
-    + ParentClassID - Move from Category table
+    + ParentCategoryID - Move from Category table
     + HierarchyLevel - Move from Category table
 
     Record of all the various classifications that can be assigned to data
@@ -432,21 +432,14 @@ The following tables are required:
     + ReferenceFlow (FK to FlowID)
     X Background - REMOVE
    
-   Background - New Table
+   Background - New Table ### PLEASE REVIEW
     * BackgroundID
     * FlowID
-    * ScenarioID (or null)
     * NodeTypeID (only Process or Fragment allowed)
+    * TargetID (NOT foreign key- interpret as ProcessID or FragmentID)
 
-   BackgroundProcess - New Table
-    * BackgroundProcessID
-    * BackgroundID
-    * ProcessID
-
-   BackgroundFragment - New Table
-    * BackgroundFragmentID
-    * BackgroundID
-    * FragmentID
+    Maps flows to background processes / fragments.  Can be overridden in
+    scenarios (in ScenarioBackground table)
 
    FragmentStage
     * FragmentStageID
@@ -522,6 +515,15 @@ The following tables are required:
     % ScenarioGroupID (was ScenarioSetID) (FK to ScenarioGroup)
     * Name
 
+   ScenarioBackground - New Table ### PLEASE REVIEW
+    * ScenarioBackgroundID
+    * ScenarioID
+    * FlowID
+    * NodeTypeID (only Process or Fragment allowed)
+    * TargetID (NOT a foreign key- interpret as ProcessID or FragmentID)
+
+    Contains scenario-specific overrides for Background mappings.
+
    NodeDissipation - New Table
     * NodeDissipationID
     * FragmentNodeID (FK to FragmentNode)
@@ -567,6 +569,7 @@ The following tables are required:
     X Scale - REMOVE
 
    ScenarioParam - New Table
+    * ScenarioParamID
     * ScenarioID
     * ParamID
     * Value
@@ -699,6 +702,11 @@ The following tables are required:
     * LCIAMethodID
     * Score
 
+   ScenarioBackgroundCache - New Table
+    * ScenarioBackgroundCacheID
+    * ScenarioBackgroundID
+    * LCIAMethodID
+    * Score
 
   Sensitivities should be computed on the fly.  If performance is slow, we
   can add a boolean table indicating whether a given FragmentNodeID +
