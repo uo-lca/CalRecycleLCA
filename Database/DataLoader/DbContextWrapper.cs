@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Data.Entity;
 using System.Data.Entity.Infrastructure;
+using System.Runtime.CompilerServices;
 using LcaDataModel;
 
 
@@ -41,34 +42,6 @@ namespace LcaDataLoader {
             _DbContext = dbContext;
         }
 
-        //
-        // Summary:
-        //     Saves all changes made in this context to the underlying database.
-        //
-        // Returns:
-        //     The number of objects written to the underlying database.
-        //
-        // Unhandled Exceptions:
-        //
-        //   System.Data.Entity.Infrastructure.DbUpdateConcurrencyException:
-        //     A database command did not affect the expected number of rows. This usually
-        //     indicates an optimistic concurrency violation; that is, a row has been changed
-        //     in the database since it was queried.
-        //
-        //   System.Data.Entity.Validation.DbEntityValidationException:
-        //     The save was aborted because validation of entity property values failed.
-        //
-        //   System.NotSupportedException:
-        //     An attempt was made to use unsupported behavior such as executing multiple
-        //     asynchronous commands concurrently on the same context instance.
-        //
-        //   System.ObjectDisposedException:
-        //     The context or connection have been disposed.
-        //
-        //   System.InvalidOperationException:
-        //     Some error occurred attempting to process entities in the context either
-        //     before or after sending commands to the database.
-        //
         public int SaveChanges() {
             try {
                 return _DbContext.SaveChanges();
@@ -130,6 +103,14 @@ namespace LcaDataLoader {
             foreach (var unitConversion in unitConversionList) {
                 _DbContext.UnitConversions.Add(unitConversion);
             }
+            _DbContext.SaveChanges();
+        }
+
+        public void AddFlowFlowProperties(List<FlowFlowProperty> flowFlowPropertyList) {
+            foreach (var flowFlowProperty in flowFlowPropertyList) {
+                _DbContext.FlowFlowProperties.Add(flowFlowProperty);
+            }
+            _DbContext.SaveChanges();
         }
 
         public static void Seed(EntityDataModel dbContext) {
@@ -150,7 +131,7 @@ namespace LcaDataLoader {
             }
             if (dbContext.FlowTypes.Count() == 0) {
                 dbContext.FlowTypes.Add(
-                    new FlowType { Name = "Intemediate Flow" }
+                    new FlowType { Name = "Intermediate Flow" }
                 );
                 dbContext.FlowTypes.Add(
                     new FlowType { Name = "Elementary Flow" }
@@ -162,13 +143,9 @@ namespace LcaDataLoader {
             }
         }
 
-        public int? GetFlowTypeID(string flowTypeName) {
-            foreach (var flowType in _DbContext.FlowTypes) {
-                if (String.Equals(flowType.Name, flowTypeName, StringComparison.OrdinalIgnoreCase)) {
-                    return flowType.FlowTypeID;
-                }
-            }
-            return null;
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public int GetFlowTypeID(string flowTypeName) {
+            return flowTypeName.Equals("Elementary flow") ? 2 : 1;
         }
 
         public int? GetID(string uuid) {

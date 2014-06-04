@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Data.Entity;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -69,6 +70,7 @@ namespace LcaDataLoader {
             }
             catch (Exception e) {
                 Console.WriteLine("ERROR: Exception Message = {0}", e.Message);
+                Console.Write(e.ToString());
                 exitCode = 1;
             }
             finally {

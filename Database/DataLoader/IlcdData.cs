@@ -27,12 +27,18 @@ namespace LcaDataLoader {
         /// </summary>
         /// <returns>Element value as a string</returns>
         public string GetElementValue(XName elementName) {
-            string elementValue;
-            elementValue = LoadedDocument.Root
-                       .Descendants(elementName)
-                       .Select(s => s.Value)
-                       .First();
-            return elementValue;
+            IEnumerable<XElement> els =
+                from el in LoadedDocument.Root.Descendants(elementName)
+                select el;
+            if (els.Count() == 0) {
+                return null;
+            }
+            else {
+                return LoadedDocument.Root
+                           .Descendants(elementName)
+                           .Select(s => s.Value)
+                           .First();
+            }
         }
 
         /// <summary>
@@ -40,13 +46,23 @@ namespace LcaDataLoader {
         /// </summary>
         /// <returns>Attribute value as a string</returns>
         public string GetElementAttributeValue(XName elementName, XName attName) {
-            string attValue;
-            attValue = LoadedDocument.Root
-                       .Descendants(elementName)
-                       .Attributes(attName)
+            IEnumerable<XElement> els =
+                from el in LoadedDocument.Root.Descendants(elementName)
+                select el;
+            if (els.Count() == 0) {
+                return null;
+            }
+            else {
+                return els.Attributes(attName)
                        .Select(s => s.Value)
                        .First();
-            return attValue;
+            }             
+        }
+
+        public XElement GetElementWithInternalId(XName elementName, string internalID) {
+            return LoadedDocument.Root
+                       .Descendants(elementName)
+                       .First(x => x.Attribute("dataSetInternalID").Value == internalID);
         }
 
         /// <summary>
@@ -93,6 +109,17 @@ namespace LcaDataLoader {
                     }).ToList();
         }
 
+        private List<FlowFlowProperty> CreateFFPList(DbContextWrapper ilcdDb, Flow flow) {
+
+            return LoadedDocument.Root.Descendants(ElementName("flowProperties")).Elements(ElementName("flowProperty")).Select(fp =>
+                    new FlowFlowProperty {
+                        FlowID = flow.FlowID,
+                        FlowPropertyID = GetFlowPropertyID(ilcdDb, fp),
+                        MeanValue = (double?)fp.Element(ElementName("meanValue")),
+                        StDev = (double?)fp.Element(ElementName("relativeStandardDeviation95In"))
+                    }).ToList();
+        }
+
         private bool SaveUnitGroup(DbContextWrapper ilcdDb) {
             bool isSaved = false;
             UnitGroup unitGroup = new UnitGroup();
@@ -116,12 +143,19 @@ namespace LcaDataLoader {
             flowProperty.FlowPropertyVersion = GetCommonVersion();
             flowProperty.Name = GetCommonName();
             ugUUID = GetElementAttributeValue(ElementName("referenceToReferenceUnitGroup"), "refObjectId");
-            ugID = ilcdDb.GetID(ugUUID);
-            if (ugID == null) {
-                Console.WriteLine("WARNING: Unable to find unit group matching flow property refObjectId = {0}", ugUUID);
+            if (ugUUID == null) {
+                Console.WriteLine("WARNING: Unable to find referenceToReferenceUnitGroup in flow property {0}", 
+                    flowProperty.FlowPropertyUUID);
             }
             else {
-                flowProperty.UnitGroupID = ugID;
+                string referenceUUID = ugUUID;
+                ugID = ilcdDb.GetID((string)referenceUUID);
+                if (ugID == null) {
+                    Console.WriteLine("WARNING: Unable to find unit group matching flow property refObjectId = {0}", ugUUID);
+                }
+                else {
+                    flowProperty.UnitGroupID = ugID;
+                }
             }
 
             if (ilcdDb.AddFlowProperty(flowProperty) ) {
@@ -131,10 +165,20 @@ namespace LcaDataLoader {
             return isSaved;
         }
 
+        private int? GetFlowPropertyID(DbContextWrapper ilcdDb, XElement fpElement) {
+            string fpUUID = fpElement.Element(ElementName("referenceToFlowPropertyDataSet")).Attribute("refObjectId").Value;
+            int? fpID = ilcdDb.GetID(fpUUID);
+            if (fpID == null) {
+                Console.WriteLine("WARNING: Unable to find flow property matching flow refObjectId = {0}", fpUUID);
+            }
+            return fpID;
+        }
+
         private bool SaveFlow(DbContextWrapper ilcdDb) {
             bool isSaved = false;
-            string fpUUID;
-            int? fpID = null;
+            int? fpID;
+            string dataSetInternalID = "0";
+            XElement fpElement;
             Flow flow = new Flow();
             flow.FlowUUID = GetCommonUUID();
             flow.FlowVersion = GetCommonVersion();
@@ -142,16 +186,14 @@ namespace LcaDataLoader {
             flow.Name = GetElementValue(ElementName("baseName"));
             flow.CASNumber = GetElementValue(ElementName("CASNumber"));
             flow.FlowTypeID = ilcdDb.GetFlowTypeID(GetElementValue(ElementName("typeOfDataSet")));
-            fpUUID = GetElementAttributeValue(ElementName("referenceToFlowPropertyDataSet"), "refObjectId");
-            fpID = ilcdDb.GetID(fpUUID);
-            if (fpID == null) {
-                Console.WriteLine("WARNING: Unable to find flow property matching flow refObjectId = {0}", fpUUID);
-            }
-            else {
-                flow.FlowPropertyID = fpID;
-            }
+            // Get Reference Flow Property
+            dataSetInternalID = GetElementValue(ElementName("referenceToReferenceFlowProperty"));
+            fpElement = GetElementWithInternalId(ElementName("flowProperty"), dataSetInternalID);
+            fpID = GetFlowPropertyID(ilcdDb, fpElement);
+            flow.FlowPropertyID = fpID;           
 
             if (ilcdDb.AddFlow(flow)) {
+                ilcdDb.AddFlowFlowProperties(CreateFFPList(ilcdDb, flow));
                 isSaved = true;
             }
 
