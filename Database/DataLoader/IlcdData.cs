@@ -59,6 +59,13 @@ namespace LcaDataLoader {
             }             
         }
 
+        /// <summary>
+        /// Find descendant element by dataSetInternalID value
+        /// </summary>
+        /// <param name="elementName">Element name of parent node</param>
+        /// <param name="internalID">Search value</param>
+        /// <returns>Element found</returns>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public XElement GetElementWithInternalId(XName elementName, string internalID) {
             return LoadedDocument.Root
                        .Descendants(elementName)
@@ -66,24 +73,27 @@ namespace LcaDataLoader {
         }
 
         /// <summary>
-        /// Generate element name with common namespace prefix
+        /// Get UUID using common namespace prefix
         /// </summary>
-        /// <returns>Element name</returns>
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public XName CommonElementName(string name) {
-            return _CommonNamespace + name;
-        }
-
+        /// <returns>Value of the UUID</returns>        
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public string GetCommonUUID() {
             return GetElementValue(_CommonNamespace + "UUID");
         }
 
+        /// <summary>
+        /// Get name using common namespace prefix
+        /// </summary>
+        /// <returns>Value of the name</returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public string GetCommonName() {
             return GetElementValue(_CommonNamespace + "name");
         }
 
+        /// <summary>
+        /// Get dataSetVersion using common namespace prefix
+        /// </summary>
+        /// <returns>Value of the dataSetVersion</returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public string GetCommonVersion() {
             return GetElementValue(_CommonNamespace + "dataSetVersion");
@@ -98,8 +108,11 @@ namespace LcaDataLoader {
             return LoadedDocument.Root.Name.Namespace + name;
         }
 
+        /// <summary>
+        /// Create a list of UnitConversion entities from elements under units.
+        /// </summary>
+        /// <param name="flow">UnitGroup parent entity</param>
         private List<UnitConversion> CreateUnitConversionList(UnitGroup unitGroup) {
-
             return LoadedDocument.Root.Descendants(ElementName("units")).Elements(ElementName("unit")).Select(u =>
                     new UnitConversion {
                         UnitConversionUUID = unitGroup.UnitGroupUUID,
@@ -109,8 +122,12 @@ namespace LcaDataLoader {
                     }).ToList();
         }
 
+        /// <summary>
+        /// Create a list of FlowFlowProperty entities from elements under flowProperties.
+        /// </summary>
+        /// <param name="ilcdDb">Database context wrapper object</param>
+        /// <param name="flow">Flow parent entity</param>
         private List<FlowFlowProperty> CreateFFPList(DbContextWrapper ilcdDb, Flow flow) {
-
             return LoadedDocument.Root.Descendants(ElementName("flowProperties")).Elements(ElementName("flowProperty")).Select(fp =>
                     new FlowFlowProperty {
                         FlowID = flow.FlowID,
@@ -120,26 +137,46 @@ namespace LcaDataLoader {
                     }).ToList();
         }
 
+        /// <summary>
+        /// Copy common ILCD data from loaded ILCD file to new entity
+        /// TODO : When ILCDEntity table is implemented, add record there.
+        /// </summary>
+        /// <param name="ilcdDb">Database context wrapper object</param>
+        /// <returns>status flag<returns>
+        private bool SaveIlcdEntity(DbContextWrapper ilcdDb, IIlcdEntity entity) {
+            entity.UUID = GetCommonUUID();
+            return true;
+        }
+
+        /// <summary>
+        /// Import data from loaded unitgroup file to new UnitGroup entity
+        /// </summary>
+        /// <param name="ilcdDb">Database context wrapper object</param>
+        /// <returns>true iff data was imported</returns>
         private bool SaveUnitGroup(DbContextWrapper ilcdDb) {
             bool isSaved = false;
             UnitGroup unitGroup = new UnitGroup();
-            unitGroup.UnitGroupUUID = GetCommonUUID();
+            SaveIlcdEntity(ilcdDb, unitGroup);
             unitGroup.Version = GetCommonVersion();
             unitGroup.Name = GetCommonName();
-            if (ilcdDb.AddUnitGroup(unitGroup)) {
-
+            if (ilcdDb.AddIlcdEntity(unitGroup)) {
                     ilcdDb.AddUnitConversions(CreateUnitConversionList(unitGroup));
                     isSaved = true;
             }
             return isSaved;
         }
 
+        /// <summary>
+        /// Import data from loaded flowproperty file to new FlowProperty entity
+        /// </summary>
+        /// <param name="ilcdDb">Database context wrapper object</param>
+        /// <returns>true iff data was imported</returns>
         private bool SaveFlowProperty(DbContextWrapper ilcdDb) {
             bool isSaved = false;
             string ugUUID;
             int? ugID = null;
             FlowProperty flowProperty = new FlowProperty();
-            flowProperty.FlowPropertyUUID = GetCommonUUID();
+            SaveIlcdEntity(ilcdDb, flowProperty);
             flowProperty.FlowPropertyVersion = GetCommonVersion();
             flowProperty.Name = GetCommonName();
             ugUUID = GetElementAttributeValue(ElementName("referenceToReferenceUnitGroup"), "refObjectId");
@@ -158,13 +195,20 @@ namespace LcaDataLoader {
                 }
             }
 
-            if (ilcdDb.AddFlowProperty(flowProperty) ) {
+            if (ilcdDb.AddIlcdEntity(flowProperty)) {
                 isSaved = true;
             }
             
             return isSaved;
         }
 
+        /// <summary>
+        /// Extract UUID from referenceToFlowPropertyDataSet and transform it to entity ID (FlowPropertyID).
+        /// This depends on the referenced flow property having been previously imported.
+        /// </summary>
+        /// <param name="ilcdDb">Database context wrapper object</param>
+        /// <param name="fpElement">Element containing referenceToFlowPropertyDataSet</param>
+        /// <returns>Entity ID, if the UUID was extracted and a loaded entity ID was found, otherwise null</returns>
         private int? GetFlowPropertyID(DbContextWrapper ilcdDb, XElement fpElement) {
             string fpUUID = fpElement.Element(ElementName("referenceToFlowPropertyDataSet")).Attribute("refObjectId").Value;
             int? fpID = ilcdDb.GetID(fpUUID);
@@ -174,13 +218,18 @@ namespace LcaDataLoader {
             return fpID;
         }
 
+        /// <summary>
+        /// Import data from loaded flow file to new Flow entity
+        /// </summary>
+        /// <param name="ilcdDb">Database context wrapper object</param>
+        /// <returns>true iff data was imported</returns>
         private bool SaveFlow(DbContextWrapper ilcdDb) {
             bool isSaved = false;
             int? fpID;
             string dataSetInternalID = "0";
             XElement fpElement;
             Flow flow = new Flow();
-            flow.FlowUUID = GetCommonUUID();
+            SaveIlcdEntity(ilcdDb, flow);
             flow.FlowVersion = GetCommonVersion();
             // TODO : generate name from classification/category
             flow.Name = GetElementValue(ElementName("baseName"));
@@ -190,9 +239,9 @@ namespace LcaDataLoader {
             dataSetInternalID = GetElementValue(ElementName("referenceToReferenceFlowProperty"));
             fpElement = GetElementWithInternalId(ElementName("flowProperty"), dataSetInternalID);
             fpID = GetFlowPropertyID(ilcdDb, fpElement);
-            flow.FlowPropertyID = fpID;           
+            flow.FlowPropertyID = fpID;
 
-            if (ilcdDb.AddFlow(flow)) {
+            if (ilcdDb.AddIlcdEntity(flow)) {
                 ilcdDb.AddFlowFlowProperties(CreateFFPList(ilcdDb, flow));
                 isSaved = true;
             }
@@ -203,6 +252,8 @@ namespace LcaDataLoader {
         /// <summary>
         /// Import data from LoadedDocument to database.
         /// </summary>
+        /// <param name="ilcdDb">Database context wrapper object</param>
+        /// <returns>true iff data was imported</returns>
         public bool Save(DbContextWrapper ilcdDb) {
             Debug.Assert(LoadedDocument != null, "LoadedDocument must be set before calling Save.");
             string nsString = LoadedDocument.Root.Name.Namespace.ToString();

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Xml.Linq;
@@ -9,7 +10,7 @@ using LcaDataModel;
 
 namespace LcaDataLoader {
     /// <summary>
-    /// Use LcaDataLoader to load ILCD data from a directory to the LCA Tool database.
+    /// Use IlcdImporter to load ILCD data from a directory to the LCA Tool database.
     /// </summary>
     class IlcdImporter : IDisposable {
         /// <summary>
@@ -62,6 +63,7 @@ namespace LcaDataLoader {
             if (Directory.Exists(dirName)) {
                 string[] files = Directory.GetFiles(dirName, "*.xml");
                 foreach (string s in files) {
+                    Debug.WriteLine("Load {0}", s);
                     _IlcdData.LoadedDocument = XDocument.Load(s);
                     if (_IlcdData.Save(_DbContext)) {
                         importCounter++;

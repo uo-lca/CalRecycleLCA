@@ -10,7 +10,7 @@ using LcaDataModel;
 
 namespace LcaDataLoader {
     /// <summary>
-    /// Program to batch load ILCD data files into a new database
+    /// Program to create and seed database. Loads ILCD data files.
     /// </summary>
     class Program {
         /// <summary>
@@ -29,6 +29,9 @@ namespace LcaDataLoader {
             }
         }
 
+        /// <summary>
+        /// Redirect console output to file with name, _logFileName.
+        /// </summary>
         static void StartLogging() {
             try {
                 // Attempt to open output file.
@@ -42,6 +45,9 @@ namespace LcaDataLoader {
             }
         }
 
+        /// <summary>
+        /// Redirect console output to stdout.
+        /// </summary>
         static void StopLogging() {
             _LogWriter.Close();
             // Recover the standard output stream so that a  
@@ -51,7 +57,9 @@ namespace LcaDataLoader {
             Console.SetOut(standardOutput);
         }
 
-
+        /// <summary>
+        /// Entry point of console app.
+        /// </summary>
         static int Main(string[] args) {
             int exitCode = 0;
             try {

@@ -10,9 +10,14 @@ using LcaDataModel;
 
 
 namespace LcaDataLoader {
+    /// <summary>
+    /// DbContextWrapper provides database access convenience methods.
+    /// </summary>
     class DbContextWrapper : IDisposable {
-
+        // Data Model DbContext object
         EntityDataModel _DbContext;
+
+        // Dictionary maps UUID to Entity ID
         Dictionary<string, int> _UuidDictionary = new Dictionary<string, int>();
 
         // Flag: Has Dispose already been called? 
@@ -35,13 +40,17 @@ namespace LcaDataLoader {
 
             disposed = true;
         }
-
-
+        /// <summary>
+        /// Constructor injects model's DbContext
+        /// </summary>
         public DbContextWrapper(EntityDataModel dbContext)
         {
             _DbContext = dbContext;
         }
 
+        /// <summary>
+        /// Invokes DbContext.SaveChanges and handles DbUpdateException.
+        /// </summary>
         public int SaveChanges() {
             try {
                 return _DbContext.SaveChanges();
@@ -54,45 +63,20 @@ namespace LcaDataLoader {
             }
         }
 
-        public bool AddUnitGroup(UnitGroup unitGroup) {
+        /// <summary>
+        /// Insert ILCD entity into the database.
+        /// </summary>
+        /// <param name="ilcdEntity">An entity with a UUID.</param>
+        /// <returns>true iff entity was successfully inserted</returns>
+        public bool AddIlcdEntity(IIlcdEntity ilcdEntity) {
             bool isAdded = false;
-            if ( _UuidDictionary.ContainsKey(unitGroup.UnitGroupUUID)) {
-                Console.WriteLine("WARNING: Unable to add unit group because UUID {0} already exists.", unitGroup.UnitGroupUUID);
+            if (_UuidDictionary.ContainsKey(ilcdEntity.UUID)) {
+                Console.WriteLine("WARNING: Unable to add entity because UUID {0} already exists.", ilcdEntity.UUID);
             }
             else {
-                _DbContext.UnitGroups.Add(unitGroup);
+                _DbContext.Set(ilcdEntity.GetType()).Add(ilcdEntity);
                 if (SaveChanges() > 0) {
-                    _UuidDictionary.Add(unitGroup.UnitGroupUUID, unitGroup.UnitGroupID);
-                    isAdded = true;
-                }
-            }
-            return isAdded;
-        }
-
-        public bool AddFlowProperty(FlowProperty flowProperty) {
-            bool isAdded = false;
-            if (_UuidDictionary.ContainsKey(flowProperty.FlowPropertyUUID)) {
-                Console.WriteLine("WARNING: Unable to add flow property because UUID {0} already exists.", flowProperty.FlowPropertyUUID);
-            }
-            else {
-                _DbContext.FlowProperties.Add(flowProperty);
-                if (SaveChanges() > 0) {
-                    _UuidDictionary.Add(flowProperty.FlowPropertyUUID, flowProperty.FlowPropertyID);
-                    isAdded = true;
-                }
-            }
-            return isAdded;
-        }
-
-        public bool AddFlow(Flow flow) {
-            bool isAdded = false;
-            if (_UuidDictionary.ContainsKey(flow.FlowUUID)) {
-                Console.WriteLine("WARNING: Unable to add flow because UUID {0} already exists.", flow.FlowUUID);
-            }
-            else {
-                _DbContext.Flows.Add(flow);
-                if (SaveChanges() > 0) {
-                    _UuidDictionary.Add(flow.FlowUUID, flow.FlowID);
+                    _UuidDictionary.Add(ilcdEntity.UUID, ilcdEntity.ID);
                     isAdded = true;
                 }
             }
