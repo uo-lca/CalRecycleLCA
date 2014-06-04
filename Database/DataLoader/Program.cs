@@ -17,7 +17,7 @@ namespace LcaDataLoader {
         /// Directory holding ILCD data files. Default setting can be overwritten by argument.
         /// </summary>
         static string _IlcdDirName = "C:\\CalRecycleLCA-DATA_ROOT\\Full UO LCA Flat Export BK 2014_05_05\\ILCD";
-        static string _logFileName = "C:\\CalRecycleLCA-DATA_ROOT\\LcaDataLoaderLog.txt";
+        static string _logFileName = "C:\\CalRecycleLCA-DATA_ROOT\\Full UO LCA Flat Export BK 2014_05_05\\LcaDataLoaderLog.txt";
         static StreamWriter _LogWriter = null;
 
         static void ParseArguments(string[] args) {
