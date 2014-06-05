@@ -318,39 +318,9 @@ The following tables are required:
    ProcessDissipation - New Table
     * ProcessDissipationID
     * ProcessFlowID
-    * FlowPropertyEmissionID
     * EmissionFactor (0-1)
 
-    This is an extension of the ILCD process type to include environmental
-    dissipation of flow constituents.  A ProcessDissipation record
-    generates an emission when LCIA computation is performed on the process
-    and the following query is non-null:
-
-    SELECT fe.EmissionID AS FlowID,
-    	   pd.EmissionFactor * ffp.MeanValue * pf.Result AS Quantity
-	   "Output" AS Direction
-	   pf.Geography AS Geography
-    FROM ProcessFlow pf
-    INNER JOIN Direction d on pf.DirectionID = d.DirectionID
-    INNER JOIN FlowFlowProperty ffp ON pf.FlowID = ffp.FlowID
-    INNER JOIN ProcessDissipation pd ON ffp.FlowPropertyID = pd.FlowPropertyID
-    INNER JOIN FlowPropertyEmission fe ON pd.FlowPropertyEmissionID = fe.FlowPropertyEmissionID
-    WHERE pf.ProcessID = @ProcessID
-      AND pd.ProcessID = @ProcessID  ???? record must match two constraints 
-      AND d.Direction = 'Input' 
-
-    i.e. if there exists a FlowFlowProperty record pairing a process input
-    flow and the identified flow property. It is a usage error to use this
-    method on a process with multiple inputs or ambiguous inputs (all
-    matching FlowFlowProperty records will generate emissions).
-
-    This happens automatically when LCIA is conducted of a process.  When
-    computing a node, it's more complicated because of the need to account
-    for scenario settings.
-
-    nodes can issue sensitivities to parameters encoded in
-    ProcessDissipation; they can't generate new emissions.
-
+    Please see description in fragment-design.txt
 
    Source - REMOVE TABLE
 
@@ -525,19 +495,15 @@ The following tables are required:
 
     Contains scenario-specific overrides for Background mappings.
 
-   NodeDissipation - New Table
+   NodeDissipation - REMOVE TABLE
     * NodeDissipationID
     * FragmentNodeID (FK to FragmentNode)
     * FlowPropertyID (FK to FlowFlowProperty - substance being dissipated)
     * EmissionFactor (0-1)
 
-    NodeDissipation accounts for the emission of flow constituents
-    (represented by flow properties) due to the operation of a node.  Table
-    records are created during scenario (or fragment) definition when users
-    (or designers) indicate that ProcessDissipation factors are to be
-    customized for a given node.
+    This table has been merged into NodeDissipationParam
 
-   NodeEmission - Rename from FragmentEmission
+   NodeEmission - REMOVE TABLE
     % NodeEmissionID (was FragmentEmissionID)
     % FragmentNodeID (was NodeID) (FK to FragmentNodeID)
     * FlowID (FK to Flow; FlowType must be Elementary)
@@ -545,14 +511,9 @@ The following tables are required:
     X ScenarioID - REMOVE
     X ParamID - REMOVE
     * Quantity
-   
-    NodeEmission accounts for emissions arising from process operation that
-    are not sensitive to flow composition (i.e. traditional LCA emissions)
-    and that are customized from ProcessFlow factors for a specific node.
-    Table records are created during scenario (or fragment) definition when
-    users (or designers) indicate that ProcessFlow factors are to be
-    customized for a given node.
 
+    This table has been merged into NodeEmissionParam
+   
    Param
     * ParamID
     + ParamTypeID 
@@ -606,7 +567,8 @@ The following tables are required:
    NodeDissipationParam - New Table
     * NodeDissipationParamID
     * ParamID (FK to Param, ParamTypeID must be 7)
-    * NodeDissipationID
+    * ProcessDissipationID (FK to ProcessDissipation)
+    * FragmentNodeID (FK to FragmentNode)
 
    ProcessEmissionParam - New Table
     * ProcessEmissionParamID
@@ -616,7 +578,8 @@ The following tables are required:
    NodeEmissionParam - New Table
     * NodeEmissionParamID
     * ParamID (FK to Param, ParamTypeID must be 9)
-    * NodeEmissionID
+    * ProcessFlowID (FK to ProcessFlow)
+    * FragmentNodeID (FK to FragmentNode)
 
    CharacterizationParam - New Table
     * CharacterizationParamID

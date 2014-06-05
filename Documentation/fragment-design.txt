@@ -226,6 +226,109 @@ Database Design
    complete, these node scores can be paired with node weights and summed
    to determine the fragment score.  Easy as pie.
 
+   Obviously it is a little bit more complicated.  For one, there is an
+   extension to the ILCD model to represent dissipation of flow
+   constituents by a process (e.g. heavy metals in combustion fuels).
+   There are three tables involved in this computation:
+
+ * Dissipation of Flow Constituents
+   
+   This is an extension of the ILCD process type to include environmental
+   dissipation of flow constituents.  A ProcessDissipation record
+   modifies an existing emission to be determined from a FlowFlowProperty
+   record rather than the originating ProcessFlow record.
+
+   The first step is to determine the correct reference input FlowID.
+   Current design ASSUMES that dissipation processes have ONLY ONE
+   INTERMEDIATE INPUT with units measured in mass.  
+
+   If LCIA computation is performed directly on a process, the input flow
+   can be determined as:
+
+   SELECT pf.FlowID FROM ProcessFlow pf
+   INNER JOIN Direction d ON pf.DirectionID = d.DirectionID
+   INNER JOIN Flow f ON pf.FlowID = f.FlowID
+   INNER JOIN FlowType ft ON f.FlowTypeID = ft.FlowTypeID
+   INNER JOIN FlowFlowProperty ffp on pf.FlowID = ffp.FlowID
+   INNER JOIN FlowProperty fp on ffp.FlowPropertyID = fp.FlowPropertyID
+   WHERE d.Direction = "Input"
+     AND ft.Name = "Intermediate Flow"
+     AND fp.Name = "Mass"
+
+   If the above query has multiple records, the first (arbitrarily) is
+   used.  If the above query has zero records, no dissipation can be
+   performed. 
+
+   If LCIA computation is performed on a node-as-process, the following
+   algorithm can be used to determine the input flow:
+
+   {
+     // edges = table of fragment edges
+     // nodes = table of fragment nodes
+     // current_node = FragmentNodeID
+
+     // direction is w.r.t. origin node- so current_node's input is parent
+     // node's output
+     upstream_input = SELECT FlowID 
+	FROM edges
+     	INNER JOIN Direction d on edges.DirectionID = d.DirectionID
+   	INNER JOIN Flow f ON pf.FlowID = f.FlowID
+   	INNER JOIN FlowFlowProperty ffp on f.FlowID = ffp.FlowID
+   	INNER JOIN FlowProperty fp on ffp.FlowPropertyID = fp.FlowPropertyID
+     	WHERE edges.Terminus = current_node
+	  AND d.Direction = "Output"
+	  AND fp.Name = "Mass"
+
+     if is_null(upstream_input)
+     {
+	// or, if node is added in reverse as a dependency-satisfier, then
+	// we need an input w.r.t. the current node
+	downstream_input = SELECT FlowID
+	FROM edges
+     	INNER JOIN Direction d on edges.DirectionID = d.DirectionID
+   	INNER JOIN Flow f ON pf.FlowID = f.FlowID
+   	INNER JOIN FlowFlowProperty ffp on f.FlowID = ffp.FlowID
+   	INNER JOIN FlowProperty fp on ffp.FlowPropertyID = fp.FlowPropertyID
+     	WHERE edges.Origin = current_node
+	  AND d.Direction = "Input"
+	  AND fp.Name = "Mass"
+
+	if is_null(downstream_input)
+	  FlowInputID = null;
+	else
+	  FlowInputID = downstream_input(1);
+     }
+     else FlowInputID = upstream_input(1);
+      
+   }
+
+   Once the FlowID with the relevant FlowProperties is known, dissipation
+   is handled with the following query, which generates a list of
+   alternate emission quantities.
+
+   SELECT pf.ProcessFlowID,
+     ffp.MeanValue * fpe.Scale * pd.EmissionFactor AS DissipationQuantity
+   FROM ProcessFlow pf
+   INNER JOIN FlowPropertyEmission fpe ON pf.FlowID = fpe.EmissionID
+   INNER JOIN FlowFlowProperty ffp 
+     ON fpe.FlowPropertyID = ffp.FlowPropertyID
+   INNER JOIN ProcessDissipation pd ON pf.ProcessFlowID = pd.ProcessFlowID 
+   WHERE ffp.FlowID = @FlowID
+     AND pf.ProcessID = @ProcessID
+
+   Note that ffp.MeanValue can be modified by type 5 params, and
+   pd.EmissionFactor can be modified by type 6 and 7 params.
+
+   This list can then be outer-joined with the original ProcessFlow list
+   for the current process, with DissipationQuantity used in place of
+   pf.Result whenever it is non-null.
+
+   ProcessDissipation records can override existing ProcessFlow emissions;
+   they can't generate new emissions.  Emission factors can be modified on
+   a process-specific basis (type 6 params- will affect all instances of
+   the process) or a node-specific basis (type 7 params- will only affect
+   the designated nodes).
+
  * Fragment Sensitivity Computation
 
    Sensitivity measures how much the LCIA score changes with respect to a
