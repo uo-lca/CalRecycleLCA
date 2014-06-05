@@ -73,7 +73,7 @@ The following tables are required:
 
    Consult with CalRecycle on implementing users and user  privileges.
 
-   User - New Table
+   User
     * UserID
     * Name
     * CanLogin (bool)
@@ -81,7 +81,7 @@ The following tables are required:
     * CanEditFragments
     * CanEditBackground (incl. base scenarios)
     * CanAppend
-    * etc
+    * etc (I guess we can discuss later, what the etc might include - Rachel)
 
     Those are given in increasing order of privilege.
 
@@ -104,11 +104,9 @@ The following tables are required:
     * DirectionID [ 1 | 2 ]
     * Name [Input | Output]
 
-   Dummy - REMOVE TABLE
-
    FlowType (enumeration)
     * FlowTypeID [ 1 | 2 ]
-    % Name (was Type) [ IntermediateFlow | Elementary Flow ]
+    % Name [ IntermediateFlow | Elementary Flow ]
 
     All product, waste, and accounting flows are Intermediate flows.  All
     interchanges with the natural world are Elementary flows.
@@ -125,7 +123,7 @@ The following tables are required:
 
     Indicator types represented in ILCD LCIA methods.
 
-   NodeType (enumeration) - New Table
+   NodeType (enumeration)
     * NodeTypeID [1 | 2 | 3 | 4]
     * Name: [Process | Fragment | InputOutput | Background]
 
@@ -133,7 +131,7 @@ The following tables are required:
     to a database process, to a subfragment, to an external input/output,
     or to a background process.
 
-   ParamType (enumeration) - New Table
+   ParamType (enumeration)
     * ParamTypeID: [1 | 2 | 3 
       	     | 4 
 	     | 5
@@ -177,13 +175,11 @@ The following tables are required:
 
     Generated prior to ILCD import.
 
-   ILCDEntity (Rename from MasterLCAModels)
+   ILCDEntity
     * UUID
     * Version - ILCD version of source data file
-    + DataProviderID
+    * DataProviderID
     * DataTypeID
-    X URI - REMOVE
-    X OldIndex - REMOVE
     
     Lookup table mapping UUIDs to sources in the file system.  Generated
     during ILCD import.
@@ -191,28 +187,15 @@ The following tables are required:
    UnitGroup
     * UnitGroupID
     * UnitGroupUUID
-    X Version - REMOVE - move to ILCDEntity.Version
     * Name
-    % ReferenceUnitConversionID (was ReferenceUnit) (FK to UnitConversionID)
-    X CreatedOn - REMOVE
-    X CreatedBy - REMOVE
-    X UpdatedOn - REMOVE
-    X UpdatedBy - REMOVE
-    X Voided - REMOVE
+    * ReferenceUnitConversionID(FK to UnitConversionID)
 
    UnitConversion
     * UnitConversionID
-    X UnitConversionUUID - REMOVE
     * UnitGroupID
     * Unit
-    + LongName
+    * LongName
     * Conversion
-    X Ind-sql - REMOVE
-    X CreatedOn - REMOVE
-    X CreatedBy - REMOVE
-    X UpdatedOn - REMOVE
-    X UpdatedBy - REMOVE
-    X Voided - REMOVE
 
     Gives a list of conversion factors relative to the ReferenceUnit- 
     Conversion for ReferenceUnit assumed to be 1 / ignored.
@@ -220,45 +203,35 @@ The following tables are required:
    FlowProperty
     * FlowPropertyID
     * FlowPropertyUUID - UUID of source data file
-    X FlowPropertyVersion - REMOVE - move to ILCDEntity.Version
     * Name
     * UnitGroupID
-    X UnitGroup_SQL - REMOVE
 
    Flow
     * FlowID
     * FlowUUID - UUID of source data file
-    X FlowVersion - REMOVE - move to ILCDEntity.Version
     * Name
     * CASNumber
     * FlowTypeID
-    * ReferenceFlowProperty (was FlowPropertyID) (FK to FlowPropertyID)
-    X FlowType_SQL - REMOVE
-    X ReferenceFlowProperty_SQL - REMOVE
+    * ReferenceFlowProperty(FK to FlowPropertyID)
 
    FlowFlowProperty
-    % FlowFlowPropertyID (was FlowPropertyVersionID)
-    X FlowPropertyVersionUUID - REMOVE
+    * FlowFlowPropertyID
     * FlowID
     * FlowPropertyID
     * MeanValue
     * StDev
-    X FlowProperty-SQL - REMOVE
-    X FlowReference-SQL - REMOVE
-    X Ind-SQL - REMOVE
 
-   FlowPropertyEmission - New Table
+   FlowPropertyEmission
     * FlowPropertyEmissionID
     * FlowPropertyID
     * EmissionID (FK to Flow.FlowID; FlowType must be Elementary)
-    + Scale (float)
+    * Scale (float)
 
     How various flow properties map to environmental emissions.
 
    LCIAMethod
     * LCIAMethodID
     * LCIAMethodUUID
-    X LCIAMethodVersion - REMOVE - move to ILCDEntity.Version
     * Name
     * Methodology
     * ImpactCategoryID
@@ -270,38 +243,28 @@ The following tables are required:
     * Normalization
     * Weighting
     * UseAdvice
-    X SourceID - REMOVE
-    % ReferenceQuantity (was FlowPropertyID) (FK to FlowPropertyID)
-    X Source - REMOVE
-    X ReferenceQuantity - REMOVE
+    * ReferenceQuantity (was FlowPropertyID) (FK to FlowPropertyID)
 
    LCIA
     * LCIAID
     * LCIAMethodID
-    X LCIAUUID - REMOVE
     * FlowID
     * DirectionID
-    * Geography (was Location)
+    * Geography
     * Factor
-    X Flow-SQL - REMOVE
-    X Direction-SQL - REMOVE
 
    Process
     * ProcessID - internal primary key
     * ProcessUUID - UUID of source file
-    X ProcessVersion - REMOVE - move to ILCDEntity.Version
     * Name
     * Year
     * Geography
-    X ReferenceFlow-SQL - REMOVE
-    * ReferenceType (could be enumeration)
-    * ProcessType (could be enumeration)
-    X Diagram - REMOVE
-    * ReferenceFlowID (was FlowID) (FK to Flow.FlowID)
+    % ReferenceType (could be enumeration) - YES - Moved into lookup table and added foreign key
+    % ProcessType (could be enumeration) - YES - Moved into lookup table and added foreign key
+    * ReferenceFlowID
 
    ProcessFlow
     * ProcessFlowID
-    X ProcessUUID - REMOVE
     * ProcessID
     * Geography
     * FlowID
@@ -311,11 +274,8 @@ The following tables are required:
     * Magnitude
     * Result
     * StDev
-    X Flow-SQL - REMOVE
-    X Direction-SQL - REMOVE
-    X Ind-SQL - REMOVE
 
-   ProcessDissipation - New Table
+   ProcessDissipation
     * ProcessDissipationID
     * ProcessFlowID
     * EmissionFactor (0-1)
@@ -326,11 +286,9 @@ The following tables are required:
 
 ### Indices, constraints
 
-    + Every table needs a primary key
-    + Unique index on UUID columns
+    * Every table needs a primary key
+    * Unique index on UUID columns
 	
-
-
 ## Classification Tables
 
    should ultimately be generated automatically; for now generated manually
@@ -338,23 +296,19 @@ The following tables are required:
 
    CategorySystem
     * CategorySystemID
-    % Name (was CategorySystem )
-    X URI (obsolete?) - REMOVE
+    * Name
     * DataTypeID 
     * Delimiter
-    X DataType-SQL - REMOVE
 
     Each CategorySystem may have only one CategorySystemID per DataTypeID. 
 
-   old Category - REMOVE TABLE -- rename old Class to Category
-
-   Category - renamed from Class
+   Category
     * CategoryID
     * ExternalClassID
     * Name
-    % CategorySystemID (was CategorySystemID-SQL)
-    + ParentCategoryID - Move from Category table
-    + HierarchyLevel - Move from Category table
+    * CategorySystemID
+    * ParentCategoryID
+    * HierarchyLevel
 
     Record of all the various classifications that can be assigned to data
     entities.  The CategorySystem and Class tables are generated by loading
@@ -365,11 +319,8 @@ The following tables are required:
 
    Classification - THIS TABLE WILL BE RE-GENERATED EXTERNALLY
     * ClassificationID
-    % UUID ? (was ClassificationUUID) (FK to ILCDEntity.UUID)
-    X CategorySystemID - REMOVE
-    % CategoryID (was ClassID)
-    X ClassID-SQL - REMOVE
-    X CategorySystem-SQL - REMOVE
+    * UUID(FK to ILCDEntity.UUID)
+    * CategoryID
 
     Mapping of UUIDs to Class information.  A single data entity (UUID) can
     have multiple ClassIDs, even within the same Category System.  A data
@@ -399,9 +350,8 @@ The following tables are required:
    Fragment
     * FragmentID
     * Name
-    + RootNode (FK to FragmentNode.FragmentNodeID)
-    + ReferenceFlow (FK to FlowID)
-    X Background - REMOVE
+    * RootNode (FK to FragmentNode.FragmentNodeID)
+    * ReferenceFlow (FK to FlowID)
    
    Background - New Table ### PLEASE REVIEW
     * BackgroundID
@@ -426,25 +376,21 @@ The following tables are required:
     * FragmentNodeID
     * FragmentID (FK to Fragment)
     * Name
-    % FragmentStageID (was StageID) (FK to FragmentStage: FragmentID must match)
-    + ReferenceProperty (FK to FlowPropertyID)
-    + NodeTypeID (FK to NodeType)
-    X ProcessID - REMOVE - move to FragmentNodeProcess
-    X ScenarioID - REMOVE
-    X ParamID - REMOVE
-    X Weight - REMOVE
+    * FragmentStageID (was StageID) (FK to FragmentStage: FragmentID must match)
+    * ReferenceProperty (FK to FlowPropertyID)
+    * NodeTypeID (FK to NodeType)
 
     The first of two core tables for fragment definition.  The node
     represents a locus of industrial activity.
 
-   FragmentNodeProcess - New Table
+   FragmentNodeProcess
     * FragmentNodeProcessID
     * FragmentNodeID
     * ProcessID (FK to ProcessFlow.ProcessID)
 
     Mapping of nodes with type "Process" to ProcessIDs
 
-   FragmentNodeFragment - New Table
+   FragmentNodeFragment
     * FragmentNodeFragmentID
     * FragmentNodeID
     * SubfragmentID
@@ -454,13 +400,11 @@ The following tables are required:
    FragmentEdge
     * FragmentEdgeID
     * FragmentID (FK to Fragment)
-    % Origin (was FragmentNodeID) (FK to FragmentNodeID)
+    * Origin (FK to FragmentNodeID)
     * FlowID (FK to Flow; FlowType must not be Elementary)
     * DirectionID (FK to Direction, w.r.t. origin node)
     * Terminus (FK to FragmentNodeID: FragmentID must match)
-    X ScenarioID - REMOVE
-    X ParamID - REMOVE
-    * Quantity (or NULL if Origin NodeType is Fragment)
+	* Quantity (or NULL if Origin NodeType is Fragment)
 
     The second core table for fragment definition.  The edge represents a
     particular intermediate flow or industrial product.
@@ -471,11 +415,11 @@ The following tables are required:
    'scenarios' subdirectory; user scenarios subsequently generated by users
    customizing their own scenarios.
 
-   ScenarioGroup - rename from ScenarioSet
-    % ScenarioGroupID (was ScenarioSetID)
-    + OwnerID (FK to UserID)
+   ScenarioGroup
+    * ScenarioGroupID (was ScenarioSetID)
+    * OwnerID (FK to UserID)
     * Name
-    + Visibility - public or private, or some other specification.
+    * Visibility - public or private, or some other specification.
 
     A scenario group is a set of scenarios owned by a single user that are
     all useful to compare against one another.  All scenarios in a given
@@ -483,10 +427,10 @@ The following tables are required:
 
    Scenario
     * ScenarioID
-    % ScenarioGroupID (was ScenarioSetID) (FK to ScenarioGroup)
+    * ScenarioGroupID(FK to ScenarioGroup)
     * Name
 
-   ScenarioBackground - New Table ### PLEASE REVIEW
+   ScenarioBackground - ### PLEASE REVIEW
     * ScenarioBackgroundID
     * ScenarioID
     * FlowID
@@ -508,35 +452,29 @@ The following tables are required:
     % FragmentNodeID (was NodeID) (FK to FragmentNodeID)
     * FlowID (FK to Flow; FlowType must be Elementary)
     * DirectionID (FK to Direction)
-    X ScenarioID - REMOVE
-    X ParamID - REMOVE
     * Quantity
 
     This table has been merged into NodeEmissionParam
    
    Param
     * ParamID
-    + ParamTypeID 
-    X ScenarioSetID - REMOVE
+    * ParamTypeID
     * Name
-    X FlowID - REMOVE
-    X ParamDefault - REMOVE
     * Min -- determined at invocation (in frontend) except for types 5, 6, 
       	     7, where it is always 0.
-    + Typ -- default value of the parameter in scenario- always 0 except
+    * Typ -- default value of the parameter in scenario- always 0 except
       	     for types 5, 6, 7, where it is set to the baseline 
 	     EmissionFactor or FlowFlowProperty value.
     * Max -- determined at invocation (in frontend) except for types 5, 6,
       	     7, where it is always 1.
-    X Scale - REMOVE
 
-   ScenarioParam - New Table
+   ScenarioParam
     * ScenarioParamID
     * ScenarioID
     * ParamID
     * Value
 
-   DependencyParam - New Table
+   DependencyParam
     * DependencyParamID
     * ParamID (FK to Param, ParamTypeID must be 1, 2, or 3)
     * FragmentEdgeID
@@ -546,12 +484,12 @@ The following tables are required:
     * DependencyParamID (FK to DependencyParam, ParamTypeID must be 2)
     * ConservationParamID (FK to DependencyParam, ParamTypeID must be 3)
 
-   FlowPropertyParam - New Table
+   FlowPropertyParam
     * FlowPropertyParamID
     * ParamID (FK to Param, ParamTypeID must be 4)
     * FlowFlowPropertyID
 
-   CompositionParam - New Table
+   CompositionParam
     * CompositionParamID
     * ParamID (FK to Param, ParamTypeID must be 5)
     * FlowFlowPropertyID
@@ -559,12 +497,12 @@ The following tables are required:
     Note: types 4 and 5 both link to FlowFlowPropertyIDs but are used
     differently during fragment computation.
 
-   ProcessDissipationParam - New Table
+   ProcessDissipationParam
     * ProcessDissipationParamID
     * ParamID (FK to Param, ParamTypeID must be 6)
     * ProcessDissipationID
 
-   NodeDissipationParam - New Table
+   NodeDissipationParam
     * NodeDissipationParamID
     * ParamID (FK to Param, ParamTypeID must be 7)
     * ProcessDissipationID (FK to ProcessDissipation)
@@ -575,7 +513,7 @@ The following tables are required:
     * ParamID (FK to Param, ParamTypeID must be 8)
     * ProcessFlowID
 
-   NodeEmissionParam - New Table
+   NodeEmissionParam
     * NodeEmissionParamID
     * ParamID (FK to Param, ParamTypeID must be 9)
     * ProcessFlowID (FK to ProcessFlow)
@@ -596,14 +534,14 @@ The following tables are required:
     distribution param requires an equal and opposite adjustment to the
     corresponding conservation param (this is handled in the front-end) 
 
-   CompositionModel - New Table
+   CompositionModel
     * CompositionModelID
     * FlowID
     * Name
 
     List of intermediate flows for which composition parameters are relevant.
 
-   CompositionData - New Table
+   CompositionData
     * CompositionDataID
     * CompositionModelID
     * FlowFlowPropertyID
@@ -613,8 +551,6 @@ The following tables are required:
     composition model.  These are stored as sets and can be easily invoked
     by a user (or designer) to generate and populate a corresponding set of
     ParamInstances in a scenario.
-
-
 
 ## Cached Computation Results
 
