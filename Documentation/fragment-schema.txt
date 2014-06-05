@@ -101,13 +101,13 @@ The following tables are required:
     extension described for the current tool.
 
    Direction (enumeration)
-    * DirectionID [1 | 2]
+    * DirectionID [ 1 | 2 ]
     * Name [Input | Output]
 
    Dummy - REMOVE TABLE
 
    FlowType (enumeration)
-    * FlowTypeID
+    * FlowTypeID [ 1 | 2 ]
     % Name (was Type) [ IntermediateFlow | Elementary Flow ]
 
     All product, waste, and accounting flows are Intermediate flows.  All
@@ -251,6 +251,7 @@ The following tables are required:
     * FlowPropertyEmissionID
     * FlowPropertyID
     * EmissionID (FK to Flow.FlowID; FlowType must be Elementary)
+    + Scale (float)
 
     How various flow properties map to environmental emissions.
 
@@ -316,7 +317,7 @@ The following tables are required:
 
    ProcessDissipation - New Table
     * ProcessDissipationID
-    * ProcessID
+    * ProcessFlowID
     * FlowPropertyEmissionID
     * EmissionFactor (0-1)
 
