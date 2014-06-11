@@ -350,12 +350,13 @@ The following tables are required:
    Fragment
     * FragmentID
     * Name
-    * RootNode (FK to FragmentNode.FragmentNodeID)
-    * ReferenceFlow (FK to FlowID)
+    % ReferenceFragmentEdgeID (FK to FragmentEdge.FragmentEdgeID) (was RootNode) 
+    X ReferenceFlow REMOVE
    
    Background - New Table ### PLEASE REVIEW
     * BackgroundID
     * FlowID
+    + DirectionID
     * NodeTypeID (only Process or Fragment allowed)
     * TargetID (NOT foreign key- interpret as ProcessID or FragmentID)
 
@@ -377,7 +378,7 @@ The following tables are required:
     * FragmentID (FK to Fragment)
     * Name
     * FragmentStageID (was StageID) (FK to FragmentStage: FragmentID must match)
-    * ReferenceProperty (FK to FlowPropertyID)
+    * ReferenceProperty (FK to FlowPropertyID) - of edge terminating at node
     * NodeTypeID (FK to NodeType)
 
     The first of two core tables for fragment definition.  The node
@@ -404,7 +405,7 @@ The following tables are required:
     * FlowID (FK to Flow; FlowType must not be Elementary)
     * DirectionID (FK to Direction, w.r.t. origin node)
     * Terminus (FK to FragmentNodeID: FragmentID must match)
-	* Quantity (or NULL if Origin NodeType is Fragment)
+    * Quantity (or NULL if Origin NodeType is Fragment)
 
     The second core table for fragment definition.  The edge represents a
     particular intermediate flow or industrial product.

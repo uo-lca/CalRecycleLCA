@@ -1,0 +1,7 @@
+FragmentID,FragmentUUID,Name,ReferenceFragmentEdgeID
+"1","19ce517e-fe42-4b72-9b56-e75e18e6423e","Electricity, at grid","85"
+"2","8be24b1c-e41d-47e0-ae23-17b8e4b0af22","Natural Gas Supply Mixer","110"
+"3","691e7962-5db0-4ada-8393-969e1db8d0f1","Haz Waste Landfill Output","112"
+"4","90718bea-435f-493d-82c4-d43a32ca862e","Haz Waste Incineration Output","130"
+"5","df5e89bd-1379-4107-ad1e-62d449db03aa","Local Collection Mixer","139"
+"6","eb766625-45a2-43b0-a96c-408ab267817d","Scenario","141"
