@@ -22,6 +22,7 @@ namespace LcaDataModel {
         // UUID accessor signature  
         [NotMapped]
         string UUID { get; set; }
+        ILCDEntity ILCDEntity { get; set; }
     }
 
     public partial class UnitGroup : IIlcdEntity {
@@ -30,7 +31,7 @@ namespace LcaDataModel {
             get { return UnitGroupID; }
             set { UnitGroupID = value; }
         }
-
+        [NotMapped]
         public string UUID {
             get { return UnitGroupUUID; }
             set { UnitGroupUUID = value; }
@@ -43,7 +44,7 @@ namespace LcaDataModel {
             get { return FlowPropertyID; }
             set { FlowPropertyID = value; }
         }
-
+        [NotMapped]
         public string UUID {
             get { return FlowPropertyUUID; }
             set { FlowPropertyUUID = value; }
@@ -56,7 +57,7 @@ namespace LcaDataModel {
             get { return FlowID; }
             set { FlowID = value; }
         }
-
+        [NotMapped]
         public string UUID {
             get { return FlowUUID; }
             set { FlowUUID = value; }

@@ -9,31 +9,25 @@ namespace LcaDataModel
     [Table("UnitConversion")]
     public partial class UnitConversion
     {
-        public int UnitConversionID { get; set; }
+        public UnitConversion()
+        {
+            UnitGroups = new HashSet<UnitGroup>();
+        }
 
-        [StringLength(36)]
-        public string UnitConversionUUID { get; set; }
+        public int UnitConversionID { get; set; }
 
         [StringLength(30)]
         public string Unit { get; set; }
 
         public int? UnitGroupID { get; set; }
 
+        [StringLength(250)]
+        public string LongName { get; set; }
+
         public double? Conversion { get; set; }
 
-        [Column("Ind-sql")]
-        public int? Ind_sql { get; set; }
-
-        
-
-        public int CreatedBy { get; set; }
-
-        
-
-        public int UpdatedBy { get; set; }
-
-        public bool Voided { get; set; }
-
         public virtual UnitGroup UnitGroup { get; set; }
+
+        public virtual ICollection<UnitGroup> UnitGroups { get; set; }
     }
 }

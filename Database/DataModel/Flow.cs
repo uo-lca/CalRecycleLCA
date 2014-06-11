@@ -11,9 +11,16 @@ namespace LcaDataModel
     {
         public Flow()
         {
+            Backgrounds = new HashSet<Background>();
+            CompostionModels = new HashSet<CompostionModel>();
+            FlowPropertyEmissions = new HashSet<FlowPropertyEmission>();
             FlowFlowProperties = new HashSet<FlowFlowProperty>();
+            Fragments = new HashSet<Fragment>();
+            FragmentEdges = new HashSet<FragmentEdge>();
+            NodeEmissions = new HashSet<NodeEmission>();
             Processes = new HashSet<Process>();
             ProcessFlows = new HashSet<ProcessFlow>();
+            ScenarioBackgrounds = new HashSet<ScenarioBackground>();
         }
 
         public int FlowID { get; set; }
@@ -21,33 +28,40 @@ namespace LcaDataModel
         [StringLength(36)]
         public string FlowUUID { get; set; }
 
-        [StringLength(15)]
-        public string FlowVersion { get; set; }
-
         [StringLength(255)]
         public string Name { get; set; }
 
         [StringLength(15)]
         public string CASNumber { get; set; }
 
-        public int? FlowPropertyID { get; set; }
+        public int? ReferenceFlowProperty { get; set; }
 
         public int? FlowTypeID { get; set; }
 
-        [StringLength(200)]
-        public string FlowType_SQL { get; set; }
+        public virtual ICollection<Background> Backgrounds { get; set; }
 
-        [StringLength(36)]
-        public string ReferenceFlowProperty_SQL { get; set; }
+        public virtual ICollection<CompostionModel> CompostionModels { get; set; }
+
+        public virtual ILCDEntity ILCDEntity { get; set; }
 
         public virtual FlowProperty FlowProperty { get; set; }
 
         public virtual FlowType FlowType { get; set; }
 
+        public virtual ICollection<FlowPropertyEmission> FlowPropertyEmissions { get; set; }
+
         public virtual ICollection<FlowFlowProperty> FlowFlowProperties { get; set; }
+
+        public virtual ICollection<Fragment> Fragments { get; set; }
+
+        public virtual ICollection<FragmentEdge> FragmentEdges { get; set; }
+
+        public virtual ICollection<NodeEmission> NodeEmissions { get; set; }
 
         public virtual ICollection<Process> Processes { get; set; }
 
         public virtual ICollection<ProcessFlow> ProcessFlows { get; set; }
+
+        public virtual ICollection<ScenarioBackground> ScenarioBackgrounds { get; set; }
     }
 }

@@ -11,6 +11,8 @@ namespace LcaDataModel
     {
         public Process()
         {
+            BackgroundProcesses = new HashSet<BackgroundProcess>();
+            FragmentNodeProcesses = new HashSet<FragmentNodeProcess>();
             ProcessFlows = new HashSet<ProcessFlow>();
         }
 
@@ -18,9 +20,6 @@ namespace LcaDataModel
 
         [StringLength(36)]
         public string ProcessUUID { get; set; }
-
-        [StringLength(255)]
-        public string ProcessVersion { get; set; }
 
         [StringLength(255)]
         public string Name { get; set; }
@@ -31,22 +30,23 @@ namespace LcaDataModel
         [StringLength(15)]
         public string Geography { get; set; }
 
-        [Column("ReferenceFlow-SQL")]
-        [StringLength(36)]
-        public string ReferenceFlow_SQL { get; set; }
+        public int? ReferenceTypeID { get; set; }
 
-        [StringLength(60)]
-        public string RefererenceType { get; set; }
+        public int? ProcessTypeID { get; set; }
 
-        [StringLength(60)]
-        public string ProcessType { get; set; }
+        public int? ReferenceFlowID { get; set; }
 
-        [StringLength(60)]
-        public string Diagram { get; set; }
-
-        public int? FlowID { get; set; }
+        public virtual ICollection<BackgroundProcess> BackgroundProcesses { get; set; }
 
         public virtual Flow Flow { get; set; }
+
+        public virtual ICollection<FragmentNodeProcess> FragmentNodeProcesses { get; set; }
+
+        public virtual ILCDEntity ILCDEntity { get; set; }
+
+        public virtual ProcessType ProcessType { get; set; }
+
+        public virtual ReferenceType ReferenceType { get; set; }
 
         public virtual ICollection<ProcessFlow> ProcessFlows { get; set; }
     }

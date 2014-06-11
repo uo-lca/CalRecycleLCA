@@ -19,9 +19,6 @@ namespace LcaDataModel
         [StringLength(36)]
         public string LCIAMethodUUID { get; set; }
 
-        [StringLength(15)]
-        public string LCIAMethodVersion { get; set; }
-
         [StringLength(255)]
         public string Name { get; set; }
 
@@ -49,17 +46,11 @@ namespace LcaDataModel
 
         public string UseAdvice { get; set; }
 
-        public int? SourceID { get; set; }
-
-        public int? FlowPropertyID { get; set; }
-
-        [StringLength(255)]
-        public string Source { get; set; }
-
-        [StringLength(255)]
-        public string ReferenceQuantity { get; set; }
+        public int? ReferenceQuantity { get; set; }
 
         public virtual FlowProperty FlowProperty { get; set; }
+
+        public virtual ILCDEntity ILCDEntity { get; set; }
 
         public virtual ImpactCategory ImpactCategory { get; set; }
 

@@ -36,6 +36,7 @@ namespace LcaDataLoader {
             try {
                 // Attempt to open output file.
                 _LogWriter = new StreamWriter(_logFileName);
+                _LogWriter.AutoFlush = true;
                 // Redirect standard output from the console to the output file.
                 Console.SetOut(_LogWriter);
             }

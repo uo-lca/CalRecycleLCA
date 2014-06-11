@@ -6,19 +6,19 @@ namespace LcaDataModel
     using System.ComponentModel.DataAnnotations.Schema;
     using System.Data.Entity.Spatial;
 
-    [Table("ParamType")]
-    public partial class ParamType
+    [Table("ProcessType")]
+    public partial class ProcessType
     {
-        public ParamType()
+        public ProcessType()
         {
-            Params = new HashSet<Param>();
+            Processes = new HashSet<Process>();
         }
 
-        public int ParamTypeID { get; set; }
+        public int ProcessTypeID { get; set; }
 
         [StringLength(250)]
         public string Name { get; set; }
 
-        public virtual ICollection<Param> Params { get; set; }
+        public virtual ICollection<Process> Processes { get; set; }
     }
 }

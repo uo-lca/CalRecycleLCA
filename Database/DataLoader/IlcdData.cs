@@ -115,7 +115,6 @@ namespace LcaDataLoader {
         private List<UnitConversion> CreateUnitConversionList(UnitGroup unitGroup) {
             return LoadedDocument.Root.Descendants(ElementName("units")).Elements(ElementName("unit")).Select(u =>
                     new UnitConversion {
-                        UnitConversionUUID = unitGroup.UnitGroupUUID,
                         Unit = (string)u.Element(ElementName("name")),
                         Conversion = (double)u.Element(ElementName("meanValue")),
                         UnitGroupID = unitGroup.UnitGroupID
@@ -138,14 +137,18 @@ namespace LcaDataLoader {
         }
 
         /// <summary>
-        /// Copy common ILCD data from loaded ILCD file to new entity
-        /// TODO : When ILCDEntity table is implemented, add record there.
+        /// Import common ILCD data from loaded ILCD file to new ILCDEntity object.
+        /// Save UUID and reference to new object in object implementing IIlcdEntity
         /// </summary>
         /// <param name="ilcdDb">Database context wrapper object</param>
-        /// <returns>status flag<returns>
-        private bool SaveIlcdEntity(DbContextWrapper ilcdDb, IIlcdEntity entity) {
+        /// <returns>new ILCDEntity object<returns>
+        private ILCDEntity SaveIlcdEntity(DbContextWrapper ilcdDb, IIlcdEntity entity) {
+            ILCDEntity ilcdEntity = new ILCDEntity();
+            ilcdEntity.UUID = GetCommonUUID();
+            ilcdEntity.Version = GetCommonVersion();
             entity.UUID = GetCommonUUID();
-            return true;
+            entity.ILCDEntity = ilcdEntity;
+            return ilcdEntity;
         }
 
         /// <summary>
@@ -157,7 +160,6 @@ namespace LcaDataLoader {
             bool isSaved = false;
             UnitGroup unitGroup = new UnitGroup();
             SaveIlcdEntity(ilcdDb, unitGroup);
-            unitGroup.Version = GetCommonVersion();
             unitGroup.Name = GetCommonName();
             if (ilcdDb.AddIlcdEntity(unitGroup)) {
                     ilcdDb.AddUnitConversions(CreateUnitConversionList(unitGroup));
@@ -177,7 +179,6 @@ namespace LcaDataLoader {
             int? ugID = null;
             FlowProperty flowProperty = new FlowProperty();
             SaveIlcdEntity(ilcdDb, flowProperty);
-            flowProperty.FlowPropertyVersion = GetCommonVersion();
             flowProperty.Name = GetCommonName();
             ugUUID = GetElementAttributeValue(ElementName("referenceToReferenceUnitGroup"), "refObjectId");
             if (ugUUID == null) {
@@ -230,7 +231,6 @@ namespace LcaDataLoader {
             XElement fpElement;
             Flow flow = new Flow();
             SaveIlcdEntity(ilcdDb, flow);
-            flow.FlowVersion = GetCommonVersion();
             // TODO : generate name from classification/category
             flow.Name = GetElementValue(ElementName("baseName"));
             flow.CASNumber = GetElementValue(ElementName("CASNumber"));
@@ -239,7 +239,7 @@ namespace LcaDataLoader {
             dataSetInternalID = GetElementValue(ElementName("referenceToReferenceFlowProperty"));
             fpElement = GetElementWithInternalId(ElementName("flowProperty"), dataSetInternalID);
             fpID = GetFlowPropertyID(ilcdDb, fpElement);
-            flow.FlowPropertyID = fpID;
+            flow.ReferenceFlowProperty = fpID;
 
             if (ilcdDb.AddIlcdEntity(flow)) {
                 ilcdDb.AddFlowFlowProperties(CreateFFPList(ilcdDb, flow));

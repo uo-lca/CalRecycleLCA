@@ -21,27 +21,20 @@ namespace LcaDataModel
         [StringLength(36)]
         public string UnitGroupUUID { get; set; }
 
-        [StringLength(15)]
-        public string Version { get; set; }
-
         [StringLength(100)]
         public string Name { get; set; }
 
         [StringLength(100)]
         public string ReferenceUnit { get; set; }
 
-        
-
-        public int CreatedBy { get; set; }
-
-        
-
-        public int UpdatedBy { get; set; }
-
-        public bool Voided { get; set; }
+        public int? ReferenceUnitConversionID { get; set; }
 
         public virtual ICollection<FlowProperty> FlowProperties { get; set; }
 
+        public virtual ILCDEntity ILCDEntity { get; set; }
+
         public virtual ICollection<UnitConversion> UnitConversions { get; set; }
+
+        public virtual UnitConversion UnitConversion { get; set; }
     }
 }
