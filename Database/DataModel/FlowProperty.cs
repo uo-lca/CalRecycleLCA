@@ -21,7 +21,7 @@ namespace LcaDataModel
         public int FlowPropertyID { get; set; }
 
         [StringLength(36)]
-        public string FlowPropertyUUID { get; set; }
+        public string UUID { get; set; }
 
         [StringLength(255)]
         public string Name { get; set; }

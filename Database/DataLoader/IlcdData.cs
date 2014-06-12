@@ -183,7 +183,7 @@ namespace LcaDataLoader {
             ugUUID = GetElementAttributeValue(ElementName("referenceToReferenceUnitGroup"), "refObjectId");
             if (ugUUID == null) {
                 Console.WriteLine("WARNING: Unable to find referenceToReferenceUnitGroup in flow property {0}", 
-                    flowProperty.FlowPropertyUUID);
+                    flowProperty.UUID);
             }
             else {
                 string referenceUUID = ugUUID;

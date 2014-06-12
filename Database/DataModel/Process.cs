@@ -19,7 +19,7 @@ namespace LcaDataModel
         public int ProcessID { get; set; }
 
         [StringLength(36)]
-        public string ProcessUUID { get; set; }
+        public string UUID { get; set; }
 
         [StringLength(255)]
         public string Name { get; set; }

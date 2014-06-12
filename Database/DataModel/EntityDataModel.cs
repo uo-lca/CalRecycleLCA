@@ -117,7 +117,7 @@ namespace LcaDataModel {
                 .IsUnicode(false);
 
             modelBuilder.Entity<Flow>()
-                .Property(e => e.FlowUUID)
+                .Property(e => e.UUID)
                 .IsUnicode(false);
 
             modelBuilder.Entity<Flow>()
@@ -145,7 +145,7 @@ namespace LcaDataModel {
                 .HasForeignKey(e => e.ReferenceFlowID);
 
             modelBuilder.Entity<FlowProperty>()
-                .Property(e => e.FlowPropertyUUID)
+                .Property(e => e.UUID)
                 .IsUnicode(false);
 
             modelBuilder.Entity<FlowProperty>()
@@ -222,27 +222,27 @@ namespace LcaDataModel {
             modelBuilder.Entity<ILCDEntity>()
                 .HasMany(e => e.Flows)
                 .WithOptional(e => e.ILCDEntity)
-                .HasForeignKey(e => e.FlowUUID);
+                .HasForeignKey(e => e.UUID);
 
             modelBuilder.Entity<ILCDEntity>()
                 .HasMany(e => e.FlowProperties)
                 .WithOptional(e => e.ILCDEntity)
-                .HasForeignKey(e => e.FlowPropertyUUID);
+                .HasForeignKey(e => e.UUID);
 
             modelBuilder.Entity<ILCDEntity>()
                 .HasMany(e => e.LCIAMethods)
                 .WithOptional(e => e.ILCDEntity)
-                .HasForeignKey(e => e.LCIAMethodUUID);
+                .HasForeignKey(e => e.UUID);
 
             modelBuilder.Entity<ILCDEntity>()
                 .HasMany(e => e.Processes)
                 .WithOptional(e => e.ILCDEntity)
-                .HasForeignKey(e => e.ProcessUUID);
+                .HasForeignKey(e => e.UUID);
 
             modelBuilder.Entity<ILCDEntity>()
                 .HasMany(e => e.UnitGroups)
                 .WithRequired(e => e.ILCDEntity)
-                .HasForeignKey(e => e.UnitGroupUUID)
+                .HasForeignKey(e => e.UUID)
                 .WillCascadeOnDelete(false);
 
             modelBuilder.Entity<ImpactCategory>()
@@ -263,7 +263,7 @@ namespace LcaDataModel {
                 .HasForeignKey(e => e.LCAID);
 
             modelBuilder.Entity<LCIAMethod>()
-                .Property(e => e.LCIAMethodUUID)
+                .Property(e => e.UUID)
                 .IsUnicode(false);
 
             modelBuilder.Entity<LCIAMethod>()
@@ -311,7 +311,7 @@ namespace LcaDataModel {
                 .IsUnicode(false);
 
             modelBuilder.Entity<Process>()
-                .Property(e => e.ProcessUUID)
+                .Property(e => e.UUID)
                 .IsUnicode(false);
 
             modelBuilder.Entity<Process>()
@@ -372,7 +372,7 @@ namespace LcaDataModel {
                 .HasForeignKey(e => e.ReferenceUnitConversionID);
 
             modelBuilder.Entity<UnitGroup>()
-                .Property(e => e.UnitGroupUUID)
+                .Property(e => e.UUID)
                 .IsUnicode(false);
 
             modelBuilder.Entity<UnitGroup>()

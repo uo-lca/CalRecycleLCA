@@ -31,11 +31,6 @@ namespace LcaDataModel {
             get { return UnitGroupID; }
             set { UnitGroupID = value; }
         }
-        [NotMapped]
-        public string UUID {
-            get { return UnitGroupUUID; }
-            set { UnitGroupUUID = value; }
-        }
     }
 
     public partial class FlowProperty : IIlcdEntity {
@@ -44,11 +39,6 @@ namespace LcaDataModel {
             get { return FlowPropertyID; }
             set { FlowPropertyID = value; }
         }
-        [NotMapped]
-        public string UUID {
-            get { return FlowPropertyUUID; }
-            set { FlowPropertyUUID = value; }
-        }
     }
 
     public partial class Flow : IIlcdEntity {
@@ -56,11 +46,6 @@ namespace LcaDataModel {
         public int ID {
             get { return FlowID; }
             set { FlowID = value; }
-        }
-        [NotMapped]
-        public string UUID {
-            get { return FlowUUID; }
-            set { FlowUUID = value; }
         }
     }
 }

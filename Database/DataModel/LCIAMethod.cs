@@ -17,7 +17,7 @@ namespace LcaDataModel
         public int LCIAMethodID { get; set; }
 
         [StringLength(36)]
-        public string LCIAMethodUUID { get; set; }
+        public string UUID { get; set; }
 
         [StringLength(255)]
         public string Name { get; set; }

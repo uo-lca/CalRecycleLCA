@@ -19,7 +19,7 @@ namespace LcaDataModel
 
         [Required]
         [StringLength(36)]
-        public string UnitGroupUUID { get; set; }
+        public string UUID { get; set; }
 
         [StringLength(100)]
         public string Name { get; set; }

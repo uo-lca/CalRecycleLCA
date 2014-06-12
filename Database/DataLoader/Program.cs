@@ -19,15 +19,18 @@ namespace LcaDataLoader {
         /// </summary>
         static string _IlcdDirName;
         static string _LogFileName;
+        static bool _DeleteFlag;
         static StreamWriter _LogWriter = null;
 
         static void ParseArguments(string[] args) {
             string dataRoot = "C:\\CalRecycleLCA-DATA_ROOT";
             string ilcdSourceName = "Full UO LCA Flat Export BK 2014_05_05";
             _LogFileName = "C:\\CalRecycleLCA-DATA_ROOT\\Full UO LCA Flat Export BK 2014_05_05\\LcaDataLoaderLog.txt";
+            _DeleteFlag = false;
             OptionSet options = new OptionSet() {
                 {"r|root=", "The full {DATA_ROOT} path.", v => dataRoot = v },
                 {"s|source=", "ILCD archive {source name}.", v => ilcdSourceName = v },
+                {"d|delete", "Delete database and recreate.", v => _DeleteFlag = (v!=null)},
                 {"l|log=", "Redirect output to {log file}.", v => _LogFileName = v }
             };
             List<string> extraArgs;
@@ -78,7 +81,9 @@ namespace LcaDataLoader {
             try {
                 ParseArguments(args);
                 StartLogging();
-                Database.SetInitializer<EntityDataModel>(new DbInitializer());
+                if (_DeleteFlag) {
+                    Database.SetInitializer<EntityDataModel>(new DropCreateDatabaseInitializer());
+                }
                 if (Directory.Exists(_IlcdDirName)) {
                     IlcdImporter ilcdImporter = new IlcdImporter();
                     ilcdImporter.LoadAll(_IlcdDirName);
