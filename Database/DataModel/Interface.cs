@@ -48,4 +48,30 @@ namespace LcaDataModel {
             set { FlowID = value; }
         }
     }
+
+    public partial class LCIAMethod : IIlcdEntity {
+        [NotMapped]
+        public int ID {
+            get { return LCIAMethodID; }
+            set { LCIAMethodID = value; }
+        }
+    }
+
+    /// <summary>
+    /// Interface to common Lookup Table properties. Hides differences in column names.
+    /// </summary>
+    public interface ILookupEntity : IEntity {
+        // ID accessor signatures, do not persist
+        [NotMapped]
+        string Name { get; set; }
+    }
+
+    public partial class ImpactCategory : ILookupEntity {
+        public int ID {
+            get { return ImpactCategoryID; }
+            set { ImpactCategoryID = ID; }
+        }
+    }
 }
+
+

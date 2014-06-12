@@ -249,6 +249,33 @@ namespace LcaDataLoader {
             return isSaved;
         }
 
+        private bool SaveLciaMethod(DbContextWrapper ilcdDb) {
+            bool isSaved = false;
+            string impactCategoryName;
+            LCIAMethod lciaMethod = new LCIAMethod();
+            SaveIlcdEntity(ilcdDb, lciaMethod);
+            lciaMethod.Name = GetElementValue(ElementName("name"));
+            lciaMethod.Methodology = GetElementValue(ElementName("methodology"));
+            impactCategoryName = GetElementValue(ElementName("impactCategory"));
+            if (impactCategoryName != null) {
+                ImpactCategory impactCategory = new ImpactCategory();
+                impactCategory.Name = impactCategoryName;
+            }
+            //lciaMethod.FlowTypeID = ilcdDb.GetFlowTypeID(GetElementValue(ElementName("typeOfDataSet")));
+            //// Get Reference Flow Property
+            //dataSetInternalID = GetElementValue(ElementName("referenceToReferenceFlowProperty"));
+            //fpElement = GetElementWithInternalId(ElementName("flowProperty"), dataSetInternalID);
+            //fpID = GetFlowPropertyID(ilcdDb, fpElement);
+            //flow.ReferenceFlowProperty = fpID;
+
+            //if (ilcdDb.AddIlcdEntity(flow)) {
+            //    ilcdDb.AddFlowFlowProperties(CreateFFPList(ilcdDb, flow));
+            //    isSaved = true;
+            //}
+
+            return isSaved;
+        }
+
         /// <summary>
         /// Import data from LoadedDocument to database.
         /// </summary>
@@ -263,6 +290,8 @@ namespace LcaDataLoader {
                 case "http://lca.jrc.it/ILCD/FlowProperty":
                     return SaveFlowProperty(ilcdDb);
                 case "http://lca.jrc.it/ILCD/Flow":
+                    return SaveFlow(ilcdDb);
+                case "http://lca.jrc.it/ILCD/LCIAMethod":
                     return SaveFlow(ilcdDb);
             }
             return false;

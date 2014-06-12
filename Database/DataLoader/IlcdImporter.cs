@@ -52,6 +52,7 @@ namespace LcaDataLoader {
             LoadDataType(Path.Combine(dirName, "unitgroups"));
             LoadDataType(Path.Combine(dirName, "flowproperties"));
             LoadDataType(Path.Combine(dirName, "flows"));
+            LoadDataType(Path.Combine(dirName, "LCIAmethods"));
         }
 
         /// <summary>
