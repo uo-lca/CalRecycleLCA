@@ -9,9 +9,16 @@ namespace LcaDataModel
     [Table("ParamType")]
     public partial class ParamType
     {
+        public ParamType()
+        {
+            Params = new HashSet<Param>();
+        }
+
         public int ParamTypeID { get; set; }
 
         [StringLength(250)]
         public string Name { get; set; }
+
+        public virtual ICollection<Param> Params { get; set; }
     }
 }

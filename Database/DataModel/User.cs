@@ -9,6 +9,11 @@ namespace LcaDataModel
     [Table("User")]
     public partial class User
     {
+        public User()
+        {
+            ScenarioGroups = new HashSet<ScenarioGroup>();
+        }
+
         public int UserID { get; set; }
 
         [StringLength(250)]
@@ -23,5 +28,7 @@ namespace LcaDataModel
         public bool? CanEditBackground { get; set; }
 
         public bool? CanAppend { get; set; }
+
+        public virtual ICollection<ScenarioGroup> ScenarioGroups { get; set; }
     }
 }

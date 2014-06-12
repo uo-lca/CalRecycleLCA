@@ -12,6 +12,7 @@ namespace LcaDataModel
         public DataType()
         {
             CategorySystems = new HashSet<CategorySystem>();
+            ILCDEntities = new HashSet<ILCDEntity>();
         }
 
         public int DataTypeID { get; set; }
@@ -20,5 +21,7 @@ namespace LcaDataModel
         public string Name { get; set; }
 
         public virtual ICollection<CategorySystem> CategorySystems { get; set; }
+
+        public virtual ICollection<ILCDEntity> ILCDEntities { get; set; }
     }
 }

@@ -12,22 +12,12 @@ namespace LcaDataModel
         public int ClassificationID { get; set; }
 
         [StringLength(36)]
-        public string ClassificationUUID { get; set; }
+        public string UUID { get; set; }
 
-        public int? CategorySystemID { get; set; }
+        public int? CategoryID { get; set; }
 
-        public int? ClassID { get; set; }
+        public virtual Category Category { get; set; }
 
-        [Column("ClassID-SQL")]
-        [StringLength(100)]
-        public string ClassID_SQL { get; set; }
-
-        [Column("CategorySystem-SQL")]
-        [StringLength(200)]
-        public string CategorySystem_SQL { get; set; }
-
-        public virtual CategorySystem CategorySystem { get; set; }
-
-        public virtual Class Class { get; set; }
+        public virtual ILCDEntity ILCDEntity { get; set; }
     }
 }

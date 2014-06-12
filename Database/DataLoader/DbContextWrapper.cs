@@ -58,7 +58,10 @@ namespace LcaDataLoader {
             catch (DbUpdateException e) {
                 Console.WriteLine("ERROR: Database update exception!");
                 Console.WriteLine(e.Message);
-                Console.WriteLine(e.InnerException.Message);
+                for (var ie = e.InnerException; ie != null; ie = ie.InnerException ) {
+                    Console.WriteLine("Inner Exception: {0}", e.InnerException.Message);
+                }
+                
                 return 0;
             }
         }

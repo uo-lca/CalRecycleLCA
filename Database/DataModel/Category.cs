@@ -9,38 +9,25 @@ namespace LcaDataModel
     [Table("Category")]
     public partial class Category
     {
+        public Category()
+        {
+            Classifications = new HashSet<Classification>();
+        }
+
         public int CategoryID { get; set; }
+
+        [StringLength(60)]
+        public string ExternalClassID { get; set; }
+
+        [StringLength(250)]
+        public string Name { get; set; }
 
         public int? CategorySystemID { get; set; }
 
-        public int? ClassID { get; set; }
-
         public int? ParentClassID { get; set; }
-
-        [Column("DataTypeID-notneededremovelater")]
-        public int? DataTypeID_notneededremovelater { get; set; }
 
         public int? HierarchyLevel { get; set; }
 
-        [StringLength(250)]
-        public string Hier { get; set; }
-
-        [Column("ClassID-SQL")]
-        [StringLength(60)]
-        public string ClassID_SQL { get; set; }
-
-        [Column("Parent-SQL")]
-        [StringLength(60)]
-        public string Parent_SQL { get; set; }
-
-        [Column("ClassName-SQL")]
-        [StringLength(100)]
-        public string ClassName_SQL { get; set; }
-
-        public virtual CategorySystem CategorySystem { get; set; }
-
-        public virtual Class Class { get; set; }
-
-        public virtual Class Class1 { get; set; }
+        public virtual ICollection<Classification> Classifications { get; set; }
     }
 }
