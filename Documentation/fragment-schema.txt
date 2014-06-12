@@ -186,7 +186,7 @@ The following tables are required:
 
    UnitGroup
     * UnitGroupID
-    * UnitGroupUUID
+    % UUID (was UnitGroupUUID)
     * Name
     * ReferenceUnitConversionID(FK to UnitConversionID)
 
@@ -202,13 +202,13 @@ The following tables are required:
 
    FlowProperty
     * FlowPropertyID
-    * FlowPropertyUUID - UUID of source data file
+    % UUID (was FlowPropertyUUID) - UUID of source data file
     * Name
     * UnitGroupID
 
    Flow
     * FlowID
-    * FlowUUID - UUID of source data file
+    % UUID (was FlowUUID) - UUID of source data file
     * Name
     * CASNumber
     * FlowTypeID
@@ -231,7 +231,7 @@ The following tables are required:
 
    LCIAMethod
     * LCIAMethodID
-    * LCIAMethodUUID
+    % UUID (was LCIAMethodUUID)
     * Name
     * Methodology
     * ImpactCategoryID
@@ -255,7 +255,7 @@ The following tables are required:
 
    Process
     * ProcessID - internal primary key
-    * ProcessUUID - UUID of source file
+    % UUID (was ProcessUUID) - UUID of source file
     * Name
     * Year
     * Geography
@@ -350,7 +350,7 @@ The following tables are required:
    Fragment
     * FragmentID
     * Name
-    % ReferenceFragmentEdgeID (FK to FragmentEdge.FragmentEdgeID) (was RootNode) 
+    % ReferenceFragmentNodeID (FK to FragmentNodeID) (was RootNode) 
     X ReferenceFlow REMOVE
    
    Background - New Table ### PLEASE REVIEW
@@ -374,15 +374,22 @@ The following tables are required:
     given FragmentStageID's scope is limited to a single fragment.
 
    FragmentNode
-    * FragmentNodeID
+    * FragmentNodeID (equals FragmentEdgeID)
     * FragmentID (FK to Fragment)
-    * Name
+node fields:
+    * Name - of process occurring at terminus (or flow name for IO/background)
     * FragmentStageID (was StageID) (FK to FragmentStage: FragmentID must match)
     * ReferenceProperty (FK to FlowPropertyID) - of edge terminating at node
     * NodeTypeID (FK to NodeType)
+edge fields (moved from FragmentEdge) :
+    * Origin (FK to FragmentNodeID)
+    * FlowID (FK to Flow; FlowType must not be Elementary)
+    * DirectionID (FK to Direction, w.r.t. origin node)
+    * Quantity (or NULL if Origin NodeType is Fragment)
+    * Terminus (sequential in fragment; FK to FragmentNodeID should = self) 
 
-    The first of two core tables for fragment definition.  The node
-    represents a locus of industrial activity.
+    A FragmentNodeID corresponds to the observation of a flow and its
+    terminus.
 
    FragmentNodeProcess
     * FragmentNodeProcessID
@@ -398,7 +405,9 @@ The following tables are required:
 
     Mapping of nodes with type "Fragment" to FragmentIDs
 
-   FragmentEdge
+   FragmentEdge - REMOVE TABLE
+
+   table has been merged with FragmentNode
     * FragmentEdgeID
     * FragmentID (FK to Fragment)
     * Origin (FK to FragmentNodeID)
@@ -478,7 +487,7 @@ The following tables are required:
    DependencyParam
     * DependencyParamID
     * ParamID (FK to Param, ParamTypeID must be 1, 2, or 3)
-    * FragmentEdgeID
+    % FragmentNodeID (was FragmentEdgeID) (FK to FragmentNodeID)
 
    DistributionParam - New Table
     * DistributionParamID
@@ -488,12 +497,12 @@ The following tables are required:
    FlowPropertyParam
     * FlowPropertyParamID
     * ParamID (FK to Param, ParamTypeID must be 4)
-    * FlowFlowPropertyID
+    * FlowFlowPropertyID (FK)
 
    CompositionParam
     * CompositionParamID
     * ParamID (FK to Param, ParamTypeID must be 5)
-    * FlowFlowPropertyID
+    * FlowFlowPropertyID (FK)
 
     Note: types 4 and 5 both link to FlowFlowPropertyIDs but are used
     differently during fragment computation.
@@ -501,7 +510,7 @@ The following tables are required:
    ProcessDissipationParam
     * ProcessDissipationParamID
     * ParamID (FK to Param, ParamTypeID must be 6)
-    * ProcessDissipationID
+    * ProcessDissipationID (FK)
 
    NodeDissipationParam
     * NodeDissipationParamID
@@ -512,7 +521,7 @@ The following tables are required:
    ProcessEmissionParam - New Table
     * ProcessEmissionParamID
     * ParamID (FK to Param, ParamTypeID must be 8)
-    * ProcessFlowID
+    * ProcessFlowID (FK)
 
    NodeEmissionParam
     * NodeEmissionParamID
@@ -523,7 +532,7 @@ The following tables are required:
    CharacterizationParam - New Table
     * CharacterizationParamID
     * ParamID  (FK to Param, ParamTypeID must be 10)
-    * LCIAID
+    * LCIAID (FK)
 
     A single parameter value can be linked to multiple points in the model-
     but they must all be of the same type (a param with type 1 cannot be
@@ -537,15 +546,15 @@ The following tables are required:
 
    CompositionModel
     * CompositionModelID
-    * FlowID
+    * FlowID (FK)
     * Name
 
     List of intermediate flows for which composition parameters are relevant.
 
    CompositionData
     * CompositionDataID
-    * CompositionModelID
-    * FlowFlowPropertyID
+    * CompositionModelID (FK)
+    * FlowFlowPropertyID (FK)
     * Value
 
     List of flow-flow property values that are relevant to a given
@@ -579,7 +588,7 @@ The following tables are required:
    NodeCache (Renamed from FragmentScore)
     % NodeCacheID (was FragmentScoreID)
     % FragmentNodeID (was FragmentID) (FK to FragmentNodeID)
-    * ScenarioID
+    * ScenarioID (FK)
     X LCIAMethodID - moved to ScoreCache
     X FragmentNodeStageID - REMOVE
     X ParamID - REMOVE
@@ -591,22 +600,22 @@ The following tables are required:
 
    ScoreCache - New Table
     * ScoreCacheID
-    * NodeCacheID (was FragmentScoreID)
-    * LCIAMethodID
+    * NodeCacheID (was FragmentScoreID) (FK)
+    * LCIAMethodID (FK)
     * ImpactScore - for a unit activity (computed during LCIA)
 
     size of ScoreCache table = #(nodes) x #(scenarios) x #(LCIA  methods)
 
    BackgroundCache - New Table
     * BackgroundCacheID
-    * BackgroundID
-    * LCIAMethodID
+    * BackgroundID (FK)
+    * LCIAMethodID (FK)
     * Score
 
    ScenarioBackgroundCache - New Table
     * ScenarioBackgroundCacheID
-    * ScenarioBackgroundID
-    * LCIAMethodID
+    * ScenarioBackgroundID (FK)
+    * LCIAMethodID (FK)
     * Score
 
   Sensitivities should be computed on the fly.  If performance is slow, we
