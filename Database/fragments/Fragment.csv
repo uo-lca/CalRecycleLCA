@@ -1,4 +1,4 @@
-FragmentID,FragmentUUID,Name,ReferenceFragmentEdgeID
+FragmentID,FragmentUUID,Name,ReferenceFragmentFlowID
 "1","9006f15b-e9f6-4ecb-be79-0bc6d4958be5","Electricity, at grid","85"
 "2","121d822b-9974-4740-8b81-37ec8995dd8c","Natural Gas Supply Mixer","110"
 "3","22af6749-c9a2-4ee5-8a94-7254720e26b9","Haz Waste Landfill Output","112"

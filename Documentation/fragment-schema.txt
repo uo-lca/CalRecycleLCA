@@ -349,8 +349,9 @@ The following tables are required:
 
    Fragment
     * FragmentID
+    + UUID - fragments should be included in ILCDEntity too
     * Name
-    % ReferenceFragmentNodeID (FK to FragmentNodeID) (was RootNode) 
+    % ReferenceFragmentFlowID (FK to FragmentFlowID) (was RootNode) 
     X ReferenceFlow REMOVE
    
    Background - New Table ### PLEASE REVIEW
@@ -373,41 +374,40 @@ The following tables are required:
     defined then nodes are grouped by stage for contribution analysis.  A
     given FragmentStageID's scope is limited to a single fragment.
 
-   FragmentNode
-    * FragmentNodeID (equals FragmentEdgeID)
+   FragmentFlow - RENAME TABLE (was FragmentNode)
+    % FragmentFlowID (equals FragmentEdgeID) (was FragmentNodeID)
     * FragmentID (FK to Fragment)
 node fields:
     * Name - of process occurring at terminus (or flow name for IO/background)
     * FragmentStageID (was StageID) (FK to FragmentStage: FragmentID must match)
-    * ReferenceProperty (FK to FlowPropertyID) - of edge terminating at node
+    % ReferenceFlowPropertyID (FK to FlowPropertyID) - of edge terminating at node
     * NodeTypeID (FK to NodeType)
 edge fields (moved from FragmentEdge) :
-    * Origin (FK to FragmentNodeID)
     * FlowID (FK to Flow; FlowType must not be Elementary)
     * DirectionID (FK to Direction, w.r.t. origin node)
     * Quantity (or NULL if Origin NodeType is Fragment)
-    * Terminus (sequential in fragment; FK to FragmentNodeID should = self) 
+    % ParentFragmentFlowID (FK to FragmentFlowID) (was Origin) (moved to last)
 
-    A FragmentNodeID corresponds to the observation of a flow and its
+    A FragmentFlowID corresponds to the observation of a flow and its
     terminus.
 
    FragmentNodeProcess
     * FragmentNodeProcessID
-    * FragmentNodeID
+    * FragmentFlowID
     * ProcessID (FK to ProcessFlow.ProcessID)
 
     Mapping of nodes with type "Process" to ProcessIDs
 
    FragmentNodeFragment
     * FragmentNodeFragmentID
-    * FragmentNodeID
+    * FragmentFlowID
     * SubfragmentID
 
     Mapping of nodes with type "Fragment" to FragmentIDs
 
    FragmentEdge - REMOVE TABLE
 
-   table has been merged with FragmentNode
+   table has been merged with FragmentNode - now FragmentFlow
     * FragmentEdgeID
     * FragmentID (FK to Fragment)
     * Origin (FK to FragmentNodeID)
@@ -451,7 +451,7 @@ edge fields (moved from FragmentEdge) :
 
    NodeDissipation - REMOVE TABLE
     * NodeDissipationID
-    * FragmentNodeID (FK to FragmentNode)
+    * FragmentFlowID (FK to FragmentFlow)
     * FlowPropertyID (FK to FlowFlowProperty - substance being dissipated)
     * EmissionFactor (0-1)
 
@@ -459,7 +459,7 @@ edge fields (moved from FragmentEdge) :
 
    NodeEmission - REMOVE TABLE
     % NodeEmissionID (was FragmentEmissionID)
-    % FragmentNodeID (was NodeID) (FK to FragmentNodeID)
+    % FragmentFlowID (was NodeID) (FK to FragmentFlowID)
     * FlowID (FK to Flow; FlowType must be Elementary)
     * DirectionID (FK to Direction)
     * Quantity
@@ -487,7 +487,7 @@ edge fields (moved from FragmentEdge) :
    DependencyParam
     * DependencyParamID
     * ParamID (FK to Param, ParamTypeID must be 1, 2, or 3)
-    % FragmentNodeID (was FragmentEdgeID) (FK to FragmentNodeID)
+    % FragmentFlowID (was FragmentEdgeID) (FK to FragmentFlowID)
 
    DistributionParam - New Table
     * DistributionParamID
@@ -516,7 +516,7 @@ edge fields (moved from FragmentEdge) :
     * NodeDissipationParamID
     * ParamID (FK to Param, ParamTypeID must be 7)
     * ProcessDissipationID (FK to ProcessDissipation)
-    * FragmentNodeID (FK to FragmentNode)
+    * FragmentFlowID (FK to FragmentFlow)
 
    ProcessEmissionParam - New Table
     * ProcessEmissionParamID
@@ -527,7 +527,7 @@ edge fields (moved from FragmentEdge) :
     * NodeEmissionParamID
     * ParamID (FK to Param, ParamTypeID must be 9)
     * ProcessFlowID (FK to ProcessFlow)
-    * FragmentNodeID (FK to FragmentNode)
+    * FragmentFlowID (FK to FragmentFlow)
 
    CharacterizationParam - New Table
     * CharacterizationParamID
@@ -587,7 +587,7 @@ edge fields (moved from FragmentEdge) :
 
    NodeCache (Renamed from FragmentScore)
     % NodeCacheID (was FragmentScoreID)
-    % FragmentNodeID (was FragmentID) (FK to FragmentNodeID)
+    % FragmentFlowID (was FragmentID) (FK to FragmentFlowID)
     * ScenarioID (FK)
     X LCIAMethodID - moved to ScoreCache
     X FragmentNodeStageID - REMOVE
@@ -619,6 +619,6 @@ edge fields (moved from FragmentEdge) :
     * Score
 
   Sensitivities should be computed on the fly.  If performance is slow, we
-  can add a boolean table indicating whether a given FragmentNodeID +
+  can add a boolean table indicating whether a given FragmentFlowID +
   ScenarioID is sensitive to a given ParamID, thus simplifying the
   traversal process.
