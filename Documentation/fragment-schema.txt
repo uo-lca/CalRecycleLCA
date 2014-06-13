@@ -156,9 +156,8 @@ The following tables are required:
 
    DataProvider
     * DataProviderID
-    X DataProviderUUID - REMOVE
     * Name
-    + DirName
+    * DirName
 
     A list of ILCD archives accessed by the tool.  One DataProvider is
     created for each source directory in the data folder (excepting the
@@ -186,7 +185,7 @@ The following tables are required:
 
    UnitGroup
     * UnitGroupID
-    % UUID (was UnitGroupUUID)
+    * UUID (was UnitGroupUUID)
     * Name
     * ReferenceUnitConversionID(FK to UnitConversionID)
 
@@ -202,13 +201,13 @@ The following tables are required:
 
    FlowProperty
     * FlowPropertyID
-    % UUID (was FlowPropertyUUID) - UUID of source data file
+    * UUID (was FlowPropertyUUID) - UUID of source data file
     * Name
     * UnitGroupID
 
    Flow
     * FlowID
-    % UUID (was FlowUUID) - UUID of source data file
+    * UUID (was FlowUUID) - UUID of source data file
     * Name
     * CASNumber
     * FlowTypeID
@@ -231,7 +230,7 @@ The following tables are required:
 
    LCIAMethod
     * LCIAMethodID
-    % UUID (was LCIAMethodUUID)
+    * UUID (was LCIAMethodUUID)
     * Name
     * Methodology
     * ImpactCategoryID
@@ -255,7 +254,7 @@ The following tables are required:
 
    Process
     * ProcessID - internal primary key
-    % UUID (was ProcessUUID) - UUID of source file
+    * UUID (was ProcessUUID) - UUID of source file
     * Name
     * Year
     * Geography
@@ -349,15 +348,14 @@ The following tables are required:
 
    Fragment
     * FragmentID
-    + UUID - fragments should be included in ILCDEntity too
+    * UUID - fragments should be included in ILCDEntity too
     * Name
-    % ReferenceFragmentFlowID (FK to FragmentFlowID) (was RootNode) 
-    X ReferenceFlow REMOVE
+    * ReferenceFragmentFlowID (FK to FragmentFlowID) (was RootNode) 
    
    Background - New Table ### PLEASE REVIEW
     * BackgroundID
     * FlowID
-    + DirectionID
+    * DirectionID
     * NodeTypeID (only Process or Fragment allowed)
     * TargetID (NOT foreign key- interpret as ProcessID or FragmentID)
 
@@ -374,19 +372,19 @@ The following tables are required:
     defined then nodes are grouped by stage for contribution analysis.  A
     given FragmentStageID's scope is limited to a single fragment.
 
-   FragmentFlow - RENAME TABLE (was FragmentNode)
-    % FragmentFlowID (equals FragmentEdgeID) (was FragmentNodeID)
+   FragmentFlow
+    * FragmentFlowID (equals FragmentEdgeID) (was FragmentNodeID)
     * FragmentID (FK to Fragment)
 node fields:
     * Name - of process occurring at terminus (or flow name for IO/background)
     * FragmentStageID (was StageID) (FK to FragmentStage: FragmentID must match)
-    % ReferenceFlowPropertyID (FK to FlowPropertyID) - of edge terminating at node
+    * ReferenceFlowPropertyID (FK to FlowPropertyID) - of edge terminating at node
     * NodeTypeID (FK to NodeType)
 edge fields (moved from FragmentEdge) :
     * FlowID (FK to Flow; FlowType must not be Elementary)
     * DirectionID (FK to Direction, w.r.t. origin node)
     * Quantity (or NULL if Origin NodeType is Fragment)
-    % ParentFragmentFlowID (FK to FragmentFlowID) (was Origin) (moved to last)
+    * ParentFragmentFlowID (FK to FragmentFlowID) (was Origin) (moved to last)
 
     A FragmentFlowID corresponds to the observation of a flow and its
     terminus.
@@ -404,20 +402,6 @@ edge fields (moved from FragmentEdge) :
     * SubfragmentID
 
     Mapping of nodes with type "Fragment" to FragmentIDs
-
-   FragmentEdge - REMOVE TABLE
-
-   table has been merged with FragmentNode - now FragmentFlow
-    * FragmentEdgeID
-    * FragmentID (FK to Fragment)
-    * Origin (FK to FragmentNodeID)
-    * FlowID (FK to Flow; FlowType must not be Elementary)
-    * DirectionID (FK to Direction, w.r.t. origin node)
-    * Terminus (FK to FragmentNodeID: FragmentID must match)
-    * Quantity (or NULL if Origin NodeType is Fragment)
-
-    The second core table for fragment definition.  The edge represents a
-    particular intermediate flow or industrial product.
 
 ## Scenarios and Parameters
 
@@ -448,23 +432,6 @@ edge fields (moved from FragmentEdge) :
     * TargetID (NOT a foreign key- interpret as ProcessID or FragmentID)
 
     Contains scenario-specific overrides for Background mappings.
-
-   NodeDissipation - REMOVE TABLE
-    * NodeDissipationID
-    * FragmentFlowID (FK to FragmentFlow)
-    * FlowPropertyID (FK to FlowFlowProperty - substance being dissipated)
-    * EmissionFactor (0-1)
-
-    This table has been merged into NodeDissipationParam
-
-   NodeEmission - REMOVE TABLE
-    % NodeEmissionID (was FragmentEmissionID)
-    % FragmentFlowID (was NodeID) (FK to FragmentFlowID)
-    * FlowID (FK to Flow; FlowType must be Elementary)
-    * DirectionID (FK to Direction)
-    * Quantity
-
-    This table has been merged into NodeEmissionParam
    
    Param
     * ParamID
@@ -487,9 +454,9 @@ edge fields (moved from FragmentEdge) :
    DependencyParam
     * DependencyParamID
     * ParamID (FK to Param, ParamTypeID must be 1, 2, or 3)
-    % FragmentFlowID (was FragmentEdgeID) (FK to FragmentFlowID)
+    * FragmentFlowID (was FragmentEdgeID) (FK to FragmentFlowID)
 
-   DistributionParam - New Table
+   DistributionParam
     * DistributionParamID
     * DependencyParamID (FK to DependencyParam, ParamTypeID must be 2)
     * ConservationParamID (FK to DependencyParam, ParamTypeID must be 3)
@@ -518,7 +485,7 @@ edge fields (moved from FragmentEdge) :
     * ProcessDissipationID (FK to ProcessDissipation)
     * FragmentFlowID (FK to FragmentFlow)
 
-   ProcessEmissionParam - New Table
+   ProcessEmissionParam
     * ProcessEmissionParamID
     * ParamID (FK to Param, ParamTypeID must be 8)
     * ProcessFlowID (FK)
