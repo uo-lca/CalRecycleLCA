@@ -14,15 +14,22 @@ namespace LCIATool.Models.Repository
     
     public partial class FlowFlowProperty
     {
-        public int FlowPropertyVersionID { get; set; }
-        public string FlowPropertyVersionUUID { get; set; }
+        public FlowFlowProperty()
+        {
+            this.CompositionDatas = new HashSet<CompositionData>();
+            this.CompositionParams = new HashSet<CompositionParam>();
+            this.FlowPropertyParams = new HashSet<FlowPropertyParam>();
+        }
+    
+        public int FlowFlowPropertyID { get; set; }
         public Nullable<int> FlowID { get; set; }
         public Nullable<int> FlowPropertyID { get; set; }
         public Nullable<double> MeanValue { get; set; }
         public Nullable<double> StDev { get; set; }
-        public string FlowReference_SQL { get; set; }
-        public Nullable<int> Ind_SQL { get; set; }
     
+        public virtual ICollection<CompositionData> CompositionDatas { get; set; }
+        public virtual ICollection<CompositionParam> CompositionParams { get; set; }
         public virtual Flow Flow { get; set; }
+        public virtual ICollection<FlowPropertyParam> FlowPropertyParams { get; set; }
     }
 }

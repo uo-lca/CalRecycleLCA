@@ -14,8 +14,15 @@ namespace LCIATool.Models.Repository
     
     public partial class DataProvider
     {
+        public DataProvider()
+        {
+            this.ILCDEntities = new HashSet<ILCDEntity>();
+        }
+    
         public int DataProviderID { get; set; }
-        public string DataProviderUUID { get; set; }
         public string Name { get; set; }
+        public string DirName { get; set; }
+    
+        public virtual ICollection<ILCDEntity> ILCDEntities { get; set; }
     }
 }

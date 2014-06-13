@@ -16,14 +16,18 @@ namespace LCIATool.Models.Repository
     {
         public Direction()
         {
+            this.FragmentEdges = new HashSet<FragmentEdge>();
             this.LCIAs = new HashSet<LCIA>();
+            this.NodeEmissions = new HashSet<NodeEmission>();
             this.ProcessFlows = new HashSet<ProcessFlow>();
         }
     
         public int DirectionID { get; set; }
         public string Name { get; set; }
     
+        public virtual ICollection<FragmentEdge> FragmentEdges { get; set; }
         public virtual ICollection<LCIA> LCIAs { get; set; }
+        public virtual ICollection<NodeEmission> NodeEmissions { get; set; }
         public virtual ICollection<ProcessFlow> ProcessFlows { get; set; }
     }
 }

@@ -16,22 +16,26 @@ namespace LCIATool.Models.Repository
     {
         public Process()
         {
+            this.BackgroundProcesses = new HashSet<BackgroundProcess>();
+            this.FragmentNodeProcesses = new HashSet<FragmentNodeProcess>();
             this.ProcessFlows = new HashSet<ProcessFlow>();
         }
     
         public int ProcessID { get; set; }
         public string ProcessUUID { get; set; }
-        public string ProcessVersion { get; set; }
         public string Name { get; set; }
         public string Year { get; set; }
         public string Geography { get; set; }
-        public string ReferenceFlow_SQL { get; set; }
-        public string RefererenceType { get; set; }
-        public string ProcessType { get; set; }
-        public string Diagram { get; set; }
-        public Nullable<int> FlowID { get; set; }
+        public Nullable<int> ReferenceTypeID { get; set; }
+        public Nullable<int> ProcessTypeID { get; set; }
+        public Nullable<int> ReferenceFlowID { get; set; }
     
+        public virtual ICollection<BackgroundProcess> BackgroundProcesses { get; set; }
         public virtual Flow Flow { get; set; }
+        public virtual ICollection<FragmentNodeProcess> FragmentNodeProcesses { get; set; }
+        public virtual ILCDEntity ILCDEntity { get; set; }
+        public virtual ProcessType ProcessType { get; set; }
+        public virtual ReferenceType ReferenceType { get; set; }
         public virtual ICollection<ProcessFlow> ProcessFlows { get; set; }
     }
 }

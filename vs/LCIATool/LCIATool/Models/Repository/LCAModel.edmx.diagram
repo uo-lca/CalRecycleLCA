@@ -5,45 +5,142 @@
     <!-- Diagram content (shape and connector positions) -->
     <edmx:Diagrams>
       <Diagram DiagramId="43bc9d11113842cb888e77920533948f" Name="Diagram1">
-        <EntityTypeShape EntityType="LCAToolDevModel.DataProvider" Width="1.5" PointX="0.75" PointY="2.125" IsExpanded="true" />
-        <EntityTypeShape EntityType="LCAToolDevModel.Direction" Width="1.5" PointX="6" PointY="12.5" IsExpanded="true" />
-        <EntityTypeShape EntityType="LCAToolDevModel.ImpactCategory" Width="1.5" PointX="0.75" PointY="12.125" IsExpanded="true" />
-        <EntityTypeShape EntityType="LCAToolDevModel.IndicatorType" Width="1.5" PointX="9.75" PointY="12.125" IsExpanded="true" />
-        <EntityTypeShape EntityType="LCAToolDevModel.LCIA" Width="1.5" PointX="5.375" PointY="8.5" IsExpanded="true" />
-        <EntityTypeShape EntityType="LCAToolDevModel.UnitConversion" Width="1.5" PointX="2.75" PointY="14.125" IsExpanded="true" />
-        <EntityTypeShape EntityType="LCAToolDevModel.UnitGroup" Width="1.5" PointX="4.75" PointY="14.125" IsExpanded="true" />
-        <AssociationConnector Association="LCAToolDevModel.FK_LCIA_Direction" ManuallyRouted="false" />
-        <EntityTypeShape EntityType="LCAToolDevModel.FlowFlowProperty" Width="1.5" PointX="5.25" PointY="2" />
-        <AssociationConnector Association="LCAToolDevModel.FK_UnitConversion_UnitGroup" />
-        <EntityTypeShape EntityType="LCAToolDevModel.Category" Width="1.5" PointX="19.625" PointY="16.875" />
-        <EntityTypeShape EntityType="LCAToolDevModel.CategorySystem" Width="1.5" PointX="17.375" PointY="21.25" />
-        <EntityTypeShape EntityType="LCAToolDevModel.Class" Width="1.5" PointX="14.375" PointY="17.375" />
-        <EntityTypeShape EntityType="LCAToolDevModel.Classification" Width="1.5" PointX="16.625" PointY="17.25" />
-        <EntityTypeShape EntityType="LCAToolDevModel.DataType" Width="1.5" PointX="15.125" PointY="21.75" />
-        <EntityTypeShape EntityType="LCAToolDevModel.Flow" Width="1.5" PointX="10.25" PointY="7.5" />
-        <EntityTypeShape EntityType="LCAToolDevModel.FlowProperty" Width="1.5" PointX="7" PointY="16.375" />
-        <EntityTypeShape EntityType="LCAToolDevModel.LCIAMethod" Width="1.5" PointX="12" PointY="13" />
-        <EntityTypeShape EntityType="LCAToolDevModel.Process" Width="1.5" PointX="12.5" PointY="7.625" />
-        <EntityTypeShape EntityType="LCAToolDevModel.ProcessFlow" Width="1.5" PointX="14.75" PointY="8.75" />
-        <AssociationConnector Association="LCAToolDevModel.FK_Category_CategorySystem" />
-        <AssociationConnector Association="LCAToolDevModel.FK_Category_Class" />
-        <AssociationConnector Association="LCAToolDevModel.FK_Category_ParentClass" />
+        <EntityTypeShape EntityType="LCAToolDevModel.Background" Width="1.5" PointX="15" PointY="26.5" />
+        <EntityTypeShape EntityType="LCAToolDevModel.BackgroundFragment" Width="1.5" PointX="20.25" PointY="29.375" />
+        <EntityTypeShape EntityType="LCAToolDevModel.BackgroundProcess" Width="1.5" PointX="17.25" PointY="39" />
+        <EntityTypeShape EntityType="LCAToolDevModel.Category" Width="1.5" PointX="6" PointY="26.5" />
+        <EntityTypeShape EntityType="LCAToolDevModel.CategorySystem" Width="1.5" PointX="3" PointY="34.75" />
+        <EntityTypeShape EntityType="LCAToolDevModel.CharacterizationParam" Width="1.5" PointX="17.25" PointY="20.625" />
+        <EntityTypeShape EntityType="LCAToolDevModel.Classification" Width="1.5" PointX="8.25" PointY="30.625" />
+        <EntityTypeShape EntityType="LCAToolDevModel.CompositionData" Width="1.5" PointX="20.25" PointY="46.625" />
+        <EntityTypeShape EntityType="LCAToolDevModel.CompositionParam" Width="1.5" PointX="17.25" PointY="44.375" />
+        <EntityTypeShape EntityType="LCAToolDevModel.CompostionModel" Width="1.5" PointX="15" PointY="48.5" />
+        <EntityTypeShape EntityType="LCAToolDevModel.DataProvider" Width="1.5" PointX="0.75" PointY="27.75" />
+        <EntityTypeShape EntityType="LCAToolDevModel.DataType" Width="1.5" PointX="0.75" PointY="30.75" />
+        <EntityTypeShape EntityType="LCAToolDevModel.DependencyParam" Width="1.5" PointX="25" PointY="32.625" />
+        <EntityTypeShape EntityType="LCAToolDevModel.Direction" Width="1.5" PointX="18" PointY="17.625" />
+        <EntityTypeShape EntityType="LCAToolDevModel.DistributionParam" Width="1.5" PointX="27.25" PointY="32.75" />
+        <EntityTypeShape EntityType="LCAToolDevModel.Flow" Width="1.5" PointX="12.75" PointY="29.375" />
+        <EntityTypeShape EntityType="LCAToolDevModel.FlowFlowProperty" Width="1.5" PointX="15" PointY="45" />
+        <EntityTypeShape EntityType="LCAToolDevModel.FlowProperty" Width="1.5" PointX="10.5" PointY="30.125" />
+        <EntityTypeShape EntityType="LCAToolDevModel.FlowPropertyEmission" Width="1.5" PointX="18" PointY="26.625" />
+        <EntityTypeShape EntityType="LCAToolDevModel.FlowPropertyParam" Width="1.5" PointX="17.25" PointY="48" />
+        <EntityTypeShape EntityType="LCAToolDevModel.FlowType" Width="1.5" PointX="10.5" PointY="26.875" />
+        <EntityTypeShape EntityType="LCAToolDevModel.Fragment" Width="1.5" PointX="15" PointY="35.625" />
+        <EntityTypeShape EntityType="LCAToolDevModel.FragmentEdge" Width="1.5" PointX="22.75" PointY="31.875" />
+        <EntityTypeShape EntityType="LCAToolDevModel.FragmentNode" Width="1.5" PointX="20.5" PointY="32.125" />
+        <EntityTypeShape EntityType="LCAToolDevModel.FragmentNodeFragment" Width="1.5" PointX="22.75" PointY="39.75" />
+        <EntityTypeShape EntityType="LCAToolDevModel.FragmentNodeProcess" Width="1.5" PointX="17.25" PointY="23.5" />
+        <EntityTypeShape EntityType="LCAToolDevModel.FragmentScore" Width="1.5" PointX="0.75" PointY="0.75" />
+        <EntityTypeShape EntityType="LCAToolDevModel.FragmentStage" Width="1.5" PointX="17.25" PointY="35.875" />
+        <EntityTypeShape EntityType="LCAToolDevModel.ILCDEntity" Width="1.5" PointX="3" PointY="30" />
+        <EntityTypeShape EntityType="LCAToolDevModel.ImpactCategory" Width="1.5" PointX="10.5" PointY="21" />
+        <EntityTypeShape EntityType="LCAToolDevModel.IndicatorType" Width="1.5" PointX="10.5" PointY="23.75" />
+        <EntityTypeShape EntityType="LCAToolDevModel.LCIA" Width="1.5" PointX="15" PointY="22.25" />
+        <EntityTypeShape EntityType="LCAToolDevModel.LCIAMethod" Width="1.5" PointX="12.75" PointY="23.375" />
+        <EntityTypeShape EntityType="LCAToolDevModel.NodeDissipation" Width="1.5" PointX="25.75" PointY="28.875" />
+        <EntityTypeShape EntityType="LCAToolDevModel.NodeDissipationParam" Width="1.5" PointX="31" PointY="29.125" />
+        <EntityTypeShape EntityType="LCAToolDevModel.NodeEmission" Width="1.5" PointX="22.75" PointY="28.25" />
+        <EntityTypeShape EntityType="LCAToolDevModel.NodeEmissionParam" Width="1.5" PointX="28" PointY="28.625" />
+        <EntityTypeShape EntityType="LCAToolDevModel.NodeType" Width="1.5" PointX="12.75" PointY="19.625" />
+        <EntityTypeShape EntityType="LCAToolDevModel.Param" Width="1.5" PointX="22.5" PointY="19.5" />
+        <EntityTypeShape EntityType="LCAToolDevModel.ParamType" Width="1.5" PointX="20.25" PointY="20.625" />
+        <EntityTypeShape EntityType="LCAToolDevModel.Process" Width="1.5" PointX="15" PointY="29.75" />
+        <EntityTypeShape EntityType="LCAToolDevModel.ProcessDissipation" Width="1.5" PointX="22.5" PointY="25.375" />
+        <EntityTypeShape EntityType="LCAToolDevModel.ProcessDissipationParam" Width="1.5" PointX="24.75" PointY="22.375" />
+        <EntityTypeShape EntityType="LCAToolDevModel.ProcessEmissionParam" Width="1.5" PointX="25.5" PointY="25.625" />
+        <EntityTypeShape EntityType="LCAToolDevModel.ProcessFlow" Width="1.5" PointX="20.25" PointY="24.75" />
+        <EntityTypeShape EntityType="LCAToolDevModel.ProcessType" Width="1.5" PointX="12.75" PointY="35.75" />
+        <EntityTypeShape EntityType="LCAToolDevModel.ReferenceType" Width="1.5" PointX="12.75" PointY="38" />
+        <EntityTypeShape EntityType="LCAToolDevModel.Scenario" Width="1.5" PointX="15.75" PointY="15.625" />
+        <EntityTypeShape EntityType="LCAToolDevModel.ScenarioBackground" Width="1.5" PointX="18" PointY="30.375" />
+        <EntityTypeShape EntityType="LCAToolDevModel.ScenarioGroup" Width="1.5" PointX="13.5" PointY="15.625" />
+        <EntityTypeShape EntityType="LCAToolDevModel.ScenarioParam" Width="1.5" PointX="24.75" PointY="19.375" />
+        <EntityTypeShape EntityType="LCAToolDevModel.UnitConversion" Width="1.5" PointX="7.5" PointY="33.5" />
+        <EntityTypeShape EntityType="LCAToolDevModel.UnitGroup" Width="1.5" PointX="5.25" PointY="30.25" />
+        <EntityTypeShape EntityType="LCAToolDevModel.User" Width="1.5" PointX="11.25" PointY="15.375" />
+        <AssociationConnector Association="LCAToolDevModel.FK_Background_Flow" />
+        <AssociationConnector Association="LCAToolDevModel.FK_Background_NodeType1" />
+        <AssociationConnector Association="LCAToolDevModel.FK_BackgroundFragment_BackgroundFragment" />
+        <AssociationConnector Association="LCAToolDevModel.FK_BackgroundFragment_Fragment" />
+        <AssociationConnector Association="LCAToolDevModel.FK_BackgroundProcess_Background" />
+        <AssociationConnector Association="LCAToolDevModel.FK_Classification_Category" />
         <AssociationConnector Association="LCAToolDevModel.FK_CategorySystem_DataType" />
-        <AssociationConnector Association="LCAToolDevModel.FK_Classification_CategorySystem" />
-        <AssociationConnector Association="LCAToolDevModel.FK_Classification_Class" />
+        <AssociationConnector Association="LCAToolDevModel.FK_CharacterizationParam_LCIA" />
+        <AssociationConnector Association="LCAToolDevModel.FK_CharacterizationParam_Param" />
+        <AssociationConnector Association="LCAToolDevModel.FK_Classification_ILCDEntity" />
+        <AssociationConnector Association="LCAToolDevModel.FK_CompositionData_CompositionData" />
+        <AssociationConnector Association="LCAToolDevModel.FK_CompositionData_FlowFlowProperty" />
+        <AssociationConnector Association="LCAToolDevModel.FK_CompositionParam_FlowFlowProperty" />
+        <AssociationConnector Association="LCAToolDevModel.FK_CompositionParam_Param" />
+        <AssociationConnector Association="LCAToolDevModel.FK_CompostionModel_Flow" />
+        <AssociationConnector Association="LCAToolDevModel.FK_ILCDEntity_DataProvider" />
+        <AssociationConnector Association="LCAToolDevModel.FK_MasterLCAModels_DataType" />
+        <AssociationConnector Association="LCAToolDevModel.FK_DependencyParam_FragmentEdge" />
+        <AssociationConnector Association="LCAToolDevModel.FK_DependencyParam_Param" />
+        <AssociationConnector Association="LCAToolDevModel.FK_DistributionParam_DependencyParam" />
+        <AssociationConnector Association="LCAToolDevModel.FK_DistributionParam_DependencyParam1" />
+        <AssociationConnector Association="LCAToolDevModel.FK_FragmentEdge_Direction" />
+        <AssociationConnector Association="LCAToolDevModel.FK_LCIA_Direction" />
+        <AssociationConnector Association="LCAToolDevModel.FK_NodeEmission_Direction" />
         <AssociationConnector Association="LCAToolDevModel.FK_ProcessFlow_Direction" />
+        <AssociationConnector Association="LCAToolDevModel.FK_Flow_Flow" />
         <AssociationConnector Association="LCAToolDevModel.FK_Flow_FlowProperty" />
+        <AssociationConnector Association="LCAToolDevModel.FK_Flow_FlowType" />
+        <AssociationConnector Association="LCAToolDevModel.FK_FlowPropertyEmission_Flow" />
         <AssociationConnector Association="LCAToolDevModel.FK_FlowPropertyVersion_Flow" />
+        <AssociationConnector Association="LCAToolDevModel.FK_Fragment_FragmentNode" />
+        <AssociationConnector Association="LCAToolDevModel.FK_FragmentEdge_Flow" />
+        <AssociationConnector Association="LCAToolDevModel.FK_NodeEmission_Flow" />
         <AssociationConnector Association="LCAToolDevModel.FK_Process_Flow" />
         <AssociationConnector Association="LCAToolDevModel.FK_ProcessFlow_Flow" />
+        <AssociationConnector Association="LCAToolDevModel.FK_ScenarioBackground_Flow" />
+        <AssociationConnector Association="LCAToolDevModel.FK_FlowPropertyParam_FlowFlowProperty" />
+        <AssociationConnector Association="LCAToolDevModel.FK_FlowProperty_FlowProperty" />
         <AssociationConnector Association="LCAToolDevModel.FK_FlowProperty_UnitGroup" />
+        <AssociationConnector Association="LCAToolDevModel.FK_FlowPropertyEmission_FlowProperty" />
+        <AssociationConnector Association="LCAToolDevModel.FK_FragmentNode_FlowProperty" />
         <AssociationConnector Association="LCAToolDevModel.FK_LCIAMethod_FlowProperty" />
+        <AssociationConnector Association="LCAToolDevModel.FK_NodeDissipation_FlowProperty" />
+        <AssociationConnector Association="LCAToolDevModel.FK_FlowPropertyParam_FlowPropertyParam1" />
+        <AssociationConnector Association="LCAToolDevModel.FK_FragmentEdge_Fragment" />
+        <AssociationConnector Association="LCAToolDevModel.FK_FragmentStage_Fragment" />
+        <AssociationConnector Association="LCAToolDevModel.FK_FragmentEdge_FragmentEdge" />
+        <AssociationConnector Association="LCAToolDevModel.FK_FragmentEdge_FragmentNode" />
+        <AssociationConnector Association="LCAToolDevModel.FK_FragmentEdge_FragmentNode1" />
+        <AssociationConnector Association="LCAToolDevModel.FK_FragmentNode_Fragment" />
+        <AssociationConnector Association="LCAToolDevModel.FK_FragmentNode_FragmentStage" />
+        <AssociationConnector Association="LCAToolDevModel.FK_FragmentNode_NodeType" />
+        <AssociationConnector Association="LCAToolDevModel.FK_FragmentNodeFragment_FragmentNode" />
+        <AssociationConnector Association="LCAToolDevModel.FK_NodeDissipation_FragmentNode" />
+        <AssociationConnector Association="LCAToolDevModel.FK_NodeEmission_FragmentNode" />
+        <AssociationConnector Association="LCAToolDevModel.FK_FragmentNodeProcess_Process" />
+        <AssociationConnector Association="LCAToolDevModel.FK_LCIAMethod_ILCDEntity" />
+        <AssociationConnector Association="LCAToolDevModel.FK_Process_ILCDEntity" />
+        <AssociationConnector Association="LCAToolDevModel.FK_UnitGroup_ILCDEntity" />
         <AssociationConnector Association="LCAToolDevModel.FK_LCIAMethod_ImpactCategory" />
         <AssociationConnector Association="LCAToolDevModel.FK_LCIAMethod_IndicatorType" />
         <AssociationConnector Association="LCAToolDevModel.FK_LCIA_LCIAMethod" />
+        <AssociationConnector Association="LCAToolDevModel.FK_NodeDissipationParam_NodeDissipation" />
+        <AssociationConnector Association="LCAToolDevModel.FK_NodeDissipationParam_Param" />
+        <AssociationConnector Association="LCAToolDevModel.FK_NodeEmissionParam_NodeEmission" />
+        <AssociationConnector Association="LCAToolDevModel.FK_NodeEmissionParam_Param" />
+        <AssociationConnector Association="LCAToolDevModel.FK_ScenarioBackground_NodeType" />
+        <AssociationConnector Association="LCAToolDevModel.FK_Param_ParamType" />
+        <AssociationConnector Association="LCAToolDevModel.FK_ProcessDissipationParam_Param" />
+        <AssociationConnector Association="LCAToolDevModel.FK_ProcessEmissionParam_Param" />
+        <AssociationConnector Association="LCAToolDevModel.FK_ScenarioParam_Scenario" />
+        <AssociationConnector Association="LCAToolDevModel.FK_Process_ProcessType" />
+        <AssociationConnector Association="LCAToolDevModel.FK_Process_ReferenceType" />
         <AssociationConnector Association="LCAToolDevModel.FK_ProcessFlow_Process" />
-        <EntityTypeShape EntityType="LCAToolDevModel.FlowType" Width="1.5" PointX="0.75" PointY="4.875" />
-        <AssociationConnector Association="LCAToolDevModel.FK_Flow_FlowType" />
+        <AssociationConnector Association="LCAToolDevModel.FK_ProcessDissipation_ProcessFlow" />
+        <AssociationConnector Association="LCAToolDevModel.FK_ProcessDissipationParam_ProcessDissipation" />
+        <AssociationConnector Association="LCAToolDevModel.FK_ProcessEmissionParam_ProcessFlow" />
+        <AssociationConnector Association="LCAToolDevModel.FK_Scenario_ScenarioGroup" />
+        <AssociationConnector Association="LCAToolDevModel.FK_ScenarioBackground_Scenario" />
+        <AssociationConnector Association="LCAToolDevModel.FK_ScenarioGroup_User" />
+        <AssociationConnector Association="LCAToolDevModel.FK_UnitConversion_UnitGroup" />
+        <AssociationConnector Association="LCAToolDevModel.FK_UnitGroup_UnitConversion" />
       </Diagram>
     </edmx:Diagrams>
   </edmx:Designer>

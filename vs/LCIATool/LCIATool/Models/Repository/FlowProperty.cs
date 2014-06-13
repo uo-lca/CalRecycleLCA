@@ -17,18 +17,23 @@ namespace LCIATool.Models.Repository
         public FlowProperty()
         {
             this.Flows = new HashSet<Flow>();
+            this.FlowPropertyEmissions = new HashSet<FlowPropertyEmission>();
+            this.FragmentNodes = new HashSet<FragmentNode>();
             this.LCIAMethods = new HashSet<LCIAMethod>();
+            this.NodeDissipations = new HashSet<NodeDissipation>();
         }
     
         public int FlowPropertyID { get; set; }
         public string FlowPropertyUUID { get; set; }
-        public string FlowPropertyVersion { get; set; }
         public string Name { get; set; }
         public Nullable<int> UnitGroupID { get; set; }
-        public string UnitGroup_SQL { get; set; }
     
         public virtual ICollection<Flow> Flows { get; set; }
+        public virtual ILCDEntity ILCDEntity { get; set; }
         public virtual UnitGroup UnitGroup { get; set; }
+        public virtual ICollection<FlowPropertyEmission> FlowPropertyEmissions { get; set; }
+        public virtual ICollection<FragmentNode> FragmentNodes { get; set; }
         public virtual ICollection<LCIAMethod> LCIAMethods { get; set; }
+        public virtual ICollection<NodeDissipation> NodeDissipations { get; set; }
     }
 }

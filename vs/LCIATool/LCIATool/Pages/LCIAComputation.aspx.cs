@@ -23,7 +23,7 @@ namespace LCIATool.Pages
                                join l in context.LCIAs on f.FlowID equals l.FlowID
                                join lm in context.LCIAMethods on l.LCIAMethodID equals lm.LCIAMethodID
                                join ft in context.FlowTypes on f.FlowTypeID equals ft.FlowTypeID
-                               join fp in context.FlowProperties on f.FlowPropertyID equals fp.FlowPropertyID
+                               join fp in context.FlowProperties on f.ReferenceFlowProperty equals fp.FlowPropertyID
                                where f.FlowTypeID == 2
                                select new
                                {
@@ -44,7 +44,7 @@ namespace LCIATool.Pages
                                join l in context.LCIAs on f.FlowID equals l.FlowID
                                join lm in context.LCIAMethods on l.LCIAMethodID equals lm.LCIAMethodID
                                join ft in context.FlowTypes on f.FlowTypeID equals ft.FlowTypeID
-                               join fp in context.FlowProperties on f.FlowPropertyID equals fp.FlowPropertyID
+                               join fp in context.FlowProperties on f.ReferenceFlowProperty equals fp.FlowPropertyID
                                where f.FlowTypeID == 2
                                select new
                                {
@@ -80,7 +80,7 @@ namespace LCIATool.Pages
                              join l in context.LCIAs on f.FlowID equals l.FlowID
                              join lm in context.LCIAMethods on l.LCIAMethodID equals lm.LCIAMethodID
                              join ft in context.FlowTypes on f.FlowTypeID equals ft.FlowTypeID
-                             join fp in context.FlowProperties on f.FlowPropertyID equals fp.FlowPropertyID
+                             join fp in context.FlowProperties on f.ReferenceFlowProperty equals fp.FlowPropertyID
                              where f.FlowTypeID == 2 && (p.ProcessID == proc || proc == 0) && (lm.LCIAMethodID == lciameth || lciameth == 0)
                              group new { p, pf, f, l, lm, ft } by new
                              {

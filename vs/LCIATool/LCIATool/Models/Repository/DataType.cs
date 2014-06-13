@@ -17,11 +17,13 @@ namespace LCIATool.Models.Repository
         public DataType()
         {
             this.CategorySystems = new HashSet<CategorySystem>();
+            this.ILCDEntities = new HashSet<ILCDEntity>();
         }
     
         public int DataTypeID { get; set; }
         public string Name { get; set; }
     
         public virtual ICollection<CategorySystem> CategorySystems { get; set; }
+        public virtual ICollection<ILCDEntity> ILCDEntities { get; set; }
     }
 }

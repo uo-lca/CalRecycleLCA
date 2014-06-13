@@ -15,13 +15,10 @@ namespace LCIATool.Models.Repository
     public partial class Classification
     {
         public int ClassificationID { get; set; }
-        public string ClassificationUUID { get; set; }
-        public Nullable<int> CategorySystemID { get; set; }
-        public Nullable<int> ClassID { get; set; }
-        public string ClassID_SQL { get; set; }
-        public string CategorySystem_SQL { get; set; }
+        public string UUID { get; set; }
+        public Nullable<int> CategoryID { get; set; }
     
-        public virtual CategorySystem CategorySystem { get; set; }
-        public virtual Class Class { get; set; }
+        public virtual Category Category { get; set; }
+        public virtual ILCDEntity ILCDEntity { get; set; }
     }
 }
