@@ -12,17 +12,20 @@ namespace LCIATool.Models.Repository
     using System;
     using System.Collections.Generic;
     
-    public partial class DataProvider
+    public partial class NodeType
     {
-        public DataProvider()
+        public NodeType()
         {
-            this.ILCDEntities = new HashSet<ILCDEntity>();
+            this.Backgrounds = new HashSet<Background>();
+            this.FragmentNodes = new HashSet<FragmentNode>();
+            this.ScenarioBackgrounds = new HashSet<ScenarioBackground>();
         }
     
-        public int DataProviderID { get; set; }
+        public int NodeTypeID { get; set; }
         public string Name { get; set; }
-        public string DirName { get; set; }
     
-        public virtual ICollection<ILCDEntity> ILCDEntities { get; set; }
+        public virtual ICollection<Background> Backgrounds { get; set; }
+        public virtual ICollection<FragmentNode> FragmentNodes { get; set; }
+        public virtual ICollection<ScenarioBackground> ScenarioBackgrounds { get; set; }
     }
 }

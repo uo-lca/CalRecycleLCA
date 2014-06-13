@@ -12,17 +12,14 @@ namespace LCIATool.Models.Repository
     using System;
     using System.Collections.Generic;
     
-    public partial class DataProvider
+    public partial class CompositionData
     {
-        public DataProvider()
-        {
-            this.ILCDEntities = new HashSet<ILCDEntity>();
-        }
+        public int CompositionDataID { get; set; }
+        public Nullable<int> CompositionModelID { get; set; }
+        public Nullable<int> FlowFlowPropertyID { get; set; }
+        public Nullable<double> Value { get; set; }
     
-        public int DataProviderID { get; set; }
-        public string Name { get; set; }
-        public string DirName { get; set; }
-    
-        public virtual ICollection<ILCDEntity> ILCDEntities { get; set; }
+        public virtual CompostionModel CompostionModel { get; set; }
+        public virtual FlowFlowProperty FlowFlowProperty { get; set; }
     }
 }

@@ -12,17 +12,14 @@ namespace LCIATool.Models.Repository
     using System;
     using System.Collections.Generic;
     
-    public partial class DataProvider
+    public partial class FragmentScore
     {
-        public DataProvider()
-        {
-            this.ILCDEntities = new HashSet<ILCDEntity>();
-        }
-    
-        public int DataProviderID { get; set; }
-        public string Name { get; set; }
-        public string DirName { get; set; }
-    
-        public virtual ICollection<ILCDEntity> ILCDEntities { get; set; }
+        public int FragmentScoreID { get; set; }
+        public Nullable<int> FragmentID { get; set; }
+        public Nullable<int> LCIAMethodID { get; set; }
+        public Nullable<int> FragmentNodeStageID { get; set; }
+        public Nullable<int> ScenarioID { get; set; }
+        public Nullable<int> ParamID { get; set; }
+        public Nullable<double> ImpactScore { get; set; }
     }
 }

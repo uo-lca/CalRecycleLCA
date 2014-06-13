@@ -16,25 +16,37 @@ namespace LCIATool.Models.Repository
     {
         public Flow()
         {
+            this.Backgrounds = new HashSet<Background>();
+            this.CompostionModels = new HashSet<CompostionModel>();
+            this.FlowPropertyEmissions = new HashSet<FlowPropertyEmission>();
             this.FlowFlowProperties = new HashSet<FlowFlowProperty>();
+            this.Fragments = new HashSet<Fragment>();
+            this.FragmentEdges = new HashSet<FragmentEdge>();
+            this.NodeEmissions = new HashSet<NodeEmission>();
             this.Processes = new HashSet<Process>();
             this.ProcessFlows = new HashSet<ProcessFlow>();
+            this.ScenarioBackgrounds = new HashSet<ScenarioBackground>();
         }
     
         public int FlowID { get; set; }
         public string FlowUUID { get; set; }
-        public string FlowVersion { get; set; }
         public string Name { get; set; }
         public string CASNumber { get; set; }
-        public Nullable<int> FlowPropertyID { get; set; }
+        public Nullable<int> ReferenceFlowProperty { get; set; }
         public Nullable<int> FlowTypeID { get; set; }
-        public string FlowType_SQL { get; set; }
-        public string ReferenceFlowProperty_SQL { get; set; }
     
+        public virtual ICollection<Background> Backgrounds { get; set; }
+        public virtual ICollection<CompostionModel> CompostionModels { get; set; }
+        public virtual ILCDEntity ILCDEntity { get; set; }
         public virtual FlowProperty FlowProperty { get; set; }
+        public virtual FlowType FlowType { get; set; }
+        public virtual ICollection<FlowPropertyEmission> FlowPropertyEmissions { get; set; }
         public virtual ICollection<FlowFlowProperty> FlowFlowProperties { get; set; }
+        public virtual ICollection<Fragment> Fragments { get; set; }
+        public virtual ICollection<FragmentEdge> FragmentEdges { get; set; }
+        public virtual ICollection<NodeEmission> NodeEmissions { get; set; }
         public virtual ICollection<Process> Processes { get; set; }
         public virtual ICollection<ProcessFlow> ProcessFlows { get; set; }
-        public virtual FlowType FlowType { get; set; }
+        public virtual ICollection<ScenarioBackground> ScenarioBackgrounds { get; set; }
     }
 }

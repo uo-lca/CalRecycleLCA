@@ -12,22 +12,20 @@ namespace LCIATool.Models.Repository
     using System;
     using System.Collections.Generic;
     
-    public partial class LCIA
+    public partial class Background
     {
-        public LCIA()
+        public Background()
         {
-            this.CharacterizationParams = new HashSet<CharacterizationParam>();
+            this.BackgroundFragments = new HashSet<BackgroundFragment>();
         }
     
-        public int LCIAID { get; set; }
-        public Nullable<int> LCIAMethodID { get; set; }
+        public int BackgroundID { get; set; }
         public Nullable<int> FlowID { get; set; }
-        public string Geography { get; set; }
-        public Nullable<int> DirectionID { get; set; }
-        public Nullable<double> Factor { get; set; }
+        public Nullable<int> NodeTypeID { get; set; }
+        public Nullable<int> TargetID { get; set; }
     
-        public virtual ICollection<CharacterizationParam> CharacterizationParams { get; set; }
-        public virtual Direction Direction { get; set; }
-        public virtual LCIAMethod LCIAMethod { get; set; }
+        public virtual Flow Flow { get; set; }
+        public virtual NodeType NodeType { get; set; }
+        public virtual ICollection<BackgroundFragment> BackgroundFragments { get; set; }
     }
 }

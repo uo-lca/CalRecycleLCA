@@ -12,22 +12,23 @@ namespace LCIATool.Models.Repository
     using System;
     using System.Collections.Generic;
     
-    public partial class Direction
+    public partial class Fragment
     {
-        public Direction()
+        public Fragment()
         {
+            this.BackgroundFragments = new HashSet<BackgroundFragment>();
             this.FragmentEdges = new HashSet<FragmentEdge>();
-            this.LCIAs = new HashSet<LCIA>();
-            this.NodeEmissions = new HashSet<NodeEmission>();
-            this.ProcessFlows = new HashSet<ProcessFlow>();
+            this.FragmentStages = new HashSet<FragmentStage>();
         }
     
-        public int DirectionID { get; set; }
+        public int FragmentID { get; set; }
         public string Name { get; set; }
+        public Nullable<int> RootNode { get; set; }
+        public Nullable<int> ReferenceFlow { get; set; }
     
+        public virtual ICollection<BackgroundFragment> BackgroundFragments { get; set; }
+        public virtual Flow Flow { get; set; }
         public virtual ICollection<FragmentEdge> FragmentEdges { get; set; }
-        public virtual ICollection<LCIA> LCIAs { get; set; }
-        public virtual ICollection<NodeEmission> NodeEmissions { get; set; }
-        public virtual ICollection<ProcessFlow> ProcessFlows { get; set; }
+        public virtual ICollection<FragmentStage> FragmentStages { get; set; }
     }
 }

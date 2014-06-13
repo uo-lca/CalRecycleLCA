@@ -12,17 +12,12 @@ namespace LCIATool.Models.Repository
     using System;
     using System.Collections.Generic;
     
-    public partial class DataProvider
+    public partial class FragmentNodeProcess
     {
-        public DataProvider()
-        {
-            this.ILCDEntities = new HashSet<ILCDEntity>();
-        }
+        public int FragmentNodeProcessID { get; set; }
+        public Nullable<int> FragmentNodeID { get; set; }
+        public Nullable<int> ProcessID { get; set; }
     
-        public int DataProviderID { get; set; }
-        public string Name { get; set; }
-        public string DirName { get; set; }
-    
-        public virtual ICollection<ILCDEntity> ILCDEntities { get; set; }
+        public virtual Process Process { get; set; }
     }
 }

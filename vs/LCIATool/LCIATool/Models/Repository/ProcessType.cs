@@ -12,17 +12,16 @@ namespace LCIATool.Models.Repository
     using System;
     using System.Collections.Generic;
     
-    public partial class DataProvider
+    public partial class ProcessType
     {
-        public DataProvider()
+        public ProcessType()
         {
-            this.ILCDEntities = new HashSet<ILCDEntity>();
+            this.Processes = new HashSet<Process>();
         }
     
-        public int DataProviderID { get; set; }
+        public int ProcessTypeID { get; set; }
         public string Name { get; set; }
-        public string DirName { get; set; }
     
-        public virtual ICollection<ILCDEntity> ILCDEntities { get; set; }
+        public virtual ICollection<Process> Processes { get; set; }
     }
 }

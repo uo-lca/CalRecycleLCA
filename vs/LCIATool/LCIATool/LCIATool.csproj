@@ -272,16 +272,34 @@
     <Compile Include="Models\ProcessFlowModel.cs">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="Models\Repository\Background.cs">
+      <DependentUpon>LCAModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\Repository\BackgroundFragment.cs">
+      <DependentUpon>LCAModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\Repository\BackgroundProcess.cs">
+      <DependentUpon>LCAModel.tt</DependentUpon>
+    </Compile>
     <Compile Include="Models\Repository\Category.cs">
       <DependentUpon>LCAModel.tt</DependentUpon>
     </Compile>
     <Compile Include="Models\Repository\CategorySystem.cs">
       <DependentUpon>LCAModel.tt</DependentUpon>
     </Compile>
-    <Compile Include="Models\Repository\Class.cs">
+    <Compile Include="Models\Repository\CharacterizationParam.cs">
       <DependentUpon>LCAModel.tt</DependentUpon>
     </Compile>
     <Compile Include="Models\Repository\Classification.cs">
+      <DependentUpon>LCAModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\Repository\CompositionData.cs">
+      <DependentUpon>LCAModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\Repository\CompositionParam.cs">
+      <DependentUpon>LCAModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\Repository\CompostionModel.cs">
       <DependentUpon>LCAModel.tt</DependentUpon>
     </Compile>
     <Compile Include="Models\Repository\DataProvider.cs">
@@ -290,7 +308,13 @@
     <Compile Include="Models\Repository\DataType.cs">
       <DependentUpon>LCAModel.tt</DependentUpon>
     </Compile>
+    <Compile Include="Models\Repository\DependencyParam.cs">
+      <DependentUpon>LCAModel.tt</DependentUpon>
+    </Compile>
     <Compile Include="Models\Repository\Direction.cs">
+      <DependentUpon>LCAModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\Repository\DistributionParam.cs">
       <DependentUpon>LCAModel.tt</DependentUpon>
     </Compile>
     <Compile Include="Models\Repository\Flow.cs">
@@ -302,7 +326,37 @@
     <Compile Include="Models\Repository\FlowProperty.cs">
       <DependentUpon>LCAModel.tt</DependentUpon>
     </Compile>
+    <Compile Include="Models\Repository\FlowPropertyEmission.cs">
+      <DependentUpon>LCAModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\Repository\FlowPropertyParam.cs">
+      <DependentUpon>LCAModel.tt</DependentUpon>
+    </Compile>
     <Compile Include="Models\Repository\FlowType.cs">
+      <DependentUpon>LCAModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\Repository\Fragment.cs">
+      <DependentUpon>LCAModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\Repository\FragmentEdge.cs">
+      <DependentUpon>LCAModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\Repository\FragmentNode.cs">
+      <DependentUpon>LCAModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\Repository\FragmentNodeFragment.cs">
+      <DependentUpon>LCAModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\Repository\FragmentNodeProcess.cs">
+      <DependentUpon>LCAModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\Repository\FragmentScore.cs">
+      <DependentUpon>LCAModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\Repository\FragmentStage.cs">
+      <DependentUpon>LCAModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\Repository\ILCDEntity.cs">
       <DependentUpon>LCAModel.tt</DependentUpon>
     </Compile>
     <Compile Include="Models\Repository\ImpactCategory.cs">
@@ -333,19 +387,73 @@
     <Compile Include="Models\Repository\LCIAMethod.cs">
       <DependentUpon>LCAModel.tt</DependentUpon>
     </Compile>
+    <Compile Include="Models\Repository\NodeDissipation.cs">
+      <DependentUpon>LCAModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\Repository\NodeDissipationParam.cs">
+      <DependentUpon>LCAModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\Repository\NodeEmission.cs">
+      <DependentUpon>LCAModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\Repository\NodeEmissionParam.cs">
+      <DependentUpon>LCAModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\Repository\NodeType.cs">
+      <DependentUpon>LCAModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\Repository\Param.cs">
+      <DependentUpon>LCAModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\Repository\ParamType.cs">
+      <DependentUpon>LCAModel.tt</DependentUpon>
+    </Compile>
     <Compile Include="Models\Repository\Process.cs">
+      <DependentUpon>LCAModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\Repository\ProcessDissipation.cs">
+      <DependentUpon>LCAModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\Repository\ProcessDissipationParam.cs">
+      <DependentUpon>LCAModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\Repository\ProcessEmissionParam.cs">
       <DependentUpon>LCAModel.tt</DependentUpon>
     </Compile>
     <Compile Include="Models\Repository\ProcessFlow.cs">
       <DependentUpon>LCAModel.tt</DependentUpon>
     </Compile>
+    <Compile Include="Models\Repository\ProcessType.cs">
+      <DependentUpon>LCAModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\Repository\ReferenceType.cs">
+      <DependentUpon>LCAModel.tt</DependentUpon>
+    </Compile>
     <Compile Include="Models\Repository\Repository.cs" />
+    <Compile Include="Models\Repository\Scenario.cs">
+      <DependentUpon>LCAModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\Repository\ScenarioBackground.cs">
+      <DependentUpon>LCAModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\Repository\ScenarioGroup.cs">
+      <DependentUpon>LCAModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\Repository\ScenarioParam.cs">
+      <DependentUpon>LCAModel.tt</DependentUpon>
+    </Compile>
     <Compile Include="Models\Repository\UnitConversion.cs">
       <DependentUpon>LCAModel.tt</DependentUpon>
     </Compile>
     <Compile Include="Models\Repository\UnitGroup.cs">
       <DependentUpon>LCAModel.tt</DependentUpon>
     </Compile>
+    <Compile Include="Models\Repository\User.cs">
+      <DependentUpon>LCAModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\ScenarioGroupModel.cs" />
+    <Compile Include="Models\ScenarioModel.cs" />
+    <Compile Include="Models\UserModel.cs" />
     <Compile Include="Pages\Default.aspx.cs">
       <DependentUpon>Default.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>

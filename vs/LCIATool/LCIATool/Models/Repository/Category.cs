@@ -14,19 +14,18 @@ namespace LCIATool.Models.Repository
     
     public partial class Category
     {
-        public int CategoryID { get; set; }
-        public Nullable<int> CategorySystemID { get; set; }
-        public Nullable<int> ClassID { get; set; }
-        public Nullable<int> ParentClassID { get; set; }
-        public Nullable<int> DataTypeID_notneededremovelater { get; set; }
-        public Nullable<int> HierarchyLevel { get; set; }
-        public string Hier { get; set; }
-        public string ClassID_SQL { get; set; }
-        public string Parent_SQL { get; set; }
-        public string ClassName_SQL { get; set; }
+        public Category()
+        {
+            this.Classifications = new HashSet<Classification>();
+        }
     
-        public virtual CategorySystem CategorySystem { get; set; }
-        public virtual Class Class { get; set; }
-        public virtual Class Class1 { get; set; }
+        public int CategoryID { get; set; }
+        public string ExternalClassID { get; set; }
+        public string Name { get; set; }
+        public Nullable<int> CategorySystemID { get; set; }
+        public Nullable<int> ParentClassID { get; set; }
+        public Nullable<int> HierarchyLevel { get; set; }
+    
+        public virtual ICollection<Classification> Classifications { get; set; }
     }
 }

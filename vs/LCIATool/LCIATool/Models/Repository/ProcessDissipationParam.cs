@@ -12,17 +12,13 @@ namespace LCIATool.Models.Repository
     using System;
     using System.Collections.Generic;
     
-    public partial class DataProvider
+    public partial class ProcessDissipationParam
     {
-        public DataProvider()
-        {
-            this.ILCDEntities = new HashSet<ILCDEntity>();
-        }
+        public int ProcessDissipationParamID { get; set; }
+        public Nullable<int> ParamID { get; set; }
+        public Nullable<int> ProcessDissipationID { get; set; }
     
-        public int DataProviderID { get; set; }
-        public string Name { get; set; }
-        public string DirName { get; set; }
-    
-        public virtual ICollection<ILCDEntity> ILCDEntities { get; set; }
+        public virtual Param Param { get; set; }
+        public virtual ProcessDissipation ProcessDissipation { get; set; }
     }
 }

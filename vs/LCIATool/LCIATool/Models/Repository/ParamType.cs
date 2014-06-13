@@ -12,17 +12,16 @@ namespace LCIATool.Models.Repository
     using System;
     using System.Collections.Generic;
     
-    public partial class DataProvider
+    public partial class ParamType
     {
-        public DataProvider()
+        public ParamType()
         {
-            this.ILCDEntities = new HashSet<ILCDEntity>();
+            this.Params = new HashSet<Param>();
         }
     
-        public int DataProviderID { get; set; }
+        public int ParamTypeID { get; set; }
         public string Name { get; set; }
-        public string DirName { get; set; }
     
-        public virtual ICollection<ILCDEntity> ILCDEntities { get; set; }
+        public virtual ICollection<Param> Params { get; set; }
     }
 }

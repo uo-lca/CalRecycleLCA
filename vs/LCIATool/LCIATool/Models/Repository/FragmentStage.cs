@@ -12,17 +12,20 @@ namespace LCIATool.Models.Repository
     using System;
     using System.Collections.Generic;
     
-    public partial class DataProvider
+    public partial class FragmentStage
     {
-        public DataProvider()
+        public FragmentStage()
         {
-            this.ILCDEntities = new HashSet<ILCDEntity>();
+            this.FragmentNodes = new HashSet<FragmentNode>();
+            this.FragmentNodes1 = new HashSet<FragmentNode>();
         }
     
-        public int DataProviderID { get; set; }
-        public string Name { get; set; }
-        public string DirName { get; set; }
+        public int FragmentStageID { get; set; }
+        public Nullable<int> FragmentID { get; set; }
+        public string StageName { get; set; }
     
-        public virtual ICollection<ILCDEntity> ILCDEntities { get; set; }
+        public virtual Fragment Fragment { get; set; }
+        public virtual ICollection<FragmentNode> FragmentNodes { get; set; }
+        public virtual ICollection<FragmentNode> FragmentNodes1 { get; set; }
     }
 }

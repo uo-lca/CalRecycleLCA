@@ -12,17 +12,13 @@ namespace LCIATool.Models.Repository
     using System;
     using System.Collections.Generic;
     
-    public partial class DataProvider
+    public partial class CharacterizationParam
     {
-        public DataProvider()
-        {
-            this.ILCDEntities = new HashSet<ILCDEntity>();
-        }
+        public int CharacterizationParamID { get; set; }
+        public Nullable<int> ParamID { get; set; }
+        public Nullable<int> LCAID { get; set; }
     
-        public int DataProviderID { get; set; }
-        public string Name { get; set; }
-        public string DirName { get; set; }
-    
-        public virtual ICollection<ILCDEntity> ILCDEntities { get; set; }
+        public virtual LCIA LCIA { get; set; }
+        public virtual Param Param { get; set; }
     }
 }

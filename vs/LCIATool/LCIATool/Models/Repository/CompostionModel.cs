@@ -12,22 +12,18 @@ namespace LCIATool.Models.Repository
     using System;
     using System.Collections.Generic;
     
-    public partial class LCIA
+    public partial class CompostionModel
     {
-        public LCIA()
+        public CompostionModel()
         {
-            this.CharacterizationParams = new HashSet<CharacterizationParam>();
+            this.CompositionDatas = new HashSet<CompositionData>();
         }
     
-        public int LCIAID { get; set; }
-        public Nullable<int> LCIAMethodID { get; set; }
+        public int CompositionModelID { get; set; }
         public Nullable<int> FlowID { get; set; }
-        public string Geography { get; set; }
-        public Nullable<int> DirectionID { get; set; }
-        public Nullable<double> Factor { get; set; }
+        public string Name { get; set; }
     
-        public virtual ICollection<CharacterizationParam> CharacterizationParams { get; set; }
-        public virtual Direction Direction { get; set; }
-        public virtual LCIAMethod LCIAMethod { get; set; }
+        public virtual ICollection<CompositionData> CompositionDatas { get; set; }
+        public virtual Flow Flow { get; set; }
     }
 }

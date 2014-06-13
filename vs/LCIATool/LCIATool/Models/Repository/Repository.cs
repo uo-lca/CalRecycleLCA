@@ -175,7 +175,7 @@ namespace LCIATool.Models.Repository
                              join lm in context.LCIAMethods on l.LCIAMethodID equals lm.LCIAMethodID
                              join ft in context.FlowTypes on f.FlowTypeID equals ft.FlowTypeID
                              //where f.FlowTypeID == 2 && (p.ProcessID == processID || processID == 0) && (lm.LCIAMethodID == lciaMethodId || lciaMethodId == 0) && (lm.ImpactCategoryID == impactCategoryId || impactCategoryId == 0)
-                             where f.FlowTypeID == 2 && l.Location == null && pf.DirectionID == l.DirectionID
+                             where f.FlowTypeID == 2 && l.Geography == null && pf.DirectionID == l.DirectionID
                              group new { p, pf, f, l, lm, ft } by new
                              {
                                  Process = p.Name,
@@ -215,7 +215,7 @@ namespace LCIATool.Models.Repository
             {
 
                 var query = context.ProcessFlows
-                    .Where(e => e.Flow.FlowType.FlowTypeID != 2 && e.Flow.FlowPropertyID != null && (e.Process.ProcessID == processId || processId == 0))
+                    .Where(e => e.Flow.FlowType.FlowTypeID != 2 && e.Flow.ReferenceFlowProperty != null && (e.Process.ProcessID == processId || processId == 0))
                     .GroupBy(p => new
                     {
                         ReferenceProperty = p.Flow.FlowProperty.Name,
@@ -236,7 +236,7 @@ namespace LCIATool.Models.Repository
             {
                 //get all intermediate flows
                 var query = context.ProcessFlows
-               .Where(e => e.Flow.FlowType.FlowTypeID != 2 && e.Flow.FlowPropertyID != null && (e.Process.ProcessID == processId || processId == 0))
+               .Where(e => e.Flow.FlowType.FlowTypeID != 2 && e.Flow.ReferenceFlowProperty != null && (e.Process.ProcessID == processId || processId == 0))
                .GroupBy(p => new
                {
                    ReferenceUnit = p.Flow.FlowProperty.UnitGroup.ReferenceUnit

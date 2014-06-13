@@ -12,17 +12,21 @@ namespace LCIATool.Models.Repository
     using System;
     using System.Collections.Generic;
     
-    public partial class DataProvider
+    public partial class User
     {
-        public DataProvider()
+        public User()
         {
-            this.ILCDEntities = new HashSet<ILCDEntity>();
+            this.ScenarioGroups = new HashSet<ScenarioGroup>();
         }
     
-        public int DataProviderID { get; set; }
+        public int UserID { get; set; }
         public string Name { get; set; }
-        public string DirName { get; set; }
+        public Nullable<bool> CanLogin { get; set; }
+        public Nullable<bool> CanEditScenarios { get; set; }
+        public Nullable<bool> CanEditFragments { get; set; }
+        public Nullable<bool> CanEditBackground { get; set; }
+        public Nullable<bool> CanAppend { get; set; }
     
-        public virtual ICollection<ILCDEntity> ILCDEntities { get; set; }
+        public virtual ICollection<ScenarioGroup> ScenarioGroups { get; set; }
     }
 }

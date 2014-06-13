@@ -21,7 +21,6 @@ namespace LCIATool.Models.Repository
     
         public int LCIAMethodID { get; set; }
         public string LCIAMethodUUID { get; set; }
-        public string LCIAMethodVersion { get; set; }
         public string Name { get; set; }
         public string Methodology { get; set; }
         public Nullable<int> ImpactCategoryID { get; set; }
@@ -33,12 +32,10 @@ namespace LCIATool.Models.Repository
         public Nullable<bool> Normalization { get; set; }
         public Nullable<bool> Weighting { get; set; }
         public string UseAdvice { get; set; }
-        public Nullable<int> SourceID { get; set; }
-        public Nullable<int> FlowPropertyID { get; set; }
-        public string Source { get; set; }
-        public string ReferenceQuantity { get; set; }
+        public Nullable<int> ReferenceQuantity { get; set; }
     
         public virtual FlowProperty FlowProperty { get; set; }
+        public virtual ILCDEntity ILCDEntity { get; set; }
         public virtual ImpactCategory ImpactCategory { get; set; }
         public virtual IndicatorType IndicatorType { get; set; }
         public virtual ICollection<LCIA> LCIAs { get; set; }
