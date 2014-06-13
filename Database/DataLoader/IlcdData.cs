@@ -187,7 +187,7 @@ namespace LcaDataLoader {
             }
             else {
                 string referenceUUID = ugUUID;
-                ugID = ilcdDb.GetID((string)referenceUUID);
+                ugID = ilcdDb.GetIlcdEntityID<UnitGroup>((string)referenceUUID);
                 if (ugID == null) {
                     Console.WriteLine("WARNING: Unable to find unit group matching flow property refObjectId = {0}", ugUUID);
                 }
@@ -212,7 +212,7 @@ namespace LcaDataLoader {
         /// <returns>Entity ID, if the UUID was extracted and a loaded entity ID was found, otherwise null</returns>
         private int? GetFlowPropertyID(DbContextWrapper ilcdDb, XElement fpElement) {
             string fpUUID = fpElement.Element(ElementName("referenceToFlowPropertyDataSet")).Attribute("refObjectId").Value;
-            int? fpID = ilcdDb.GetID(fpUUID);
+            int? fpID = ilcdDb.GetIlcdEntityID<FlowProperty>(fpUUID);
             if (fpID == null) {
                 Console.WriteLine("WARNING: Unable to find flow property matching flow refObjectId = {0}", fpUUID);
             }
@@ -251,28 +251,33 @@ namespace LcaDataLoader {
 
         private bool SaveLciaMethod(DbContextWrapper ilcdDb) {
             bool isSaved = false;
-            string impactCategoryName;
+            string lookupName;
+            string refUUID;
             LCIAMethod lciaMethod = new LCIAMethod();
             SaveIlcdEntity(ilcdDb, lciaMethod);
             lciaMethod.Name = GetElementValue(ElementName("name"));
             lciaMethod.Methodology = GetElementValue(ElementName("methodology"));
-            impactCategoryName = GetElementValue(ElementName("impactCategory"));
-            if (impactCategoryName != null) {
-                ImpactCategory impactCategory = new ImpactCategory();
-                impactCategory.Name = impactCategoryName;
+            lookupName = GetElementValue(ElementName("impactCategory"));
+            if (lookupName != null) {
+                lciaMethod.ImpactCategoryID = ilcdDb.LookupEntityID<ImpactCategory>(lookupName);
             }
-            //lciaMethod.FlowTypeID = ilcdDb.GetFlowTypeID(GetElementValue(ElementName("typeOfDataSet")));
-            //// Get Reference Flow Property
-            //dataSetInternalID = GetElementValue(ElementName("referenceToReferenceFlowProperty"));
-            //fpElement = GetElementWithInternalId(ElementName("flowProperty"), dataSetInternalID);
-            //fpID = GetFlowPropertyID(ilcdDb, fpElement);
-            //flow.ReferenceFlowProperty = fpID;
-
-            //if (ilcdDb.AddIlcdEntity(flow)) {
-            //    ilcdDb.AddFlowFlowProperties(CreateFFPList(ilcdDb, flow));
-            //    isSaved = true;
-            //}
-
+            lciaMethod.ImpactIndicator = GetElementValue(ElementName("impactIndicator"));
+            lookupName = GetElementValue(ElementName("typeOfDataSet"));
+            if (lookupName != null) {
+                lciaMethod.IndicatorTypeID = ilcdDb.LookupEntityID<IndicatorType>(lookupName);
+            }
+            lciaMethod.ReferenceYear = GetElementValue(ElementName("referenceYear"));
+            lciaMethod.Duration = GetElementValue(ElementName("duration"));
+            lciaMethod.ImpactLocation = GetElementValue(ElementName("impactLocation"));
+            lciaMethod.Normalization = Convert.ToBoolean(GetElementValue(ElementName("normalisation")));
+            lciaMethod.Weighting = Convert.ToBoolean(GetElementValue(ElementName("weighting")));
+            lciaMethod.UseAdvice = GetElementValue(ElementName("useAdviceForDataSet"));
+            refUUID = GetElementAttributeValue(ElementName("referenceQuantity"), "refObjectId");
+            Debug.Assert(refUUID != null);
+            lciaMethod.ReferenceQuantity = ilcdDb.GetIlcdEntityID<FlowProperty>(refUUID);
+            if (ilcdDb.AddIlcdEntity(lciaMethod)) {
+                isSaved = true;
+            }
             return isSaved;
         }
 
@@ -282,19 +287,30 @@ namespace LcaDataLoader {
         /// <param name="ilcdDb">Database context wrapper object</param>
         /// <returns>true iff data was imported</returns>
         public bool Save(DbContextWrapper ilcdDb) {
+            bool isSaved = false;
             Debug.Assert(LoadedDocument != null, "LoadedDocument must be set before calling Save.");
             string nsString = LoadedDocument.Root.Name.Namespace.ToString();
-            switch (nsString) {
-                case "http://lca.jrc.it/ILCD/UnitGroup":
-                    return SaveUnitGroup(ilcdDb);
-                case "http://lca.jrc.it/ILCD/FlowProperty":
-                    return SaveFlowProperty(ilcdDb);
-                case "http://lca.jrc.it/ILCD/Flow":
-                    return SaveFlow(ilcdDb);
-                case "http://lca.jrc.it/ILCD/LCIAMethod":
-                    return SaveFlow(ilcdDb);
+            string commonUUID = GetCommonUUID();
+            if (ilcdDb.IlcdUuidExists(commonUUID)) {
+                Console.WriteLine("WARNING: UUID {0} was already imported and will not be updated.", commonUUID);
             }
-            return false;
+            else {
+                switch (nsString) {
+                    case "http://lca.jrc.it/ILCD/UnitGroup":
+                        isSaved = SaveUnitGroup(ilcdDb);
+                        break;
+                    case "http://lca.jrc.it/ILCD/FlowProperty":
+                        isSaved = SaveFlowProperty(ilcdDb);
+                        break;
+                    case "http://lca.jrc.it/ILCD/Flow":
+                        isSaved = SaveFlow(ilcdDb);
+                        break;
+                    case "http://lca.jrc.it/ILCD/LCIAMethod":
+                        isSaved = SaveLciaMethod(ilcdDb);
+                        break;
+                }
+            }
+            return isSaved;
         }
 
     }

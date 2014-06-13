@@ -58,18 +58,41 @@ namespace LcaDataModel {
     }
 
     /// <summary>
-    /// Interface to common Lookup Table properties. Hides differences in column names.
+    /// Interface to common Lookup Table properties. Hides differences in ID column name.
     /// </summary>
     public interface ILookupEntity : IEntity {
-        // ID accessor signatures, do not persist
-        [NotMapped]
         string Name { get; set; }
     }
 
+    public partial class DataProvider : ILookupEntity {
+        [NotMapped]
+        public int ID {
+            get { return DataProviderID; }
+            set { DataProviderID = ID; }
+        }
+    }
+
+    public partial class FlowType : ILookupEntity {
+        [NotMapped]
+        public int ID {
+            get { return FlowTypeID; }
+            set { FlowTypeID = ID; }
+        }
+    }
+
     public partial class ImpactCategory : ILookupEntity {
+        [NotMapped]
         public int ID {
             get { return ImpactCategoryID; }
             set { ImpactCategoryID = ID; }
+        }
+    }
+
+    public partial class IndicatorType : ILookupEntity {
+        [NotMapped]
+        public int ID {
+            get { return IndicatorTypeID; }
+            set { IndicatorTypeID = ID; }
         }
     }
 }
