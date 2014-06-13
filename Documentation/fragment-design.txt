@@ -354,7 +354,7 @@ Database Design
 
 # Fragment Computation Specification
 
-A fragment should be implemented as an object.  Computing a fragment
+A fragment should be implemented as a class.  Computing a fragment
 requires:
 
    1. generating a fragment object in the application space with an internal

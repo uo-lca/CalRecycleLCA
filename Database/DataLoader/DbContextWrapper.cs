@@ -43,8 +43,7 @@ namespace LcaDataLoader {
         /// <summary>
         /// Constructor injects model's DbContext
         /// </summary>
-        public DbContextWrapper(EntityDataModel dbContext)
-        {
+        public DbContextWrapper(EntityDataModel dbContext) {
             _DbContext = dbContext;
         }
 
@@ -58,7 +57,10 @@ namespace LcaDataLoader {
             catch (DbUpdateException e) {
                 Console.WriteLine("ERROR: Database update exception!");
                 Console.WriteLine(e.Message);
-                Console.WriteLine(e.InnerException.Message);
+                for (var ie = e.InnerException; ie != null; ie = ie.InnerException) {
+                    Console.WriteLine("Inner Exception: {0}", e.InnerException.Message);
+                }
+
                 return 0;
             }
         }
@@ -97,6 +99,23 @@ namespace LcaDataLoader {
             _DbContext.SaveChanges();
         }
 
+        public static void SeedLUT<T>(DbSet<T> lutSet, List<string> nameList) where T : class, ILookupEntity, new() {
+            if (lutSet.Count() == 0) {
+                foreach (string name in nameList) {
+                    lutSet.Add(new T { Name = name });
+                }
+            }
+            else {
+                Console.WriteLine("ERROR: Lookup table is not empty...");
+                Console.WriteLine(lutSet.ToString());
+            }
+        }
+
+        public int LookupEntityID<T>(string name) where T : class, ILookupEntity {
+            DbSet<T> dbSet = _DbContext.Set<T>();
+            return (from le in dbSet where le.Name == name select le).FirstOrDefault().ID;
+        }
+
         public static void Seed(EntityDataModel dbContext) {
             if (dbContext.DataProviders.Count() == 0) {
                 dbContext.DataProviders.Add(
@@ -125,6 +144,23 @@ namespace LcaDataLoader {
             else {
                 Console.WriteLine("WARNING: FlowType table is not empty and will not be seeded.");
             }
+            SeedLUT<ImpactCategory>(dbContext.ImpactCategories,
+                    new List<string>(new string[] {            
+                        "Abiotic resource depletion",
+                        "Acidification",
+                        "Aquatic Eutrophication",
+                        "Cancer human health effects",
+                        "Climate change",
+                        "Ionizing radiation",
+                        "Land use",
+                        "Non-cancer human health effects",
+                        "Ozone depletion",
+                        "Photochemical ozone creation",
+                        "Respiratory inorganics",
+                        "Terrestrial Eutrophication"
+                    }));
+            dbContext.SaveChanges();
+
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -133,13 +169,13 @@ namespace LcaDataLoader {
         }
 
         public int? GetID(string uuid) {
-            if ( _UuidDictionary.ContainsKey(uuid)) {
+            if (_UuidDictionary.ContainsKey(uuid)) {
                 return _UuidDictionary[uuid];
             }
             else {
                 return null;
             }
         }
-        
+
     }
 }

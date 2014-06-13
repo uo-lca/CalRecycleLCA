@@ -8,11 +8,11 @@ using LcaDataModel;
 
 namespace LcaDataLoader {
     /// <summary>
-    /// Database initializer - currently set to drop and recreate database.
+    /// Database initializer - drops and recreates database.
     /// This will fail if database is in use.
     /// Uses DbContextWrapper to seed database.
     /// </summary>
-    public class DbInitializer : DropCreateDatabaseAlways<EntityDataModel> {
+    public class DropCreateDatabaseInitializer : DropCreateDatabaseAlways<EntityDataModel> {
         protected override void Seed(EntityDataModel context) {
             DbContextWrapper.Seed(context);
         }

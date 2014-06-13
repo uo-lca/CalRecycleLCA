@@ -9,11 +9,14 @@ namespace LcaDataModel
     [Table("FlowFlowProperty")]
     public partial class FlowFlowProperty
     {
-        [Key]
-        public int FlowPropertyVersionID { get; set; }
+        public FlowFlowProperty()
+        {
+            CompositionDatas = new HashSet<CompositionData>();
+            CompositionParams = new HashSet<CompositionParam>();
+            FlowPropertyParams = new HashSet<FlowPropertyParam>();
+        }
 
-        [StringLength(36)]
-        public string FlowPropertyVersionUUID { get; set; }
+        public int FlowFlowPropertyID { get; set; }
 
         public int? FlowID { get; set; }
 
@@ -23,17 +26,12 @@ namespace LcaDataModel
 
         public double? StDev { get; set; }
 
-        [Column("FlowProperty-SQL")]
-        [StringLength(36)]
-        public string FlowProperty_SQL { get; set; }
+        public virtual ICollection<CompositionData> CompositionDatas { get; set; }
 
-        [Column("FlowReference-SQL")]
-        [StringLength(36)]
-        public string FlowReference_SQL { get; set; }
-
-        [Column("Ind-SQL")]
-        public int? Ind_SQL { get; set; }
+        public virtual ICollection<CompositionParam> CompositionParams { get; set; }
 
         public virtual Flow Flow { get; set; }
+
+        public virtual ICollection<FlowPropertyParam> FlowPropertyParams { get; set; }
     }
 }

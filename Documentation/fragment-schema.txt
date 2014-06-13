@@ -186,7 +186,7 @@ The following tables are required:
 
    UnitGroup
     * UnitGroupID
-    * UnitGroupUUID
+    % UUID (was UnitGroupUUID)
     * Name
     * ReferenceUnitConversionID(FK to UnitConversionID)
 
@@ -202,13 +202,13 @@ The following tables are required:
 
    FlowProperty
     * FlowPropertyID
-    * FlowPropertyUUID - UUID of source data file
+    % UUID (was FlowPropertyUUID) - UUID of source data file
     * Name
     * UnitGroupID
 
    Flow
     * FlowID
-    * FlowUUID - UUID of source data file
+    % UUID (was FlowUUID) - UUID of source data file
     * Name
     * CASNumber
     * FlowTypeID
@@ -231,7 +231,7 @@ The following tables are required:
 
    LCIAMethod
     * LCIAMethodID
-    * LCIAMethodUUID
+    % UUID (was LCIAMethodUUID)
     * Name
     * Methodology
     * ImpactCategoryID
@@ -255,7 +255,7 @@ The following tables are required:
 
    Process
     * ProcessID - internal primary key
-    * ProcessUUID - UUID of source file
+    % UUID (was ProcessUUID) - UUID of source file
     * Name
     * Year
     * Geography
@@ -349,13 +349,15 @@ The following tables are required:
 
    Fragment
     * FragmentID
+    + UUID - fragments should be included in ILCDEntity too
     * Name
-    * RootNode (FK to FragmentNode.FragmentNodeID)
-    * ReferenceFlow (FK to FlowID)
+    % ReferenceFragmentFlowID (FK to FragmentFlowID) (was RootNode) 
+    X ReferenceFlow REMOVE
    
    Background - New Table ### PLEASE REVIEW
     * BackgroundID
     * FlowID
+    + DirectionID
     * NodeTypeID (only Process or Fragment allowed)
     * TargetID (NOT foreign key- interpret as ProcessID or FragmentID)
 
@@ -372,39 +374,47 @@ The following tables are required:
     defined then nodes are grouped by stage for contribution analysis.  A
     given FragmentStageID's scope is limited to a single fragment.
 
-   FragmentNode
-    * FragmentNodeID
+   FragmentFlow - RENAME TABLE (was FragmentNode)
+    % FragmentFlowID (equals FragmentEdgeID) (was FragmentNodeID)
     * FragmentID (FK to Fragment)
-    * Name
+node fields:
+    * Name - of process occurring at terminus (or flow name for IO/background)
     * FragmentStageID (was StageID) (FK to FragmentStage: FragmentID must match)
-    * ReferenceProperty (FK to FlowPropertyID)
+    % ReferenceFlowPropertyID (FK to FlowPropertyID) - of edge terminating at node
     * NodeTypeID (FK to NodeType)
+edge fields (moved from FragmentEdge) :
+    * FlowID (FK to Flow; FlowType must not be Elementary)
+    * DirectionID (FK to Direction, w.r.t. origin node)
+    * Quantity (or NULL if Origin NodeType is Fragment)
+    % ParentFragmentFlowID (FK to FragmentFlowID) (was Origin) (moved to last)
 
-    The first of two core tables for fragment definition.  The node
-    represents a locus of industrial activity.
+    A FragmentFlowID corresponds to the observation of a flow and its
+    terminus.
 
    FragmentNodeProcess
     * FragmentNodeProcessID
-    * FragmentNodeID
+    * FragmentFlowID
     * ProcessID (FK to ProcessFlow.ProcessID)
 
     Mapping of nodes with type "Process" to ProcessIDs
 
    FragmentNodeFragment
     * FragmentNodeFragmentID
-    * FragmentNodeID
+    * FragmentFlowID
     * SubfragmentID
 
     Mapping of nodes with type "Fragment" to FragmentIDs
 
-   FragmentEdge
+   FragmentEdge - REMOVE TABLE
+
+   table has been merged with FragmentNode - now FragmentFlow
     * FragmentEdgeID
     * FragmentID (FK to Fragment)
     * Origin (FK to FragmentNodeID)
     * FlowID (FK to Flow; FlowType must not be Elementary)
     * DirectionID (FK to Direction, w.r.t. origin node)
     * Terminus (FK to FragmentNodeID: FragmentID must match)
-	* Quantity (or NULL if Origin NodeType is Fragment)
+    * Quantity (or NULL if Origin NodeType is Fragment)
 
     The second core table for fragment definition.  The edge represents a
     particular intermediate flow or industrial product.
@@ -441,7 +451,7 @@ The following tables are required:
 
    NodeDissipation - REMOVE TABLE
     * NodeDissipationID
-    * FragmentNodeID (FK to FragmentNode)
+    * FragmentFlowID (FK to FragmentFlow)
     * FlowPropertyID (FK to FlowFlowProperty - substance being dissipated)
     * EmissionFactor (0-1)
 
@@ -449,7 +459,7 @@ The following tables are required:
 
    NodeEmission - REMOVE TABLE
     % NodeEmissionID (was FragmentEmissionID)
-    % FragmentNodeID (was NodeID) (FK to FragmentNodeID)
+    % FragmentFlowID (was NodeID) (FK to FragmentFlowID)
     * FlowID (FK to Flow; FlowType must be Elementary)
     * DirectionID (FK to Direction)
     * Quantity
@@ -477,7 +487,7 @@ The following tables are required:
    DependencyParam
     * DependencyParamID
     * ParamID (FK to Param, ParamTypeID must be 1, 2, or 3)
-    * FragmentEdgeID
+    % FragmentFlowID (was FragmentEdgeID) (FK to FragmentFlowID)
 
    DistributionParam - New Table
     * DistributionParamID
@@ -487,12 +497,12 @@ The following tables are required:
    FlowPropertyParam
     * FlowPropertyParamID
     * ParamID (FK to Param, ParamTypeID must be 4)
-    * FlowFlowPropertyID
+    * FlowFlowPropertyID (FK)
 
    CompositionParam
     * CompositionParamID
     * ParamID (FK to Param, ParamTypeID must be 5)
-    * FlowFlowPropertyID
+    * FlowFlowPropertyID (FK)
 
     Note: types 4 and 5 both link to FlowFlowPropertyIDs but are used
     differently during fragment computation.
@@ -500,29 +510,29 @@ The following tables are required:
    ProcessDissipationParam
     * ProcessDissipationParamID
     * ParamID (FK to Param, ParamTypeID must be 6)
-    * ProcessDissipationID
+    * ProcessDissipationID (FK)
 
    NodeDissipationParam
     * NodeDissipationParamID
     * ParamID (FK to Param, ParamTypeID must be 7)
     * ProcessDissipationID (FK to ProcessDissipation)
-    * FragmentNodeID (FK to FragmentNode)
+    * FragmentFlowID (FK to FragmentFlow)
 
    ProcessEmissionParam - New Table
     * ProcessEmissionParamID
     * ParamID (FK to Param, ParamTypeID must be 8)
-    * ProcessFlowID
+    * ProcessFlowID (FK)
 
    NodeEmissionParam
     * NodeEmissionParamID
     * ParamID (FK to Param, ParamTypeID must be 9)
     * ProcessFlowID (FK to ProcessFlow)
-    * FragmentNodeID (FK to FragmentNode)
+    * FragmentFlowID (FK to FragmentFlow)
 
    CharacterizationParam - New Table
     * CharacterizationParamID
     * ParamID  (FK to Param, ParamTypeID must be 10)
-    * LCIAID
+    * LCIAID (FK)
 
     A single parameter value can be linked to multiple points in the model-
     but they must all be of the same type (a param with type 1 cannot be
@@ -536,15 +546,15 @@ The following tables are required:
 
    CompositionModel
     * CompositionModelID
-    * FlowID
+    * FlowID (FK)
     * Name
 
     List of intermediate flows for which composition parameters are relevant.
 
    CompositionData
     * CompositionDataID
-    * CompositionModelID
-    * FlowFlowPropertyID
+    * CompositionModelID (FK)
+    * FlowFlowPropertyID (FK)
     * Value
 
     List of flow-flow property values that are relevant to a given
@@ -577,8 +587,8 @@ The following tables are required:
 
    NodeCache (Renamed from FragmentScore)
     % NodeCacheID (was FragmentScoreID)
-    % FragmentNodeID (was FragmentID) (FK to FragmentNodeID)
-    * ScenarioID
+    % FragmentFlowID (was FragmentID) (FK to FragmentFlowID)
+    * ScenarioID (FK)
     X LCIAMethodID - moved to ScoreCache
     X FragmentNodeStageID - REMOVE
     X ParamID - REMOVE
@@ -590,25 +600,25 @@ The following tables are required:
 
    ScoreCache - New Table
     * ScoreCacheID
-    * NodeCacheID (was FragmentScoreID)
-    * LCIAMethodID
+    * NodeCacheID (was FragmentScoreID) (FK)
+    * LCIAMethodID (FK)
     * ImpactScore - for a unit activity (computed during LCIA)
 
     size of ScoreCache table = #(nodes) x #(scenarios) x #(LCIA  methods)
 
    BackgroundCache - New Table
     * BackgroundCacheID
-    * BackgroundID
-    * LCIAMethodID
+    * BackgroundID (FK)
+    * LCIAMethodID (FK)
     * Score
 
    ScenarioBackgroundCache - New Table
     * ScenarioBackgroundCacheID
-    * ScenarioBackgroundID
-    * LCIAMethodID
+    * ScenarioBackgroundID (FK)
+    * LCIAMethodID (FK)
     * Score
 
   Sensitivities should be computed on the fly.  If performance is slow, we
-  can add a boolean table indicating whether a given FragmentNodeID +
+  can add a boolean table indicating whether a given FragmentFlowID +
   ScenarioID is sensitive to a given ParamID, thus simplifying the
   traversal process.

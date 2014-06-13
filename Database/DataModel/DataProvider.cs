@@ -9,12 +9,19 @@ namespace LcaDataModel
     [Table("DataProvider")]
     public partial class DataProvider
     {
-        public int DataProviderID { get; set; }
+        public DataProvider()
+        {
+            ILCDEntities = new HashSet<ILCDEntity>();
+        }
 
-        [StringLength(36)]
-        public string DataProviderUUID { get; set; }
+        public int DataProviderID { get; set; }
 
         [StringLength(100)]
         public string Name { get; set; }
+
+        [StringLength(100)]
+        public string DirName { get; set; }
+
+        public virtual ICollection<ILCDEntity> ILCDEntities { get; set; }
     }
 }
