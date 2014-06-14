@@ -136,6 +136,27 @@ namespace LcaDataLoader {
                     }).ToList();
         }
 
+        private LCIA CreateLCIA(DbContextWrapper ilcdDb, XElement factorElement) {
+            LCIA lcia;
+            string uuid = factorElement.Element(ElementName("referenceToFlowDataSet")).Attribute("refObjectId").Value;
+            int? id = ilcdDb.GetIlcdEntityID<Flow>(uuid);
+            if (id == null) {
+                Console.WriteLine("WARNING: Unable to find flow matching LCIA refObjectId = {0}", uuid);
+            }
+            lcia = new LCIA { FlowID = id };
+            return lcia;
+        }
+
+        /// <summary>
+        /// Create a list of LCIA entities from LCIAMethod characterization factors.
+        /// </summary>
+        /// <param name="ilcdDb">Database context wrapper object</param>
+        /// <param name="flow">LCIAMethod parent entity</param>
+        private List<LCIA> CreateLciaList(DbContextWrapper ilcdDb, LCIAMethod lciaMethod) {
+            return LoadedDocument.Root.Descendants(ElementName("characterisationFactors")).Elements(ElementName("factor")).Select(f =>
+                   CreateLCIA(ilcdDb, f)).ToList();
+        }
+
         /// <summary>
         /// Import common ILCD data from loaded ILCD file to new ILCDEntity object.
         /// Save UUID and reference to new object in object implementing IIlcdEntity
@@ -218,6 +239,7 @@ namespace LcaDataLoader {
             }
             return fpID;
         }
+
 
         /// <summary>
         /// Import data from loaded flow file to new Flow entity

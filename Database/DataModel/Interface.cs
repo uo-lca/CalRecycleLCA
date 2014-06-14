@@ -71,6 +71,14 @@ namespace LcaDataModel {
             set { DataProviderID = ID; }
         }
     }
+    
+    public partial class Direction : ILookupEntity {
+        [NotMapped]
+        public int ID {
+            get { return DirectionID; }
+            set { DirectionID = ID; }
+        }
+    }
 
     public partial class FlowType : ILookupEntity {
         [NotMapped]

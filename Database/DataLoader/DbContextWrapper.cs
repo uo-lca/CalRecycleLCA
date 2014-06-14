@@ -175,6 +175,11 @@ namespace LcaDataLoader {
                     "Damage indicator",
                     "Mid-point indicator"
                 }));
+            SeedLUT<Direction>(dbContext.Directions,
+                new List<string>(new string[] {            
+                    "Input",
+                    "Output"
+             }));
             dbContext.SaveChanges();
 
         }
