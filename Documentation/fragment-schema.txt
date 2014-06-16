@@ -85,7 +85,7 @@ The following tables are required:
 
     Those are given in increasing order of privilege.
 
-    User 0 is default w all privileges
+    User 1 is "DB Creator" w no privileges
 
 ## Type Enumerations
    
@@ -148,6 +148,10 @@ The following tables are required:
 
     Different parameter types must be handled at different points in the
     tree traversal / LCIA computation.  
+
+   Visibility (enumeration)
+    * VisibilityID : [ 1 | 2 ]
+    * Name: [ Public | Private ]
 
 
 ## Standard ILCD-based Tables
@@ -411,7 +415,7 @@ edge fields (moved from FragmentEdge) :
 
    ScenarioGroup
     * ScenarioGroupID (was ScenarioSetID)
-    * OwnerID (FK to UserID)
+    * OwnedBy (FK to UserID)
     * Name
     * Visibility - public or private, or some other specification.
 
