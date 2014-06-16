@@ -15,6 +15,14 @@ namespace LcaDataModel {
         int ID { get; set; }
     }
 
+    public partial class LCIA : IEntity {
+        [NotMapped]
+        public int ID {
+            get { return LCIAID; }
+            set { LCIAID = value; }
+        }
+    }
+
     /// <summary>
     /// Interface to common ILCD Entity properties. Hides differences in column names.
     /// </summary>

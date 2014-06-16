@@ -136,25 +136,34 @@ namespace LcaDataLoader {
                     }).ToList();
         }
 
-        private LCIA CreateLCIA(DbContextWrapper ilcdDb, XElement factorElement) {
+        /// <summary>
+        /// Create an LCIA entity from an LCIAMethod characterization factor.
+        /// </summary>
+        /// <param name="ilcdDb">Database context wrapper object</param>
+        /// <param name="factorElement">LCIAMethod characterization factor element</param>
+        /// <param name="lciaMethodID">LCIAMethod parent entity ID</param>
+        private LCIA CreateLCIA(DbContextWrapper ilcdDb, XElement factorElement, int lciaMethodID) {
             LCIA lcia;
             string uuid = factorElement.Element(ElementName("referenceToFlowDataSet")).Attribute("refObjectId").Value;
+            double meanValue = (double)factorElement.Element(ElementName(("meanValue")));
+            string direction = (string)factorElement.Element(ElementName(("exchangeDirection")));
+            string location = (string)factorElement.Element(ElementName(("location")));
             int? id = ilcdDb.GetIlcdEntityID<Flow>(uuid);
             if (id == null) {
                 Console.WriteLine("WARNING: Unable to find flow matching LCIA refObjectId = {0}", uuid);
             }
-            lcia = new LCIA { FlowID = id };
+            int? dirID = ilcdDb.LookupEntityID<Direction>(direction);
+            if (dirID == null) {
+                Console.WriteLine("WARNING: Unable to find ID for exchangeDirection = {0}", direction);
+            }
+            lcia = new LCIA { FlowID = id, DirectionID = dirID, Factor = meanValue, Geography = location, LCIAMethodID = lciaMethodID };
             return lcia;
         }
 
-        /// <summary>
-        /// Create a list of LCIA entities from LCIAMethod characterization factors.
-        /// </summary>
-        /// <param name="ilcdDb">Database context wrapper object</param>
-        /// <param name="flow">LCIAMethod parent entity</param>
+       
         private List<LCIA> CreateLciaList(DbContextWrapper ilcdDb, LCIAMethod lciaMethod) {
             return LoadedDocument.Root.Descendants(ElementName("characterisationFactors")).Elements(ElementName("factor")).Select(f =>
-                   CreateLCIA(ilcdDb, f)).ToList();
+                   CreateLCIA(ilcdDb, f, lciaMethod.ID)).ToList();
         }
 
         /// <summary>
@@ -298,7 +307,13 @@ namespace LcaDataLoader {
             Debug.Assert(refUUID != null);
             lciaMethod.ReferenceQuantity = ilcdDb.GetIlcdEntityID<FlowProperty>(refUUID);
             if (ilcdDb.AddIlcdEntity(lciaMethod)) {
+                List<LCIA> lciaList = 
+                    LoadedDocument.Root.Descendants(ElementName("characterisationFactors")).Elements(ElementName("factor")).Select(f =>
+                        CreateLCIA(ilcdDb, f, lciaMethod.ID)).ToList();
+                ilcdDb.AddEntities<LCIA>(lciaList);
+
                 isSaved = true;
+
             }
             return isSaved;
         }

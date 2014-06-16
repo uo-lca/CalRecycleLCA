@@ -72,15 +72,11 @@ namespace LcaDataLoader {
         /// <returns>true iff entity was successfully inserted</returns>
         public bool AddIlcdEntity(IIlcdEntity ilcdEntity) {
             bool isAdded = false;
-            if (_UuidDictionary.ContainsKey(ilcdEntity.UUID)) {
-                Console.WriteLine("WARNING: Unable to add entity because UUID {0} already exists.", ilcdEntity.UUID);
-            }
-            else {
-                _DbContext.Set(ilcdEntity.GetType()).Add(ilcdEntity);
-                if (SaveChanges() > 0) {
-                    _UuidDictionary.Add(ilcdEntity.UUID, ilcdEntity.ID);
-                    isAdded = true;
-                }
+
+            _DbContext.Set(ilcdEntity.GetType()).Add(ilcdEntity);
+            if (SaveChanges() > 0) {
+                _UuidDictionary.Add(ilcdEntity.UUID, ilcdEntity.ID);
+                isAdded = true;
             }
             return isAdded;
         }
@@ -96,6 +92,11 @@ namespace LcaDataLoader {
             foreach (var flowFlowProperty in flowFlowPropertyList) {
                 _DbContext.FlowFlowProperties.Add(flowFlowProperty);
             }
+            _DbContext.SaveChanges();
+        }
+
+        public void AddEntities<T>(List<T> entityList) where T : class, IEntity  {
+            _DbContext.Set<T>().AddRange(entityList);
             _DbContext.SaveChanges();
         }
 
