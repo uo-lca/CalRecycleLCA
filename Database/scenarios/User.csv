@@ -1,0 +1,2 @@
+UserID,Name,CanLogin,CanEditScenarios,CanEditFragments,CanEditBackground,CanAppend
+"1","DB Creator",0,0,0,0,0

@@ -1,4 +1,5 @@
 ### Fragment Traversal with Parameters
+## updated Mon 06-16 11:22:24 -0700
 
 Traverse(ScenarioID)
 {
@@ -9,149 +10,114 @@ Traverse(ScenarioID)
   ScenarioID = @ScenarioID) 
     return // do not re-compute 
 
-  // traverse the fragment, using the appropriate edge weights
-
-  // Param_Traversal returns node and edge tables decorated with
-  // param data- 
-  [n, e] = Param_Traversal(ScenarioID)
+  myflows = this.flows; 
+    
+  myflows = applyDependencyParam ( myflows, ScenarioID );
   
-  FragmentEdge ReferenceEdge = SELECT ReferenceFragmentEdgeID FROM Fragment
-  	      	          WHERE FragmentID=@FragmentID
+  // fpflows now has an additional field from FlowFlowProperty.MeanValue
+  fpflows = applyFlowPropertyParam ( myflows, ScenarioID );
 
-  FragmentNode RootNode = ReferenceEdge.Origin;
-
-  float activity = 1 / ReferenceEdge.Quantity;
+  float RootNode = ReferenceFlow.FragmentFlowID;
+  float activity = 1;
   
   // traverse the tree recursively, writing cache values as you go
-  node_recurse(n, e, ScenarioID, RootNode, activity);
+  node_recurse(fpflows, ScenarioID, RootNode, activity);
   // DONE.
 }
 
 
-[nodes,edges]=Param_Traversal(ScenarioID)
+e=applyDependencyParam(flows,ScenarioID)
 {
-  // This function returns modified nodes and edges tables that contain
-  // parameterization info relevant to the current Fragment and ScenarioID
-  // separate function because it is also needed for sensitivity analysis
-
-  /* STEP 1 */
-  // first, pull all params of type 1-4 belonging to the named scenario 
+  // This function returns modified flows table that contains
+  // scenario-specific parameterization for dependency relationships
 
   ParamList params = ScenarioParam.* WHERE ScenarioID = @ScenarioID
   	    	     		     AND FragmentID = @FragmentID
-  edge_params = INNER JOIN params->Param->DependencyParam // types 1, 2, 3
-  fp_params = INNER JOIN params->Param->FlowPropertyParam // type 4
- 
-
+  dep_params = INNER JOIN params->Param->DependencyParam // types 1, 2, 3
+  
   // generate scenario-specific edge table.  The idea is that we use the
   // edge weights specified in the default FragmentEdge table, unless they
   // have been overridden by scenario params
-  e = Edges // base edge table is fragment property
-
-  // determine which edge records are parameterized under the current
-  // scenarioID :
-  edges = SELECT
-      FragmentEdgeID,
-      Origin,
-      FlowID,
-      DirectionID,
-      Terminus,
-      Quantity,
-      edge_params.ParamID,
-      edge_params.Value,
-      edge_params.ParamTypeID
-      FROM e LEFT OUTER JOIN edge_params ON FragmentEdgeID
-
+  e = SELECT flows.*,
+      edge_params.Value AS ParamValue,
+      FROM flows 
+      LEFT OUTER JOIN edge_params ON FragmentFlowID
+        
   // take the param values as defaults:
-  // update e to set Quantity field equal to Value wherever it is non-null
-  UPDATE e.Quantity with e.Value where e.Value is not null
+  UPDATE e.Quantity with e.ParamValue where e.ParamValue is not null;
 
+  DROP field ParamValue; // so e has the same fields as flows
 
-  /* STEP 2 */
-  // for each node, we need to find a FlowFlowProperty record that matches
-  // the Flow feeding the node and the FlowProperty listed as the node's
-  // reference property.  This is true regardless of parameterization
-
-  // Determine root node:
-
-  FragmentEdge ReferenceEdge = SELECT ReferenceFragmentEdgeID FROM
-  	       		       Fragment WHERE FragmentID=@FragmentID
-
-  n = SELECT 
-      FragmentNodeID,
-      nt.Name AS NodeType,
-      ReferenceProperty,
-      e.FlowID AS InputFlow
-      FROM Nodes // base node table is fragment property
-      INNER JOIN NodeType nt ON Nodes.NodeTypeID = nt.NodeTypeID
-      LEFT OUTER JOIN e ON Nodes.FragmentNodeID = e.Terminus
-
-  // the Root Node is not listed as terminus in the edge table; so its
-  // FlowID field should be null-- set it to the fragment reference flow (a
-  // fragment property drawn from Fragment table)
-  UPDATE n.InputFlow = e.FlowID WHERE FragmentEdgeID = ReferenceEdge
-
-  // next, match each node's input flow and reference property to an
-  // entry in the FlowFlowProperty table.
-  n = SELECT * 
-      FROM n LEFT OUTER JOIN FlowFlowProperty ffp 
-      	ON n.InputFlow = ffp.FlowID
- 	WHERE ffp.FlowPropertyID = n.ReferenceProperty
-
-  // finally, determine which nodes are affected by type 4 params
-  nodes = SELECT
-      FragmentNodeID,
-      NodeType,
-      ReferenceProperty,
-      InputFlow,
-      MeanValue,
-      fp_params.ParamID,
-      fp_params.Value,
-      fp_params.ParamTypeID
-      FROM n LEFT OUTER JOIN fp_params 
-	ON n.FlowFlowPropertyID = fp_params.FlowFlowPropertyID
-
-  // take the param values as defaults:
-  // update n to set MeanValue field equal to Value wherever it is non-null
-  UPDATE n.MeanValue with n.Value WHERE n.Value is not null
-
-  return(nodes,edges)
+  return e;
 }
 
-Fragment.node_recurse(n, e, ScenarioID, current_node, activity)
+fp_flows=applyFlowPropertyParam(flows,ScenarioID)
 {
-  the_node = SELECT * FROM n WHERE FragmentNodeID = current_node
+  // This function returns an augmented flows table that includes
+  // a field containing the FlowFlowProperty.MeanValue field that
+  // matches both FlowID and FlowPropertyID in each flows record.
+  // also applies scenario-specific flow property parameterization.
+
+  // first, determine the correct FlowFlowPropertyID
+  fp_flows = SELECT flows.*,
+  	     ffp.MeanValue
+	     FROM flows INNER JOIN FlowFlowProperty ffp
+  	     ON flows.FlowID = ffp.FlowID
+	     WHERE flows.FlowPropertyID = ffp.FlowPropertyID
+  
+  // next, see if there are any relevant flow property params
+  ParamList params = ScenarioParam.* WHERE ScenarioID = @ScenarioID
+  	    	     		     AND FragmentID = @FragmentID
+  fp_params = INNER JOIN params->Param->FlowPropertyParam // type 4
+  
+  // then attach the param values (if there are any) to fp_flows
+  fp_flows = SELECT fp_flows.*,
+      	     fp_params.Value AS ParamValue,
+      	     FROM fp_flows 
+      	     LEFT OUTER JOIN fp_params 
+	     ON fp_flows.FlowFlowPropertyID = fp_params.FlowFlowPropertyID
+        
+  // take the param values as defaults:
+  UPDATE fp_flows.MeanValue with fp_flows.ParamValue 
+  	 where fp_flows.ParamValue is not null;
+
+  DROP field ParamValue; // so e has the same fields as fp_flows
+
+  return fp_flows;
+}
+
+
+Fragment.node_recurse(flows, ScenarioID, current_flow, activity)
+{
+  the_flow = SELECT * FROM flows WHERE FragmentNodeID = current_flow
 
   // "enter" the node -- handle reference property conversion
   // (params of type 4 have effect here)
-  if the_node.InputFlow == 0 
-    // special case: very top-level fragment with no input
-    node_conv = 1;
-  else
-    node_conv = the_node.MeanValue
+  node_weight = the_node.Quantity;
+  node_conv = the_node.MeanValue;
 
-  activity = activity * node_conv % node activity level unit conversion
+  activity = activity * node_weight * node_conv; % node activity level unit conversion
 
-  SetNodeCache( current_node, ScenarioID, activity )
+  SetNodeCache( current_flow, ScenarioID, activity )
   
   // now descend into node's children
   switch the_node.NodeType
     case 'Process'
     {
       // dependencies are encoded in the edge table
-      dependencies = SELECT * FROM e WHERE Origin = current_node
+      dependencies = SELECT * FROM flows WHERE ParentFragmentFlowID = current_flow
       for i in dependencies
       { 
-        node_recurse(n, e, ScenarioID, i.Terminus, activity * i.Quantity)
+        node_recurse(flows, ScenarioID, i.FragmentFlowID, activity )
       }
     }
     case 'Fragment'
     { 
       // dependencies are inputs and outputs from subfragment
-      the_node = SELECT * FROM the_node INNER JOIN FragmentNodeFragment fnf
-      	       	 ON the_node.FragmentNodeID = fnf.FragmentNodeID
+      the_node = SELECT * FROM the_flow INNER JOIN FragmentNodeFragment fnf
+      	       	 ON the_flow.FragmentNodeID = fnf.FragmentNodeID
       
-      F = new Fragment(the_node.SubfragmentID)
+      F = new Fragment(the_flow.SubFragmentID);
 
       // traverse the subfragment
       F.Traverse(ScenarioID)
@@ -162,28 +128,11 @@ Fragment.node_recurse(n, e, ScenarioID, current_node, activity)
       // IOFlows is a list of edges.  For every edge that has a
       // corresponding entry in our local edge table, follow it.  
 
-      dependencies = SELECT 
-      		     e.FragmentEdgeID,
-      		     e.Origin,
-      		     IOFlows.FlowID AS FlowID,
-      		     IOFlows.DirectionID AS DirectionID,
-      		     e.Terminus AS Terminus,
-      		     IOFlows.Quantity AS Quantity,
-      		    FROM e 
-      	       INNER JOIN IOFlows ON e.Origin = IOFlows.FragmentNodeID
-
-      // An IOFlow that does not have a corresponding edge entry, or
-      // conversely an edge that does not have a corresponding IOFlow, is
-      // an error condition.
-      // THIS CAN ONLY HAPPEN if the subfragment was modified to add or
-      // remove inputs or outputs SINCE the parent fragment was
-      // defined.  
-
-      catch_unmatched_dependencies();
+      dependencies = MatchDependencies(flows,IOFlows); // not written yet
 
       for i in dependencies
       { 
-        node_recurse(n, e, ScenarioID, i.Terminus, activity * i.Quantity)
+        node_recurse(flows, ScenarioID, i.ParentFragmentFlowID, activity )
       }
 
     }
