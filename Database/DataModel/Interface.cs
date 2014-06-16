@@ -8,11 +8,21 @@ using System.ComponentModel.DataAnnotations.Schema;
 namespace LcaDataModel {
     /// <summary>
     /// Interface to common Entity properties. Hides differences in column names.
+    /// All Entities have ID.
     /// </summary>
     public interface IEntity {
         // ID accessor signatures, do not persist
         [NotMapped]
         int ID { get; set; }
+    }
+
+
+    public partial class FlowFlowProperty : IEntity {
+        [NotMapped]
+        public int ID {
+            get { return FlowFlowPropertyID; }
+            set { FlowFlowPropertyID = value; }
+        }
     }
 
     public partial class LCIA : IEntity {
@@ -23,8 +33,26 @@ namespace LcaDataModel {
         }
     }
 
+    public partial class ProcessFlow : IEntity {
+        [NotMapped]
+        public int ID {
+            get { return ProcessFlowID; }
+            set { ProcessFlowID = value; }
+        }
+    }
+
+
+    public partial class UnitConversion : IEntity {
+        [NotMapped]
+        public int ID {
+            get { return UnitConversionID; }
+            set { UnitConversionID = value; }
+        }
+    }
+
     /// <summary>
     /// Interface to common ILCD Entity properties. Hides differences in column names.
+    /// All ILCD entities have UUID
     /// </summary>
     public interface IIlcdEntity : IEntity {
         // UUID accessor signature  
@@ -65,8 +93,17 @@ namespace LcaDataModel {
         }
     }
 
+    public partial class Process : IIlcdEntity {
+        [NotMapped]
+        public int ID {
+            get { return ProcessID; }
+            set { ProcessID = value; }
+        }
+    }
+
     /// <summary>
     /// Interface to common Lookup Table properties. Hides differences in ID column name.
+    /// All Lookup entities have Name
     /// </summary>
     public interface ILookupEntity : IEntity {
         string Name { get; set; }
@@ -111,6 +148,23 @@ namespace LcaDataModel {
             set { IndicatorTypeID = ID; }
         }
     }
+
+    public partial class ProcessType : ILookupEntity {
+        [NotMapped]
+        public int ID {
+            get { return ProcessTypeID; }
+            set { ProcessTypeID = ID; }
+        }
+    }
+
+    public partial class ReferenceType : ILookupEntity {
+        [NotMapped]
+        public int ID {
+            get { return ReferenceTypeID; }
+            set { ReferenceTypeID = ID; }
+        }
+    }
+
 }
 
 

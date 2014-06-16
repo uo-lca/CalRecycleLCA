@@ -81,25 +81,16 @@ namespace LcaDataLoader {
             return isAdded;
         }
 
-        public void AddUnitConversions(List<UnitConversion> unitConversionList) {
-            foreach (var unitConversion in unitConversionList) {
-                _DbContext.UnitConversions.Add(unitConversion);
-            }
-            _DbContext.SaveChanges();
-        }
-
-        public void AddFlowFlowProperties(List<FlowFlowProperty> flowFlowPropertyList) {
-            foreach (var flowFlowProperty in flowFlowPropertyList) {
-                _DbContext.FlowFlowProperties.Add(flowFlowProperty);
-            }
-            _DbContext.SaveChanges();
-        }
-
         public void AddEntities<T>(List<T> entityList) where T : class, IEntity  {
             _DbContext.Set<T>().AddRange(entityList);
             _DbContext.SaveChanges();
         }
 
+        /// <summary>
+        /// Populate Lookup table, if it is empty.
+        /// </summary>
+        /// <param name="lutSet">database context DbSet for the lookup table</param>
+        /// <param name="nameList">list of names to be inserted (order is preserved)</param>
         public static void SeedLUT<T>(DbSet<T> lutSet, List<string> nameList) where T : class, ILookupEntity, new() {
             int id = 1;
             if (lutSet.Count() == 0) {
@@ -139,6 +130,10 @@ namespace LcaDataLoader {
             }
         }
 
+        /// <summary>
+        /// Insert initial data into new database.
+        /// </summary>
+        /// <param name="dbContext">Entity Framework database context</param>
         public static void Seed(EntityDataModel dbContext) {
             SeedLUT<DataProvider>(dbContext.DataProviders,
                 new List<string>(new string[] {            
@@ -180,6 +175,17 @@ namespace LcaDataLoader {
                 new List<string>(new string[] {            
                     "Input",
                     "Output"
+             }));
+            SeedLUT<ReferenceType>(dbContext.ReferenceTypes,
+                new List<string>(new string[] {            
+                    "Other parameter",
+                    "Reference flow(s)"
+             }));
+            SeedLUT<ProcessType>(dbContext.ProcessTypes,
+                new List<string>(new string[] {            
+                    "LCI result",
+                    "Unit process, single operation",
+                    "Partly terminated system"
              }));
             dbContext.SaveChanges();
 
