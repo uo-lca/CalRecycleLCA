@@ -189,11 +189,6 @@ namespace LcaDataLoader {
                 STDev = stdev, Type = type, VarName = varName };
         }
        
-        private List<LCIA> CreateLciaList(DbContextWrapper ilcdDb, LCIAMethod lciaMethod) {
-            return LoadedDocument.Root.Descendants(ElementName("characterisationFactors")).Elements(ElementName("factor")).Select(f =>
-                   CreateLCIA(ilcdDb, f, lciaMethod.ID)).ToList();
-        }
-
         /// <summary>
         /// Import common ILCD data from loaded ILCD file to new ILCDEntity object.
         /// Save UUID and reference to new object in object implementing IIlcdEntity

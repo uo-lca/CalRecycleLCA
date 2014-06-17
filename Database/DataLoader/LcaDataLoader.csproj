@@ -77,6 +77,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="CsvImporter.cs" />
     <Compile Include="DbInitializer.cs" />
     <Compile Include="DbContextWrapper.cs" />
     <Compile Include="IlcdImporter.cs" />

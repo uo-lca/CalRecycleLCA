@@ -79,7 +79,7 @@ namespace LcaDataModel {
                 .IsUnicode(false);
 
             modelBuilder.Entity<CategorySystem>()
-                .Property(e => e.Delimeter)
+                .Property(e => e.Delimiter)
                 .IsUnicode(false);
 
             modelBuilder.Entity<Classification>()

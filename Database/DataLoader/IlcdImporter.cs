@@ -16,7 +16,7 @@ namespace LcaDataLoader {
         /// <summary>
         /// Wrapper for the app's DbContext
         /// </summary>
-        private DbContextWrapper _DbContext = new DbContextWrapper(new EntityDataModel());
+        private DbContextWrapper _DbContext = new DbContextWrapper();
 
         /// <summary>
         /// Object to handle loading ILCD data file.
