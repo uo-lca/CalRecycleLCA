@@ -182,13 +182,14 @@ namespace LcaDataLoader {
                     "Reference flow(s)"
              }));
             SeedLUT<ProcessType>(dbContext.ProcessTypes,
-                new List<string>(new string[] {            
+                new List<string>(new string[] {  
+                    "Avoided product system",
                     "LCI result",
-                    "Unit process, single operation",
-                    "Partly terminated system"
+                    "Partly terminated system",
+                    "Unit process, black box",
+                    "Unit process, single operation"
              }));
             dbContext.SaveChanges();
-
         }
 
         /// <summary>

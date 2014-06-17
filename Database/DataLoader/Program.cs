@@ -30,8 +30,8 @@ namespace LcaDataLoader {
             OptionSet options = new OptionSet() {
                 {"r|root=", "The full {DATA_ROOT} path.", v => dataRoot = v },
                 {"s|source=", "ILCD archive {source name}.", v => ilcdSourceName = v },
-                {"d|delete", "Delete database and recreate.", v => _DeleteFlag = (v!=null)},
-                {"l|log=", "Redirect output to {log file}.", v => _LogFileName = v }
+                {"d|delete", "Delete database and recreate.", v => _DeleteFlag = (v!=null)} // TODO : Use logger tool
+                //{"l|log=", "Redirect output to {log file}.", v => _LogFileName = v }
             };
             List<string> extraArgs;
             try {
@@ -80,7 +80,8 @@ namespace LcaDataLoader {
             int exitCode = 0;
             try {
                 ParseArguments(args);
-                StartLogging();
+                // TODO : Use logger tool
+                // StartLogging();
                 if (_DeleteFlag) {
                     Database.SetInitializer<EntityDataModel>(new DropCreateDatabaseInitializer());
                 }
@@ -100,7 +101,7 @@ namespace LcaDataLoader {
                 exitCode = 1;
             }
             finally {
-                StopLogging();
+                // StopLogging();
             }
             return exitCode;
         }
