@@ -56,7 +56,7 @@ namespace LcaDataLoader {
                 isImported = dbContext.AddEntity(obj);
             }
             else {
-                Console.WriteLine("WARNING: Classification UUID {0} not found. Skipping record.", uuid);
+                Program.Logger.WarnFormat("Classification UUID {0} not found. Skipping record.", uuid);
             }
             return isImported;
         }
@@ -67,7 +67,7 @@ namespace LcaDataLoader {
             foreach (Row row in table.Rows) {
                 if (importRow(row, dbContext)) importCounter++;
             }
-            Console.WriteLine("INFO: {0} of {1} records imported from {2}.", importCounter, table.Rows.Count(), fileName);
+            Program.Logger.InfoFormat("{0} of {1} records imported from {2}.", importCounter, table.Rows.Count(), fileName);
             return importCounter;
         }
 
@@ -79,7 +79,7 @@ namespace LcaDataLoader {
                 }
             }
             else {
-                Console.WriteLine("INFO: Skipping {0}. File does not exist.", fileName);
+                Program.Logger.InfoFormat("Skipping {0}. File does not exist.", fileName);
             }
             return false;
         }
@@ -93,10 +93,10 @@ namespace LcaDataLoader {
                 ImportAppendCSV(dirName, "CategorySystem", ImportCategorySystem, dbContext);
                 ImportAppendCSV(dirName, "Category", ImportCategory, dbContext);
                 ImportAppendCSV(dirName, "Classification", ImportClassification, dbContext);
-                Console.WriteLine("INFO: Loaded files in {0}", dirName);
+                Program.Logger.InfoFormat("Loaded files in {0}", dirName);
             }
             else {
-                Console.WriteLine("WARNING: CSV folder, {0}, does not exist.", dirName);
+                Program.Logger.WarnFormat("CSV folder, {0}, does not exist.", dirName);
             }
         }
     }

@@ -52,10 +52,9 @@ namespace LcaDataLoader {
                 return _DbContext.SaveChanges();
             }
             catch (DbUpdateException e) {
-                Console.WriteLine("ERROR: Database update exception!");
-                Console.WriteLine(e.Message);
+                Program.Logger.ErrorFormat("Database update exception: {0}", e.Message);
                 for (var ie = e.InnerException; ie != null; ie = ie.InnerException) {
-                    Console.WriteLine("Inner Exception: {0}", e.InnerException.Message);
+                    Program.Logger.ErrorFormat("Inner exception: {0}", e.InnerException.Message);
                 }
 
                 return 0;
@@ -100,7 +99,7 @@ namespace LcaDataLoader {
                 }
             }
             else {
-                Console.WriteLine("ERROR: Lookup table {0} is not empty.", typeof(T).ToString());
+                Program.Logger.ErrorFormat("Lookup table {0} is not empty.", typeof(T).ToString());
             }
         }
 
@@ -111,7 +110,7 @@ namespace LcaDataLoader {
                 if (typeof(T) == typeof(FlowType)) {
                     return GetFlowTypeID(name);
                 }
-                Console.WriteLine("ERROR: Lookup {0} by name, {1}, failed.", typeof(T).ToString(), name);
+                Program.Logger.ErrorFormat("Lookup {0} by name, {1}, failed.", typeof(T).ToString(), name);
                 return null;
             }
             else {
@@ -123,7 +122,7 @@ namespace LcaDataLoader {
             DbSet<T> dbSet = _DbContext.Set<T>();
             IIlcdEntity entity = (from le in dbSet where le.UUID == uuid select le).FirstOrDefault();
             if (entity == null) {
-                Console.WriteLine("ERROR: Unable to find {0} with UUID, {1}.", typeof(T).ToString(), uuid);
+                Program.Logger.ErrorFormat("Unable to find {0} with UUID, {1}.", typeof(T).ToString(), uuid);
                 return null;
             }
             else {

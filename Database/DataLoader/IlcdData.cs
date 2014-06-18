@@ -150,11 +150,11 @@ namespace LcaDataLoader {
             string location = (string)el.Element(ElementName(("location")));
             int? id = ilcdDb.GetIlcdEntityID<Flow>(uuid);
             if (id == null) {
-                Console.WriteLine("WARNING: Unable to find flow matching LCIA refObjectId = {0}", uuid);
+                Program.Logger.WarnFormat("Unable to find flow matching LCIA refObjectId = {0}", uuid);
             }
             int? dirID = ilcdDb.LookupEntityID<Direction>(direction);
             if (dirID == null) {
-                Console.WriteLine("WARNING: Unable to find ID for exchangeDirection = {0}", direction);
+                Program.Logger.WarnFormat("Unable to find ID for exchangeDirection = {0}", direction);
             }
             lcia = new LCIA { FlowID = id, DirectionID = dirID, Factor = meanValue, Geography = location, LCIAMethodID = lciaMethodID };
             return lcia;
@@ -175,12 +175,12 @@ namespace LcaDataLoader {
             string uuid = el.Element(ElementName("referenceToFlowDataSet")).Attribute("refObjectId").Value;
             int? id = ilcdDb.GetIlcdEntityID<Flow>(uuid);
             if (id == null) {
-                Console.WriteLine("WARNING: Unable to find flow matching exchange refObjectId = {0}", uuid);
+                Program.Logger.WarnFormat("Unable to find flow matching exchange refObjectId = {0}", uuid);
             }
             string direction = (string)el.Element(ElementName(("exchangeDirection")));
             int? dirID = ilcdDb.LookupEntityID<Direction>(direction);
             if (dirID == null) {
-                Console.WriteLine("WARNING: Unable to find ID for exchangeDirection = {0}", direction);
+                Program.Logger.WarnFormat("Unable to find ID for exchangeDirection = {0}", direction);
             }
             string location = (string)el.Element(ElementName(("location")));
             return new ProcessFlow { 
@@ -235,14 +235,14 @@ namespace LcaDataLoader {
             flowProperty.Name = GetCommonName();
             ugUUID = GetElementAttributeValue(ElementName("referenceToReferenceUnitGroup"), "refObjectId");
             if (ugUUID == null) {
-                Console.WriteLine("WARNING: Unable to find referenceToReferenceUnitGroup in flow property {0}", 
+                Program.Logger.WarnFormat("Unable to find referenceToReferenceUnitGroup in flow property {0}", 
                     flowProperty.UUID);
             }
             else {
                 string referenceUUID = ugUUID;
                 ugID = ilcdDb.GetIlcdEntityID<UnitGroup>((string)referenceUUID);
                 if (ugID == null) {
-                    Console.WriteLine("WARNING: Unable to find unit group matching flow property refObjectId = {0}", ugUUID);
+                    Program.Logger.WarnFormat("Unable to find unit group matching flow property refObjectId = {0}", ugUUID);
                 }
                 else {
                     flowProperty.UnitGroupID = ugID;
@@ -267,7 +267,7 @@ namespace LcaDataLoader {
             string fpUUID = fpElement.Element(ElementName("referenceToFlowPropertyDataSet")).Attribute("refObjectId").Value;
             int? fpID = ilcdDb.GetIlcdEntityID<FlowProperty>(fpUUID);
             if (fpID == null) {
-                Console.WriteLine("WARNING: Unable to find flow property matching flow refObjectId = {0}", fpUUID);
+                Program.Logger.WarnFormat("Unable to find flow property matching flow refObjectId = {0}", fpUUID);
             }
             return fpID;
         }
@@ -378,7 +378,7 @@ namespace LcaDataLoader {
             string nsString = LoadedDocument.Root.Name.Namespace.ToString();
             string commonUUID = GetCommonUUID();
             if (ilcdDb.IlcdUuidExists(commonUUID)) {
-                Console.WriteLine("WARNING: UUID {0} was already imported and will not be updated.", commonUUID);
+                Program.Logger.WarnFormat("UUID {0} was already imported and will not be updated.", commonUUID);
             }
             else {
                 switch (nsString) {

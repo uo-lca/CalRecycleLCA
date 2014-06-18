@@ -8,6 +8,8 @@ using System.Text;
 using System.Threading.Tasks;
 using NDesk.Options;
 using LcaDataModel;
+using log4net;
+using log4net.Config;
 
 namespace LcaDataLoader {
     /// <summary>
@@ -19,28 +21,24 @@ namespace LcaDataLoader {
         /// </summary>
         static string _DataRoot;
         static string _IlcdDirName = null;
-        static string _LogFileName;
         static bool _DeleteFlag;
-        static StreamWriter _LogWriter = null;
+        public static readonly ILog Logger = LogManager.GetLogger(typeof(Program));
 
         static void ParseArguments(string[] args) {
             _DataRoot = "C:\\CalRecycleLCA-DATA_ROOT";
             string ilcdSourceName = null;
-            //_LogFileName = "C:\\CalRecycleLCA-DATA_ROOT\\Full UO LCA Flat Export BK 2014_05_05\\LcaDataLoaderLog.txt";
             _DeleteFlag = false;
             OptionSet options = new OptionSet() {
                 {"r|root=", "The full {DATA_ROOT} path.", v => _DataRoot = v },
                 {"s|source=", "ILCD archive {source name}.", v => ilcdSourceName = v },
-                {"d|delete", "Delete database and recreate.", v => _DeleteFlag = (v!=null)} // TODO : Use logger tool
-                //{"l|log=", "Redirect output to {log file}.", v => _LogFileName = v }
+                {"d|delete", "Delete database and recreate.", v => _DeleteFlag = (v!=null)} 
             };
             List<string> extraArgs;
             try {
                 extraArgs = options.Parse(args);
             }
             catch (OptionException e) {
-                Console.Write("Usage Error: ");
-                Console.WriteLine(e.Message);
+                Logger.ErrorFormat("Usage Error: {0}", e.Message);
             }
             if (!String.IsNullOrEmpty(ilcdSourceName)) {
                 _IlcdDirName = Path.Combine(_DataRoot, ilcdSourceName, "ILCD");
@@ -48,33 +46,14 @@ namespace LcaDataLoader {
         }
 
         /// <summary>
-        /// Redirect console output to file with name, _LogFileName.
+        /// Initialize logging.
         /// </summary>
         static void StartLogging() {
-            try {
-                // Attempt to open output file.
-                _LogWriter = new StreamWriter(_LogFileName);
-                _LogWriter.AutoFlush = true;
-                // Redirect standard output from the console to the output file.
-                Console.SetOut(_LogWriter);
-            }
-            catch (IOException e) {
-                TextWriter errorWriter = Console.Error;
-                errorWriter.WriteLine(e.Message);
-            }
+            // Default configuration
+            // TODO : Create and use configuration file
+            BasicConfigurator.Configure();
         }
 
-        /// <summary>
-        /// Redirect console output to stdout.
-        /// </summary>
-        static void StopLogging() {
-            _LogWriter.Close();
-            // Recover the standard output stream so that a  
-            // completion message can be displayed.
-            StreamWriter standardOutput = new StreamWriter(Console.OpenStandardOutput());
-            standardOutput.AutoFlush = true;
-            Console.SetOut(standardOutput);
-        }
 
         /// <summary>
         /// Entry point of console app.
@@ -82,9 +61,8 @@ namespace LcaDataLoader {
         static int Main(string[] args) {
             int exitCode = 0;
             try {
+                StartLogging();
                 ParseArguments(args);
-                // TODO : Use logger tool
-                // StartLogging();
                 if (_DeleteFlag) {
                     Database.SetInitializer<EntityDataModel>(new DropCreateDatabaseInitializer());
                 }
@@ -92,25 +70,25 @@ namespace LcaDataLoader {
                     if (Directory.Exists(_IlcdDirName)) {
                         IlcdImporter ilcdImporter = new IlcdImporter();
                         ilcdImporter.LoadAll(_IlcdDirName);
-                        Console.WriteLine("SUCCESS: Loaded ILCD archive from {0}.", _IlcdDirName);
+                        Logger.InfoFormat("Loaded ILCD archive from {0}.", _IlcdDirName);
                     }
                     else {
-                        Console.WriteLine("ERROR: ILCD folder, {0}, does not exist.", _IlcdDirName);
+                        Logger.ErrorFormat("ILCD folder, {0}, does not exist.", _IlcdDirName);
                         exitCode = 1;
                     }
                 }
                 if (Directory.Exists(_DataRoot)) {
                     CsvImporter csvImporter = new CsvImporter();
                     csvImporter.LoadAll(_DataRoot);
-                    Console.WriteLine("SUCCESS: Loaded CSV folders under {0}.", _DataRoot);
+                    Logger.InfoFormat("Loaded CSV folders under {0}.", _DataRoot);
                 }
                 else {
-                    Console.WriteLine("ERROR: Data Root folder, {0}, does not exist.", _DataRoot);
+                    Logger.ErrorFormat("Data Root folder, {0}, does not exist.", _DataRoot);
                     exitCode = 1;
                 }
             }
             catch (Exception e) {
-                Console.WriteLine("ERROR: Exception Message = {0}", e.Message);
+                Logger.FatalFormat("Unexpected Exception. Message = {0}", e.Message);
                 Console.Write(e.ToString());
                 exitCode = 1;
             }

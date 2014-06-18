@@ -71,13 +71,13 @@ namespace LcaDataLoader {
                         importCounter++;
                     }
                     else {
-                        Console.WriteLine("WARNING: Data in file {0} was not imported.", s);
+                        Program.Logger.WarnFormat("Data in file {0} was not imported.", s);
                     }
                 }
-                Console.WriteLine("INFO: {0} of {1} files imported from {2}.", importCounter, files.Length, dirName);
+                Program.Logger.InfoFormat("{0} of {1} files imported from {2}.", importCounter, files.Length, dirName);
             }
             else {
-                Console.WriteLine("WARNING: ILCD data type folder, {0}, does not exist.", dirName);
+                Program.Logger.WarnFormat("ILCD data type folder, {0}, does not exist.", dirName);
             }
         }
     }
