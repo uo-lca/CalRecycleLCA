@@ -19,9 +19,9 @@ namespace LcaDataModel
 
         public int? ParamID { get; set; }
 
-        public int? FragmentEdgeID { get; set; }
+        public int? FragmentFlowID { get; set; }
 
-        public virtual FragmentEdge FragmentEdge { get; set; }
+        public virtual FragmentFlow FragmentFlow { get; set; }
 
         public virtual Param Param { get; set; }
 

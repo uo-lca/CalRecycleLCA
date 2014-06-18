@@ -14,9 +14,5 @@ namespace LcaDataModel
         public int? ParamID { get; set; }
 
         public int? NodeDissipationID { get; set; }
-
-        public virtual NodeDissipation NodeDissipation { get; set; }
-
-        public virtual Param Param { get; set; }
     }
 }

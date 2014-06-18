@@ -74,6 +74,7 @@
     <Compile Include="Fragment.cs" />
     <Compile Include="FragmentEdge.cs" />
     <Compile Include="FragmentEmission.cs" />
+    <Compile Include="FragmentFlow.cs" />
     <Compile Include="FragmentNode.cs" />
     <Compile Include="FragmentNodeFragment.cs" />
     <Compile Include="FragmentNodeProcess.cs" />
@@ -107,10 +108,10 @@
     <Compile Include="ScenarioParam.cs" />
     <Compile Include="ScenarioSet.cs" />
     <Compile Include="Source.cs" />
-    <Compile Include="sysdiagram.cs" />
     <Compile Include="UnitConversion.cs" />
     <Compile Include="UnitGroup.cs" />
     <Compile Include="User.cs" />
+    <Compile Include="Visibility.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />

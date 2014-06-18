@@ -15,9 +15,7 @@ namespace LcaDataModel
             CompostionModels = new HashSet<CompostionModel>();
             FlowPropertyEmissions = new HashSet<FlowPropertyEmission>();
             FlowFlowProperties = new HashSet<FlowFlowProperty>();
-            Fragments = new HashSet<Fragment>();
-            FragmentEdges = new HashSet<FragmentEdge>();
-            NodeEmissions = new HashSet<NodeEmission>();
+            FragmentFlows = new HashSet<FragmentFlow>();
             Processes = new HashSet<Process>();
             ProcessFlows = new HashSet<ProcessFlow>();
             ScenarioBackgrounds = new HashSet<ScenarioBackground>();
@@ -52,11 +50,7 @@ namespace LcaDataModel
 
         public virtual ICollection<FlowFlowProperty> FlowFlowProperties { get; set; }
 
-        public virtual ICollection<Fragment> Fragments { get; set; }
-
-        public virtual ICollection<FragmentEdge> FragmentEdges { get; set; }
-
-        public virtual ICollection<NodeEmission> NodeEmissions { get; set; }
+        public virtual ICollection<FragmentFlow> FragmentFlows { get; set; }
 
         public virtual ICollection<Process> Processes { get; set; }
 

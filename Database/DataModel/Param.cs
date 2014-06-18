@@ -14,7 +14,6 @@ namespace LcaDataModel
             CharacterizationParams = new HashSet<CharacterizationParam>();
             CompositionParams = new HashSet<CompositionParam>();
             DependencyParams = new HashSet<DependencyParam>();
-            NodeDissipationParams = new HashSet<NodeDissipationParam>();
             NodeEmissionParams = new HashSet<NodeEmissionParam>();
             ProcessDissipationParams = new HashSet<ProcessDissipationParam>();
             ProcessEmissionParams = new HashSet<ProcessEmissionParam>();
@@ -38,8 +37,6 @@ namespace LcaDataModel
         public virtual ICollection<CompositionParam> CompositionParams { get; set; }
 
         public virtual ICollection<DependencyParam> DependencyParams { get; set; }
-
-        public virtual ICollection<NodeDissipationParam> NodeDissipationParams { get; set; }
 
         public virtual ICollection<NodeEmissionParam> NodeEmissionParams { get; set; }
 

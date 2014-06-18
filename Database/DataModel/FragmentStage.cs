@@ -11,8 +11,7 @@ namespace LcaDataModel
     {
         public FragmentStage()
         {
-            FragmentNodes = new HashSet<FragmentNode>();
-            FragmentNodes1 = new HashSet<FragmentNode>();
+            FragmentFlows = new HashSet<FragmentFlow>();
         }
 
         public int FragmentStageID { get; set; }
@@ -24,8 +23,6 @@ namespace LcaDataModel
 
         public virtual Fragment Fragment { get; set; }
 
-        public virtual ICollection<FragmentNode> FragmentNodes { get; set; }
-
-        public virtual ICollection<FragmentNode> FragmentNodes1 { get; set; }
+        public virtual ICollection<FragmentFlow> FragmentFlows { get; set; }
     }
 }

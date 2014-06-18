@@ -24,7 +24,7 @@ namespace LcaDataModel
 
         public int? CategorySystemID { get; set; }
 
-        public int? ParentClassID { get; set; }
+        public int? ParentCategoryID { get; set; }
 
         public int? HierarchyLevel { get; set; }
 

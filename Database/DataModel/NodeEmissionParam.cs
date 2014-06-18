@@ -13,10 +13,14 @@ namespace LcaDataModel
 
         public int? ParamID { get; set; }
 
-        public int? NodeEmissionID { get; set; }
+        public int? ProcessFlowID { get; set; }
 
-        public virtual NodeEmission NodeEmission { get; set; }
+        public int? FragmentFlowID { get; set; }
+
+        public virtual FragmentFlow FragmentFlow { get; set; }
 
         public virtual Param Param { get; set; }
+
+        public virtual ProcessFlow ProcessFlow { get; set; }
     }
 }

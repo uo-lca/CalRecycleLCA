@@ -18,9 +18,17 @@ namespace LcaDataModel
 
         public int? FlowID { get; set; }
 
+        public int? DirectionID { get; set; }
+
         public int? NodeTypeID { get; set; }
 
         public int? TargetID { get; set; }
+
+        [StringLength(50)]
+        public string FlowUUID { get; set; }
+
+        [StringLength(50)]
+        public string TargetUUID { get; set; }
 
         public virtual Flow Flow { get; set; }
 

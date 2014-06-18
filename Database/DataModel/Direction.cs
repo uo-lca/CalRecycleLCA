@@ -11,9 +11,8 @@ namespace LcaDataModel
     {
         public Direction()
         {
-            FragmentEdges = new HashSet<FragmentEdge>();
+            FragmentFlows = new HashSet<FragmentFlow>();
             LCIAs = new HashSet<LCIA>();
-            NodeEmissions = new HashSet<NodeEmission>();
             ProcessFlows = new HashSet<ProcessFlow>();
         }
 
@@ -22,11 +21,9 @@ namespace LcaDataModel
         [StringLength(100)]
         public string Name { get; set; }
 
-        public virtual ICollection<FragmentEdge> FragmentEdges { get; set; }
+        public virtual ICollection<FragmentFlow> FragmentFlows { get; set; }
 
         public virtual ICollection<LCIA> LCIAs { get; set; }
-
-        public virtual ICollection<NodeEmission> NodeEmissions { get; set; }
 
         public virtual ICollection<ProcessFlow> ProcessFlows { get; set; }
     }

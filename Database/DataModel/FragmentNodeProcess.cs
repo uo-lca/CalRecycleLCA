@@ -11,10 +11,8 @@ namespace LcaDataModel
     {
         public int FragmentNodeProcessID { get; set; }
 
-        public int? FragmentNodeID { get; set; }
+        public int? FragmentFlowID { get; set; }
 
         public int? ProcessID { get; set; }
-
-        public virtual Process Process { get; set; }
     }
 }

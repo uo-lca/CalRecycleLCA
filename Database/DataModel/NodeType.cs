@@ -12,7 +12,7 @@ namespace LcaDataModel
         public NodeType()
         {
             Backgrounds = new HashSet<Background>();
-            FragmentNodes = new HashSet<FragmentNode>();
+            FragmentFlows = new HashSet<FragmentFlow>();
             ScenarioBackgrounds = new HashSet<ScenarioBackground>();
         }
 
@@ -23,7 +23,7 @@ namespace LcaDataModel
 
         public virtual ICollection<Background> Backgrounds { get; set; }
 
-        public virtual ICollection<FragmentNode> FragmentNodes { get; set; }
+        public virtual ICollection<FragmentFlow> FragmentFlows { get; set; }
 
         public virtual ICollection<ScenarioBackground> ScenarioBackgrounds { get; set; }
     }

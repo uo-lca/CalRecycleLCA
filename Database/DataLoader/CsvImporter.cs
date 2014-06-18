@@ -31,6 +31,15 @@ namespace LcaDataLoader {
             return dbContext.AddEntity(obj);
         }
 
+        private bool ImportCategory(Row row, DbContextWrapper dbContext) {
+            Category obj = new Category {
+                CategorySystemID = Convert.ToInt32(row["CategorySystemID"]),
+                ExternalClassID = row["ExternalClassID"],
+                HierarchyLevel = Convert.ToInt32(row["HierarchyLevel"]),
+                Name = row["Name"]
+            };
+            return dbContext.AddEntity(obj);
+        }
 
         private int ImportCSV(string fileName, Func<Row, DbContextWrapper, bool> importRow, DbContextWrapper dbContext) {
             int importCounter = 0;
@@ -42,16 +51,28 @@ namespace LcaDataLoader {
             return importCounter;
         }
 
+        private bool ImportAppendCSV(string dirName, string typeName, Func<Row, DbContextWrapper, bool> importRow, DbContextWrapper dbContext) {
+            string fileName = Path.Combine(dirName, typeName + ".csv");
+            if (System.IO.File.Exists(fileName)) {
+                if (ImportCSV(fileName, ImportCategorySystem, dbContext) > 0) {
+                    System.IO.File.Move(fileName, Path.Combine(dirName, typeName + "-appended.csv"));
+                }
+            }
+            else {
+                Console.WriteLine("INFO: Skipping {0}. File does not exist.", fileName);
+            }
+            return false;
+        }
+
         /// <summary>
         /// Load CSV files in append directory
         /// </summary>
         /// <param name="dirName">Full path name of append directory</param>
         public void LoadAppend(string dirName, DbContextWrapper dbContext) {
-            int importCounter = 0;
             if (Directory.Exists(dirName)) {
-                if (ImportCSV(Path.Combine(dirName, "CategorySystem.csv"), ImportCategorySystem, dbContext) > 0)
-                    ++importCounter;
-                Console.WriteLine("INFO: {0} of {1} CSV files loaded from {2}.", importCounter, 3, dirName);
+                ImportAppendCSV(dirName, "CategorySystem", ImportCategorySystem, dbContext);
+                ImportAppendCSV(dirName, "Category", ImportCategory, dbContext);
+                Console.WriteLine("INFO: Loaded files in {0}", dirName);
             }
             else {
                 Console.WriteLine("WARNING: CSV folder, {0}, does not exist.", dirName);
