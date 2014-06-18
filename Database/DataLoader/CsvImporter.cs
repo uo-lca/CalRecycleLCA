@@ -45,6 +45,22 @@ namespace LcaDataLoader {
             return dbContext.AddEntity(obj);
         }
 
+        private bool ImportClassification(Row row, DbContextWrapper dbContext) {
+            bool isImported = false;
+            string uuid = row["UUID"];
+            if (dbContext.IlcdUuidExists(uuid)) {
+                Classification obj = new Classification {
+                    UUID = uuid,
+                    CategoryID = Convert.ToInt32(row["CategoryID"])
+                };
+                isImported = dbContext.AddEntity(obj);
+            }
+            else {
+                Console.WriteLine("WARNING: Classification UUID {0} not found. Skipping record.", uuid);
+            }
+            return isImported;
+        }
+        
         private int ImportCSV(string fileName, Func<Row, DbContextWrapper, bool> importRow, DbContextWrapper dbContext) {
             int importCounter = 0;
             var table = DataAccess.DataTable.New.ReadCsv(fileName);
@@ -76,6 +92,7 @@ namespace LcaDataLoader {
             if (Directory.Exists(dirName)) {
                 ImportAppendCSV(dirName, "CategorySystem", ImportCategorySystem, dbContext);
                 ImportAppendCSV(dirName, "Category", ImportCategory, dbContext);
+                ImportAppendCSV(dirName, "Classification", ImportClassification, dbContext);
                 Console.WriteLine("INFO: Loaded files in {0}", dirName);
             }
             else {
