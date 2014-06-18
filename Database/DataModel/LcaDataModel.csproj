@@ -65,6 +65,7 @@
     <Compile Include="Direction.cs" />
     <Compile Include="DistributionParam.cs" />
     <Compile Include="EntityDataModel.cs" />
+    <Compile Include="Enum.cs" />
     <Compile Include="Flow.cs" />
     <Compile Include="FlowFlowProperty.cs" />
     <Compile Include="FlowProperty.cs" />

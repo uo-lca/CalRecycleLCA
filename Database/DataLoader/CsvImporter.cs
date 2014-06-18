@@ -19,6 +19,7 @@ namespace LcaDataLoader {
         public void LoadAll(string dirName) {
             using (DbContextWrapper dbContext = new DbContextWrapper()) {
                 LoadAppend(Path.Combine(dirName, "append"), dbContext);
+                LoadFragments(Path.Combine(dirName, "fragments"), dbContext);
             }
         }
 
@@ -60,7 +61,32 @@ namespace LcaDataLoader {
             }
             return isImported;
         }
-        
+
+        private bool CreateIlcdEntity(string uuid, DataProviderEnum providerEnum, DataTypeEnum typeEnum, DbContextWrapper dbContext) {
+            ILCDEntity ilcdEntity = new ILCDEntity {
+                UUID = uuid,
+                DataProviderID = Convert.ToInt32(providerEnum),
+                DataTypeID = Convert.ToInt32(typeEnum)
+            };
+            return dbContext.AddEntity(ilcdEntity);
+        }
+
+        private bool CreateFragment(Row row, DbContextWrapper dbContext) {
+            bool isImported = false;
+            string uuid = row["FragmentUUID"];
+            if (dbContext.IlcdUuidExists(uuid)) {
+                Program.Logger.WarnFormat("UUID {0} already exists. Fragment will not be created.", uuid);
+            }
+            else if ( CreateIlcdEntity( uuid, DataProviderEnum.fragments, DataTypeEnum.Fragment, dbContext)) {
+                Fragment obj = new Fragment {
+                    UUID = uuid,
+                    Name = row["Name"]
+                };
+                isImported = dbContext.AddEntity(obj);
+            }        
+            return isImported;
+        }
+
         private int ImportCSV(string fileName, Func<Row, DbContextWrapper, bool> importRow, DbContextWrapper dbContext) {
             int importCounter = 0;
             var table = DataAccess.DataTable.New.ReadCsv(fileName);
@@ -90,13 +116,27 @@ namespace LcaDataLoader {
         /// <param name="dirName">Full path name of append directory</param>
         public void LoadAppend(string dirName, DbContextWrapper dbContext) {
             if (Directory.Exists(dirName)) {
+                Program.Logger.InfoFormat("Load append files in {0}...", dirName);
                 ImportAppendCSV(dirName, "CategorySystem", ImportCategorySystem, dbContext);
                 ImportAppendCSV(dirName, "Category", ImportCategory, dbContext);
                 ImportAppendCSV(dirName, "Classification", ImportClassification, dbContext);
-                Program.Logger.InfoFormat("Loaded files in {0}", dirName);
             }
             else {
-                Program.Logger.WarnFormat("CSV folder, {0}, does not exist.", dirName);
+                Program.Logger.WarnFormat("Append folder, {0}, does not exist.", dirName);
+            }
+        }
+
+        /// <summary>
+        /// Load CSV files in fragments directory
+        /// </summary>
+        /// <param name="dirName">Full path name of fragments directory</param>
+        public void LoadFragments(string dirName, DbContextWrapper dbContext) {
+            if (Directory.Exists(dirName)) {
+                Program.Logger.InfoFormat("Load fragment files in {0}...", dirName);
+                ImportCSV(Path.Combine( dirName, "Fragment.csv"), CreateFragment, dbContext);
+            }
+            else {
+                Program.Logger.WarnFormat("Fragment folder, {0}, does not exist.", dirName);
             }
         }
     }

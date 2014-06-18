@@ -103,6 +103,25 @@ namespace LcaDataLoader {
             }
         }
 
+        /// <summary>
+        /// Populate Lookup table from enum, if it is empty.
+        /// </summary>
+        /// <param name="lutSet">database context DbSet for the lookup table</param>
+        /// <param name="enumType">the enum type to use as data source</param>
+        public static void SeedLUT<T>(DbSet<T> lutSet, Type enumType) 
+            where T : class, ILookupEntity, new() 
+            {
+            int id = 1;
+            if (lutSet.Count() == 0) {
+                foreach (string name in Enum.GetNames(enumType)) {
+                    lutSet.Add(new T { ID = id++, Name = name });
+                }
+            }
+            else {
+                Program.Logger.ErrorFormat("Lookup table {0} is not empty.", typeof(T).ToString());
+            }
+        }
+
         public int? LookupEntityID<T>(string name) where T : class, ILookupEntity {
             DbSet<T> dbSet = _DbContext.Set<T>();
             ILookupEntity entity = (from le in dbSet where le.Name == name select le).FirstOrDefault();
@@ -135,23 +154,8 @@ namespace LcaDataLoader {
         /// </summary>
         /// <param name="dbContext">Entity Framework database context</param>
         public static void Seed(EntityDataModel dbContext) {
-            SeedLUT<DataProvider>(dbContext.DataProviders,
-                new List<string>(new string[] {            
-                    "append",
-                    "fragments",
-                    "scenarios"
-             }));
-            SeedLUT<DataType>(dbContext.DataTypes,
-                new List<string>(new string[] {            
-                    "Flow",
-                    "FlowProperty",
-                    "Process",
-                    "UnitGroup",
-                    "Source",
-                    "LCIAMethod",
-                    "Contact",
-                    "Fragment"
-             }));
+            SeedLUT<DataProvider>(dbContext.DataProviders, typeof(DataProviderEnum));
+            SeedLUT<DataType>(dbContext.DataTypes, typeof(DataTypeEnum));
             SeedLUT<FlowType>(dbContext.FlowTypes,
                 new List<string>(new string[] {            
                     "Intermediate Flow",
