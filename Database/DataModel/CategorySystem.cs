@@ -17,7 +17,7 @@ namespace LcaDataModel
         public int? DataTypeID { get; set; }
 
         [StringLength(4)]
-        public string Delimeter { get; set; }
+        public string Delimiter { get; set; }
 
         public virtual DataType DataType { get; set; }
     }

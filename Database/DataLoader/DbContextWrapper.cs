@@ -17,9 +17,6 @@ namespace LcaDataLoader {
         // Data Model DbContext object
         EntityDataModel _DbContext;
 
-        // Dictionary maps UUID to Entity ID
-        Dictionary<string, int> _UuidDictionary = new Dictionary<string, int>();
-
         // Flag: Has Dispose already been called? 
         bool disposed = false;
 
@@ -41,10 +38,10 @@ namespace LcaDataLoader {
             disposed = true;
         }
         /// <summary>
-        /// Constructor injects model's DbContext
+        /// Constructor creates model's DbContext
         /// </summary>
-        public DbContextWrapper(EntityDataModel dbContext) {
-            _DbContext = dbContext;
+        public DbContextWrapper() {
+            _DbContext = new EntityDataModel();
         }
 
         /// <summary>
@@ -75,10 +72,14 @@ namespace LcaDataLoader {
 
             _DbContext.Set(ilcdEntity.GetType()).Add(ilcdEntity);
             if (SaveChanges() > 0) {
-                _UuidDictionary.Add(ilcdEntity.UUID, ilcdEntity.ID);
                 isAdded = true;
             }
             return isAdded;
+        }
+
+        public bool AddEntity<T>(T entity) where T : class {
+            _DbContext.Set<T>().Add(entity);
+            return (_DbContext.SaveChanges() > 0);
         }
 
         public void AddEntities<T>(List<T> entityList) where T : class, IEntity  {
@@ -141,6 +142,17 @@ namespace LcaDataLoader {
                     "fragments",
                     "scenarios"
              }));
+            SeedLUT<DataType>(dbContext.DataTypes,
+                new List<string>(new string[] {            
+                    "Flow",
+                    "FlowProperty",
+                    "Process",
+                    "UnitGroup",
+                    "Source",
+                    "LCIAMethod",
+                    "Contact",
+                    "Fragment"
+             }));
             SeedLUT<FlowType>(dbContext.FlowTypes,
                 new List<string>(new string[] {            
                     "Intermediate Flow",
@@ -182,13 +194,14 @@ namespace LcaDataLoader {
                     "Reference flow(s)"
              }));
             SeedLUT<ProcessType>(dbContext.ProcessTypes,
-                new List<string>(new string[] {            
+                new List<string>(new string[] {  
+                    "Avoided product system",
                     "LCI result",
-                    "Unit process, single operation",
-                    "Partly terminated system"
+                    "Partly terminated system",
+                    "Unit process, black box",
+                    "Unit process, single operation"
              }));
             dbContext.SaveChanges();
-
         }
 
         /// <summary>
