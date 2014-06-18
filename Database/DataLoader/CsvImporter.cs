@@ -32,12 +32,16 @@ namespace LcaDataLoader {
         }
 
         private bool ImportCategory(Row row, DbContextWrapper dbContext) {
+            int parentID = Convert.ToInt32(row["ParentCategoryID"]);
             Category obj = new Category {
                 CategorySystemID = Convert.ToInt32(row["CategorySystemID"]),
                 ExternalClassID = row["ExternalClassID"],
                 HierarchyLevel = Convert.ToInt32(row["HierarchyLevel"]),
-                Name = row["Name"]
+                Name = row["Name"],
             };
+            if (parentID > 0) {
+                obj.ParentCategoryID = parentID;
+            }
             return dbContext.AddEntity(obj);
         }
 
@@ -54,7 +58,7 @@ namespace LcaDataLoader {
         private bool ImportAppendCSV(string dirName, string typeName, Func<Row, DbContextWrapper, bool> importRow, DbContextWrapper dbContext) {
             string fileName = Path.Combine(dirName, typeName + ".csv");
             if (System.IO.File.Exists(fileName)) {
-                if (ImportCSV(fileName, ImportCategorySystem, dbContext) > 0) {
+                if (ImportCSV(fileName, importRow, dbContext) > 0) {
                     System.IO.File.Move(fileName, Path.Combine(dirName, typeName + "-appended.csv"));
                 }
             }
