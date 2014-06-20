@@ -26,6 +26,8 @@ namespace LcaDataModel
 
         public int? ReferenceFragmentFlowID { get; set; }
 
+        public virtual ILCDEntity ILCDEntity { get; set; }
+
         public virtual ICollection<BackgroundFragment> BackgroundFragments { get; set; }
 
         public virtual ICollection<FragmentFlow> FragmentFlows { get; set; }

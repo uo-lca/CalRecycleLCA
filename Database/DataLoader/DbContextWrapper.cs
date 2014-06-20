@@ -66,6 +66,7 @@ namespace LcaDataLoader {
         /// </summary>
         /// <param name="ilcdEntity">An entity with a UUID.</param>
         /// <returns>true iff entity was successfully inserted</returns>
+        /// TODO : this method is no longer needed. Replace all references with AddEntity, defined below
         public bool AddIlcdEntity(IIlcdEntity ilcdEntity) {
             bool isAdded = false;
 
@@ -76,14 +77,23 @@ namespace LcaDataLoader {
             return isAdded;
         }
 
+        /// <summary>
+        /// Insert  entity into the database.
+        /// </summary>
+        /// <param name="entity">An entity modeled in LcaDataModel</param>
+        /// <returns>true iff entity was successfully inserted</returns>
         public bool AddEntity<T>(T entity) where T : class {
             _DbContext.Set<T>().Add(entity);
-            return (_DbContext.SaveChanges() > 0);
+            return (SaveChanges() > 0);
         }
 
-        public void AddEntities<T>(List<T> entityList) where T : class, IEntity  {
+        /// <summary>
+        /// Insert  list of entities into the database.
+        /// </summary>
+        /// <param name="entityList">List of entities modeled in LcaDataModel</param>
+        public void AddEntities<T>(List<T> entityList) where T : class  {
             _DbContext.Set<T>().AddRange(entityList);
-            _DbContext.SaveChanges();
+            SaveChanges();
         }
 
         /// <summary>
@@ -150,6 +160,14 @@ namespace LcaDataLoader {
         }
 
         /// <summary>
+        /// Search for entity by ID
+        /// </summary>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public T Find<T>(int id) where T : class {
+            return _DbContext.Set<T>().Find(id);
+        }
+
+        /// <summary>
         /// Insert initial data into new database.
         /// </summary>
         /// <param name="dbContext">Entity Framework database context</param>
@@ -196,6 +214,8 @@ namespace LcaDataLoader {
                     "Other parameter",
                     "Reference flow(s)"
              }));
+            SeedLUT<NodeType>(dbContext.NodeTypes, typeof(NodeTypeEnum));
+
             SeedLUT<ProcessType>(dbContext.ProcessTypes,
                 new List<string>(new string[] {  
                     "Avoided product system",
@@ -221,5 +241,8 @@ namespace LcaDataLoader {
             return (entity != null);
         }
 
+        public bool EntityIdExists<T>(int id) where T : class {
+            return _DbContext.Set<T>().Find(id) != null ;
+        }
     }
 }

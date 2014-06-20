@@ -22,7 +22,7 @@ namespace LcaDataLoader {
         static string _DataRoot;
         static string _IlcdDirName = null;
         static bool _DeleteFlag;
-        public static readonly ILog Logger = LogManager.GetLogger(typeof(Program));
+        public static readonly ILog Logger = LogManager.GetLogger("LcaDataLoader");
 
         static void ParseArguments(string[] args) {
             _DataRoot = "C:\\CalRecycleLCA-DATA_ROOT";
@@ -49,11 +49,14 @@ namespace LcaDataLoader {
         /// Initialize logging.
         /// </summary>
         static void StartLogging() {
-            // Default configuration
-            // TODO : Create and use configuration file
+            // Configured in App.config
             BasicConfigurator.Configure();
+            Logger.Info("****** START LOG ******");
         }
 
+        static void StopLogging() {
+            Logger.Info("******* END LOG *******");
+        }
 
         /// <summary>
         /// Entry point of console app.
@@ -78,8 +81,7 @@ namespace LcaDataLoader {
                     }
                 }
                 if (Directory.Exists(_DataRoot)) {
-                    CsvImporter csvImporter = new CsvImporter();
-                    csvImporter.LoadAll(_DataRoot);
+                    CsvImporter.LoadAll(_DataRoot);
                     Logger.InfoFormat("Loaded CSV folders under {0}.", _DataRoot);
                 }
                 else {
@@ -93,7 +95,7 @@ namespace LcaDataLoader {
                 exitCode = 1;
             }
             finally {
-                // StopLogging();
+                StopLogging();
             }
             return exitCode;
         }

@@ -16,12 +16,27 @@ namespace LcaDataModel {
         int ID { get; set; }
     }
 
+    public partial class Background : IEntity {
+        [NotMapped]
+        public int ID {
+            get { return BackgroundID; }
+            set { BackgroundID = value; }
+        }
+    }
 
     public partial class FlowFlowProperty : IEntity {
         [NotMapped]
         public int ID {
             get { return FlowFlowPropertyID; }
             set { FlowFlowPropertyID = value; }
+        }
+    }
+
+    public partial class FragmentFlow : IEntity {
+        [NotMapped]
+        public int ID {
+            get { return FragmentFlowID; }
+            set { FragmentFlowID = value; }
         }
     }
 
@@ -82,6 +97,14 @@ namespace LcaDataModel {
         public int ID {
             get { return FlowID; }
             set { FlowID = value; }
+        }
+    }
+
+    public partial class Fragment : IIlcdEntity {
+        [NotMapped]
+        public int ID {
+            get { return FragmentID; }
+            set { FragmentID = value; }
         }
     }
 
@@ -154,6 +177,14 @@ namespace LcaDataModel {
         public int ID {
             get { return IndicatorTypeID; }
             set { IndicatorTypeID = ID; }
+        }
+    }
+
+    public partial class NodeType : ILookupEntity {
+        [NotMapped]
+        public int ID {
+            get { return NodeTypeID; }
+            set { NodeTypeID = ID; }
         }
     }
 

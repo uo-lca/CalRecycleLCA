@@ -18,4 +18,8 @@ namespace LcaDataModel {
         Contact,
         Fragment
     }
+
+    public enum NodeTypeEnum {
+        Process, Fragment, InputOutput, Background
+    }
 }

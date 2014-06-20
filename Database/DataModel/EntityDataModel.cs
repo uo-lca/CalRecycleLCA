@@ -363,6 +363,8 @@ namespace LcaDataModel {
             modelBuilder.Entity<Visibility>()
                 .Property(e => e.Visibility1)
                 .IsUnicode(false);
+
+            modelBuilder.Entity<FragmentFlow>().Property(f => f.FragmentFlowID).HasDatabaseGeneratedOption(DatabaseGeneratedOption.None);
         }
     }
 }
