@@ -75,15 +75,25 @@ namespace LcaDataLoader {
         private static bool CreateFragment(Row row, DbContextWrapper dbContext) {
             bool isImported = false;
             string uuid = row["FragmentUUID"];
+            int fragmentID = Convert.ToInt32(row["FragmentID"]);
+            bool uuidExists = false;
             if (dbContext.IlcdUuidExists(uuid)) {
-                Program.Logger.WarnFormat("UUID {0} already exists. Fragment will not be created.", uuid);
+                Program.Logger.WarnFormat("Fragment UUID {0} already exists.", uuid);
+                uuidExists = true;
             }
-            else if ( CreateIlcdEntity( uuid, DataProviderEnum.fragments, DataTypeEnum.Fragment, dbContext)) {
-                Fragment obj = new Fragment {
-                    UUID = uuid,
-                    Name = row["Name"]
-                };
-                isImported = dbContext.AddEntity(obj);
+            else uuidExists = CreateIlcdEntity(uuid, DataProviderEnum.fragments, DataTypeEnum.Fragment, dbContext);
+            if (uuidExists)
+            {
+                if (dbContext.EntityIdExists<Fragment>(fragmentID)) {
+                    Program.Logger.WarnFormat("FragmentID {0} already exists.", fragmentID);
+                }
+                else {
+                    Fragment obj = new Fragment {
+                        UUID = uuid,
+                        FragmentID = fragmentID
+                    };
+                    isImported = dbContext.AddEntity(obj);
+                }
             }        
             return isImported;
         }
@@ -98,18 +108,9 @@ namespace LcaDataLoader {
         }
 
         private static bool CreateFragmentFlow(Row row, DbContextWrapper dbContext) {
-            bool isImported = false;
             int fragmentFlowID = Convert.ToInt32(row["FragmentFlowID"]);
-            if (dbContext.EntityIdExists<FragmentFlow>(fragmentFlowID)) {
-                Program.Logger.WarnFormat("FragmentFlowID, {0}, already exists.", row["FragmentFlowID"]);
-            }
-            else {
-                FragmentFlow ent = new FragmentFlow {
-                    FragmentFlowID = fragmentFlowID
-                };
-                isImported = dbContext.AddEntity<FragmentFlow>(ent);
-            }
-            return isImported;
+            FragmentFlow ent = dbContext.CreateEntityWithID<FragmentFlow>(fragmentFlowID);
+            return (ent != null);
         }
 
         private static bool UpdateFragmentFlow(Row row, DbContextWrapper dbContext) {
@@ -134,10 +135,11 @@ namespace LcaDataLoader {
         private static IEnumerable<Row> ImportCSV(string fileName, Func<Row, DbContextWrapper, bool> importRow, DbContextWrapper dbContext) {
             int importCounter = 0;
             var table = DataAccess.DataTable.New.ReadCsv(fileName);
+            Program.Logger.InfoFormat("Import {0}...", fileName);
             foreach (Row row in table.Rows) {
                 if (importRow(row, dbContext)) importCounter++;
             }
-            Program.Logger.InfoFormat("{0} of {1} records imported from {2}.", importCounter, table.Rows.Count(), fileName);
+            //Program.Logger.InfoFormat("{0} of {1} rows imported from {2}.", importCounter, table.Rows.Count(), fileName);
             return table.Rows;
         }
 
