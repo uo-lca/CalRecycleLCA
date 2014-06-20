@@ -10,8 +10,6 @@ namespace LcaDataModel {
         }
 
         public virtual DbSet<Background> Backgrounds { get; set; }
-        public virtual DbSet<BackgroundFragment> BackgroundFragments { get; set; }
-        public virtual DbSet<BackgroundProcess> BackgroundProcesses { get; set; }
         public virtual DbSet<Category> Categories { get; set; }
         public virtual DbSet<CategorySystem> CategorySystems { get; set; }
         public virtual DbSet<CharacterizationParam> CharacterizationParams { get; set; }
@@ -78,6 +76,11 @@ namespace LcaDataModel {
             modelBuilder.Entity<Category>()
                 .Property(e => e.Name)
                 .IsUnicode(false);
+
+            modelBuilder.Entity<Category>()
+                .HasMany(e => e.Category1)
+                .WithOptional(e => e.Category2)
+                .HasForeignKey(e => e.ParentCategoryID);
 
             modelBuilder.Entity<CategorySystem>()
                 .Property(e => e.Name)
@@ -183,6 +186,11 @@ namespace LcaDataModel {
                 .Property(e => e.Name)
                 .IsUnicode(false);
 
+            modelBuilder.Entity<Fragment>()
+                .HasMany(e => e.FragmentFlows)
+                .WithOptional(e => e.Fragment)
+                .HasForeignKey(e => e.FragmentID);
+
             modelBuilder.Entity<FragmentFlow>()
                 .Property(e => e.Name)
                 .IsUnicode(false);
@@ -194,6 +202,11 @@ namespace LcaDataModel {
             modelBuilder.Entity<FragmentFlow>()
                 .Property(e => e.FlowUUID)
                 .IsUnicode(false);
+
+            modelBuilder.Entity<FragmentFlow>()
+                .HasMany(e => e.Fragments)
+                .WithOptional(e => e.FragmentFlow)
+                .HasForeignKey(e => e.ReferenceFragmentFlowID);
 
             modelBuilder.Entity<FragmentStage>()
                 .Property(e => e.StageName)
@@ -363,8 +376,6 @@ namespace LcaDataModel {
             modelBuilder.Entity<Visibility>()
                 .Property(e => e.Visibility1)
                 .IsUnicode(false);
-
-            modelBuilder.Entity<FragmentFlow>().Property(f => f.FragmentFlowID).HasDatabaseGeneratedOption(DatabaseGeneratedOption.None);
         }
     }
 }

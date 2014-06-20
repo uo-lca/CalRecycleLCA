@@ -9,6 +9,12 @@ namespace LcaDataModel
     [Table("CategorySystem")]
     public partial class CategorySystem
     {
+        public CategorySystem()
+        {
+            Categories = new HashSet<Category>();
+        }
+
+        [DatabaseGenerated(DatabaseGeneratedOption.None)]
         public int CategorySystemID { get; set; }
 
         [StringLength(100)]
@@ -18,6 +24,8 @@ namespace LcaDataModel
 
         [StringLength(4)]
         public string Delimiter { get; set; }
+
+        public virtual ICollection<Category> Categories { get; set; }
 
         public virtual DataType DataType { get; set; }
     }

@@ -9,6 +9,7 @@ namespace LcaDataModel
     [Table("Classification")]
     public partial class Classification
     {
+        [DatabaseGenerated(DatabaseGeneratedOption.None)]
         public int ClassificationID { get; set; }
 
         [StringLength(36)]

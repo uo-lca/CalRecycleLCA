@@ -12,9 +12,11 @@ namespace LcaDataModel
         public FragmentFlow()
         {
             DependencyParams = new HashSet<DependencyParam>();
+            Fragments = new HashSet<Fragment>();
             NodeEmissionParams = new HashSet<NodeEmissionParam>();
         }
 
+        [DatabaseGenerated(DatabaseGeneratedOption.None)]
         public int FragmentFlowID { get; set; }
 
         public int? FragmentID { get; set; }
@@ -48,6 +50,8 @@ namespace LcaDataModel
         public virtual Flow Flow { get; set; }
 
         public virtual FlowProperty FlowProperty { get; set; }
+
+        public virtual ICollection<Fragment> Fragments { get; set; }
 
         public virtual Fragment Fragment { get; set; }
 

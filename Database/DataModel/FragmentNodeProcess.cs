@@ -9,6 +9,7 @@ namespace LcaDataModel
     [Table("FragmentNodeProcess")]
     public partial class FragmentNodeProcess
     {
+        [DatabaseGenerated(DatabaseGeneratedOption.None)]
         public int FragmentNodeProcessID { get; set; }
 
         public int? FragmentFlowID { get; set; }

@@ -11,7 +11,6 @@ namespace LcaDataModel
     {
         public Process()
         {
-            BackgroundProcesses = new HashSet<BackgroundProcess>();
             ProcessFlows = new HashSet<ProcessFlow>();
         }
 
@@ -34,8 +33,6 @@ namespace LcaDataModel
         public int? ProcessTypeID { get; set; }
 
         public int? ReferenceFlowID { get; set; }
-
-        public virtual ICollection<BackgroundProcess> BackgroundProcesses { get; set; }
 
         public virtual Flow Flow { get; set; }
 

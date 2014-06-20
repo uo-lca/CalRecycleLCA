@@ -11,6 +11,7 @@ namespace LcaDataModel
     {
         public Direction()
         {
+            Backgrounds = new HashSet<Background>();
             FragmentFlows = new HashSet<FragmentFlow>();
             LCIAs = new HashSet<LCIA>();
             ProcessFlows = new HashSet<ProcessFlow>();
@@ -20,6 +21,8 @@ namespace LcaDataModel
 
         [StringLength(100)]
         public string Name { get; set; }
+
+        public virtual ICollection<Background> Backgrounds { get; set; }
 
         public virtual ICollection<FragmentFlow> FragmentFlows { get; set; }
 

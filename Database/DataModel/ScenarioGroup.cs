@@ -14,6 +14,7 @@ namespace LcaDataModel
             Scenarios = new HashSet<Scenario>();
         }
 
+        [DatabaseGenerated(DatabaseGeneratedOption.None)]
         public int ScenarioGroupID { get; set; }
 
         public int? OwnedBy { get; set; }

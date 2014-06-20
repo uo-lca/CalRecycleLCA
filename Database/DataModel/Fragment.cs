@@ -11,11 +11,11 @@ namespace LcaDataModel
     {
         public Fragment()
         {
-            BackgroundFragments = new HashSet<BackgroundFragment>();
             FragmentFlows = new HashSet<FragmentFlow>();
             FragmentStages = new HashSet<FragmentStage>();
         }
 
+        [DatabaseGenerated(DatabaseGeneratedOption.None)]
         public int FragmentID { get; set; }
 
         [StringLength(36)]
@@ -26,10 +26,9 @@ namespace LcaDataModel
 
         public int? ReferenceFragmentFlowID { get; set; }
 
+        public virtual FragmentFlow FragmentFlow { get; set; }
+        
         public virtual ILCDEntity ILCDEntity { get; set; }
-
-        public virtual ICollection<BackgroundFragment> BackgroundFragments { get; set; }
-
         public virtual ICollection<FragmentFlow> FragmentFlows { get; set; }
 
         public virtual ICollection<FragmentStage> FragmentStages { get; set; }

@@ -9,11 +9,7 @@ namespace LcaDataModel
     [Table("Background")]
     public partial class Background
     {
-        public Background()
-        {
-            BackgroundFragments = new HashSet<BackgroundFragment>();
-        }
-
+        [DatabaseGenerated(DatabaseGeneratedOption.None)]
         public int BackgroundID { get; set; }
 
         public int? FlowID { get; set; }
@@ -30,10 +26,10 @@ namespace LcaDataModel
         [StringLength(50)]
         public string TargetUUID { get; set; }
 
+        public virtual Direction Direction { get; set; }
+
         public virtual Flow Flow { get; set; }
 
         public virtual NodeType NodeType { get; set; }
-
-        public virtual ICollection<BackgroundFragment> BackgroundFragments { get; set; }
     }
 }

@@ -14,6 +14,7 @@ namespace LcaDataModel
             ScenarioBackgrounds = new HashSet<ScenarioBackground>();
         }
 
+        [DatabaseGenerated(DatabaseGeneratedOption.None)]
         public int ScenarioID { get; set; }
 
         public int? ScenarioGroupID { get; set; }
