@@ -24,6 +24,22 @@ namespace LcaDataModel {
         }
     }
 
+    public partial class Category : IEntity {
+        [NotMapped]
+        public int ID {
+            get { return CategoryID; }
+            set { CategoryID = value; }
+        }
+    }
+
+    public partial class CategorySystem : IEntity {
+        [NotMapped]
+        public int ID {
+            get { return CategorySystemID; }
+            set { CategorySystemID = value; }
+        }
+    }
+
     public partial class FlowFlowProperty : IEntity {
         [NotMapped]
         public int ID {
@@ -100,14 +116,6 @@ namespace LcaDataModel {
         }
     }
 
-    public partial class Fragment : IIlcdEntity {
-        [NotMapped]
-        public int ID {
-            get { return FragmentID; }
-            set { FragmentID = value; }
-        }
-    }
-
     public partial class LCIAMethod : IIlcdEntity {
         [NotMapped]
         public int ID {
@@ -121,6 +129,31 @@ namespace LcaDataModel {
         public int ID {
             get { return ProcessID; }
             set { ProcessID = value; }
+        }
+    }
+
+    /// <summary>
+    /// Hack : Workaround missing foreign key referencing IlcdEntity
+    /// </summary>
+    public interface ILocalIlcdEntity : IEntity {
+        // UUID accessor signature  
+        [NotMapped]
+        string UUID { get; set; }
+    }
+
+    public partial class Fragment : ILocalIlcdEntity {
+        [NotMapped]
+        public int ID {
+            get { return FragmentID; }
+            set { FragmentID = value; }
+        }
+    }
+
+    public partial class Classification : ILocalIlcdEntity {
+        [NotMapped]
+        public int ID {
+            get { return ClassificationID; }
+            set { ClassificationID = value; }
         }
     }
 

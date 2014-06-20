@@ -54,7 +54,7 @@ namespace LcaDataLoader {
             catch (DbUpdateException e) {
                 Program.Logger.ErrorFormat("Database update exception: {0}", e.Message);
                 for (var ie = e.InnerException; ie != null; ie = ie.InnerException) {
-                    Program.Logger.ErrorFormat("Inner exception: {0}", e.InnerException.Message);
+                    Program.Logger.ErrorFormat("Inner exception: {0}", ie.InnerException.Message);
                 }
 
                 return 0;
@@ -97,7 +97,8 @@ namespace LcaDataLoader {
         }
 
         /// <summary>
-        /// Create an entity with a given ID, if the ID does not already exist, and insert it into it the database.
+        /// Create an entity with a given ID, if the ID does not already exist, and add it to the data model.
+        /// Changes are not saved so that other properties can be set before saving.
         /// Use this when loading entities from CSV.
         /// </summary>
         /// <param name="id">The entity ID</param>
@@ -106,8 +107,7 @@ namespace LcaDataLoader {
             T ent = Find<T>(id);
             if (ent == null) {
                 ent = new T { ID = id };
-                AddEntity(ent);
-                SaveChanges();
+                _DbContext.Set<T>().Add(ent);
             }
             else {
                 Program.Logger.WarnFormat("Found {1} with ID = {0}. Entity will not be added.", id, typeof(T).ToString());
