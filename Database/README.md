@@ -12,7 +12,12 @@ The console app is named LcaDataLoader.exe and has the following arguments:
   * -s ILCD archive source name
   * -d Delete database and recreate. 
  
- The console app creates a log file in the current directory. Logging can be configured by editing app.Config. (See log4net documentation for instructions.
+The console app creates a log file in the current directory. Logging can be configured by editing app.Config. (See log4net documentation for instructions).
+
+ILCD archives and the following CSV directories are expected to be in the data root directory.
+ * append
+ * fragments
+ * scenarios
  
  Examples: 
  
