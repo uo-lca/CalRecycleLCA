@@ -19,6 +19,15 @@ namespace LcaDataModel {
         Fragment
     }
 
+    public enum DirectionEnum {
+        Input, Output
+    }
+
+    public enum FlowTypeEnum {
+         IntermediateFlow,
+         ElementaryFlow
+    }
+
     public enum NodeTypeEnum {
         Process, Fragment, InputOutput, Background
     }
