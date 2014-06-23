@@ -19,11 +19,11 @@ ILCD archives and the following CSV directories are expected to be in the data r
  * fragments
  * scenarios
  
- Examples: 
- 
+Examples: 
+
  Create database, load ILCD archive and CSVs using
   <pre><code>LcaDataLoader -r "C:\CalRecycleLCA-DATA_ROOT" -s "Full UO LCA Flat Export BK 2014_05_05" -d</pre></code>
-  
+
  Update database, load ILCD archive and CSVs using
   <pre><code>LcaDataLoader -r "C:\CalRecycleLCA-DATA_ROOT" -s "Full UO LCA Flat Export Ecoinvent 2014_04_24"</pre></code>
 
