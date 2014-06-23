@@ -10,14 +10,14 @@ Traverse(ScenarioID)
   ScenarioID = @ScenarioID) 
     return // do not re-compute 
 
-  myflows = this.flows; 
+  myflows = this.flows; // (I have no idea what language I'm writing)
     
   myflows = applyDependencyParam ( myflows, ScenarioID );
   
   // fpflows now has an additional field from FlowFlowProperty.MeanValue
   fpflows = applyFlowPropertyParam ( myflows, ScenarioID );
 
-  float RootNode = ReferenceFlow.FragmentFlowID;
+  RootNode = ReferenceFlow.FragmentFlowID;
   float activity = 1;
   
   // traverse the tree recursively, writing cache values as you go
@@ -39,9 +39,9 @@ e=applyDependencyParam(flows,ScenarioID)
   // edge weights specified in the default FragmentEdge table, unless they
   // have been overridden by scenario params
   e = SELECT flows.*,
-      edge_params.Value AS ParamValue,
+      dep_params.Value AS ParamValue,
       FROM flows 
-      LEFT OUTER JOIN edge_params ON FragmentFlowID
+      LEFT OUTER JOIN dep_params ON FragmentFlowID
         
   // take the param values as defaults:
   UPDATE e.Quantity with e.ParamValue where e.ParamValue is not null;
@@ -123,12 +123,15 @@ Fragment.node_recurse(flows, ScenarioID, current_flow, activity)
       F.Traverse(ScenarioID)
 
       // extract inputs and outputs from the subfragment
-      IOFlows = F.InputOutput(ScenarioID)
+      dependencies = F.GetIO( this ); // map F.IOflows to local IO-flows
 
+      /*
       // IOFlows is a list of edges.  For every edge that has a
       // corresponding entry in our local edge table, follow it.  
+      IOFlows = F.InputOutput(ScenarioID)
+      dependencies = MatchDependencies(flows,IOFlows); 
+      */
 
-      dependencies = MatchDependencies(flows,IOFlows); // not written yet
 
       for i in dependencies
       { 
@@ -137,7 +140,6 @@ Fragment.node_recurse(flows, ScenarioID, current_flow, activity)
 
     }
     case Background
-      // nothing to do -- cache value specifies bg activity level
 
     case InputOutput
       // nothing to do -- cache value specifies input/output quantity
@@ -145,3 +147,6 @@ Fragment.node_recurse(flows, ScenarioID, current_flow, activity)
   end // switch NodeType
 }
 
+dependencies = Fragment.GetIO( other )
+{
+  // match local inputs to remote outputs, and vice versa

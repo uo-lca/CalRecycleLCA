@@ -277,6 +277,9 @@ The following tables are required:
     * Magnitude
     * Result
     * StDev
+      
+    * TypMin
+    * YypMax
 
    ProcessDissipation
     * ProcessDissipationID
@@ -379,16 +382,17 @@ The following tables are required:
    FragmentFlow
     * FragmentFlowID (equals FragmentEdgeID) (was FragmentNodeID)
     * FragmentID (FK to Fragment)
-node fields:
+      edge fields (moved from FragmentEdge) :
+    * FlowID (FK to Flow; FlowType must be Intermediate)
+    * DirectionID (FK to Direction, w.r.t. origin node)
+    * Quantity (or NULL if Origin NodeType is Fragment) (wrt unity activity
+   of parent
+    * ParentFragmentFlowID (FK to FragmentFlowID) (was Origin) (moved to last)
+      node fields:
     * Name - of process occurring at terminus (or flow name for IO/background)
     * FragmentStageID (was StageID) (FK to FragmentStage: FragmentID must match)
     * ReferenceFlowPropertyID (FK to FlowPropertyID) - of edge terminating at node
     * NodeTypeID (FK to NodeType)
-edge fields (moved from FragmentEdge) :
-    * FlowID (FK to Flow; FlowType must not be Elementary)
-    * DirectionID (FK to Direction, w.r.t. origin node)
-    * Quantity (or NULL if Origin NodeType is Fragment)
-    * ParentFragmentFlowID (FK to FragmentFlowID) (was Origin) (moved to last)
 
     A FragmentFlowID corresponds to the observation of a flow and its
     terminus.
@@ -453,12 +457,12 @@ edge fields (moved from FragmentEdge) :
     * ScenarioParamID
     * ScenarioID
     * ParamID
-    * Value
 
    DependencyParam
     * DependencyParamID
     * ParamID (FK to Param, ParamTypeID must be 1, 2, or 3)
     * FragmentFlowID (was FragmentEdgeID) (FK to FragmentFlowID)
+    * Value (float) unit value of param (phi=0) (aka scenario setting)
 
    DistributionParam
     * DistributionParamID
@@ -469,11 +473,13 @@ edge fields (moved from FragmentEdge) :
     * FlowPropertyParamID
     * ParamID (FK to Param, ParamTypeID must be 4)
     * FlowFlowPropertyID (FK)
+    * Value (float) unit value of param (phi=0) (aka scenario setting)
 
    CompositionParam
     * CompositionParamID
     * ParamID (FK to Param, ParamTypeID must be 5)
     * FlowFlowPropertyID (FK)
+    * Value (float) unit value of param (phi=0) (aka scenario setting)
 
     Note: types 4 and 5 both link to FlowFlowPropertyIDs but are used
     differently during fragment computation.
@@ -482,28 +488,33 @@ edge fields (moved from FragmentEdge) :
     * ProcessDissipationParamID
     * ParamID (FK to Param, ParamTypeID must be 6)
     * ProcessDissipationID (FK)
+    * Value (float) unit value of param (phi=0) (aka scenario setting)
 
    NodeDissipationParam
     * NodeDissipationParamID
     * ParamID (FK to Param, ParamTypeID must be 7)
     * ProcessDissipationID (FK to ProcessDissipation)
     * FragmentFlowID (FK to FragmentFlow)
+    * Value (float) unit value of param (phi=0) (aka scenario setting)
 
    ProcessEmissionParam
     * ProcessEmissionParamID
     * ParamID (FK to Param, ParamTypeID must be 8)
     * ProcessFlowID (FK)
+    * Value (float) unit value of param (phi=0) (aka scenario setting)
 
    NodeEmissionParam
     * NodeEmissionParamID
     * ParamID (FK to Param, ParamTypeID must be 9)
     * ProcessFlowID (FK to ProcessFlow)
     * FragmentFlowID (FK to FragmentFlow)
+    * Value (float) unit value of param (phi=0) (aka scenario setting)
 
    CharacterizationParam - New Table
     * CharacterizationParamID
     * ParamID  (FK to Param, ParamTypeID must be 10)
     * LCIAID (FK)
+    * Value (float) unit value of param (phi=0) (aka scenario setting)
 
     A single parameter value can be linked to multiple points in the model-
     but they must all be of the same type (a param with type 1 cannot be
@@ -520,7 +531,8 @@ edge fields (moved from FragmentEdge) :
     * FlowID (FK)
     * Name
 
-    List of intermediate flows for which composition parameters are relevant.
+    List of intermediate flows for which composition parameters are
+    relevant (multiple entries allowed for each FlowID)
 
    CompositionData
     * CompositionDataID
@@ -577,13 +589,13 @@ edge fields (moved from FragmentEdge) :
 
     size of ScoreCache table = #(nodes) x #(scenarios) x #(LCIA  methods)
 
-   BackgroundCache - New Table
+   BackgroundCache - New Table - I think we should ditch this table
     * BackgroundCacheID
     * BackgroundID (FK)
     * LCIAMethodID (FK)
     * Score
 
-   ScenarioBackgroundCache - New Table
+   ScenarioBackgroundCache - New Table - I think we should ditch this table
     * ScenarioBackgroundCacheID
     * ScenarioBackgroundID (FK)
     * LCIAMethodID (FK)
