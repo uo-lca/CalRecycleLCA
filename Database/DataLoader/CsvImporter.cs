@@ -104,6 +104,18 @@ namespace LcaDataLoader {
             return isImported;
         }
 
+        private static bool UpdateFragment(Row row, DbContextWrapper dbContext) {
+            bool isImported = false;
+            int fragmentID = Convert.ToInt32(row["FragmentID"]);
+            Fragment ent = dbContext.Find<Fragment>(fragmentID);
+            if (ent != null) {
+                ent.ReferenceFragmentFlowID = Convert.ToInt32(row["ReferenceFragmentFlowID"]);
+                ent.Name = row["Name"];
+                if (dbContext.SaveChanges() > 0) isImported = true;
+            }
+            return isImported;
+        }
+
         public static int? TransformOptionalID(string idString) {
             int? id = null;
             if (!String.IsNullOrEmpty(idString)) {
@@ -138,6 +150,30 @@ namespace LcaDataLoader {
                     ent.Quantity = Convert.ToDouble(row["Quantity"]);
                 ent.ParentFragmentFlowID = TransformOptionalID(row["ParentFragmentFlowID"]);
                 if (dbContext.SaveChanges() > 0) isImported = true;
+            }
+            return isImported;
+        }
+
+        private static bool ImportFragmentNodeProcess(Row row, DbContextWrapper dbContext) {
+            bool isImported = false;
+            int id = Convert.ToInt32(row["FragmentNodeProcessID"]);
+            FragmentNodeProcess ent = dbContext.CreateEntityWithID<FragmentNodeProcess>(id);
+            if (ent != null) {
+                ent.FragmentFlowID = Convert.ToInt32(row["FragmentFlowID"]);
+                ent.ProcessID = Convert.ToInt32(row["ProcessID"]);
+                isImported = (dbContext.SaveChanges() > 0);
+            }
+            return isImported;
+        }
+
+        private static bool ImportFragmentNodeFragment(Row row, DbContextWrapper dbContext) {
+            bool isImported = false;
+            int id = Convert.ToInt32(row["FragmentNodeFragmentID"]);
+            FragmentNodeFragment ent = dbContext.CreateEntityWithID<FragmentNodeFragment>(id);
+            if (ent != null) {
+                ent.FragmentFlowID = Convert.ToInt32(row["FragmentFlowID"]);
+                ent.SubFragmentID = Convert.ToInt32(row["SubFragmentID"]);
+                isImported = (dbContext.SaveChanges() > 0);
             }
             return isImported;
         }
@@ -207,6 +243,9 @@ namespace LcaDataLoader {
                 fRows = ImportCSV(Path.Combine(dirName, "Fragment.csv"), CreateFragment, dbContext);
                 ffRows = ImportCSV(Path.Combine(dirName, "FragmentFlow.csv"), CreateFragmentFlow, dbContext);
                 UpdateEntities(ffRows, UpdateFragmentFlow, dbContext);
+                UpdateEntities(fRows, UpdateFragment, dbContext);
+                ImportCSV(Path.Combine(dirName, "FragmentNodeProcess.csv"), ImportFragmentNodeProcess, dbContext);
+                ImportCSV(Path.Combine(dirName, "FragmentNodeFragment.csv"), ImportFragmentNodeFragment, dbContext);
             }
             else {
                 Program.Logger.WarnFormat("Fragment folder, {0}, does not exist.", dirName);
