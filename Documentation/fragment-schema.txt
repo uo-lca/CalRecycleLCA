@@ -589,17 +589,16 @@ The following tables are required:
 
     size of ScoreCache table = #(nodes) x #(scenarios) x #(LCIA  methods)
 
-   BackgroundCache - New Table - I think we should ditch this table
+   BackgroundCache 
     * BackgroundCacheID
     * BackgroundID (FK)
+    + ScenarioID (FK)
     * LCIAMethodID (FK)
     * Score
 
-   ScenarioBackgroundCache - New Table - I think we should ditch this table
-    * ScenarioBackgroundCacheID
-    * ScenarioBackgroundID (FK)
-    * LCIAMethodID (FK)
-    * Score
+    Stores summed background computations for LCIA computation.
+
+   ScenarioBackgroundCache - DELETE TABLE
 
   Sensitivities should be computed on the fly.  If performance is slow, we
   can add a boolean table indicating whether a given FragmentFlowID +
