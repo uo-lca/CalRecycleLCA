@@ -73,6 +73,19 @@ namespace LcaDataLoader {
             return isImported;
         }
 
+        private static bool UpdateDataProvider(DataProviderEnum dpEnum, string dirName, DbContextWrapper dbContext) {
+            bool updated = false;
+            DataProvider dp = dbContext.Find<DataProvider>(Convert.ToInt32(dpEnum));
+            if (dp == null) {
+                Program.Logger.ErrorFormat("Data provider for {0} not found.", dpEnum.ToString());
+            }
+            else {
+                dp.DirName = dirName;
+                updated = (dbContext.SaveChanges() > 0);
+            }
+            return updated;
+        }
+
         private static bool CreateIlcdEntity(string uuid, DataProviderEnum providerEnum, DataTypeEnum typeEnum, DbContextWrapper dbContext) {
             bool uuidExists = false;
             if (dbContext.IlcdUuidExists(uuid)) {
@@ -185,7 +198,7 @@ namespace LcaDataLoader {
             var table = DataAccess.DataTable.New.ReadCsv(fileName);
             Program.Logger.InfoFormat("Import {0}...", fileName);
             foreach (Row row in table.Rows) {
-                Program.Logger.DebugFormat("Import row {0}", importCounter);
+                Program.Logger.DebugFormat("Import row {0}", row.DebugValues);
                 if (importRow(row, dbContext)) importCounter++;
             }
             Program.Logger.InfoFormat("{0} of {1} rows imported from {2}.", importCounter, table.Rows.Count(), fileName);
@@ -196,7 +209,7 @@ namespace LcaDataLoader {
             int importCounter = 0;
             Program.Logger.InfoFormat("Update imported rows...");
             foreach (Row row in rows) {
-                Program.Logger.DebugFormat("Update row {0}", importCounter);
+                Program.Logger.DebugFormat("Update row {0}", row.DebugValues);
                 if (updateRow(row, dbContext)) importCounter++;
             }
             Program.Logger.InfoFormat("Updated {0} of {1} entities.", importCounter, rows.Count());
@@ -226,6 +239,7 @@ namespace LcaDataLoader {
             if (Directory.Exists(dirName)) {
                 IEnumerable<Row> rows;
                 Program.Logger.InfoFormat("Load append files in {0}...", dirName);
+                UpdateDataProvider(DataProviderEnum.append, dirName, dbContext);
                 ImportAppendCSV(dirName, "CategorySystem", ImportCategorySystem, dbContext);
                 rows = ImportAppendCSV(dirName, "Category", CreateCategory, dbContext);
                 if (rows != null) UpdateEntities(rows, UpdateCategory, dbContext);
@@ -245,6 +259,7 @@ namespace LcaDataLoader {
             if (Directory.Exists(dirName)) {
                 IEnumerable<Row> fRows, ffRows;
                 Program.Logger.InfoFormat("Load fragment files in {0}...", dirName);
+                UpdateDataProvider(DataProviderEnum.fragments, dirName, dbContext);
                 fRows = ImportCSV(Path.Combine(dirName, "Fragment.csv"), CreateFragment, dbContext);
                 ffRows = ImportCSV(Path.Combine(dirName, "FragmentFlow.csv"), CreateFragmentFlow, dbContext);
                 UpdateEntities(ffRows, UpdateFragmentFlow, dbContext);
