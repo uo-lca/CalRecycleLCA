@@ -12,62 +12,42 @@ namespace LcaDataLoader {
     /// <summary>
     /// Use IlcdImporter to load ILCD data from a directory to the LCA Tool database.
     /// </summary>
-    class IlcdImporter : IDisposable {
-        /// <summary>
-        /// Wrapper for the app's DbContext
-        /// </summary>
-        private DbContextWrapper _DbContext = new DbContextWrapper();
-
+    class IlcdImporter  {
         /// <summary>
         /// Object to handle loading ILCD data file.
         /// </summary>
         private IlcdData _IlcdData = new IlcdData();
 
-        // Flag: Has Dispose already been called? 
-        bool disposed = false;
-
-        // Public implementation of Dispose pattern callable by consumers. 
-        public void Dispose() {
-            Dispose(true);
-            GC.SuppressFinalize(this);
-        }
-
-        // Protected implementation of Dispose pattern. 
-        protected virtual void Dispose(bool disposing) {
-            if (disposed)
-                return;
-
-            if (disposing) {
-                _DbContext.Dispose();
-            }
-
-            disposed = true;
-        }
-
         /// <summary>
         /// Load all ILCD data types in directory.
         /// </summary>
         /// <param name="dirName">Full path name of directory</param>
-        public void LoadAll(string dirName) {
-            LoadDataType(Path.Combine(dirName, "unitgroups"));
-            LoadDataType(Path.Combine(dirName, "flowproperties"));
-            LoadDataType(Path.Combine(dirName, "flows"));
-            LoadDataType(Path.Combine(dirName, "LCIAmethods"));
-            LoadDataType(Path.Combine(dirName, "processes"));
+        /// <param name="ilcdSourceName">Name of ILCD data source</param>
+        public void LoadAll(string dirName, string ilcdSourceName) {
+            using (DbContextWrapper dbContext = new DbContextWrapper()) {
+                if (dbContext.CreateDataProvider(dirName, ilcdSourceName) != null) { 
+                    LoadDataType(Path.Combine(dirName, "unitgroups"), dbContext);
+                    LoadDataType(Path.Combine(dirName, "flowproperties"), dbContext);
+                    LoadDataType(Path.Combine(dirName, "flows"), dbContext);
+                    LoadDataType(Path.Combine(dirName, "LCIAmethods"), dbContext);
+                    LoadDataType(Path.Combine(dirName, "processes"), dbContext);
+                }
+            }
         }
 
         /// <summary>
         /// Load XML files in ILCD data type directory
         /// </summary>
         /// <param name="dirName">Full path name of directory for the data type</param>
-        public void LoadDataType(string dirName) {
+        /// <param name="dbContext">Instance of DbContextWrapper</param>
+        public void LoadDataType(string dirName, DbContextWrapper dbContext) {
             int importCounter = 0;
             if (Directory.Exists(dirName)) {
                 string[] files = Directory.GetFiles(dirName, "*.xml");
                 foreach (string s in files) {
-                    Debug.WriteLine("Load {0}", s);
+                    Program.Logger.DebugFormat("Load {0}", s);
                     _IlcdData.LoadedDocument = XDocument.Load(s);
-                    if (_IlcdData.Save(_DbContext)) {
+                    if (_IlcdData.Save(dbContext)) {
                         importCounter++;
                     }
                     else {

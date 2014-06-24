@@ -16,6 +16,7 @@ namespace LcaDataLoader {
     class DbContextWrapper : IDisposable {
         // Data Model DbContext object
         EntityDataModel _DbContext;
+        int _CurrentIlcdDataProviderID;
 
         // Flag: Has Dispose already been called? 
         bool disposed = false;
@@ -44,9 +45,38 @@ namespace LcaDataLoader {
             _DbContext = new EntityDataModel();
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public int GetCurrentIlcdDataProviderID() {
+            return _CurrentIlcdDataProviderID;
+        }
+
+        /// <summary>
+        /// Create DataProvider record if a record with the same attribute values does not already exist.
+        /// </summary>
+        /// <param name="dirName">DataProvider.DirName</param>
+        /// <param name="name">DataProvider.Name</param>
+        /// <returns>DataProvider object created or found.</returns>
+        public DataProvider CreateDataProvider(string dirName, string name) {
+            DataProvider dataProvider;
+            dataProvider = (from dp in _DbContext.DataProviders 
+                            where dp.Name.ToLower() == name.ToLower() && dp.DirName.ToLower() == dirName.ToLower() 
+                            select dp).FirstOrDefault();
+            if (dataProvider == null) {
+                dataProvider = new DataProvider { Name = name, DirName = dirName };
+                _DbContext.DataProviders.Add(dataProvider);
+                SaveChanges();
+            }
+            else {
+                Program.Logger.InfoFormat("Data Provider with Name = {0} and Directory = {1} already exists.", name, dirName);
+            }
+            _CurrentIlcdDataProviderID = dataProvider.DataProviderID;
+            return dataProvider;
+        }
+
         /// <summary>
         /// Invokes DbContext.SaveChanges and handles DbUpdateException.
         /// </summary>
+        /// <returns>Number of objects written to the database, or 0 if DbUpdateException occurs.</returns>
         public int SaveChanges() {
             try {
                 return _DbContext.SaveChanges();
@@ -151,6 +181,11 @@ namespace LcaDataLoader {
             }
         }
 
+        /// <summary>
+        /// Generic method to look up entity by name.
+        /// </summary>
+        /// <param name="name">Entity name</param>
+        /// <returns>Entity ID, if name was found, otherwise null</returns>
         public int? LookupEntityID<T>(string name) where T : class, ILookupEntity {
             DbSet<T> dbSet = _DbContext.Set<T>();
             ILookupEntity entity = (from le in dbSet where le.Name == name select le).FirstOrDefault();
@@ -166,6 +201,11 @@ namespace LcaDataLoader {
             }
         }
 
+        /// <summary>
+        /// Generic method to look up ILCD Entity ID by UUID.
+        /// </summary>
+        /// <param name="uuid">UUID value</param>
+        /// <returns>Entity ID, if found, otherwise null</returns>
         public int? GetIlcdEntityID<T>(string uuid) where T : class, IIlcdEntity {
             DbSet<T> dbSet = _DbContext.Set<T>();
             IIlcdEntity entity = (from le in dbSet where le.UUID == uuid select le).FirstOrDefault();
@@ -179,8 +219,10 @@ namespace LcaDataLoader {
         }
 
         /// <summary>
-        /// Search for entity by ID
+        /// Generic method to search for entity by ID
         /// </summary>
+        /// <param name="id">ID value</param>
+        /// <returns>Entity with ID, if found, otherwise null</returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public T Find<T>(int id) where T : class {
             return _DbContext.Set<T>().Find(id);
@@ -193,11 +235,7 @@ namespace LcaDataLoader {
         public static void Seed(EntityDataModel dbContext) {
             SeedLUT<DataProvider>(dbContext.DataProviders, typeof(DataProviderEnum));
             SeedLUT<DataType>(dbContext.DataTypes, typeof(DataTypeEnum));
-            SeedLUT<FlowType>(dbContext.FlowTypes,
-                new List<string>(new string[] {            
-                    "Intermediate Flow",
-                    "Elementary Flow"
-             })); 
+            SeedLUT<FlowType>(dbContext.FlowTypes, typeof(FlowTypeEnum)); 
             SeedLUT<ImpactCategory>(dbContext.ImpactCategories,
                 new List<string>(new string[] {            
                     "Abiotic resource depletion",
@@ -223,11 +261,7 @@ namespace LcaDataLoader {
                     "Damage indicator",
                     "Mid-point indicator"
                 }));
-            SeedLUT<Direction>(dbContext.Directions,
-                new List<string>(new string[] {            
-                    "Input",
-                    "Output"
-             }));
+            SeedLUT<Direction>(dbContext.Directions, typeof(DirectionEnum));
             SeedLUT<ReferenceType>(dbContext.ReferenceTypes,
                 new List<string>(new string[] {            
                     "Other parameter",
@@ -249,10 +283,12 @@ namespace LcaDataLoader {
         /// <summary>
         /// Use this method to transform ILCD flow type name to database FlowTypeID.
         /// </summary>
+        /// <param name="flowTypeName">ILCD flow type as string</param>
+        /// <returns>FlowTypeEnum value as int</returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public int GetFlowTypeID(string flowTypeName) {
-            // Database only has 2 flow types: "Elementary Flow" and "Intermediate Flow", for all other ILCD flow types. 
-            return flowTypeName.Equals("Elementary flow") ? 2 : 1;
+            // Database only has 2 flow types: "ElementaryFlow" and "IntermediateFlow", for all other ILCD flow types. 
+            return flowTypeName.Equals("Elementary flow") ? Convert.ToInt32(FlowTypeEnum.ElementaryFlow) : Convert.ToInt32(FlowTypeEnum.IntermediateFlow);
         }
         
         public bool IlcdUuidExists(string uuid) {

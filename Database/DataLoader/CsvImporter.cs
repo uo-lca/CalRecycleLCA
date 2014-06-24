@@ -83,7 +83,7 @@ namespace LcaDataLoader {
                 ILCDEntity ilcdEntity = new ILCDEntity {
                     UUID = uuid,
                     DataProviderID = Convert.ToInt32(providerEnum),
-                    DataTypeID = Convert.ToInt32(typeEnum)
+                    DataTypeID = Convert.ToInt32(typeEnum)                  
                 };
                 uuidExists = dbContext.AddEntity(ilcdEntity);
             }
@@ -98,7 +98,9 @@ namespace LcaDataLoader {
             if (uuidExists)
             {
                 Fragment obj = dbContext.CreateEntityWithID<Fragment>(fragmentID);
-                if (obj != null) obj.UUID = uuid;
+                if (obj != null) {
+                    obj.UUID = uuid;
+                }
                 isImported = (dbContext.SaveChanges() > 0);
             }        
             return isImported;
@@ -183,6 +185,7 @@ namespace LcaDataLoader {
             var table = DataAccess.DataTable.New.ReadCsv(fileName);
             Program.Logger.InfoFormat("Import {0}...", fileName);
             foreach (Row row in table.Rows) {
+                Program.Logger.DebugFormat("Import row {0}", importCounter);
                 if (importRow(row, dbContext)) importCounter++;
             }
             Program.Logger.InfoFormat("{0} of {1} rows imported from {2}.", importCounter, table.Rows.Count(), fileName);
@@ -191,7 +194,9 @@ namespace LcaDataLoader {
 
         private static int UpdateEntities(IEnumerable<Row> rows, Func<Row, DbContextWrapper, bool> updateRow, DbContextWrapper dbContext) {
             int importCounter = 0;
+            Program.Logger.InfoFormat("Update imported rows...");
             foreach (Row row in rows) {
+                Program.Logger.DebugFormat("Update row {0}", importCounter);
                 if (updateRow(row, dbContext)) importCounter++;
             }
             Program.Logger.InfoFormat("Updated {0} of {1} entities.", importCounter, rows.Count());
