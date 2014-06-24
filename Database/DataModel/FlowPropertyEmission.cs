@@ -13,7 +13,7 @@ namespace LcaDataModel
 
         public int? FlowPropertyID { get; set; }
 
-        public int? EmissionID { get; set; }
+        public int? FlowID { get; set; }
 
         public double? Scale { get; set; }
 

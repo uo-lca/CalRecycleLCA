@@ -226,8 +226,8 @@ The following tables are required:
 
    FlowPropertyEmission
     * FlowPropertyEmissionID
-    * FlowPropertyID
-    * EmissionID (FK to Flow.FlowID; FlowType must be Elementary)
+    * FlowPropertyID (FK to FlowProperty)
+    * FlowID (FK to Flow.FlowID; FlowType must be Elementary)
     * Scale (float)
 
     How various flow properties map to environmental emissions.

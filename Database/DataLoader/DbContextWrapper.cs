@@ -229,6 +229,15 @@ namespace LcaDataLoader {
         }
 
         /// <summary>
+        /// Expose DbSet members for operations on relationship and other unusual tables.
+        /// </summary>
+        /// <returns>DbSet member variable for type T.</returns>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public DbSet<T> GetDbSet<T>() where T : class {
+            return _DbContext.Set<T>();
+        }
+
+        /// <summary>
         /// Insert initial data into new database.
         /// </summary>
         /// <param name="dbContext">Entity Framework database context</param>

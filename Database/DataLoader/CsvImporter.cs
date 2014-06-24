@@ -1,5 +1,6 @@
 ﻿using System.Runtime.CompilerServices;
 using System;
+using System.Data.Entity;
 using System.Diagnostics;
 using System.Collections.Generic;
 using System.IO;
@@ -69,6 +70,47 @@ namespace LcaDataLoader {
             }
             else {
                 Program.Logger.ErrorFormat("Classification UUID {0} not found. Skipping record.", uuid);
+            }
+            return isImported;
+        }
+
+        private static bool ImportFlowPropertyEmission(Row row, DbContextWrapper dbContext) {
+            bool isImported = false;
+            int? fpID = dbContext.GetIlcdEntityID<FlowProperty>(row["FlowPropertyUUID"]);
+            int? fID = dbContext.GetIlcdEntityID<Flow>(row["EmissionUUID"]);
+            if (fpID != null && fID != null) {
+                DbSet<FlowPropertyEmission> fpEmissions = dbContext.GetDbSet<FlowPropertyEmission>();
+                FlowPropertyEmission fpEmission = (from fpe in fpEmissions 
+                                                   where fpe.FlowPropertyID == fpID && fpe.FlowID == fID
+                                                   select fpe).FirstOrDefault();
+                if (fpEmission == null) {
+                    fpEmission = new FlowPropertyEmission { FlowPropertyID = fpID, FlowID = fID };
+                    fpEmissions.Add(fpEmission);
+                }
+                fpEmission.Scale = Convert.ToDouble(row["Scale"]);
+                isImported = (dbContext.SaveChanges() > 0);
+            }
+            else {
+                Program.Logger.Error("FlowPropertyEmission: Related entity not found. Skipping record.");
+            }
+            return isImported;
+        }
+
+        private static bool ImportProcessDissipation(Row row, DbContextWrapper dbContext) {
+            bool isImported = false;
+            int? pID = dbContext.GetIlcdEntityID<LcaDataModel.Process>(row["ProcessUUID"]);
+            int? fID = dbContext.GetIlcdEntityID<Flow>(row["FlowUUID"]);
+            if (pID != null && fID != null) {
+                DbSet<ProcessFlow> dbSet = dbContext.GetDbSet<ProcessFlow>();
+                ProcessFlow obj = (from o in dbSet
+                                   where (o.ProcessID == pID) && (o.FlowID == fID) && (o.DirectionID == Convert.ToInt32(DirectionEnum.Output))
+                                  select o).FirstOrDefault();
+                // TODO
+                
+                isImported = (dbContext.SaveChanges() > 0);
+            }
+            else {
+                Program.Logger.Error("ProcessDissipation: Related entity not found. Skipping record.");
             }
             return isImported;
         }
@@ -244,6 +286,8 @@ namespace LcaDataLoader {
                 rows = ImportAppendCSV(dirName, "Category", CreateCategory, dbContext);
                 if (rows != null) UpdateEntities(rows, UpdateCategory, dbContext);
                 ImportAppendCSV(dirName, "Classification", ImportClassification, dbContext);
+                ImportCSV(Path.Combine(dirName, "FlowPropertyEmission.csv"), ImportFlowPropertyEmission, dbContext);
+                ImportCSV(Path.Combine(dirName, "ProcessDissipation.csv"), ImportProcessDissipation, dbContext);
             }
             else {
                 Program.Logger.WarnFormat("Append folder, {0}, does not exist.", dirName);
