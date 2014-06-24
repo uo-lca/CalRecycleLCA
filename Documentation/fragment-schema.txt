@@ -288,6 +288,11 @@ The following tables are required:
 
     Please see description in fragment-design.txt
 
+    Note-- when this table is exported from Matlab to CSV, the exported
+    file will contain separate UUIDs for Process and Flow.  The CSV
+    importer must find the ProcessFlowID that matches the identified
+    Process AND Flow.
+
    Source - REMOVE TABLE
 
 ### Indices, constraints

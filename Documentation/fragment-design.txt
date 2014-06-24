@@ -263,19 +263,17 @@ Database Design
    algorithm can be used to determine the input flow:
 
    {
-     // edges = table of fragment edges
-     // nodes = table of fragment nodes
-     // current_node = FragmentNodeID
+     // flows = table of fragment flows
+     // current_node = FragmentFlowID
 
      // direction is w.r.t. origin node- so current_node's input is parent
      // node's output
      upstream_input = SELECT FlowID 
-	FROM edges
-     	INNER JOIN Direction d on edges.DirectionID = d.DirectionID
-   	INNER JOIN Flow f ON pf.FlowID = f.FlowID
-   	INNER JOIN FlowFlowProperty ffp on f.FlowID = ffp.FlowID
+	FROM flows
+     	INNER JOIN Direction d on flows.DirectionID = d.DirectionID
+   	INNER JOIN FlowFlowProperty ffp on flows.FlowID = ffp.FlowID
    	INNER JOIN FlowProperty fp on ffp.FlowPropertyID = fp.FlowPropertyID
-     	WHERE edges.Terminus = current_node
+     	WHERE flows.FragmentFlowID = current_node
 	  AND d.Direction = "Output"
 	  AND fp.Name = "Mass"
 
@@ -284,12 +282,11 @@ Database Design
 	// or, if node is added in reverse as a dependency-satisfier, then
 	// we need an input w.r.t. the current node
 	downstream_input = SELECT FlowID
-	FROM edges
+	FROM flows
      	INNER JOIN Direction d on edges.DirectionID = d.DirectionID
-   	INNER JOIN Flow f ON pf.FlowID = f.FlowID
-   	INNER JOIN FlowFlowProperty ffp on f.FlowID = ffp.FlowID
+   	INNER JOIN FlowFlowProperty ffp on flows.FlowID = ffp.FlowID
    	INNER JOIN FlowProperty fp on ffp.FlowPropertyID = fp.FlowPropertyID
-     	WHERE edges.Origin = current_node
+     	WHERE flows.ParentFlowID = current_node
 	  AND d.Direction = "Input"
 	  AND fp.Name = "Mass"
 
