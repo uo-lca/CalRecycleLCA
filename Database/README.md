@@ -10,7 +10,8 @@ DataLoader is a web app that loads individual data files. It is not currently us
 The console app is named LcaDataLoader.exe and has the following arguments:
   * -r The full data root path Default: C:\\CalRecycleLCA-DATA_ROOT
   * -s ILCD archive source name
-  * -d Delete database and recreate. 
+  * -d Delete database and recreate.
+  * -c Load CSV files
  
 The console app creates a log file in the current directory. Logging can be configured by editing app.Config. (See log4net documentation for instructions).
 
@@ -21,12 +22,14 @@ ILCD archives and the following CSV directories are expected to be in the data r
  
 Examples: 
 
- Create database, load ILCD archive and CSVs using
+ Create database and load ILCD archive using
   <pre><code>LcaDataLoader -r "C:\CalRecycleLCA-DATA_ROOT" -s "Full UO LCA Flat Export BK 2014_05_05" -d</pre></code>
 
- Update database, load ILCD archive and CSVs using
+ Update database and load ILCD archive using
   <pre><code>LcaDataLoader -r "C:\CalRecycleLCA-DATA_ROOT" -s "Full UO LCA Flat Export Ecoinvent 2014_04_24"</pre></code>
 
+  Update database and load CSV files using
+  <pre><code>LcaDataLoader -r "C:\CalRecycleLCA-DATA_ROOT" -c</pre></code>
   
   
  
