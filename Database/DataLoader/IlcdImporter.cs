@@ -22,13 +22,16 @@ namespace LcaDataLoader {
         /// Load all ILCD data types in directory.
         /// </summary>
         /// <param name="dirName">Full path name of directory</param>
-        public void LoadAll(string dirName) {
+        /// <param name="ilcdSourceName">Name of ILCD data source</param>
+        public void LoadAll(string dirName, string ilcdSourceName) {
             using (DbContextWrapper dbContext = new DbContextWrapper()) {
-                LoadDataType(Path.Combine(dirName, "unitgroups"), dbContext);
-                LoadDataType(Path.Combine(dirName, "flowproperties"), dbContext);
-                LoadDataType(Path.Combine(dirName, "flows"), dbContext);
-                LoadDataType(Path.Combine(dirName, "LCIAmethods"), dbContext);
-                LoadDataType(Path.Combine(dirName, "processes"), dbContext);
+                if (dbContext.CreateDataProvider(dirName, ilcdSourceName) != null) { 
+                    LoadDataType(Path.Combine(dirName, "unitgroups"), dbContext);
+                    LoadDataType(Path.Combine(dirName, "flowproperties"), dbContext);
+                    LoadDataType(Path.Combine(dirName, "flows"), dbContext);
+                    LoadDataType(Path.Combine(dirName, "LCIAmethods"), dbContext);
+                    LoadDataType(Path.Combine(dirName, "processes"), dbContext);
+                }
             }
         }
 
