@@ -3,13 +3,13 @@ namespace LcaDataModel {
     using System;
 
     public enum DataProviderEnum {
-        append,
+        append=1,
         fragments,
         scenarios
     }
 
     public enum DataTypeEnum {
-        Flow,
+        Flow=1,
         FlowProperty,
         Process,
         UnitGroup,
@@ -20,15 +20,15 @@ namespace LcaDataModel {
     }
 
     public enum DirectionEnum {
-        Input, Output
+        Input=1, Output
     }
 
     public enum FlowTypeEnum {
-         IntermediateFlow,
+         IntermediateFlow=1,
          ElementaryFlow
     }
 
     public enum NodeTypeEnum {
-        Process, Fragment, InputOutput, Background
+        Process=1, Fragment, InputOutput, Background
     }
 }
