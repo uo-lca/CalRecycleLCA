@@ -251,10 +251,25 @@ The following tables are required:
    LCIA
     * LCIAID
     * LCIAMethodID
-    * FlowID
+    * FlowUUID - not a FK
+    * FlowName - as listed in LCIAMethod data set
     * DirectionID
     * Geography
     * Factor
+
+    Table of all LCIA factors listed in all LCIAMethod datasets.  At a late
+    stage in database initialization, this table should be indexed with
+    respect to internal FlowIDs to create:
+
+   LocalLCIA
+    * LocalLCIAID
+    * LCIAID - FK to LCIA
+    * FlowID - FK to Flow
+    
+    This table is generated internally after DB initialization, and can be
+    re-generated any time either the Flow or LCIA tables change.  It
+    includes all records from LCIA for which LCIA.FlowUUID matches a Flow
+    record on Flow.UUID
 
    Process
     * ProcessID - internal primary key
