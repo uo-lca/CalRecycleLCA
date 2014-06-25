@@ -114,7 +114,7 @@ namespace LcaDataLoader {
         /// <returns>true iff entity was successfully inserted</returns>
         public bool AddEntity<T>(T entity) where T : class {
             _DbContext.Set<T>().Add(entity);
-            return (SaveChanges() > 0);
+            return (SaveChanges() > 0);     
         }
 
         /// <summary>
@@ -202,13 +202,24 @@ namespace LcaDataLoader {
         }
 
         /// <summary>
+        /// Generic method to retrieve ILCD Entity by UUID.
+        /// </summary>
+        /// <param name="uuid">UUID value</param>
+        /// <returns>Entity, if found, otherwise null</returns>
+        public T GetIlcdEntity<T>(string uuid) where T : class, IIlcdEntity {
+            DbSet<T> dbSet = _DbContext.Set<T>();
+            T entity = (from le in dbSet where le.UUID == uuid select le).FirstOrDefault();
+            return entity;
+        }
+
+        /// <summary>
         /// Generic method to look up ILCD Entity ID by UUID.
+        /// Report error if not found.
         /// </summary>
         /// <param name="uuid">UUID value</param>
         /// <returns>Entity ID, if found, otherwise null</returns>
         public int? GetIlcdEntityID<T>(string uuid) where T : class, IIlcdEntity {
-            DbSet<T> dbSet = _DbContext.Set<T>();
-            IIlcdEntity entity = (from le in dbSet where le.UUID == uuid select le).FirstOrDefault();
+            IIlcdEntity entity = GetIlcdEntity<T>(uuid);
             if (entity == null) {
                 Program.Logger.ErrorFormat("Unable to find {0} with UUID, {1}.", typeof(T).ToString(), uuid);
                 return null;
