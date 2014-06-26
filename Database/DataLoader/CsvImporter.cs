@@ -129,7 +129,7 @@ namespace LcaDataLoader {
             if (pID != null && fID != null) {
                 DbSet<ProcessFlow> dbSet = dbContext.GetDbSet<ProcessFlow>();
                 ProcessFlow obj = (from o in dbSet
-                                   where (o.ProcessID == pID) && (o.FlowID == fID) && (o.DirectionID == Convert.ToInt32(DirectionEnum.Output))
+                                   where (o.ProcessID == pID) && (o.FlowID == fID) && (o.DirectionID == dirID)
                                   select o).FirstOrDefault();
                 if (obj == null) {
                     Program.Logger.ErrorFormat("ProcessFlow with ProcessID = {0}, FlowID = {1}, and Output direction not found.", pID, fID);

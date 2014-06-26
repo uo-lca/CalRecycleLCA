@@ -310,14 +310,38 @@ namespace LcaDataLoader {
             // Database only has 2 flow types: "ElementaryFlow" and "IntermediateFlow", for all other ILCD flow types. 
             return flowTypeName.Equals("Elementary flow") ? Convert.ToInt32(FlowTypeEnum.ElementaryFlow) : Convert.ToInt32(FlowTypeEnum.IntermediateFlow);
         }
-        
+
+        /// <summary>
+        /// Use this method to check if an ILCDEntity with given UUID already exists in the database
+        /// </summary>
+        /// <param name="uuid">The UUID value</param>
+        /// <returns>true iff found</returns>
         public bool IlcdUuidExists(string uuid) {
             ILCDEntity entity = (from il in _DbContext.ILCDEntities where il.UUID == uuid select il).FirstOrDefault();
             return (entity != null);
         }
 
+        /// <summary>
+        /// Use this method to check if an entity (any type having internal ID as primary key) already exists in the database
+        /// </summary>
+        /// <param name="id">The ID value</param>
+        /// <returns>true iff found</returns>
         public bool EntityIdExists<T>(int id) where T : class {
             return _DbContext.Set<T>().Find(id) != null ;
+        }
+
+        /// <summary>
+        /// Use this method to fill in missing LCIA FlowID references whenever Flows have been inserted after LCIA import.
+        /// Could not see how to do this in EF/LINQ, so this method uses SQL command. 
+        /// </summary>
+        /// <returns>Number of records updated</returns>
+        public int UpdateLciaFlowID() {
+            _DbContext.Database.ExecuteSqlCommand(
+                "UPDATE LCIA SET FlowID = (SELECT FlowID FROM Flow WHERE LCIA.FlowUUID = Flow.UUID) " +
+                "WHERE  FlowID IS NULL AND EXISTS (SELECT FlowID FROM Flow WHERE LCIA.FlowUUID = Flow.UUID)");
+            int changeCount = _DbContext.SaveChanges();
+            Program.Logger.InfoFormat("Updated FlowID in {0} LCIA records.", changeCount);
+            return changeCount;
         }
     }
 }
