@@ -98,6 +98,9 @@ namespace LcaDataLoader {
                         exitCode = 1;
                     }
                 }
+                using (DbContextWrapper dbContext = new DbContextWrapper()) {
+                    dbContext.UpdateLciaFlowID();
+                }
             }
             catch (Exception e) {
                 Logger.FatalFormat("Unexpected Exception. Message = {0}", e.Message);

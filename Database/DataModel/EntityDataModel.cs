@@ -140,7 +140,7 @@ namespace LcaDataModel {
             modelBuilder.Entity<Flow>()
                 .HasMany(e => e.FlowPropertyEmissions)
                 .WithOptional(e => e.Flow)
-                .HasForeignKey(e => e.EmissionID);
+                .HasForeignKey(e => e.FlowID);
 
             modelBuilder.Entity<Flow>()
                 .HasMany(e => e.Processes)

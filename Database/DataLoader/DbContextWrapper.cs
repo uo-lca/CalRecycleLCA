@@ -114,7 +114,7 @@ namespace LcaDataLoader {
         /// <returns>true iff entity was successfully inserted</returns>
         public bool AddEntity<T>(T entity) where T : class {
             _DbContext.Set<T>().Add(entity);
-            return (SaveChanges() > 0);
+            return (SaveChanges() > 0);     
         }
 
         /// <summary>
@@ -202,13 +202,24 @@ namespace LcaDataLoader {
         }
 
         /// <summary>
+        /// Generic method to retrieve ILCD Entity by UUID.
+        /// </summary>
+        /// <param name="uuid">UUID value</param>
+        /// <returns>Entity, if found, otherwise null</returns>
+        public T GetIlcdEntity<T>(string uuid) where T : class, IIlcdEntity {
+            DbSet<T> dbSet = _DbContext.Set<T>();
+            T entity = (from le in dbSet where le.UUID == uuid select le).FirstOrDefault();
+            return entity;
+        }
+
+        /// <summary>
         /// Generic method to look up ILCD Entity ID by UUID.
+        /// Report error if not found.
         /// </summary>
         /// <param name="uuid">UUID value</param>
         /// <returns>Entity ID, if found, otherwise null</returns>
         public int? GetIlcdEntityID<T>(string uuid) where T : class, IIlcdEntity {
-            DbSet<T> dbSet = _DbContext.Set<T>();
-            IIlcdEntity entity = (from le in dbSet where le.UUID == uuid select le).FirstOrDefault();
+            IIlcdEntity entity = GetIlcdEntity<T>(uuid);
             if (entity == null) {
                 Program.Logger.ErrorFormat("Unable to find {0} with UUID, {1}.", typeof(T).ToString(), uuid);
                 return null;
@@ -226,6 +237,15 @@ namespace LcaDataLoader {
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public T Find<T>(int id) where T : class {
             return _DbContext.Set<T>().Find(id);
+        }
+
+        /// <summary>
+        /// Expose DbSet members for operations on relationship and other unusual tables.
+        /// </summary>
+        /// <returns>DbSet member variable for type T.</returns>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public DbSet<T> GetDbSet<T>() where T : class {
+            return _DbContext.Set<T>();
         }
 
         /// <summary>
@@ -290,14 +310,38 @@ namespace LcaDataLoader {
             // Database only has 2 flow types: "ElementaryFlow" and "IntermediateFlow", for all other ILCD flow types. 
             return flowTypeName.Equals("Elementary flow") ? Convert.ToInt32(FlowTypeEnum.ElementaryFlow) : Convert.ToInt32(FlowTypeEnum.IntermediateFlow);
         }
-        
+
+        /// <summary>
+        /// Use this method to check if an ILCDEntity with given UUID already exists in the database
+        /// </summary>
+        /// <param name="uuid">The UUID value</param>
+        /// <returns>true iff found</returns>
         public bool IlcdUuidExists(string uuid) {
             ILCDEntity entity = (from il in _DbContext.ILCDEntities where il.UUID == uuid select il).FirstOrDefault();
             return (entity != null);
         }
 
+        /// <summary>
+        /// Use this method to check if an entity (any type having internal ID as primary key) already exists in the database
+        /// </summary>
+        /// <param name="id">The ID value</param>
+        /// <returns>true iff found</returns>
         public bool EntityIdExists<T>(int id) where T : class {
             return _DbContext.Set<T>().Find(id) != null ;
+        }
+
+        /// <summary>
+        /// Use this method to fill in missing LCIA FlowID references whenever Flows have been inserted after LCIA import.
+        /// Could not see how to do this in EF/LINQ, so this method uses SQL command. 
+        /// </summary>
+        /// <returns>Number of records updated</returns>
+        public int UpdateLciaFlowID() {
+            _DbContext.Database.ExecuteSqlCommand(
+                "UPDATE LCIA SET FlowID = (SELECT FlowID FROM Flow WHERE LCIA.FlowUUID = Flow.UUID) " +
+                "WHERE  FlowID IS NULL AND EXISTS (SELECT FlowID FROM Flow WHERE LCIA.FlowUUID = Flow.UUID)");
+            int changeCount = _DbContext.SaveChanges();
+            Program.Logger.InfoFormat("Updated FlowID in {0} LCIA records.", changeCount);
+            return changeCount;
         }
     }
 }
