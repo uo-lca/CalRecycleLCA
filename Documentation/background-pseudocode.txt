@@ -18,11 +18,22 @@ ComputeBackground( ScenarioID, ListOfLCIAMethods L)
     switch background.NodeType
     {
       case 'Process'
-        // compute LCIA results 
+      {
+	inventory = ComputeProcessLCI( bk.TargetID, ScenarioID );
+        for j in missing_L
+	{
+	  LCIA = ComputeProcessLCIA ( inventory, ScenarioID, j );
+	  MyScore = sum( LCIA.Score );
+	  SetBackgroundCache( bk.BackgroundID, ScenarioID, j, MyScore );
+	}
+      }
       case 'Fragment'
-        // compute LCIA results
+      {
+        FragmentScore = ComputeFragmentLCIA( bk.TargetID, ScenarioID, j );
+	MyScore = sum( FragmentScore.LCIA );
+	SetBackgroundCache( bk.BackgroundID, ScenarioID, j, MyScore );
+      }
     }
-    
   }
 }
 
