@@ -20,6 +20,16 @@ namespace LcaDataModel
 
         public int? FlowID { get; set; }
 
+        // The following 2 properties are imported from ILCD LCIAMethod characterization data 
+        // in case the related flow record is not available at the time of import.
+        // FlowID above should be updated after a flow with a matching UUID is created in the database.
+        [StringLength(36)]
+        public string FlowUUID { get; set; }
+
+        [StringLength(255)]
+        public string FlowName { get; set; }
+
+
         [StringLength(100)]
         public string Geography { get; set; }
 
