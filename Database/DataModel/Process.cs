@@ -11,6 +11,7 @@ namespace LcaDataModel
     {
         public Process()
         {
+            FragmentNodeProcesses = new HashSet<FragmentNodeProcess>();
             ProcessFlows = new HashSet<ProcessFlow>();
         }
 
@@ -35,6 +36,8 @@ namespace LcaDataModel
         public int? ReferenceFlowID { get; set; }
 
         public virtual Flow Flow { get; set; }
+
+        public virtual ICollection<FragmentNodeProcess> FragmentNodeProcesses { get; set; }
 
         public virtual ILCDEntity ILCDEntity { get; set; }
 

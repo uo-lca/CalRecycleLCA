@@ -11,7 +11,10 @@ namespace LcaDataModel
     {
         public Scenario()
         {
+            BackgroundCaches = new HashSet<BackgroundCache>();
+            NodeCaches = new HashSet<NodeCache>();
             ScenarioBackgrounds = new HashSet<ScenarioBackground>();
+            ScenarioParams = new HashSet<ScenarioParam>();
         }
 
         [DatabaseGenerated(DatabaseGeneratedOption.None)]
@@ -22,8 +25,14 @@ namespace LcaDataModel
         [StringLength(50)]
         public string Name { get; set; }
 
+        public virtual ICollection<BackgroundCache> BackgroundCaches { get; set; }
+
+        public virtual ICollection<NodeCache> NodeCaches { get; set; }
+
         public virtual ScenarioGroup ScenarioGroup { get; set; }
 
         public virtual ICollection<ScenarioBackground> ScenarioBackgrounds { get; set; }
+
+        public virtual ICollection<ScenarioParam> ScenarioParams { get; set; }
     }
 }

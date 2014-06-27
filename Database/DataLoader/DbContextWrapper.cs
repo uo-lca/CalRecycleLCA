@@ -297,11 +297,7 @@ namespace LcaDataLoader {
                     "Unit process, black box",
                     "Unit process, single operation"
              }));
-            //SeedLUT<Visibility>(dbContext.Visibilities, typeof(VisibilityEnum));
-
-            if (dbContext.Users.Count() == 0) {
-                dbContext.Users.Add(new User { Name = "DB Creator" });
-            }
+            SeedLUT<Visibility>(dbContext.Visibilities, typeof(VisibilityEnum));
 
             dbContext.SaveChanges();
         }

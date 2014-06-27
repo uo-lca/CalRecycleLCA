@@ -10,6 +10,7 @@ namespace LcaDataModel {
         }
 
         public virtual DbSet<Background> Backgrounds { get; set; }
+        public virtual DbSet<BackgroundCache> BackgroundCaches { get; set; }
         public virtual DbSet<Category> Categories { get; set; }
         public virtual DbSet<CategorySystem> CategorySystems { get; set; }
         public virtual DbSet<CharacterizationParam> CharacterizationParams { get; set; }
@@ -32,13 +33,13 @@ namespace LcaDataModel {
         public virtual DbSet<FragmentFlow> FragmentFlows { get; set; }
         public virtual DbSet<FragmentNodeFragment> FragmentNodeFragments { get; set; }
         public virtual DbSet<FragmentNodeProcess> FragmentNodeProcesses { get; set; }
-        public virtual DbSet<FragmentScore> FragmentScores { get; set; }
         public virtual DbSet<FragmentStage> FragmentStages { get; set; }
         public virtual DbSet<ILCDEntity> ILCDEntities { get; set; }
         public virtual DbSet<ImpactCategory> ImpactCategories { get; set; }
         public virtual DbSet<IndicatorType> IndicatorTypes { get; set; }
         public virtual DbSet<LCIA> LCIAs { get; set; }
         public virtual DbSet<LCIAMethod> LCIAMethods { get; set; }
+        public virtual DbSet<NodeCache> NodeCaches { get; set; }
         public virtual DbSet<NodeDissipationParam> NodeDissipationParams { get; set; }
         public virtual DbSet<NodeEmissionParam> NodeEmissionParams { get; set; }
         public virtual DbSet<NodeType> NodeTypes { get; set; }
@@ -55,6 +56,7 @@ namespace LcaDataModel {
         public virtual DbSet<ScenarioBackground> ScenarioBackgrounds { get; set; }
         public virtual DbSet<ScenarioGroup> ScenarioGroups { get; set; }
         public virtual DbSet<ScenarioParam> ScenarioParams { get; set; }
+        public virtual DbSet<ScoreCache> ScoreCaches { get; set; }
         public virtual DbSet<UnitConversion> UnitConversions { get; set; }
         public virtual DbSet<UnitGroup> UnitGroups { get; set; }
         public virtual DbSet<User> Users { get; set; }
@@ -113,12 +115,12 @@ namespace LcaDataModel {
             modelBuilder.Entity<DependencyParam>()
                 .HasMany(e => e.DistributionParams)
                 .WithOptional(e => e.DependencyParam)
-                .HasForeignKey(e => e.DependencyParamID);
+                .HasForeignKey(e => e.ConservationParamID);
 
             modelBuilder.Entity<DependencyParam>()
                 .HasMany(e => e.DistributionParams1)
                 .WithOptional(e => e.DependencyParam1)
-                .HasForeignKey(e => e.ConservationParamID);
+                .HasForeignKey(e => e.DependencyParamID);
 
             modelBuilder.Entity<Direction>()
                 .Property(e => e.Name)
@@ -136,11 +138,6 @@ namespace LcaDataModel {
                 .Property(e => e.CASNumber)
                 .IsFixedLength()
                 .IsUnicode(false);
-
-            modelBuilder.Entity<Flow>()
-                .HasMany(e => e.FlowPropertyEmissions)
-                .WithOptional(e => e.Flow)
-                .HasForeignKey(e => e.FlowID);
 
             modelBuilder.Entity<Flow>()
                 .HasMany(e => e.Processes)
@@ -170,10 +167,6 @@ namespace LcaDataModel {
                 .WithOptional(e => e.FlowProperty)
                 .HasForeignKey(e => e.ReferenceQuantity);
 
-            modelBuilder.Entity<FlowPropertyParam>()
-                .HasOptional(e => e.FlowPropertyParam1)
-                .WithRequired(e => e.FlowPropertyParam2);
-
             modelBuilder.Entity<FlowType>()
                 .Property(e => e.Name)
                 .IsUnicode(false);
@@ -191,22 +184,24 @@ namespace LcaDataModel {
                 .WithOptional(e => e.Fragment)
                 .HasForeignKey(e => e.FragmentID);
 
+            modelBuilder.Entity<Fragment>()
+                .HasMany(e => e.FragmentNodeFragments)
+                .WithOptional(e => e.Fragment)
+                .HasForeignKey(e => e.SubFragmentID);
+
             modelBuilder.Entity<FragmentFlow>()
                 .Property(e => e.Name)
-                .IsUnicode(false);
-
-            modelBuilder.Entity<FragmentFlow>()
-                .Property(e => e.ReferenceFlowPropertyUUID)
-                .IsUnicode(false);
-
-            modelBuilder.Entity<FragmentFlow>()
-                .Property(e => e.FlowUUID)
                 .IsUnicode(false);
 
             modelBuilder.Entity<FragmentFlow>()
                 .HasMany(e => e.Fragments)
                 .WithOptional(e => e.FragmentFlow)
                 .HasForeignKey(e => e.ReferenceFragmentFlowID);
+
+            modelBuilder.Entity<FragmentFlow>()
+                .HasMany(e => e.FragmentFlow1)
+                .WithOptional(e => e.FragmentFlow2)
+                .HasForeignKey(e => e.ParentFragmentFlowID);
 
             modelBuilder.Entity<FragmentStage>()
                 .Property(e => e.StageName)
@@ -282,10 +277,6 @@ namespace LcaDataModel {
                 .Property(e => e.Name)
                 .IsUnicode(false);
 
-            modelBuilder.Entity<Param>()
-                .HasOptional(e => e.ScenarioParam)
-                .WithRequired(e => e.Param);
-
             modelBuilder.Entity<ParamType>()
                 .Property(e => e.Name)
                 .IsUnicode(false);
@@ -356,10 +347,6 @@ namespace LcaDataModel {
                 .IsUnicode(false);
 
             modelBuilder.Entity<UnitGroup>()
-                .Property(e => e.ReferenceUnit)
-                .IsUnicode(false);
-
-            modelBuilder.Entity<UnitGroup>()
                 .HasMany(e => e.UnitConversions)
                 .WithOptional(e => e.UnitGroup)
                 .HasForeignKey(e => e.UnitGroupID);
@@ -374,7 +361,7 @@ namespace LcaDataModel {
                 .HasForeignKey(e => e.OwnedBy);
 
             modelBuilder.Entity<Visibility>()
-                .Property(e => e.Visibility1)
+                .Property(e => e.Name)
                 .IsUnicode(false);
         }
     }

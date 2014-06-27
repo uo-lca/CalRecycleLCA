@@ -15,6 +15,8 @@ namespace LcaDataModel
 
         public int? FlowFlowPropertyID { get; set; }
 
+        public double? Value { get; set; }
+
         public virtual FlowFlowProperty FlowFlowProperty { get; set; }
 
         public virtual Param Param { get; set; }

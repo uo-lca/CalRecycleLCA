@@ -15,5 +15,9 @@ namespace LcaDataModel
         public int? FragmentFlowID { get; set; }
 
         public int? SubFragmentID { get; set; }
+
+        public virtual Fragment Fragment { get; set; }
+
+        public virtual FragmentFlow FragmentFlow { get; set; }
     }
 }

@@ -11,6 +11,7 @@ namespace LcaDataModel
     {
         public ProcessDissipation()
         {
+            NodeDissipationParams = new HashSet<NodeDissipationParam>();
             ProcessDissipationParams = new HashSet<ProcessDissipationParam>();
         }
 
@@ -21,6 +22,8 @@ namespace LcaDataModel
         public int? FlowPropertyEmissionID { get; set; }
 
         public double? EmissionFactor { get; set; }
+
+        public virtual ICollection<NodeDissipationParam> NodeDissipationParams { get; set; }
 
         public virtual ProcessFlow ProcessFlow { get; set; }
 

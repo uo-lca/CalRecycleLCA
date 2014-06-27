@@ -261,7 +261,13 @@ namespace LcaDataModel {
         }
     }
 
-    
+    public partial class Visibility : ILookupEntity {
+        [NotMapped]
+        public int ID {
+            get { return VisibilityID; }
+            set { VisibilityID = ID; }
+        }
+    }
 }
 
 

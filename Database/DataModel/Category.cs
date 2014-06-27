@@ -30,11 +30,11 @@ namespace LcaDataModel
 
         public int? HierarchyLevel { get; set; }
 
-        public virtual CategorySystem CategorySystem { get; set; }
-
         public virtual ICollection<Category> Category1 { get; set; }
 
         public virtual Category Category2 { get; set; }
+
+        public virtual CategorySystem CategorySystem { get; set; }
 
         public virtual ICollection<Classification> Classifications { get; set; }
     }

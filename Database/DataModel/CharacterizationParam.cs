@@ -15,6 +15,8 @@ namespace LcaDataModel
 
         public int? LCAID { get; set; }
 
+        public double? Value { get; set; }
+
         public virtual LCIA LCIA { get; set; }
 
         public virtual Param Param { get; set; }

@@ -6,17 +6,23 @@ namespace LcaDataModel
     using System.ComponentModel.DataAnnotations.Schema;
     using System.Data.Entity.Spatial;
 
-    [Table("ScenarioParam")]
-    public partial class ScenarioParam
+    [Table("BackgroundCache")]
+    public partial class BackgroundCache
     {
         [DatabaseGenerated(DatabaseGeneratedOption.None)]
-        public int ScenarioParamID { get; set; }
+        public int BackgroundCacheID { get; set; }
+
+        public int? BackgroundID { get; set; }
 
         public int? ScenarioID { get; set; }
 
-        public int? ParamID { get; set; }
+        public int? LCIAMethodID { get; set; }
 
-        public virtual Param Param { get; set; }
+        public double? Score { get; set; }
+
+        public virtual Background Background { get; set; }
+
+        public virtual LCIAMethod LCIAMethod { get; set; }
 
         public virtual Scenario Scenario { get; set; }
     }

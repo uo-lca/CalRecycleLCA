@@ -13,6 +13,16 @@ namespace LcaDataModel
 
         public int? ParamID { get; set; }
 
-        public int? NodeDissipationID { get; set; }
+        public int? ProcessDissipationID { get; set; }
+
+        public int? FragmentFlowID { get; set; }
+
+        public double? Value { get; set; }
+
+        public virtual FragmentFlow FragmentFlow { get; set; }
+
+        public virtual Param Param { get; set; }
+
+        public virtual ProcessDissipation ProcessDissipation { get; set; }
     }
 }

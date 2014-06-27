@@ -11,7 +11,9 @@ namespace LcaDataModel
     {
         public LCIAMethod()
         {
+            BackgroundCaches = new HashSet<BackgroundCache>();
             LCIAs = new HashSet<LCIA>();
+            ScoreCaches = new HashSet<ScoreCache>();
         }
 
         public int LCIAMethodID { get; set; }
@@ -48,6 +50,8 @@ namespace LcaDataModel
 
         public int? ReferenceQuantity { get; set; }
 
+        public virtual ICollection<BackgroundCache> BackgroundCaches { get; set; }
+
         public virtual FlowProperty FlowProperty { get; set; }
 
         public virtual ILCDEntity ILCDEntity { get; set; }
@@ -57,5 +61,7 @@ namespace LcaDataModel
         public virtual IndicatorType IndicatorType { get; set; }
 
         public virtual ICollection<LCIA> LCIAs { get; set; }
+
+        public virtual ICollection<ScoreCache> ScoreCaches { get; set; }
     }
 }
