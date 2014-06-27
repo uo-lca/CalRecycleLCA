@@ -407,7 +407,7 @@ The following tables are required:
    FragmentNodeProcess
     * FragmentNodeProcessID
     * FragmentFlowID
-    * ProcessID (FK to ProcessFlow.ProcessID)
+    * ProcessID (FK to Process.ProcessID)
 
     Mapping of nodes with type "Process" to ProcessIDs
 

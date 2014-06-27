@@ -31,4 +31,21 @@ namespace LcaDataModel {
     public enum NodeTypeEnum {
         Process=1, Fragment, InputOutput, Background
     }
+
+    public enum ParamTypeEnum {
+        Dependency = 1, 
+        Conservation,
+        Distribution,
+        FlowProperty,
+        CompositionProperty, 
+        ProcessDissipation,
+        NodeDissipation, 
+        ProcessEmission,
+        NodeEmission, 
+        LCIAFactor
+    }
+
+    public enum VisibilityEnum {
+        Public = 1, Private
+    }
 }

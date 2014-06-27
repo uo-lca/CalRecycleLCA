@@ -377,12 +377,13 @@ namespace LcaDataLoader {
                 ImportAppendCSV(dirName, "CategorySystem", ImportCategorySystem, dbContext);
                 rows = ImportAppendCSV(dirName, "Category", CreateCategory, dbContext);
                 if (rows != null) UpdateEntities(rows, UpdateCategory, dbContext);
-                ImportAppendCSV(dirName, "Classification", ImportClassification, dbContext);
                 ImportAppendCSV(dirName, "Flow-append", ImportFlow, dbContext);
                 ImportAppendCSV(dirName, "FlowProperty-append", ImportFlowProperty, dbContext);
                 ImportAppendCSV(dirName, "FlowFlowProperty-append", ImportFlowFlowProperty, dbContext);
                 ImportAppendCSV(dirName, "FlowPropertyEmission", ImportFlowPropertyEmission, dbContext);
                 ImportAppendCSV(dirName, "ProcessDissipation", ImportProcessDissipation, dbContext);
+                // Import Classification last because it references UUIDs in other files
+                ImportAppendCSV(dirName, "Classification", ImportClassification, dbContext);
             }
             else {
                 Program.Logger.WarnFormat("Append folder, {0}, does not exist.", dirName);
