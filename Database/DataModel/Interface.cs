@@ -56,6 +56,22 @@ namespace LcaDataModel {
         }
     }
 
+    public partial class FragmentNodeProcess : IEntity {
+        [NotMapped]
+        public int ID {
+            get { return FragmentNodeProcessID; }
+            set { FragmentNodeProcessID = value; }
+        }
+    }
+
+    public partial class FragmentNodeFragment : IEntity {
+        [NotMapped]
+        public int ID {
+            get { return FragmentNodeFragmentID; }
+            set { FragmentNodeFragmentID = value; }
+        }
+    }
+
     public partial class LCIA : IEntity {
         [NotMapped]
         public int ID {

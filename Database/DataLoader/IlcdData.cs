@@ -144,19 +144,26 @@ namespace LcaDataLoader {
         /// <param name="lciaMethodID">LCIAMethod parent entity ID</param>
         private LCIA CreateLCIA(DbContextWrapper ilcdDb, XElement el, int lciaMethodID) {
             LCIA lcia;
-            string uuid = el.Element(ElementName("referenceToFlowDataSet")).Attribute("refObjectId").Value;
+            XElement refEl = el.Element(ElementName("referenceToFlowDataSet"));
+            string uuid = refEl.Attribute("refObjectId").Value;
             double meanValue = (double)el.Element(ElementName(("meanValue")));
             string direction = (string)el.Element(ElementName(("exchangeDirection")));
             string location = (string)el.Element(ElementName(("location")));
-            int? id = ilcdDb.GetIlcdEntityID<Flow>(uuid);
-            if (id == null) {
+            string name = (string)refEl.Element(_CommonNamespace + "shortDescription");
+            Flow flow = ilcdDb.GetIlcdEntity<Flow>(uuid);
+            int? id = null;
+            if (flow == null) {
                 Program.Logger.WarnFormat("Unable to find flow matching LCIA refObjectId = {0}", uuid);
+            }
+            else {
+                id = flow.FlowID;
             }
             int? dirID = ilcdDb.LookupEntityID<Direction>(direction);
             if (dirID == null) {
-                Program.Logger.WarnFormat("Unable to find ID for exchangeDirection = {0}", direction);
+                Program.Logger.ErrorFormat("Unable to find ID for LCIA exchangeDirection = {0}", direction);
             }
-            lcia = new LCIA { FlowID = id, DirectionID = dirID, Factor = meanValue, Geography = location, LCIAMethodID = lciaMethodID };
+            lcia = new LCIA { FlowID = id, FlowUUID = uuid, FlowName = name,
+                              DirectionID = dirID, Factor = meanValue, Geography = location, LCIAMethodID = lciaMethodID };
             return lcia;
         }
 
@@ -194,11 +201,15 @@ namespace LcaDataLoader {
         /// Save UUID and reference to new object in object implementing IIlcdEntity
         /// </summary>
         /// <param name="ilcdDb">Database context wrapper object</param>
+        /// <param name="entity">Object implementing IIlcdEntity</param>
+        /// <param name="dtEnum">Data type of entity</param>
         /// <returns>new ILCDEntity object<returns>
-        private ILCDEntity SaveIlcdEntity(DbContextWrapper ilcdDb, IIlcdEntity entity) {
+        private ILCDEntity SaveIlcdEntity(DbContextWrapper ilcdDb, IIlcdEntity entity, DataTypeEnum dtEnum) {
             ILCDEntity ilcdEntity = new ILCDEntity();
             ilcdEntity.UUID = GetCommonUUID();
             ilcdEntity.Version = GetCommonVersion();
+            ilcdEntity.DataTypeID = Convert.ToInt32(dtEnum);
+            ilcdEntity.DataProviderID = ilcdDb.GetCurrentIlcdDataProviderID();
             entity.UUID = GetCommonUUID();
             entity.ILCDEntity = ilcdEntity;
             return ilcdEntity;
@@ -212,7 +223,7 @@ namespace LcaDataLoader {
         private bool SaveUnitGroup(DbContextWrapper ilcdDb) {
             bool isSaved = false;
             UnitGroup unitGroup = new UnitGroup();
-            SaveIlcdEntity(ilcdDb, unitGroup);
+            SaveIlcdEntity(ilcdDb, unitGroup, DataTypeEnum.UnitGroup);
             unitGroup.Name = GetCommonName();
             if (ilcdDb.AddIlcdEntity(unitGroup)) {
                     ilcdDb.AddEntities<UnitConversion>(CreateUnitConversionList(unitGroup));
@@ -231,7 +242,7 @@ namespace LcaDataLoader {
             string ugUUID;
             int? ugID = null;
             FlowProperty flowProperty = new FlowProperty();
-            SaveIlcdEntity(ilcdDb, flowProperty);
+            SaveIlcdEntity(ilcdDb, flowProperty, DataTypeEnum.FlowProperty);
             flowProperty.Name = GetCommonName();
             ugUUID = GetElementAttributeValue(ElementName("referenceToReferenceUnitGroup"), "refObjectId");
             if (ugUUID == null) {
@@ -284,7 +295,7 @@ namespace LcaDataLoader {
             string dataSetInternalID = "0";
             XElement fpElement;
             Flow flow = new Flow();
-            SaveIlcdEntity(ilcdDb, flow);
+            SaveIlcdEntity(ilcdDb, flow, DataTypeEnum.Flow);
             // TODO : generate name from classification/category
             flow.Name = GetElementValue(ElementName("baseName"));
             flow.CASNumber = GetElementValue(ElementName("CASNumber"));
@@ -308,7 +319,7 @@ namespace LcaDataLoader {
             string lookupName;
             string refUUID;
             LCIAMethod lciaMethod = new LCIAMethod();
-            SaveIlcdEntity(ilcdDb, lciaMethod);
+            SaveIlcdEntity(ilcdDb, lciaMethod, DataTypeEnum.LCIAMethod);
             lciaMethod.Name = GetCommonName();
             lciaMethod.Methodology = GetElementValue(ElementName("methodology"));
             lookupName = GetElementValue(ElementName("impactCategory"));
@@ -345,7 +356,7 @@ namespace LcaDataLoader {
             bool isSaved = false;
             string lookupName;
             LcaDataModel.Process process = new LcaDataModel.Process();
-            SaveIlcdEntity(ilcdDb, process);
+            SaveIlcdEntity(ilcdDb, process, DataTypeEnum.Process);
             process.Name = GetElementValue(ElementName("baseName"));
             process.Geography = GetElementAttributeValue(ElementName("locationOfOperationSupplyOrProduction"), "location");            
             lookupName = GetElementAttributeValue(ElementName("quantitativeReference"), "type");

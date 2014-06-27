@@ -1,0 +1,151 @@
+==========
+Tue Jun 24 11:48:59 -0700 2014
+
+ScenarioInit( ScenarioID )
+{
+  // run this code any time a scenario is modified
+  // "Scenario is modified" means: 
+
+  ClearNodeCache( ScenarioID ); // deletes all records matching
+  		  	       // ScenarioID 
+
+  ClearScoreCache( ScenarioID ); // deletes all records matching
+  		       		// ScenarioID 
+
+  ClearBackgroundCache( ScenarioID ); // deletes all records matching
+  		       		     // ScenarioID 
+
+}
+  
+
+ComputeFragment( FragmentID, ScenarioID, ListOfLCIAMethods L )
+{
+  // top-level function to populate fragment cache data
+  ComputeBackground( ScenarioID, L ); // make sure background is computed
+  		     		      // for all requested LCIA methods
+
+  // F is fragment object
+  F = new Fragment( FragmentID ); 
+
+  // next, traverse the fragment -- populates NodeCache
+  F.Traverse( ScenarioID );
+
+  // now, do LCIA computation
+  F.ComputeNodeScores( ScenarioID, L );
+}
+
+  
+Fragment.ComputeNodeScores( ScenarioID, ListOfLCIAMethods L )
+{
+  // this is actually really easy.
+  // flows is fragment's internal flows table.
+  B = applyScenarioBackground( ScenarioID );
+  
+  flows = SELECT * FROM flows 
+  	  INNER JOIN NodeCache nc 
+	  ON flows.FragmentFlowID = nc.FragmentFlowID
+
+  for i in flows
+  {
+    missing_L = SELECT LCIAMethodID 
+    	      	FROM L LEFT OUTER JOIN ScoreCache sc
+		  ON L = sc.LCIAMethodID
+		WHERE sc.NodeCacheID = i.NodeCacheID
+		  AND sc.ImpactScore IS NULL
+
+    switch i.NodeType
+    {
+      case InputOutput
+        // nothing to do-- IO flows have no impacts
+        for j in missing_L
+	  SetScoreCache( i.NodeCacheID, j, 0 );
+
+      case Background
+      {
+        for j in missing_L
+	{
+	  bid = SELECT BackgroundID FROM B 
+	        WHERE B.FlowID = i.FlowID
+		  AND B.DirectionID = i.DirectionID
+
+	  MyScore = SELECT Score FROM BackgroundCache
+	  	    WHERE BackgroundID = bid
+		      AND ScenarioID = @ScenarioID
+		      AND LCIAMethodID = j
+
+	  SetScoreCache( i.NodeCacheID, j, MyScore );
+	} // just replicate BackgroundCache score into ScoreCache
+      }
+      case Process
+      {
+        the_node = i INNER JOIN FragmentNodeProcess ON FragmentFlowID;
+      	inventory = ComputeProcessLCI (	the_node.ProcessID, ScenarioID );
+
+        for j in missing_L
+	{
+	  LCIA = ComputeProcessLCIA ( inventory, ScenarioID, j );
+	  MyScore = sum( LCIA.Score );
+	  SetScoreCache( i.NodeCacheID, j, MyScore );
+	}
+      }
+      case Fragment
+      {
+        the_node = i INNER JOIN FragmentNodeFragment ON FragmentFlowID
+	
+	for j in missing_L
+	{
+	  FragmentScore = ComputeFragmentLCIA ( the_node.FragmentID, 
+	  		  		      	ScenarioID, j);
+	  MyScore = sum ( FragmentScore.LCIA );
+	  SetScoreCache( i.NodeCacheID, j, MyScore );
+	}
+      }
+    }
+  } // see?? easy!
+}
+
+inventory = ComputeProcessLCI( ProcessID, ScenarioID )
+{
+ - pull ProcessFlow.Result
+ - override with ProcessEmissionParam
+ - override further with NodeEmissionParam
+
+ - get dissipation flows (ProcessDissipation.EmissionFactor)
+ - override with ProcessDissipationParam.Value
+ - override further with NodeDissipationParam.Value
+ - lookup FlowFlowProperty.MeanValue
+ - override with CompositionParam.Value
+
+ - compute Result = EmissionFactor * MeanValue
+ - override ProcessFlow.Result where non-null
+
+ - return inventory result (ProcessFlow table)
+}
+
+lcia = ComputeProcessLCIA( inventory, ScenarioID, LCIAMethodID )
+{
+ - start with inventory result
+ - lookup LCIA.Factor (null geography)
+ - override with LCIAParam.Value
+ - compute Score = Result * Factor
+ - return lcia result (array)
+}
+
+FragmentScore = ComputeFragmentLCIA ( FragmentID, ScenarioID, LCIAMethodID )
+{
+  F = new Fragment( @FragmentID );
+  // F.flows is the FragmentFlow excerpt belonging to Fragment F
+
+  FragmentScore = SELECT nc.NodeCacheID AS NodeCacheID,
+  	      	     nc.NodeWeight AS NodeWeight,
+		     sc.ImpactScore AS ImpactScore,
+		     NodeWeight * ImpactScore AS LCIA,
+		FROM F.Flows INNER JOIN NodeCache nc ON FragmentFlowID
+		INNER JOIN ScoreCache sc ON NodeCacheID
+		WHERE ScenarioID = @ScenarioID
+		  AND sc.LCIAMethodID = @LCIAMethodID;
+
+  // later-- add in grouping by stage
+}
+
+

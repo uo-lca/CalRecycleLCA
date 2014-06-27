@@ -21,27 +21,35 @@ namespace LcaDataLoader {
         /// </summary>
         static string _DataRoot;
         static string _IlcdDirName = null;
+        static string _IlcdSourceName = null;
         static bool _DeleteFlag;
+        static bool _CsvFlag;
+
         public static readonly ILog Logger = LogManager.GetLogger("LcaDataLoader");
 
         static void ParseArguments(string[] args) {
             _DataRoot = "C:\\CalRecycleLCA-DATA_ROOT";
-            string ilcdSourceName = null;
             _DeleteFlag = false;
+            _CsvFlag = false;
+
             OptionSet options = new OptionSet() {
                 {"r|root=", "The full {DATA_ROOT} path.", v => _DataRoot = v },
-                {"s|source=", "ILCD archive {source name}.", v => ilcdSourceName = v },
+                {"s|source=", "ILCD archive {source name}.", v => _IlcdSourceName = v },
+                {"c|csv", "Load CSV files.", v => _CsvFlag = (v!=null)}, 
                 {"d|delete", "Delete database and recreate.", v => _DeleteFlag = (v!=null)} 
             };
             List<string> extraArgs;
             try {
                 extraArgs = options.Parse(args);
+                Logger.InfoFormat("Data root={0}, Load CSVs={1}, Delete={2}", _DataRoot, _CsvFlag.ToString(), _DeleteFlag.ToString());
+                if (_IlcdSourceName != null)
+                    Logger.InfoFormat("ILCD source={0}", _IlcdSourceName);
             }
             catch (OptionException e) {
                 Logger.ErrorFormat("Usage Error: {0}", e.Message);
             }
-            if (!String.IsNullOrEmpty(ilcdSourceName)) {
-                _IlcdDirName = Path.Combine(_DataRoot, ilcdSourceName, "ILCD");
+            if (!String.IsNullOrEmpty(_IlcdSourceName)) {
+                _IlcdDirName = Path.Combine(_DataRoot, _IlcdSourceName, "ILCD");
             }
         }
 
@@ -72,7 +80,7 @@ namespace LcaDataLoader {
                 if (!String.IsNullOrEmpty(_IlcdDirName)) {
                     if (Directory.Exists(_IlcdDirName)) {
                         IlcdImporter ilcdImporter = new IlcdImporter();
-                        ilcdImporter.LoadAll(_IlcdDirName);
+                        ilcdImporter.LoadAll(_IlcdDirName, _IlcdSourceName);
                         Logger.InfoFormat("Loaded ILCD archive from {0}.", _IlcdDirName);
                     }
                     else {
@@ -80,13 +88,18 @@ namespace LcaDataLoader {
                         exitCode = 1;
                     }
                 }
-                if (Directory.Exists(_DataRoot)) {
-                    CsvImporter.LoadAll(_DataRoot);
-                    Logger.InfoFormat("Loaded CSV folders under {0}.", _DataRoot);
+                if (_CsvFlag) {
+                    if (Directory.Exists(_DataRoot)) {
+                        CsvImporter.LoadAll(_DataRoot);
+                        Logger.InfoFormat("Loaded CSV folders under {0}.", _DataRoot);
+                    }
+                    else {
+                        Logger.ErrorFormat("Data Root folder, {0}, does not exist.", _DataRoot);
+                        exitCode = 1;
+                    }
                 }
-                else {
-                    Logger.ErrorFormat("Data Root folder, {0}, does not exist.", _DataRoot);
-                    exitCode = 1;
+                using (DbContextWrapper dbContext = new DbContextWrapper()) {
+                    dbContext.UpdateLciaFlowID();
                 }
             }
             catch (Exception e) {
