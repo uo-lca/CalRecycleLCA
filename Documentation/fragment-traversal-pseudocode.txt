@@ -7,7 +7,7 @@ Traverse(ScenarioID)
   // first things first: don't re-compute if there is cached data
 
   if ~isempty( SELECT * FROM NodeCache WHERE FragmentID = @FragmentID AND
-  ScenarioID = @ScenarioID) 
+  ScenarioID = @ScenarioID AND NodeWeight ~=0 ) 
     return // do not re-compute 
 
   myflows = this.flows; // (I have no idea what language I'm writing)
@@ -81,7 +81,7 @@ fp_flows=applyFlowPropertyParam(flows,ScenarioID)
   UPDATE fp_flows.MeanValue with fp_flows.ParamValue 
   	 where fp_flows.ParamValue is not null;
 
-  DROP field ParamValue; // so e has the same fields as fp_flows
+  DROP field ParamValue; 
 
   return fp_flows;
 }
@@ -89,19 +89,19 @@ fp_flows=applyFlowPropertyParam(flows,ScenarioID)
 
 Fragment.node_recurse(flows, ScenarioID, current_flow, activity)
 {
-  the_flow = SELECT * FROM flows WHERE FragmentNodeID = current_flow
+  the_flow = SELECT * FROM flows WHERE FragmentFlowID = current_flow
 
   // "enter" the node -- handle reference property conversion
   // (params of type 4 have effect here)
-  node_weight = the_node.Quantity;
-  node_conv = the_node.MeanValue;
+  node_weight = the_flow.Quantity;
+  node_conv = the_flow.MeanValue;
 
   activity = activity * node_weight * node_conv; % node activity level unit conversion
 
   SetNodeCache( current_flow, ScenarioID, activity )
   
   // now descend into node's children
-  switch the_node.NodeType
+  switch the_flow.NodeType
     case 'Process'
     {
       // dependencies are encoded in the edge table
@@ -117,13 +117,18 @@ Fragment.node_recurse(flows, ScenarioID, current_flow, activity)
       the_node = SELECT * FROM the_flow INNER JOIN FragmentNodeFragment fnf
       	       	 ON the_flow.FragmentNodeID = fnf.FragmentNodeID
       
-      F = new Fragment(the_flow.SubFragmentID);
+      // flows in current fragment that depend on this node
+      dependencies = SELECT * FROM flows
+      		     WHERE flows.ParentFragmentFlowID = current_flow;
+
+      F = new Fragment(the_node.SubFragmentID);
 
       // traverse the subfragment
-      F.Traverse(ScenarioID)
+      F.Traverse(ScenarioID);
 
-      // extract inputs and outputs from the subfragment
-      dependencies = F.GetIO( this ); // map F.IOflows to local IO-flows
+      // need to set current fragment quantities based on subfragment 
+      // inputs and outputs
+      F.map_dependencies(dependencies);
 
       /*
       // IOFlows is a list of edges.  For every edge that has a
@@ -140,6 +145,7 @@ Fragment.node_recurse(flows, ScenarioID, current_flow, activity)
 
     }
     case Background
+      // nothing to do -- background fragments have already been traversed
 
     case InputOutput
       // nothing to do -- cache value specifies input/output quantity
@@ -147,6 +153,32 @@ Fragment.node_recurse(flows, ScenarioID, current_flow, activity)
   end // switch NodeType
 }
 
-dependencies = Fragment.GetIO( other )
+Fragment.map_dependencies( dep )
 {
-  // match local inputs to remote outputs, and vice versa
+  // match local input-output flows to remote dependencies
+  // flows = this fragment
+  // dependencies = remote fragment
+
+  my_IO = SELECT FlowID, 
+  	         DirectionID, 
+		 sum( Quantity ) AS IOsum
+	  FROM flows
+	  WHERE flows.NodeType = 'InputOutput'
+	  GROUP BY FlowID, DirectionID;
+
+  dep = CompDir( dep ); // create a new field CompDirID which reverses the
+      		     	// sense of DirectionID: 
+      		     	// 'Input' becomes 'Output' and vice versa
+
+  // some error checking here-- dep records should match my_IO records
+  // exactly on FlowID and Direction / CompDir
+ 
+  dep = SELECT dep.*,
+  	       my_IO.IOsum
+	FROM dep
+	INNER JOIN my_IO ON dep.FlowID = my_IO.FlowID
+	WHERE dep.CompDirID = my_IO.DirectionID
+
+
+  UPDATE dep.Quantity WITH dep.IOsum
+}

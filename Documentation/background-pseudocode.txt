@@ -1,0 +1,69 @@
+ComputeBackground( ScenarioID, ListOfLCIAMethods L)
+{
+  // First generate a list of scenario-specific background resolutions
+  B = applyScenarioBackground( ScenarioID );
+  // now we have a table of targets with scenario overrides
+  // we want to populate BackgroundCache-- but only for LCIA methods that
+  // aren't already computed
+
+  BCache = SELECT * FROM BackgroundCache WHERE ScenarioID = @ScenarioID;
+
+  for bk in B
+  {
+    missing_L = SELECT LCIAMethodID 
+    	      	FROM L LEFT OUTER JOIN BCache ON L = BCache.LCIAMethod
+		WHERE BCache.BackgroundID = bk.BackgroundID
+		  AND BCache.Score IS NULL // ??? 
+
+    switch background.NodeType
+    {
+      case 'Process'
+      {
+	inventory = ComputeProcessLCI( bk.TargetID, ScenarioID );
+        for j in missing_L
+	{
+	  LCIA = ComputeProcessLCIA ( inventory, ScenarioID, j );
+	  MyScore = sum( LCIA.Score );
+	  SetBackgroundCache( bk.BackgroundID, ScenarioID, j, MyScore );
+	}
+      }
+      case 'Fragment'
+      {
+        FragmentScore = ComputeFragmentLCIA( bk.TargetID, ScenarioID, j );
+	MyScore = sum( FragmentScore.LCIA );
+	SetBackgroundCache( bk.BackgroundID, ScenarioID, j, MyScore );
+      }
+    }
+  }
+}
+
+BackgroundTable B = applyScenarioBackground( ScenarioID )
+{
+  // Background table maps Flow+Direction to Target, either Process or
+  // Fragment.  
+  //
+  // This function overrides standard background mappings with
+  // scenario-specific alternatives, which can also be either processes or
+  // fragments. 
+  //
+  // For now: it is against the rules for a background fragment 
+  // to include fragment nodes or background nodes
+  
+  B = SELECT b.*,
+             sb.NodeTypeID AS ScenarioTypeID,
+	     sb.TargetID AS ScenarioTargetID
+      FROM Background b
+      LEFT OUTER JOIN ScenarioBackground sb ON b.FlowID = sb.FlowID
+      WHERE b.DirectionID = sb.DirectionID
+        AND sb.ScenarioID = @ScenarioID
+
+  UPDATE B.NodeTypeID = B.ScenarioTypeID, 
+  	 B.TargetID = B.ScenarioTargetID
+  WHERE ScenarioTypeID IS NOT NULL
+
+  DROP field ScenarioTypeID, ScenarioTargetID; // so 
+
+  return B;
+}
+
+  
