@@ -7,10 +7,9 @@ using System.Net.Http.Headers;
 using System.Web;
 using System.Web.Http;
 using Repository;
-using Data.Mappings;
+using Data;
 using Newtonsoft.Json.Converters;
 using Services;
-using Data;
 
 namespace LCIAToolAPI.App_Start
 {

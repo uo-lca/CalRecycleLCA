@@ -75,7 +75,8 @@ namespace LCAToolAPI.App_Start
         {
             kernel.Bind<IFragmentService>().To<FragmentService>();
             kernel.Bind(typeof(IRepository<>)).To(typeof(Repository<>));
-            kernel.Bind<IDbContext>().To<LCAModelContext>();
+            kernel.Bind<IDbContext>().To<UsedOilLCAContext>();
+            kernel.Bind<IUnitOfWork>().To<UnitOfWork>();
         }
 
         public static void RegisterNinject(HttpConfiguration configuration)

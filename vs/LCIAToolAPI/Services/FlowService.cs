@@ -1,4 +1,4 @@
-﻿using Data.Mappings;
+﻿using Data;
 using Repository;
 using System;
 using System.Collections.Generic;

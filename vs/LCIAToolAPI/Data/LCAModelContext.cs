@@ -32,12 +32,11 @@ namespace Data
         return base.SaveChanges();
     }
 
-    public virtual DbSet<BackgroundProcess> BackgroundProcesses { get; set; }
+
     public DbSet<CompositionData> CompositionDatas { get; set; }
     public DbSet<CompositionParam> CompositionParams { get; set; }
     public DbSet<FlowPropertyParam> FlowPropertyParams { get; set; }
     public DbSet<Background> Backgrounds { get; set; }
-    public DbSet<BackgroundFragment> BackgroundFragments { get; set; }
     public DbSet<Category> Categories { get; set; }
     public DbSet<CategorySystem> CategorySystems { get; set; }
     public DbSet<CharacterizationParam> CharacterizationParams { get; set; }
@@ -54,8 +53,8 @@ namespace Data
     public DbSet<FlowPropertyEmission> FlowPropertyEmissions { get; set; }
     public DbSet<FlowType> FlowTypes { get; set; }
     public DbSet<Fragment> Fragments { get; set; }
+    public DbSet<FragmentFlow> FragmentFlows { get; set; }
     public DbSet<FragmentNodeProcess> FragmentNodeProcesses { get; set; }
-    public DbSet<FragmentScore> FragmentScores { get; set; }
     public DbSet<FragmentStage> FragmentStages { get; set; }
     public DbSet<ILCDEntity> ILCDEntities { get; set; }
     public DbSet<ImpactCategory> ImpactCategories { get; set; }
@@ -76,7 +75,7 @@ namespace Data
     public DbSet<Scenario> Scenarios { get; set; }
     public DbSet<ScenarioBackground> ScenarioBackgrounds { get; set; }
     public DbSet<ScenarioGroup> ScenarioGroups { get; set; }
-    public virtual DbSet<ScenarioParam> ScenarioParams { get; set; }
+    public DbSet<ScenarioParam> ScenarioParams { get; set; }
     public DbSet<UnitConversion> UnitConversions { get; set; }
     public DbSet<UnitGroup> UnitGroups { get; set; }
     public DbSet<User> Users { get; set; }

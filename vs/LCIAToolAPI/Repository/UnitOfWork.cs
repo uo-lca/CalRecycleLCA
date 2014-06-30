@@ -25,7 +25,7 @@ namespace Repository
 
         public UnitOfWork()
         {
-            _context = new LCAModelContext();
+            _context = new UsedOilLCAContext();
         }
 
         public void Dispose()

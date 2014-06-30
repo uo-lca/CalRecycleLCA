@@ -6,7 +6,7 @@ using System.Net.Http;
 using System.Web.Http;
 using Repository;
 using Services;
-using Data.Mappings;
+using Data;
 using Entities.Models;
 using System.Web.Http.Services;
 using Ninject;
@@ -46,17 +46,17 @@ namespace LCIAToolAPI.API
 
 
 
-        // GET api/<controller>
-        //[System.Web.Http.AcceptVerbs("GET", "POST")]
-        //[System.Web.Http.HttpGet]
-        //public IEnumerable<Fragment> ImpactCategoryDDL()
-        //{
+         //GET api/<controller>
+        [System.Web.Http.AcceptVerbs("GET", "POST")]
+        [System.Web.Http.HttpGet]
+        public IEnumerable<Fragment> ImpactCategoryDDL()
+        {
 
-        //    var processes = _fragmentService.GetFragments();
-        //    return processes;
+            var processes = _fragmentService.GetFragments();
+            return processes;
 
 
-        //}
+        }
 
       
 

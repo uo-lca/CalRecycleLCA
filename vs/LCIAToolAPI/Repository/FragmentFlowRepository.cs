@@ -1,9 +1,9 @@
-﻿using Data.Mappings;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Data;
 
 namespace Repository
 {
@@ -17,7 +17,7 @@ namespace Repository
             .OrderBy(q => q
                 .OrderBy(c => c.FlowID)
                 .ThenBy(c => c.Name))
-            .Filter(q => q.FlowID == fragmentId)
+            .Filter(q => q.FragmentID == fragmentId)
             .GetPage();
 
             return fragmentFlows;

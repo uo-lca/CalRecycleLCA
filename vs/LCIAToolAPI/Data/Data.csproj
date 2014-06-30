@@ -41,11 +41,13 @@
     <Reference Include="dotless.Core">
       <HintPath>..\packages\dotless.1.4.0.0\lib\dotless.Core.dll</HintPath>
     </Reference>
-    <Reference Include="EntityFramework">
-      <HintPath>..\packages\EntityFramework.6.1.0\lib\net45\EntityFramework.dll</HintPath>
+    <Reference Include="EntityFramework, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\packages\EntityFramework.6.1.1\lib\net45\EntityFramework.dll</HintPath>
     </Reference>
-    <Reference Include="EntityFramework.SqlServer">
-      <HintPath>..\packages\EntityFramework.6.1.0\lib\net45\EntityFramework.SqlServer.dll</HintPath>
+    <Reference Include="EntityFramework.SqlServer, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\packages\EntityFramework.6.1.1\lib\net45\EntityFramework.SqlServer.dll</HintPath>
     </Reference>
     <Reference Include="LinqKit">
       <HintPath>..\packages\LINQKit.1.1.1\lib\net45\LinqKit.dll</HintPath>
@@ -162,66 +164,63 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Background.cs" />
+    <Compile Include="BackgroundCache.cs" />
+    <Compile Include="Category.cs" />
+    <Compile Include="CategorySystem.cs" />
+    <Compile Include="CharacterizationParam.cs" />
+    <Compile Include="Classification.cs" />
+    <Compile Include="CompositionData.cs" />
+    <Compile Include="CompositionParam.cs" />
+    <Compile Include="CompostionModel.cs" />
+    <Compile Include="C__MigrationHistory.cs" />
+    <Compile Include="DataProvider.cs" />
+    <Compile Include="DataType.cs" />
+    <Compile Include="DependencyParam.cs" />
+    <Compile Include="Direction.cs" />
+    <Compile Include="DistributionParam.cs" />
+    <Compile Include="Flow.cs" />
+    <Compile Include="FlowFlowProperty.cs" />
+    <Compile Include="FlowProperty.cs" />
+    <Compile Include="FlowPropertyEmission.cs" />
+    <Compile Include="FlowPropertyParam.cs" />
+    <Compile Include="FlowType.cs" />
+    <Compile Include="Fragment.cs" />
+    <Compile Include="FragmentFlow.cs" />
+    <Compile Include="FragmentNodeFragment.cs" />
+    <Compile Include="FragmentNodeProcess.cs" />
+    <Compile Include="FragmentStage.cs" />
     <Compile Include="IDbContext.cs" />
-    <Compile Include="LCAModelContext.cs" />
-    <Compile Include="Mappings\AUDIT_UNDO.cs" />
-    <Compile Include="Mappings\Background.cs" />
-    <Compile Include="Mappings\BackgroundFragment.cs" />
-    <Compile Include="Mappings\BackgroundProcess.cs" />
-    <Compile Include="Mappings\Category.cs" />
-    <Compile Include="Mappings\CategorySystem.cs" />
-    <Compile Include="Mappings\CharacterizationParam.cs" />
-    <Compile Include="Mappings\Class1.cs" />
-    <Compile Include="Mappings\Classification.cs" />
-    <Compile Include="Mappings\CompositionData.cs" />
-    <Compile Include="Mappings\CompositionParam.cs" />
-    <Compile Include="Mappings\CompostionModel.cs" />
-    <Compile Include="Mappings\DataProvider.cs" />
-    <Compile Include="Mappings\DataType.cs" />
-    <Compile Include="Mappings\DependencyParam.cs" />
-    <Compile Include="Mappings\Direction.cs" />
-    <Compile Include="Mappings\DistributionParam.cs" />
-    <Compile Include="Mappings\Flow.cs" />
-    <Compile Include="Mappings\FlowFlowProperty.cs" />
-    <Compile Include="Mappings\FlowProperty.cs" />
-    <Compile Include="Mappings\FlowPropertyEmission.cs" />
-    <Compile Include="Mappings\FlowPropertyParam.cs" />
-    <Compile Include="Mappings\FlowType.cs" />
-    <Compile Include="Mappings\Fragment.cs" />
-    <Compile Include="Mappings\FragmentFlow.cs" />
-    <Compile Include="Mappings\FragmentNodeFragment.cs" />
-    <Compile Include="Mappings\FragmentNodeProcess.cs" />
-    <Compile Include="Mappings\FragmentScore.cs" />
-    <Compile Include="Mappings\FragmentStage.cs" />
-    <Compile Include="Mappings\ILCDEntity.cs" />
-    <Compile Include="Mappings\ImpactCategory.cs" />
-    <Compile Include="Mappings\IndicatorType.cs" />
-    <Compile Include="Mappings\LCIA.cs" />
-    <Compile Include="Mappings\LCIAMethod.cs" />
-    <Compile Include="Mappings\Model1.cs" />
-    <Compile Include="Mappings\NodeDissipationParam.cs" />
-    <Compile Include="Mappings\NodeEmissionParam.cs" />
-    <Compile Include="Mappings\NodeType.cs" />
-    <Compile Include="Mappings\Param.cs" />
-    <Compile Include="Mappings\ParamType.cs" />
-    <Compile Include="Mappings\Process.cs" />
-    <Compile Include="Mappings\ProcessDissipation.cs" />
-    <Compile Include="Mappings\ProcessDissipationParam.cs" />
-    <Compile Include="Mappings\ProcessEmissionParam.cs" />
-    <Compile Include="Mappings\ProcessFlow.cs" />
-    <Compile Include="Mappings\ProcessType.cs" />
+    <Compile Include="ILCDEntity.cs" />
+    <Compile Include="ImpactCategory.cs" />
+    <Compile Include="IndicatorType.cs" />
+    <Compile Include="LCIA.cs" />
+    <Compile Include="LCIAMethod.cs" />
+    <Compile Include="NodeCache.cs" />
+    <Compile Include="NodeDissipationParam.cs" />
+    <Compile Include="NodeEmissionParam.cs" />
+    <Compile Include="NodeType.cs" />
+    <Compile Include="Param.cs" />
+    <Compile Include="ParamType.cs" />
+    <Compile Include="Process.cs" />
+    <Compile Include="ProcessDissipation.cs" />
+    <Compile Include="ProcessDissipationParam.cs" />
+    <Compile Include="ProcessEmissionParam.cs" />
+    <Compile Include="ProcessFlow.cs" />
+    <Compile Include="ProcessType.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Mappings\ReferenceType.cs" />
-    <Compile Include="Mappings\Scenario.cs" />
-    <Compile Include="Mappings\ScenarioBackground.cs" />
-    <Compile Include="Mappings\ScenarioGroup.cs" />
-    <Compile Include="Mappings\ScenarioParam.cs" />
-    <Compile Include="Mappings\sysdiagram.cs" />
-    <Compile Include="Mappings\UnitConversion.cs" />
-    <Compile Include="Mappings\UnitGroup.cs" />
-    <Compile Include="Mappings\User.cs" />
-    <Compile Include="Mappings\Visibility.cs" />
+    <Compile Include="ReferenceType.cs" />
     <Compile Include="ResponseObject.cs" />
+    <Compile Include="Scenario.cs" />
+    <Compile Include="ScenarioBackground.cs" />
+    <Compile Include="ScenarioGroup.cs" />
+    <Compile Include="ScenarioParam.cs" />
+    <Compile Include="ScoreCache.cs" />
+    <Compile Include="UnitConversion.cs" />
+    <Compile Include="UnitGroup.cs" />
+    <Compile Include="UsedOilLCAContext.cs" />
+    <Compile Include="User.cs" />
+    <Compile Include="Visibility.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config">

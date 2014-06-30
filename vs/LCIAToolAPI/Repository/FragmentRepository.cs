@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Data.Mappings;
+using Data;
 
 namespace Repository
 {
@@ -15,9 +15,9 @@ namespace Repository
             var fragments =
        fragmentRepository
             .Query()
-            //.Include(i => i.BackgroundFragments)
+            .Include(i => i.FragmentFlow)
             .OrderBy(q => q
-                .OrderBy(c => c.FragmentID)
+                .OrderBy(c => c.FragmentFlow.FragmentStageID)
                 .ThenBy(c => c.FragmentID))
             .Filter(q => q.Name != null)
             .GetPage();
