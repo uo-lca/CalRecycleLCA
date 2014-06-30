@@ -15,6 +15,8 @@ namespace LcaDataModel
 
         public int? ProcessFlowID { get; set; }
 
+        public double? Value { get; set; }
+
         public virtual Param Param { get; set; }
 
         public virtual ProcessFlow ProcessFlow { get; set; }

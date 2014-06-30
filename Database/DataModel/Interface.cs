@@ -237,6 +237,14 @@ namespace LcaDataModel {
         }
     }
 
+    public partial class ParamType : ILookupEntity {
+        [NotMapped]
+        public int ID {
+            get { return ParamTypeID; }
+            set { ParamTypeID = ID; }
+        }
+    }
+
     public partial class ProcessType : ILookupEntity {
         [NotMapped]
         public int ID {
@@ -253,6 +261,13 @@ namespace LcaDataModel {
         }
     }
 
+    public partial class Visibility : ILookupEntity {
+        [NotMapped]
+        public int ID {
+            get { return VisibilityID; }
+            set { VisibilityID = ID; }
+        }
+    }
 }
 
 

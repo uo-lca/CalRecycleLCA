@@ -99,6 +99,7 @@ namespace LcaDataLoader {
                     }
                 }
                 using (DbContextWrapper dbContext = new DbContextWrapper()) {
+                    Program.Logger.InfoFormat("Update LCIA Flow reference...");
                     dbContext.UpdateLciaFlowID();
                 }
             }

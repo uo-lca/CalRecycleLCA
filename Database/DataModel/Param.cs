@@ -14,9 +14,12 @@ namespace LcaDataModel
             CharacterizationParams = new HashSet<CharacterizationParam>();
             CompositionParams = new HashSet<CompositionParam>();
             DependencyParams = new HashSet<DependencyParam>();
+            FlowPropertyParams = new HashSet<FlowPropertyParam>();
+            NodeDissipationParams = new HashSet<NodeDissipationParam>();
             NodeEmissionParams = new HashSet<NodeEmissionParam>();
             ProcessDissipationParams = new HashSet<ProcessDissipationParam>();
             ProcessEmissionParams = new HashSet<ProcessEmissionParam>();
+            ScenarioParams = new HashSet<ScenarioParam>();
         }
 
         public int ParamID { get; set; }
@@ -38,6 +41,10 @@ namespace LcaDataModel
 
         public virtual ICollection<DependencyParam> DependencyParams { get; set; }
 
+        public virtual ICollection<FlowPropertyParam> FlowPropertyParams { get; set; }
+
+        public virtual ICollection<NodeDissipationParam> NodeDissipationParams { get; set; }
+
         public virtual ICollection<NodeEmissionParam> NodeEmissionParams { get; set; }
 
         public virtual ParamType ParamType { get; set; }
@@ -46,6 +53,6 @@ namespace LcaDataModel
 
         public virtual ICollection<ProcessEmissionParam> ProcessEmissionParams { get; set; }
 
-        public virtual ScenarioParam ScenarioParam { get; set; }
+        public virtual ICollection<ScenarioParam> ScenarioParams { get; set; }
     }
 }

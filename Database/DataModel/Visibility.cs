@@ -16,9 +16,8 @@ namespace LcaDataModel
 
         public int VisibilityID { get; set; }
 
-        [Column("Visibility")]
         [StringLength(50)]
-        public string Visibility1 { get; set; }
+        public string Name { get; set; }
 
         public virtual ICollection<ScenarioGroup> ScenarioGroups { get; set; }
     }

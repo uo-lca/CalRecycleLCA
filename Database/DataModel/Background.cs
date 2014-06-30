@@ -9,6 +9,11 @@ namespace LcaDataModel
     [Table("Background")]
     public partial class Background
     {
+        public Background()
+        {
+            BackgroundCaches = new HashSet<BackgroundCache>();
+        }
+
         [DatabaseGenerated(DatabaseGeneratedOption.None)]
         public int BackgroundID { get; set; }
 
@@ -25,6 +30,8 @@ namespace LcaDataModel
 
         [StringLength(50)]
         public string TargetUUID { get; set; }
+
+        public virtual ICollection<BackgroundCache> BackgroundCaches { get; set; }
 
         public virtual Direction Direction { get; set; }
 

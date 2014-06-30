@@ -288,7 +288,7 @@ namespace LcaDataLoader {
                     "Reference flow(s)"
              }));
             SeedLUT<NodeType>(dbContext.NodeTypes, typeof(NodeTypeEnum));
-
+            SeedLUT<ParamType>(dbContext.ParamTypes, typeof(ParamTypeEnum));
             SeedLUT<ProcessType>(dbContext.ProcessTypes,
                 new List<string>(new string[] {  
                     "Avoided product system",
@@ -297,6 +297,8 @@ namespace LcaDataLoader {
                     "Unit process, black box",
                     "Unit process, single operation"
              }));
+            SeedLUT<Visibility>(dbContext.Visibilities, typeof(VisibilityEnum));
+
             dbContext.SaveChanges();
         }
 
@@ -339,9 +341,7 @@ namespace LcaDataLoader {
             _DbContext.Database.ExecuteSqlCommand(
                 "UPDATE LCIA SET FlowID = (SELECT FlowID FROM Flow WHERE LCIA.FlowUUID = Flow.UUID) " +
                 "WHERE  FlowID IS NULL AND EXISTS (SELECT FlowID FROM Flow WHERE LCIA.FlowUUID = Flow.UUID)");
-            int changeCount = _DbContext.SaveChanges();
-            Program.Logger.InfoFormat("Updated FlowID in {0} LCIA records.", changeCount);
-            return changeCount;
+            return _DbContext.SaveChanges();
         }
     }
 }

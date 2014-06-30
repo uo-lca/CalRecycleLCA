@@ -14,6 +14,11 @@ namespace LcaDataModel
             DependencyParams = new HashSet<DependencyParam>();
             Fragments = new HashSet<Fragment>();
             NodeEmissionParams = new HashSet<NodeEmissionParam>();
+            FragmentFlow1 = new HashSet<FragmentFlow>();
+            FragmentNodeFragments = new HashSet<FragmentNodeFragment>();
+            FragmentNodeProcesses = new HashSet<FragmentNodeProcess>();
+            NodeCaches = new HashSet<NodeCache>();
+            NodeDissipationParams = new HashSet<NodeDissipationParam>();
         }
 
         [DatabaseGenerated(DatabaseGeneratedOption.None)]
@@ -37,12 +42,6 @@ namespace LcaDataModel
 
         public int? ParentFragmentFlowID { get; set; }
 
-        [StringLength(50)]
-        public string ReferenceFlowPropertyUUID { get; set; }
-
-        [StringLength(50)]
-        public string FlowUUID { get; set; }
-
         public virtual ICollection<DependencyParam> DependencyParams { get; set; }
 
         public virtual Direction Direction { get; set; }
@@ -60,5 +59,17 @@ namespace LcaDataModel
         public virtual NodeType NodeType { get; set; }
 
         public virtual ICollection<NodeEmissionParam> NodeEmissionParams { get; set; }
+
+        public virtual ICollection<FragmentFlow> FragmentFlow1 { get; set; }
+
+        public virtual FragmentFlow FragmentFlow2 { get; set; }
+
+        public virtual ICollection<FragmentNodeFragment> FragmentNodeFragments { get; set; }
+
+        public virtual ICollection<FragmentNodeProcess> FragmentNodeProcesses { get; set; }
+
+        public virtual ICollection<NodeCache> NodeCaches { get; set; }
+
+        public virtual ICollection<NodeDissipationParam> NodeDissipationParams { get; set; }
     }
 }
