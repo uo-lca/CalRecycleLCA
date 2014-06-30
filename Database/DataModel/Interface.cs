@@ -104,7 +104,7 @@ namespace LcaDataModel {
     public interface IIlcdEntity : IEntity {
         // UUID accessor signature  
         [NotMapped]
-        string UUID { get; set; }
+        //string UUID { get; set; }
         ILCDEntity ILCDEntity { get; set; }
     }
 
@@ -148,16 +148,9 @@ namespace LcaDataModel {
         }
     }
 
-    /// <summary>
-    /// Hack : Workaround missing foreign key referencing IlcdEntity
-    /// </summary>
-    public interface ILocalIlcdEntity : IEntity {
-        // UUID accessor signature  
-        [NotMapped]
-        string UUID { get; set; }
-    }
+  
 
-    public partial class Fragment : ILocalIlcdEntity {
+    public partial class Fragment : IIlcdEntity {
         [NotMapped]
         public int ID {
             get { return FragmentID; }
@@ -165,7 +158,7 @@ namespace LcaDataModel {
         }
     }
 
-    public partial class Classification : ILocalIlcdEntity {
+    public partial class Classification : IIlcdEntity {
         [NotMapped]
         public int ID {
             get { return ClassificationID; }

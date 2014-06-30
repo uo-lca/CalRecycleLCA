@@ -63,14 +63,6 @@ namespace LcaDataModel {
         public virtual DbSet<Visibility> Visibilities { get; set; }
 
         protected override void OnModelCreating(DbModelBuilder modelBuilder) {
-            modelBuilder.Entity<Background>()
-                .Property(e => e.FlowUUID)
-                .IsUnicode(false);
-
-            modelBuilder.Entity<Background>()
-                .Property(e => e.TargetUUID)
-                .IsUnicode(false);
-
             modelBuilder.Entity<Category>()
                 .Property(e => e.ExternalClassID)
                 .IsUnicode(false);
@@ -90,10 +82,6 @@ namespace LcaDataModel {
 
             modelBuilder.Entity<CategorySystem>()
                 .Property(e => e.Delimiter)
-                .IsUnicode(false);
-
-            modelBuilder.Entity<Classification>()
-                .Property(e => e.UUID)
                 .IsUnicode(false);
 
             modelBuilder.Entity<CompostionModel>()
@@ -127,10 +115,6 @@ namespace LcaDataModel {
                 .IsUnicode(false);
 
             modelBuilder.Entity<Flow>()
-                .Property(e => e.UUID)
-                .IsUnicode(false);
-
-            modelBuilder.Entity<Flow>()
                 .Property(e => e.Name)
                 .IsUnicode(false);
 
@@ -143,10 +127,6 @@ namespace LcaDataModel {
                 .HasMany(e => e.Processes)
                 .WithOptional(e => e.Flow)
                 .HasForeignKey(e => e.ReferenceFlowID);
-
-            modelBuilder.Entity<FlowProperty>()
-                .Property(e => e.UUID)
-                .IsUnicode(false);
 
             modelBuilder.Entity<FlowProperty>()
                 .Property(e => e.Name)
@@ -169,10 +149,6 @@ namespace LcaDataModel {
 
             modelBuilder.Entity<FlowType>()
                 .Property(e => e.Name)
-                .IsUnicode(false);
-
-            modelBuilder.Entity<Fragment>()
-                .Property(e => e.UUID)
                 .IsUnicode(false);
 
             modelBuilder.Entity<Fragment>()
@@ -215,11 +191,6 @@ namespace LcaDataModel {
                 .Property(e => e.Version)
                 .IsUnicode(false);
 
-            modelBuilder.Entity<ILCDEntity>()
-                .HasMany(e => e.UnitGroups)
-                .WithRequired(e => e.ILCDEntity)
-                .WillCascadeOnDelete(false);
-
             modelBuilder.Entity<ImpactCategory>()
                 .Property(e => e.Name)
                 .IsUnicode(false);
@@ -236,10 +207,6 @@ namespace LcaDataModel {
                 .HasMany(e => e.CharacterizationParams)
                 .WithOptional(e => e.LCIA)
                 .HasForeignKey(e => e.LCAID);
-
-            modelBuilder.Entity<LCIAMethod>()
-                .Property(e => e.UUID)
-                .IsUnicode(false);
 
             modelBuilder.Entity<LCIAMethod>()
                 .Property(e => e.Name)
@@ -279,10 +246,6 @@ namespace LcaDataModel {
 
             modelBuilder.Entity<ParamType>()
                 .Property(e => e.Name)
-                .IsUnicode(false);
-
-            modelBuilder.Entity<Process>()
-                .Property(e => e.UUID)
                 .IsUnicode(false);
 
             modelBuilder.Entity<Process>()
@@ -337,10 +300,6 @@ namespace LcaDataModel {
                 .HasMany(e => e.UnitGroups)
                 .WithOptional(e => e.UnitConversion)
                 .HasForeignKey(e => e.ReferenceUnitConversionID);
-
-            modelBuilder.Entity<UnitGroup>()
-                .Property(e => e.UUID)
-                .IsUnicode(false);
 
             modelBuilder.Entity<UnitGroup>()
                 .Property(e => e.Name)

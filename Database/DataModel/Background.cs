@@ -25,18 +25,12 @@ namespace LcaDataModel
 
         public int? TargetID { get; set; }
 
-        [StringLength(50)]
-        public string FlowUUID { get; set; }
-
-        [StringLength(50)]
-        public string TargetUUID { get; set; }
-
-        public virtual ICollection<BackgroundCache> BackgroundCaches { get; set; }
-
         public virtual Direction Direction { get; set; }
 
         public virtual Flow Flow { get; set; }
 
         public virtual NodeType NodeType { get; set; }
+
+        public virtual ICollection<BackgroundCache> BackgroundCaches { get; set; }
     }
 }

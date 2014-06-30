@@ -17,14 +17,12 @@ namespace LcaDataModel
 
         public int UnitGroupID { get; set; }
 
-        [Required]
-        [StringLength(36)]
-        public string UUID { get; set; }
-
         [StringLength(100)]
         public string Name { get; set; }
 
         public int? ReferenceUnitConversionID { get; set; }
+
+        public int? ILCDEntityID { get; set; }
 
         public virtual ICollection<FlowProperty> FlowProperties { get; set; }
 

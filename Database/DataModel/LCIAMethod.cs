@@ -18,9 +18,6 @@ namespace LcaDataModel
 
         public int LCIAMethodID { get; set; }
 
-        [StringLength(36)]
-        public string UUID { get; set; }
-
         [StringLength(255)]
         public string Name { get; set; }
 
@@ -49,6 +46,8 @@ namespace LcaDataModel
         public string UseAdvice { get; set; }
 
         public int? ReferenceQuantity { get; set; }
+
+        public int? ILCDEntityID { get; set; }
 
         public virtual ICollection<BackgroundCache> BackgroundCaches { get; set; }
 

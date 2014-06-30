@@ -60,10 +60,11 @@ namespace LcaDataLoader {
         private static bool ImportClassification(Row row, DbContextWrapper dbContext) {
             bool isImported = false;
             string uuid = row["UUID"];
+            ILCDEntity ilcdEntity = dbContext.GetIlcdEntity(uuid);
             if (dbContext.IlcdUuidExists(uuid)) {
                 Classification obj = dbContext.CreateEntityWithID<Classification>(Convert.ToInt32(row["ClassificationID"])); 
                 if (obj != null) {
-                    obj.UUID = uuid;
+                    obj.ILCDEntity = ilcdEntity;
                     obj.CategoryID = Convert.ToInt32(row["CategoryID"]);
                 }
                 isImported = (dbContext.SaveChanges() > 0);
@@ -167,21 +168,21 @@ namespace LcaDataLoader {
             return updated;
         }
 
-        private static bool CreateIlcdEntity(string uuid, DataProviderEnum providerEnum, DataTypeEnum typeEnum, DbContextWrapper dbContext) {
-            bool inserted = false;
+        private static ILCDEntity CreateIlcdEntity(string uuid, DataProviderEnum providerEnum, DataTypeEnum typeEnum, DbContextWrapper dbContext) {
+            ILCDEntity ilcdEntity = null;
             if (dbContext.IlcdUuidExists(uuid)) {
                 Program.Logger.ErrorFormat("UUID {0} already exists. ILCDEntity for {0}, {1} will not be added.", uuid, 
                     Convert.ToString(providerEnum), Convert.ToString(typeEnum));
             }
             else {
-                ILCDEntity ilcdEntity = new ILCDEntity {
+                ilcdEntity = new ILCDEntity {
                     UUID = uuid,
                     DataProviderID = Convert.ToInt32(providerEnum),
                     DataTypeID = Convert.ToInt32(typeEnum)                  
                 };
-                inserted = (dbContext.GetDbSet<ILCDEntity>().Add(ilcdEntity) != null);
+                ilcdEntity = dbContext.GetDbSet<ILCDEntity>().Add(ilcdEntity);
             }
-            return inserted;
+            return ilcdEntity;
         }
 
         private static bool ImportFlow(Row row, DbContextWrapper dbContext) {
@@ -193,8 +194,10 @@ namespace LcaDataLoader {
             }
             else {
                 if (flow == null) {
-                    if (CreateIlcdEntity(row["FlowUUID"], DataProviderEnum.append, DataTypeEnum.Flow, dbContext)) {
-                        flow = new Flow { UUID = row["FlowUUID"] };
+                    ILCDEntity ilcdEntity = CreateIlcdEntity(row["FlowUUID"], DataProviderEnum.append, DataTypeEnum.Flow, dbContext);
+                    if (ilcdEntity != null) {
+                        flow = new Flow();
+                        flow.ILCDEntity = ilcdEntity;
                         dbContext.GetDbSet<Flow>().Add(flow);
                     }
                 }
@@ -220,8 +223,10 @@ namespace LcaDataLoader {
             }
             else {
                 if (flowProperty == null) {
-                    if (CreateIlcdEntity(row["FlowPropertyUUID"], DataProviderEnum.append, DataTypeEnum.FlowProperty, dbContext)) {
-                        flowProperty = new FlowProperty { UUID = row["FlowPropertyUUID"] };
+                    ILCDEntity ilcdEntity = CreateIlcdEntity(row["FlowPropertyUUID"], DataProviderEnum.append, DataTypeEnum.FlowProperty, dbContext);
+                    if (ilcdEntity != null) {
+                        flowProperty = new FlowProperty();
+                        flowProperty.ILCDEntity = ilcdEntity;
                         dbContext.GetDbSet<FlowProperty>().Add(flowProperty);
                     }
                 }
@@ -242,10 +247,11 @@ namespace LcaDataLoader {
             string uuid = row["FragmentUUID"];
             int fragmentID = Convert.ToInt32(row["FragmentID"]);
             if (!dbContext.EntityIdExists<Fragment>(fragmentID)) {
-                if (CreateIlcdEntity(uuid, DataProviderEnum.fragments, DataTypeEnum.Fragment, dbContext)) {
+                ILCDEntity ilcdEntity = CreateIlcdEntity(uuid, DataProviderEnum.fragments, DataTypeEnum.Fragment, dbContext);
+                if (ilcdEntity != null) {
                     Fragment obj = dbContext.CreateEntityWithID<Fragment>(fragmentID);
                     if (obj != null) {
-                        obj.UUID = uuid;
+                        obj.ILCDEntity = ilcdEntity;
                     }
                     isImported = (dbContext.SaveChanges() > 0);
                 }

@@ -210,7 +210,7 @@ namespace LcaDataLoader {
             ilcdEntity.Version = GetCommonVersion();
             ilcdEntity.DataTypeID = Convert.ToInt32(dtEnum);
             ilcdEntity.DataProviderID = ilcdDb.GetCurrentIlcdDataProviderID();
-            entity.UUID = GetCommonUUID();
+            //entity.UUID = GetCommonUUID();
             entity.ILCDEntity = ilcdEntity;
             return ilcdEntity;
         }
@@ -247,7 +247,7 @@ namespace LcaDataLoader {
             ugUUID = GetElementAttributeValue(ElementName("referenceToReferenceUnitGroup"), "refObjectId");
             if (ugUUID == null) {
                 Program.Logger.WarnFormat("Unable to find referenceToReferenceUnitGroup in flow property {0}", 
-                    flowProperty.UUID);
+                    flowProperty.ILCDEntity.UUID);
             }
             else {
                 string referenceUUID = ugUUID;

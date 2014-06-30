@@ -12,29 +12,28 @@ namespace LcaDataModel
         public Fragment()
         {
             FragmentFlows = new HashSet<FragmentFlow>();
-            FragmentStages = new HashSet<FragmentStage>();
             FragmentNodeFragments = new HashSet<FragmentNodeFragment>();
+            FragmentStages = new HashSet<FragmentStage>();
         }
 
         [DatabaseGenerated(DatabaseGeneratedOption.None)]
         public int FragmentID { get; set; }
-
-        [StringLength(36)]
-        public string UUID { get; set; }
 
         [StringLength(255)]
         public string Name { get; set; }
 
         public int? ReferenceFragmentFlowID { get; set; }
 
-        public virtual FragmentFlow FragmentFlow { get; set; }
+        public int? ILCDEntityID { get; set; }
 
-        public virtual ILCDEntity ILCDEntity { get; set; }
+        public virtual FragmentFlow FragmentFlow { get; set; }
 
         public virtual ICollection<FragmentFlow> FragmentFlows { get; set; }
 
+        public virtual ICollection<FragmentNodeFragment> FragmentNodeFragments { get; set; }
+
         public virtual ICollection<FragmentStage> FragmentStages { get; set; }
 
-        public virtual ICollection<FragmentNodeFragment> FragmentNodeFragments { get; set; }
+        public virtual ILCDEntity ILCDEntity { get; set; }
     }
 }

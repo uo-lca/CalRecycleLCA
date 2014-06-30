@@ -19,17 +19,14 @@ namespace LcaDataModel
 
         public int FlowPropertyID { get; set; }
 
-        [StringLength(36)]
-        public string UUID { get; set; }
-
         [StringLength(255)]
         public string Name { get; set; }
 
         public int? UnitGroupID { get; set; }
 
-        public virtual ICollection<Flow> Flows { get; set; }
+        public int? ILCDEntityID { get; set; }
 
-        public virtual ILCDEntity ILCDEntity { get; set; }
+        public virtual ICollection<Flow> Flows { get; set; }
 
         public virtual UnitGroup UnitGroup { get; set; }
 
@@ -38,5 +35,7 @@ namespace LcaDataModel
         public virtual ICollection<FragmentFlow> FragmentFlows { get; set; }
 
         public virtual ICollection<LCIAMethod> LCIAMethods { get; set; }
+
+        public virtual ILCDEntity ILCDEntity { get; set; }
     }
 }

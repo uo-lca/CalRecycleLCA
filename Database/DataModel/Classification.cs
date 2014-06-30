@@ -12,10 +12,9 @@ namespace LcaDataModel
         [DatabaseGenerated(DatabaseGeneratedOption.None)]
         public int ClassificationID { get; set; }
 
-        [StringLength(36)]
-        public string UUID { get; set; }
-
         public int? CategoryID { get; set; }
+
+        public int? ILCDEntityID { get; set; }
 
         public virtual Category Category { get; set; }
 

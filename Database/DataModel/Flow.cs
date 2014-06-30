@@ -24,9 +24,6 @@ namespace LcaDataModel
 
         public int FlowID { get; set; }
 
-        [StringLength(36)]
-        public string UUID { get; set; }
-
         [StringLength(255)]
         public string Name { get; set; }
 
@@ -37,6 +34,8 @@ namespace LcaDataModel
 
         public int? FlowTypeID { get; set; }
 
+        public int? ILCDEntityID { get; set; }
+
         public virtual ICollection<Background> Backgrounds { get; set; }
 
         public virtual ICollection<CompostionModel> CompostionModels { get; set; }
@@ -45,14 +44,12 @@ namespace LcaDataModel
 
         public virtual FlowType FlowType { get; set; }
 
-        public virtual ILCDEntity ILCDEntity { get; set; }
-
         public virtual ICollection<FlowFlowProperty> FlowFlowProperties { get; set; }
 
         public virtual ICollection<FlowPropertyEmission> FlowPropertyEmissions { get; set; }
 
         public virtual ICollection<FragmentFlow> FragmentFlows { get; set; }
-        
+
         public virtual ICollection<LCIA> LCIAs { get; set; }
 
         public virtual ICollection<Process> Processes { get; set; }
@@ -60,5 +57,7 @@ namespace LcaDataModel
         public virtual ICollection<ProcessFlow> ProcessFlows { get; set; }
 
         public virtual ICollection<ScenarioBackground> ScenarioBackgrounds { get; set; }
+
+        public virtual ILCDEntity ILCDEntity { get; set; }
     }
 }
