@@ -112,13 +112,22 @@ namespace LcaDataLoader {
         /// Create a list of UnitConversion entities from elements under units.
         /// </summary>
         /// <param name="flow">UnitGroup parent entity</param>
-        private List<UnitConversion> CreateUnitConversionList(UnitGroup unitGroup) {
-            return LoadedDocument.Root.Descendants(ElementName("units")).Elements(ElementName("unit")).Select(u =>
-                    new UnitConversion {
-                        Unit = (string)u.Element(ElementName("name")),
-                        Conversion = (double)u.Element(ElementName("meanValue")),
+        /// <param name="refID">unit group referenceToReferenceUnit</param>
+        private List<UnitConversion> CreateUnitConversionList(UnitGroup unitGroup, string refID) {
+            List<UnitConversion> ucList = new List<UnitConversion>();
+            IEnumerable<XElement> elements = LoadedDocument.Root.Descendants(ElementName("units")).Elements(ElementName("unit"));
+            foreach (XElement el in elements) {
+                UnitConversion uc = new UnitConversion {
+                        Unit = (string)el.Element(ElementName("name")),
+                        Conversion = (double)el.Element(ElementName("meanValue")),
                         UnitGroupID = unitGroup.UnitGroupID
-                    }).ToList();
+                    };
+                if ( el.Attribute("dataSetInternalID").Value == refID) {
+                    unitGroup.UnitConversion = uc;
+                }
+                ucList.Add(uc);
+            }
+            return ucList;
         }
 
         /// <summary>
@@ -222,11 +231,14 @@ namespace LcaDataLoader {
         /// <returns>true iff data was imported</returns>
         private bool SaveUnitGroup(DbContextWrapper ilcdDb) {
             bool isSaved = false;
+            string dataSetInternalID = "0"; 
             UnitGroup unitGroup = new UnitGroup();
             SaveIlcdEntity(ilcdDb, unitGroup, DataTypeEnum.UnitGroup);
             unitGroup.Name = GetCommonName();
+            // Get Reference Flow Property
+            dataSetInternalID = GetElementValue(ElementName("referenceToReferenceUnit"));
             if (ilcdDb.AddIlcdEntity(unitGroup)) {
-                    ilcdDb.AddEntities<UnitConversion>(CreateUnitConversionList(unitGroup));
+                ilcdDb.AddEntities<UnitConversion>(CreateUnitConversionList(unitGroup, dataSetInternalID));
                     isSaved = true;
             }
             return isSaved;
