@@ -1,4 +1,5 @@
 ﻿using Data;
+using Entities.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -7,8 +8,8 @@ using System.Threading.Tasks;
 
 namespace Services
 {
-    public interface IFlowService : IService<Flow>
+    public interface IFragmentTraversal
     {
-            
+        IEnumerable<DependencyParamModel> ApplyDependencyParam(int scenarioId = 0);
     }
 }

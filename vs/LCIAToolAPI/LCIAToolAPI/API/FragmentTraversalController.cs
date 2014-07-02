@@ -1,4 +1,6 @@
 ﻿using Data;
+using Ninject;
+using Services;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -10,6 +12,33 @@ namespace LCAToolAPI.API
 {
     public class FragmentTraversalController : ApiController
     {
+             //private readonly IFragmentService _fragmentService;
+        [Inject]
+        private readonly IFragmentFlowService _fragmentFlowService ;
+        [Inject]
+        private readonly IDependencyParamService _dependencyParamService ;
+
+
+        public FragmentTraversalController(IFragmentFlowService fragmentFlowService, IDependencyParamService dependencyParamService)
+        {
+
+            if (fragmentFlowService == null)
+            {
+                throw new ArgumentNullException("fragmentFlowService is null");
+            }
+
+            _fragmentFlowService = fragmentFlowService;
+
+            if (dependencyParamService == null)
+            {
+                throw new ArgumentNullException("dependencyParamService is null");
+            }
+
+            _dependencyParamService = dependencyParamService;
+
+
+        }
+
         // GET api/<controller>
         public IEnumerable<string> Get()
         {
@@ -37,6 +66,5 @@ namespace LCAToolAPI.API
         {
         }
 
-        
     }
 }

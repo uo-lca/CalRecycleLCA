@@ -16,16 +16,13 @@ namespace Data
             FlowFlowProperties = new HashSet<FlowFlowProperty>();
             FlowPropertyEmissions = new HashSet<FlowPropertyEmission>();
             FragmentFlows = new HashSet<FragmentFlow>();
+            LCIAs = new HashSet<LCIA>();
             Processes = new HashSet<Process>();
             ProcessFlows = new HashSet<ProcessFlow>();
             ScenarioBackgrounds = new HashSet<ScenarioBackground>();
-            LCIAs = new HashSet<LCIA>();
         }
 
         public int FlowID { get; set; }
-
-        [StringLength(36)]
-        public string UUID { get; set; }
 
         [StringLength(255)]
         public string Name { get; set; }
@@ -36,6 +33,8 @@ namespace Data
         public int? ReferenceFlowProperty { get; set; }
 
         public int? FlowTypeID { get; set; }
+
+        public int? ILCDEntityID { get; set; }
 
         public virtual ICollection<Background> Backgrounds { get; set; }
 
@@ -53,12 +52,12 @@ namespace Data
 
         public virtual ICollection<FragmentFlow> FragmentFlows { get; set; }
 
+        public virtual ICollection<LCIA> LCIAs { get; set; }
+
         public virtual ICollection<Process> Processes { get; set; }
 
         public virtual ICollection<ProcessFlow> ProcessFlows { get; set; }
 
         public virtual ICollection<ScenarioBackground> ScenarioBackgrounds { get; set; }
-
-        public virtual ICollection<LCIA> LCIAs { get; set; }
     }
 }

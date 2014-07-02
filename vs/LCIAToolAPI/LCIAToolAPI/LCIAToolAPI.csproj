@@ -222,6 +222,7 @@
     <Content Include="Content\bootstrap.min.css" />
     <Content Include="Content\images\glyphicons-halflings-white.png" />
     <Content Include="Content\images\glyphicons-halflings.png" />
+    <Content Include="DependencyParamTest.aspx" />
     <Content Include="Global.asax" />
     <Content Include="packages.config" />
     <Content Include="Scripts\bootstrap.js" />
@@ -237,6 +238,7 @@
   <ItemGroup>
     <Compile Include="API\FragmentController.cs" />
     <Compile Include="API\FragmentTraversalController.cs" />
+    <Compile Include="API\HttpResponseMessage.cs" />
     <Compile Include="App_Start\BundleConfig.cs" />
     <Compile Include="App_Start\NinjectWeb.cs" />
     <Compile Include="App_Start\NinjectWebApi.cs" />
@@ -263,6 +265,13 @@
     <Compile Include="Areas\RouteDebugger\RequestHelper.cs" />
     <Compile Include="Areas\RouteDebugger\RouteDebuggerAreaRegistration.cs" />
     <Compile Include="Areas\RouteDebugger\RouteDebuggerConfig.cs" />
+    <Compile Include="DependencyParamTest.aspx.cs">
+      <DependentUpon>DependencyParamTest.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="DependencyParamTest.aspx.designer.cs">
+      <DependentUpon>DependencyParamTest.aspx</DependentUpon>
+    </Compile>
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>

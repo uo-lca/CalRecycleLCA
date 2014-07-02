@@ -1,4 +1,5 @@
 ﻿using Data;
+using Ninject;
 using Repository;
 using System;
 using System.Collections.Generic;
@@ -8,18 +9,20 @@ using System.Threading.Tasks;
 
 namespace Services
 {
-    public class FlowService : Service<Flow>, IFlowService
-    {
-        private readonly IRepository<Flow> _repository;
 
-        public FlowService(IRepository<Flow> repository)
+    public class ScenarioParamService : Service<ScenarioParam>, IScenarioParamService
+    {
+        [Inject]
+        private readonly IRepository<ScenarioParam> _repository;
+
+
+        public ScenarioParamService(IRepository<ScenarioParam> repository)
             : base(repository)
         {
             _repository = repository;
         }
 
        
-
 
     }
 }

@@ -5,12 +5,15 @@ using System.Text;
 using System.Threading.Tasks;
 using Data;
 using Repository;
+using Ninject;
 
 namespace Services
 {
     public class FragmentService : Service<Fragment>, IFragmentService
     {
+        [Inject]
         private readonly IRepository<Fragment> _repository;
+
 
         public FragmentService(IRepository<Fragment> repository)
             : base(repository)

@@ -1,20 +1,42 @@
-namespace Data.Mappings
+namespace Data
 {
     using System;
     using System.Data.Entity;
     using System.ComponentModel.DataAnnotations.Schema;
     using System.Linq;
+    using System.Collections.Generic;
+    using System.Text;
+    using System.Threading.Tasks;
+    using System.Data.Entity.Infrastructure;
+    using Data;
 
-    public partial class Model1 : DbContext
+    public class UsedOilLCAContextold : DbContext, IDbContext
     {
-        public Model1()
-            : base("name=Model1")
+
+        static UsedOilLCAContextold()
+    {
+        Database.SetInitializer<UsedOilLCAContext>(null);
+    }
+
+        public UsedOilLCAContextold()
+            : base("name=UsedOilLCAContext")
         {
         }
 
+        public new IDbSet<T> Set<T>() where T : class
+        {
+            return base.Set<T>();
+        }
+
+        public override int SaveChanges()
+        {
+
+            return base.SaveChanges();
+        }
+
+        public virtual DbSet<C__MigrationHistory> C__MigrationHistory { get; set; }
         public virtual DbSet<Background> Backgrounds { get; set; }
-        public virtual DbSet<BackgroundFragment> BackgroundFragments { get; set; }
-        public virtual DbSet<BackgroundProcess> BackgroundProcesses { get; set; }
+        public virtual DbSet<BackgroundCache> BackgroundCaches { get; set; }
         public virtual DbSet<Category> Categories { get; set; }
         public virtual DbSet<CategorySystem> CategorySystems { get; set; }
         public virtual DbSet<CharacterizationParam> CharacterizationParams { get; set; }
@@ -37,13 +59,13 @@ namespace Data.Mappings
         public virtual DbSet<FragmentFlow> FragmentFlows { get; set; }
         public virtual DbSet<FragmentNodeFragment> FragmentNodeFragments { get; set; }
         public virtual DbSet<FragmentNodeProcess> FragmentNodeProcesses { get; set; }
-        public virtual DbSet<FragmentScore> FragmentScores { get; set; }
         public virtual DbSet<FragmentStage> FragmentStages { get; set; }
         public virtual DbSet<ILCDEntity> ILCDEntities { get; set; }
         public virtual DbSet<ImpactCategory> ImpactCategories { get; set; }
         public virtual DbSet<IndicatorType> IndicatorTypes { get; set; }
         public virtual DbSet<LCIA> LCIAs { get; set; }
         public virtual DbSet<LCIAMethod> LCIAMethods { get; set; }
+        public virtual DbSet<NodeCache> NodeCaches { get; set; }
         public virtual DbSet<NodeDissipationParam> NodeDissipationParams { get; set; }
         public virtual DbSet<NodeEmissionParam> NodeEmissionParams { get; set; }
         public virtual DbSet<NodeType> NodeTypes { get; set; }
@@ -60,7 +82,7 @@ namespace Data.Mappings
         public virtual DbSet<ScenarioBackground> ScenarioBackgrounds { get; set; }
         public virtual DbSet<ScenarioGroup> ScenarioGroups { get; set; }
         public virtual DbSet<ScenarioParam> ScenarioParams { get; set; }
-        public virtual DbSet<sysdiagram> sysdiagrams { get; set; }
+        public virtual DbSet<ScoreCache> ScoreCaches { get; set; }
         public virtual DbSet<UnitConversion> UnitConversions { get; set; }
         public virtual DbSet<UnitGroup> UnitGroups { get; set; }
         public virtual DbSet<User> Users { get; set; }
@@ -68,6 +90,9 @@ namespace Data.Mappings
 
         protected override void OnModelCreating(DbModelBuilder modelBuilder)
         {
+            //turned off the because caused infinite loop.  Grrrr.
+            base.Configuration.LazyLoadingEnabled = false; 
+
             modelBuilder.Entity<Background>()
                 .Property(e => e.FlowUUID)
                 .IsUnicode(false);
@@ -83,6 +108,11 @@ namespace Data.Mappings
             modelBuilder.Entity<Category>()
                 .Property(e => e.Name)
                 .IsUnicode(false);
+
+            modelBuilder.Entity<Category>()
+                .HasMany(e => e.Category1)
+                .WithOptional(e => e.Category2)
+                .HasForeignKey(e => e.ParentCategoryID);
 
             modelBuilder.Entity<CategorySystem>()
                 .Property(e => e.Name)
@@ -115,12 +145,12 @@ namespace Data.Mappings
             modelBuilder.Entity<DependencyParam>()
                 .HasMany(e => e.DistributionParams)
                 .WithOptional(e => e.DependencyParam)
-                .HasForeignKey(e => e.DependencyParamID);
+                .HasForeignKey(e => e.ConservationParamID);
 
             modelBuilder.Entity<DependencyParam>()
                 .HasMany(e => e.DistributionParams1)
                 .WithOptional(e => e.DependencyParam1)
-                .HasForeignKey(e => e.ConservationParamID);
+                .HasForeignKey(e => e.DependencyParamID);
 
             modelBuilder.Entity<Direction>()
                 .Property(e => e.Name)
@@ -138,11 +168,6 @@ namespace Data.Mappings
                 .Property(e => e.CASNumber)
                 .IsFixedLength()
                 .IsUnicode(false);
-
-            modelBuilder.Entity<Flow>()
-                .HasMany(e => e.FlowPropertyEmissions)
-                .WithOptional(e => e.Flow)
-                .HasForeignKey(e => e.EmissionID);
 
             modelBuilder.Entity<Flow>()
                 .HasMany(e => e.Processes)
@@ -163,6 +188,11 @@ namespace Data.Mappings
                 .HasForeignKey(e => e.ReferenceFlowProperty);
 
             modelBuilder.Entity<FlowProperty>()
+                .HasMany(e => e.FragmentFlows)
+                .WithOptional(e => e.FlowProperty)
+                .HasForeignKey(e => e.ReferenceFlowPropertyID);
+
+            modelBuilder.Entity<FlowProperty>()
                 .HasMany(e => e.LCIAMethods)
                 .WithOptional(e => e.FlowProperty)
                 .HasForeignKey(e => e.ReferenceQuantity);
@@ -179,17 +209,29 @@ namespace Data.Mappings
                 .Property(e => e.Name)
                 .IsUnicode(false);
 
+            modelBuilder.Entity<Fragment>()
+                .HasMany(e => e.FragmentFlows)
+                .WithOptional(e => e.Fragment)
+                .HasForeignKey(e => e.FragmentID);
+
+            modelBuilder.Entity<Fragment>()
+                .HasMany(e => e.FragmentNodeFragments)
+                .WithOptional(e => e.Fragment)
+                .HasForeignKey(e => e.SubFragmentID);
+
             modelBuilder.Entity<FragmentFlow>()
                 .Property(e => e.Name)
                 .IsUnicode(false);
 
             modelBuilder.Entity<FragmentFlow>()
-                .Property(e => e.ReferenceFlowPropertyUUID)
-                .IsUnicode(false);
+                .HasMany(e => e.Fragments)
+                .WithOptional(e => e.FragmentFlow)
+                .HasForeignKey(e => e.ReferenceFragmentFlowID);
 
             modelBuilder.Entity<FragmentFlow>()
-                .Property(e => e.FlowUUID)
-                .IsUnicode(false);
+                .HasMany(e => e.FragmentFlow1)
+                .WithOptional(e => e.FragmentFlow2)
+                .HasForeignKey(e => e.ParentFragmentFlowID);
 
             modelBuilder.Entity<FragmentStage>()
                 .Property(e => e.StageName)
@@ -265,10 +307,6 @@ namespace Data.Mappings
                 .Property(e => e.Name)
                 .IsUnicode(false);
 
-            modelBuilder.Entity<Param>()
-                .HasOptional(e => e.ScenarioParam)
-                .WithRequired(e => e.Param);
-
             modelBuilder.Entity<ParamType>()
                 .Property(e => e.Name)
                 .IsUnicode(false);
@@ -339,10 +377,6 @@ namespace Data.Mappings
                 .IsUnicode(false);
 
             modelBuilder.Entity<UnitGroup>()
-                .Property(e => e.ReferenceUnit)
-                .IsUnicode(false);
-
-            modelBuilder.Entity<UnitGroup>()
                 .HasMany(e => e.UnitConversions)
                 .WithOptional(e => e.UnitGroup)
                 .HasForeignKey(e => e.UnitGroupID);
@@ -357,7 +391,7 @@ namespace Data.Mappings
                 .HasForeignKey(e => e.OwnedBy);
 
             modelBuilder.Entity<Visibility>()
-                .Property(e => e.Visibility1)
+                .Property(e => e.Name)
                 .IsUnicode(false);
         }
     }

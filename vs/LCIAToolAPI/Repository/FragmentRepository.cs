@@ -15,14 +15,14 @@ namespace Repository
             var fragments =
        fragmentRepository
             .Query()
-            .Include(i => i.FragmentFlow)
+            //.Include(i => i.BackgroundFragments)
             .OrderBy(q => q
-                .OrderBy(c => c.FragmentFlow.FragmentStageID)
+                .OrderBy(c => c.FragmentID)
                 .ThenBy(c => c.FragmentID))
             .Filter(q => q.Name != null)
             .GetPage();
 
-            return fragments;
+            return fragments.AsEnumerable();
         }
 
        

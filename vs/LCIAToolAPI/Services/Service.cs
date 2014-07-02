@@ -26,6 +26,6 @@ namespace Services
 
         public virtual void Delete(TEntity entity) { _repository.Delete(entity); }
 
-        //public RepositoryQuery<TEntity> Query() { return _repository.Query(); }
+        public RepositoryQuery<TEntity> Query() { return _repository.Query(); }
     }
 }

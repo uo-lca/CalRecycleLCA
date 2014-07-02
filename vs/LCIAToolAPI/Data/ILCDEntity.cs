@@ -20,7 +20,9 @@ namespace Data
             UnitGroups = new HashSet<UnitGroup>();
         }
 
-        [Key]
+        public int ILCDEntityID { get; set; }
+
+        [Required]
         [StringLength(36)]
         public string UUID { get; set; }
 

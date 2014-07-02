@@ -12,7 +12,7 @@ namespace Services
         void Update(TEntity entity);
         void Delete(object id);
         void Delete(TEntity entity);
-        //RepositoryQuery<TEntity> Query();
+        RepositoryQuery<TEntity> Query();
         
     }
 }

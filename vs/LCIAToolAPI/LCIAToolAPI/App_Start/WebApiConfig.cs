@@ -29,15 +29,15 @@ namespace LCIAToolAPI.App_Start
             //jsonMediaTypeFormatter.SerializerSettings = serializerSettings;
             //GlobalConfiguration.Configuration.Formatters.Insert(0, jsonMediaTypeFormatter);
 
+
+
             GlobalConfiguration.Configuration.Formatters.JsonFormatter.SerializerSettings = new JsonSerializerSettings();
             GlobalConfiguration.Configuration.Formatters.JsonFormatter.SerializerSettings.NullValueHandling = NullValueHandling.Ignore;
             GlobalConfiguration.Configuration.Formatters.JsonFormatter.SerializerSettings.Formatting = Formatting.Indented;
 
+
             GlobalConfiguration.Configuration.Formatters.JsonFormatter.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Serialize;
             GlobalConfiguration.Configuration.Formatters.JsonFormatter.SerializerSettings.PreserveReferencesHandling = Newtonsoft.Json.PreserveReferencesHandling.Objects;
-
-      
-        
 
             config.Routes.MapHttpRoute(
             name: "DefaultApi",

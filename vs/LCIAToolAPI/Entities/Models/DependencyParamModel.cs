@@ -8,15 +8,29 @@ namespace Entities.Models
 {
     public class DependencyParamModel
     {
-        public int ScenarioParamID { get; set; }
+        public int FragmentFlowID { get; set; }
 
-        public int? ScenarioID { get; set; }
+        public int? FragmentID { get; set; }
 
-        public int? ParamID { get; set; }
+        public string Name { get; set; }
+
+        public int? FragmentStageID { get; set; }
+
+        public int? ReferenceFlowPropertyID { get; set; }
+
+        public int? NodeTypeID { get; set; }
+
+        public int? FlowID { get; set; }
+
+        public int? DirectionID { get; set; }
+
+        public double? Quantity { get; set; }
+
+        public int? ParentFragmentFlowID { get; set; }
 
         public int DependencyParamID { get; set; }
 
-        public int? FragmentFlowID { get; set; }
+        public int? ParamID { get; set; }
 
         public double? Value { get; set; }
     }

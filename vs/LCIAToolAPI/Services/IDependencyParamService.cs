@@ -7,8 +7,9 @@ using System.Threading.Tasks;
 
 namespace Services
 {
-    public interface IFlowService : IService<Flow>
+    public interface IDependencyParamService: IService<DependencyParam>
     {
-            
+        IEnumerable<DependencyParam> GetDependencyParams(int scenarioId = 0);
+
     }
 }

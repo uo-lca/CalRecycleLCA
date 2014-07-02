@@ -7,8 +7,8 @@ using System.Threading.Tasks;
 
 namespace Services
 {
-    public interface IFlowService : IService<Flow>
+    public interface IFragmentFlowService : IService<FragmentFlow>
     {
-            
+        IEnumerable<FragmentFlow> GetFragmentFlows(int fragmentId);
     }
 }
