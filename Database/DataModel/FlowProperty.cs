@@ -12,6 +12,7 @@ namespace LcaDataModel
         public FlowProperty()
         {
             Flows = new HashSet<Flow>();
+            FlowProperties = new HashSet<FlowProperty>();
             FlowPropertyEmissions = new HashSet<FlowPropertyEmission>();
             FragmentFlows = new HashSet<FragmentFlow>();
             LCIAMethods = new HashSet<LCIAMethod>();
@@ -29,6 +30,8 @@ namespace LcaDataModel
         public virtual ICollection<Flow> Flows { get; set; }
 
         public virtual UnitGroup UnitGroup { get; set; }
+
+        public virtual ICollection<FlowProperty> FlowProperties { get; set; }
 
         public virtual ICollection<FlowPropertyEmission> FlowPropertyEmissions { get; set; }
 
