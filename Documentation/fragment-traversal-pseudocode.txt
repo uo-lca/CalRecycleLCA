@@ -20,8 +20,10 @@ Traverse(ScenarioID)
   RootNode = ReferenceFlow.FragmentFlowID;
   float activity = 1;
   
+  Ref_Flow = this.ReferenceFragmentFlowID; //
+
   // traverse the tree recursively, writing cache values as you go
-  node_recurse(fpflows, ScenarioID, RootNode, activity);
+  node_recurse(fpflows, ScenarioID, Ref_Flow, activity);
   // DONE.
 }
 
@@ -32,7 +34,6 @@ e=applyDependencyParam(flows,ScenarioID)
   // scenario-specific parameterization for dependency relationships
 
   ParamList params = ScenarioParam.* WHERE ScenarioID = @ScenarioID
-  	    	     		     AND FragmentID = @FragmentID
   dep_params = INNER JOIN params->Param->DependencyParam // types 1, 2, 3
   
   // generate scenario-specific edge table.  The idea is that we use the
@@ -128,7 +129,7 @@ Fragment.node_recurse(flows, ScenarioID, current_flow, activity)
 
       // need to set current fragment quantities based on subfragment 
       // inputs and outputs
-      F.map_dependencies(dependencies);
+      F.map_dependencies(dependencies); // updates dependencies.Quantity
 
       /*
       // IOFlows is a list of edges.  For every edge that has a
@@ -180,5 +181,7 @@ Fragment.map_dependencies( dep )
 	WHERE dep.CompDirID = my_IO.DirectionID
 
 
-  UPDATE dep.Quantity WITH dep.IOsum
+  UPDATE dep.Quantity WITH dep.IOsum;
+
+  return dep;
 }

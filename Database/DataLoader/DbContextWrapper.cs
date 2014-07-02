@@ -208,7 +208,7 @@ namespace LcaDataLoader {
         /// <returns>Entity, if found, otherwise null</returns>
         public T GetIlcdEntity<T>(string uuid) where T : class, IIlcdEntity {
             DbSet<T> dbSet = _DbContext.Set<T>();
-            T entity = (from le in dbSet where le.UUID == uuid select le).FirstOrDefault();
+            T entity = (from le in dbSet where le.ILCDEntity.UUID == uuid select le).FirstOrDefault();
             return entity;
         }
 
@@ -319,8 +319,17 @@ namespace LcaDataLoader {
         /// <param name="uuid">The UUID value</param>
         /// <returns>true iff found</returns>
         public bool IlcdUuidExists(string uuid) {
+            return (GetIlcdEntity(uuid) != null);
+        }
+
+        /// <summary>
+        /// Use this method to check if an ILCDEntity with given UUID already exists in the database
+        /// </summary>
+        /// <param name="uuid">The UUID value</param>
+        /// <returns>true iff found</returns>
+        public ILCDEntity GetIlcdEntity(string uuid) {
             ILCDEntity entity = (from il in _DbContext.ILCDEntities where il.UUID == uuid select il).FirstOrDefault();
-            return (entity != null);
+            return entity;
         }
 
         /// <summary>
@@ -338,9 +347,9 @@ namespace LcaDataLoader {
         /// </summary>
         /// <returns>Number of records updated</returns>
         public int UpdateLciaFlowID() {
-            _DbContext.Database.ExecuteSqlCommand(
-                "UPDATE LCIA SET FlowID = (SELECT FlowID FROM Flow WHERE LCIA.FlowUUID = Flow.UUID) " +
-                "WHERE  FlowID IS NULL AND EXISTS (SELECT FlowID FROM Flow WHERE LCIA.FlowUUID = Flow.UUID)");
+            string flowIDQuery = "(SELECT FlowID FROM Flow INNER JOIN ILCDEntity ON Flow.ILCDEntityID = ILCDEntity.ILCDEntityID WHERE LCIA.FlowUUID = ILCDEntity.UUID)";
+            string updateCmd = string.Format("UPDATE LCIA SET FlowID = {0} WHERE  FlowID IS NULL AND EXISTS {0}", flowIDQuery);
+            _DbContext.Database.ExecuteSqlCommand(updateCmd);
             return _DbContext.SaveChanges();
         }
     }

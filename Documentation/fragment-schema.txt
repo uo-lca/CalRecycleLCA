@@ -194,6 +194,7 @@ The following tables are required:
     Generated prior to ILCD import.
 
    ILCDEntity
+    * ILCDEntityID
     * UUID
     * Version - ILCD version of source data file
     * DataProviderID
@@ -201,10 +202,11 @@ The following tables are required:
     
     Lookup table mapping UUIDs to sources in the file system.  Generated
     during ILCD import.
+	Unique Index on (UUID, Version)
 
    UnitGroup
     * UnitGroupID
-    * UUID (was UnitGroupUUID)
+    * ILCDEntityID (FK, was UnitGroupUUID)
     * Name
     * ReferenceUnitConversionID(FK to UnitConversionID)
 
@@ -220,13 +222,13 @@ The following tables are required:
 
    FlowProperty
     * FlowPropertyID
-    * UUID (was FlowPropertyUUID) - UUID of source data file
+    * ILCDEntityID (FK, was FlowPropertyUUID) - UUID of source data file
     * Name
     * UnitGroupID
 
    Flow
     * FlowID
-    * UUID (was FlowUUID) - UUID of source data file
+    * ILCDEntityID (FK, was FlowUUID) - UUID of source data file
     * Name
     * CASNumber
     * FlowTypeID
@@ -256,7 +258,7 @@ The following tables are required:
 
    LCIAMethod
     * LCIAMethodID
-    * UUID (was LCIAMethodUUID)
+    * ILCDEntityID (FK, was LCIAMethodUUID)
     * Name
     * Methodology
     * ImpactCategoryID
@@ -275,7 +277,7 @@ The following tables are required:
     * LCIAMethodID
     * FlowUUID - not a FK, UUID stored by import tool so that Flow can be created after LCIAMethod is imported.
     * FlowName - as listed in LCIAMethod data set
-    * FlowID - FK. (set to Flow.FlowID where LCIA.FlowUUID = Flow.FlowUUID)
+    * FlowID - FK. (set to Flow.FlowID where LCIA.FlowUUID = ILCDEntity.UUID and ILCDEntity.ILCDEntityID = Flow.ILCDEntityID)
     * DirectionID
     * Geography
     * Factor
@@ -331,7 +333,6 @@ The following tables are required:
 ### Indices, constraints
 
     * Every table needs a primary key
-    * Unique index on UUID columns
 	
 ## Classification Tables
 
@@ -365,7 +366,7 @@ The following tables are required:
 
    Classification - THIS TABLE WILL BE RE-GENERATED EXTERNALLY
     * ClassificationID
-    * UUID(FK to ILCDEntity.UUID)
+    * ILCDEntityID (FK to ILCDEntity.ILCDEntityID)
     * CategoryID
 
     Mapping of UUIDs to Class information.  A single data entity (UUID) can
