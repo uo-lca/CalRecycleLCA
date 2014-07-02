@@ -95,6 +95,10 @@
     <Compile Include="Migrations\201407021756141_FK_FlowFlowProperty_FlowProperty.Designer.cs">
       <DependentUpon>201407021756141_FK_FlowFlowProperty_FlowProperty.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\201407022035013_FK_FlowFlowProperty_FlowProperty_Fix.cs" />
+    <Compile Include="Migrations\201407022035013_FK_FlowFlowProperty_FlowProperty_Fix.Designer.cs">
+      <DependentUpon>201407022035013_FK_FlowFlowProperty_FlowProperty_Fix.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="NodeCache.cs" />
     <Compile Include="NodeDissipation.cs" />
@@ -135,6 +139,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\201407021756141_FK_FlowFlowProperty_FlowProperty.resx">
       <DependentUpon>201407021756141_FK_FlowFlowProperty_FlowProperty.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201407022035013_FK_FlowFlowProperty_FlowProperty_Fix.resx">
+      <DependentUpon>201407022035013_FK_FlowFlowProperty_FlowProperty_Fix.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
