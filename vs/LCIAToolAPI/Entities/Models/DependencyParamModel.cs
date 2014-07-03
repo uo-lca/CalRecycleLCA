@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Newtonsoft.Json;
 
 namespace Entities.Models
 {
@@ -28,8 +29,10 @@ namespace Entities.Models
 
         public int? ParentFragmentFlowID { get; set; }
 
+        [JsonIgnore]
         public int DependencyParamID { get; set; }
 
+        [JsonIgnore]
         public int? ParamID { get; set; }
 
         public double? Value { get; set; }
