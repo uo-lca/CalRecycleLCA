@@ -79,7 +79,8 @@ Fragment.ComputeNodeScores( ScenarioID, ListOfLCIAMethods L )
       case Process
       {
         the_node = i INNER JOIN FragmentNodeProcess ON FragmentFlowID;
-      	inventory = ComputeProcessLCI (	the_node.ProcessID, ScenarioID );
+      	inventory = ComputeProcessLCI (	the_node.ProcessID, FragmentFlowID,
+		    		      	ScenarioID );
 
         for j in missing_L
 	{
@@ -104,22 +105,33 @@ Fragment.ComputeNodeScores( ScenarioID, ListOfLCIAMethods L )
   } // see?? easy!
 }
 
-inventory = ComputeProcessLCI( ProcessID, ScenarioID )
+inventory = ComputeProcessLCI( ProcessID, FragmentFlowID, ScenarioID )
 {
- - pull ProcessFlow.Result
- - override with ProcessEmissionParam
- - override further with NodeEmissionParam
+  // pull ProcessFlow.Result
+  p_flow = SELECT * FROM ProcessFlow where ProcessID = @ProcessID
 
- - get dissipation flows (ProcessDissipation.EmissionFactor)
- - override with ProcessDissipationParam.Value
- - override further with NodeDissipationParam.Value
- - lookup FlowFlowProperty.MeanValue
- - override with CompositionParam.Value
+  // override with ProcessEmissionParam:
+  p_flow = applyParam( process_flow, ScenarioID, ProcessEmissionParam,
+  	   	       ProcessFlowID, Result );
 
- - compute Result = EmissionFactor * MeanValue
- - override ProcessFlow.Result where non-null
+  // override further with NodeEmissionParam
+  p_flow = applyNodeParam( process_flow, ScenarioID, FragmentFlowID,
+  	   		   NodeEmissionParam, ProcessFlowID, Result );
 
- - return inventory result (ProcessFlow table)
+  if 0
+  { 
+    // hold off on this until later
+    - get dissipation flows (ProcessDissipation.EmissionFactor)
+    - override with ProcessDissipationParam.Value
+    - override further with NodeDissipationParam.Value
+    - lookup FlowFlowProperty.MeanValue
+    - override with CompositionParam.Value
+
+    - compute Result = EmissionFactor * MeanValue
+    - override ProcessFlow.Result where non-null
+  {
+
+  return p_flow;
 }
 
 lcia = ComputeProcessLCIA( inventory, ScenarioID, LCIAMethodID )
