@@ -1,0 +1,1187 @@
+[
+  {
+    "FlowPropertyID":40,
+    "Name":"Price",
+    "ReferenceUnitName":"EUR"
+  },
+  {
+    "FlowPropertyID":43,
+    "Name":"Market price US97",
+    "ReferenceUnitName":"EUR"
+  },
+  {
+    "FlowPropertyID":36,
+    "Name":"Avoided Product",
+    "ReferenceUnitName":"kg-Av"
+  },
+  {
+    "FlowPropertyID":138,
+    "Name":"Potentially Not Occuring Number of plant species in terrestrial ecosystems * time",
+    "ReferenceUnitName":"Items*a"
+  },
+  {
+    "FlowPropertyID":155,
+    "Name":"Potentially Disappeared Number of freshwater species * time",
+    "ReferenceUnitName":"Items*a"
+  },
+  {
+    "FlowPropertyID":160,
+    "Name":"Potentially Disappeared Number of terrestrial species * time",
+    "ReferenceUnitName":"Items*a"
+  },
+  {
+    "FlowPropertyID":229,
+    "Name":"Potentially Disappeared Number of plant species in terrestrial ecosystems * time",
+    "ReferenceUnitName":"Items*a"
+  },
+  {
+    "FlowPropertyID":25,
+    "Name":"Standard volume",
+    "ReferenceUnitName":"Nm3"
+  },
+  {
+    "FlowPropertyID":13,
+    "Name":"Displaced Energy",
+    "ReferenceUnitName":"MJ-D"
+  },
+  {
+    "FlowPropertyID":12,
+    "Name":"Coproduct",
+    "ReferenceUnitName":"kgP"
+  },
+  {
+    "FlowPropertyID":15,
+    "Name":"kgkm",
+    "ReferenceUnitName":"kgkm"
+  },
+  {
+    "FlowPropertyID":9,
+    "Name":"Groundwater Replenishment (Occ.)",
+    "ReferenceUnitName":"mm*m2"
+  },
+  {
+    "FlowPropertyID":32,
+    "Name":"Groundwater Replenishment Indicator (GWR (Occ.))",
+    "ReferenceUnitName":"mm*m2"
+  },
+  {
+    "FlowPropertyID":7,
+    "Name":"Physicochemical Filtration Indicator (PCF (Transf.))",
+    "ReferenceUnitName":"(cmol*m2)/kg"
+  },
+  {
+    "FlowPropertyID":35,
+    "Name":"Physicochemical Filtration (Transf.)",
+    "ReferenceUnitName":"(cmol*m2)/kg"
+  },
+  {
+    "FlowPropertyID":37,
+    "Name":"Ecoinvent quantity ton kilometer (tkm)",
+    "ReferenceUnitName":"tkm"
+  },
+  {
+    "FlowPropertyID":34,
+    "Name":"Erosion Resistance (Occ.)",
+    "ReferenceUnitName":"kg"
+  },
+  {
+    "FlowPropertyID":50,
+    "Name":"Erosion Resistance Indicator (ER (Occ.))",
+    "ReferenceUnitName":"kg"
+  },
+  {
+    "FlowPropertyID":72,
+    "Name":"Vehicle transport",
+    "ReferenceUnitName":"Items*km"
+  },
+  {
+    "FlowPropertyID":172,
+    "Name":"Masse",
+    "ReferenceUnitName":"kg*a"
+  },
+  {
+    "FlowPropertyID":44,
+    "Name":"Mechanical Filtration Indicator (MF (Occ.))",
+    "ReferenceUnitName":"cm*m3"
+  },
+  {
+    "FlowPropertyID":46,
+    "Name":"Mechanical Filtration (Occ.)",
+    "ReferenceUnitName":"cm*m3"
+  },
+  {
+    "FlowPropertyID":221,
+    "Name":"Comparative Toxic Unit for human (CTUh)",
+    "ReferenceUnitName":"Item(s)"
+  },
+  {
+    "FlowPropertyID":51,
+    "Name":"Ecoinvent quantity cubic meter years (m3a)",
+    "ReferenceUnitName":"m3a"
+  },
+  {
+    "FlowPropertyID":10,
+    "Name":"Land Occupation Indicator",
+    "ReferenceUnitName":"sqm*a"
+  },
+  {
+    "FlowPropertyID":47,
+    "Name":"Land Transformation Indicator",
+    "ReferenceUnitName":"sqm"
+  },
+  {
+    "FlowPropertyID":16,
+    "Name":"Length",
+    "ReferenceUnitName":"m"
+  },
+  {
+    "FlowPropertyID":4,
+    "Name":"Erosion Resistance (Transf.)",
+    "ReferenceUnitName":"kg/a"
+  },
+  {
+    "FlowPropertyID":45,
+    "Name":"Erosion Resistance Indicator (ER (Transf.))",
+    "ReferenceUnitName":"kg/a"
+  },
+  {
+    "FlowPropertyID":1,
+    "Name":"Number of pieces",
+    "ReferenceUnitName":"pcs."
+  },
+  {
+    "FlowPropertyID":54,
+    "Name":"Energy ren. (gross calorific value)",
+    "ReferenceUnitName":"MJ"
+  },
+  {
+    "FlowPropertyID":77,
+    "Name":"Energy renewable and non renewable (gross calorific value)",
+    "ReferenceUnitName":"MJ"
+  },
+  {
+    "FlowPropertyID":162,
+    "Name":"Energy renewable and non renewable (net calorific value)",
+    "ReferenceUnitName":"MJ"
+  },
+  {
+    "FlowPropertyID":224,
+    "Name":"Methane content (volume)",
+    "ReferenceUnitName":"m3"
+  },
+  {
+    "FlowPropertyID":100,
+    "Name":"Volume*time",
+    "ReferenceUnitName":"m3*a"
+  },
+  {
+    "FlowPropertyID":128,
+    "Name":"Comparative Toxic Unit for ecosystems (CTUe) * volume * time",
+    "ReferenceUnitName":"m3*a"
+  },
+  {
+    "FlowPropertyID":55,
+    "Name":"Iodine content",
+    "ReferenceUnitName":"kg"
+  },
+  {
+    "FlowPropertyID":56,
+    "Name":"Lead content",
+    "ReferenceUnitName":"kg"
+  },
+  {
+    "FlowPropertyID":58,
+    "Name":"Germanium content",
+    "ReferenceUnitName":"kg"
+  },
+  {
+    "FlowPropertyID":59,
+    "Name":"Nitrogen content (mass)",
+    "ReferenceUnitName":"kg"
+  },
+  {
+    "FlowPropertyID":60,
+    "Name":"Mass Sb-equivalents",
+    "ReferenceUnitName":"kg"
+  },
+  {
+    "FlowPropertyID":61,
+    "Name":"Copper content",
+    "ReferenceUnitName":"kg"
+  },
+  {
+    "FlowPropertyID":62,
+    "Name":"Cerium content",
+    "ReferenceUnitName":"kg"
+  },
+  {
+    "FlowPropertyID":63,
+    "Name":"Ytterbium content",
+    "ReferenceUnitName":"kg"
+  },
+  {
+    "FlowPropertyID":64,
+    "Name":"Rhenium content",
+    "ReferenceUnitName":"kg"
+  },
+  {
+    "FlowPropertyID":65,
+    "Name":"Tin content",
+    "ReferenceUnitName":"kg"
+  },
+  {
+    "FlowPropertyID":70,
+    "Name":"Indium content",
+    "ReferenceUnitName":"kg"
+  },
+  {
+    "FlowPropertyID":73,
+    "Name":"Argon content (mass)",
+    "ReferenceUnitName":"kg"
+  },
+  {
+    "FlowPropertyID":74,
+    "Name":"Thulium content",
+    "ReferenceUnitName":"kg"
+  },
+  {
+    "FlowPropertyID":76,
+    "Name":"EDIP 1997",
+    "ReferenceUnitName":" Water (fresh)"
+  },
+  {
+    "FlowPropertyID":78,
+    "Name":"EI99",
+    "ReferenceUnitName":" EA"
+  },
+  {
+    "FlowPropertyID":79,
+    "Name":"Zirconium content",
+    "ReferenceUnitName":"kg"
+  },
+  {
+    "FlowPropertyID":80,
+    "Name":"Thorium content",
+    "ReferenceUnitName":"kg"
+  },
+  {
+    "FlowPropertyID":81,
+    "Name":"Mercury content",
+    "ReferenceUnitName":"kg"
+  },
+  {
+    "FlowPropertyID":83,
+    "Name":"Titanium content",
+    "ReferenceUnitName":"kg"
+  },
+  {
+    "FlowPropertyID":85,
+    "Name":"Radium content",
+    "ReferenceUnitName":"kg"
+  },
+  {
+    "FlowPropertyID":86,
+    "Name":"Yttrium content",
+    "ReferenceUnitName":"kg"
+  },
+  {
+    "FlowPropertyID":87,
+    "Name":"EDIP 1997",
+    "ReferenceUnitName":" Nuclear waste"
+  },
+  {
+    "FlowPropertyID":91,
+    "Name":"Tantalum content",
+    "ReferenceUnitName":"kg"
+  },
+  {
+    "FlowPropertyID":93,
+    "Name":"Mass C2H4-equivalents",
+    "ReferenceUnitName":"kg"
+  },
+  {
+    "FlowPropertyID":97,
+    "Name":"Holmium content",
+    "ReferenceUnitName":"kg"
+  },
+  {
+    "FlowPropertyID":99,
+    "Name":"Antimony content",
+    "ReferenceUnitName":"kg"
+  },
+  {
+    "FlowPropertyID":102,
+    "Name":"Fluorine content (mass)",
+    "ReferenceUnitName":"kg"
+  },
+  {
+    "FlowPropertyID":106,
+    "Name":"Recycled content (mass)",
+    "ReferenceUnitName":"kg"
+  },
+  {
+    "FlowPropertyID":108,
+    "Name":"Mass U235-equivalents",
+    "ReferenceUnitName":"kg"
+  },
+  {
+    "FlowPropertyID":109,
+    "Name":"Mass P-equivalents",
+    "ReferenceUnitName":"kg"
+  },
+  {
+    "FlowPropertyID":110,
+    "Name":"Manganese content",
+    "ReferenceUnitName":"kg"
+  },
+  {
+    "FlowPropertyID":111,
+    "Name":"Ruthenium content",
+    "ReferenceUnitName":"kg"
+  },
+  {
+    "FlowPropertyID":112,
+    "Name":"Barium content",
+    "ReferenceUnitName":"kg"
+  },
+  {
+    "FlowPropertyID":113,
+    "Name":"Silicon content",
+    "ReferenceUnitName":"kg"
+  },
+  {
+    "FlowPropertyID":115,
+    "Name":"Silver content",
+    "ReferenceUnitName":"kg"
+  },
+  {
+    "FlowPropertyID":116,
+    "Name":"Carbon content (biogenic)",
+    "ReferenceUnitName":"kg"
+  },
+  {
+    "FlowPropertyID":117,
+    "Name":"Carbon content (fossil)",
+    "ReferenceUnitName":"kg"
+  },
+  {
+    "FlowPropertyID":120,
+    "Name":"Potassium content",
+    "ReferenceUnitName":"kg"
+  },
+  {
+    "FlowPropertyID":121,
+    "Name":"Caesium content",
+    "ReferenceUnitName":"kg"
+  },
+  {
+    "FlowPropertyID":122,
+    "Name":"Phosphorus content",
+    "ReferenceUnitName":"kg"
+  },
+  {
+    "FlowPropertyID":126,
+    "Name":"Mass deficit of Soil Organic Carbon",
+    "ReferenceUnitName":"kg"
+  },
+  {
+    "FlowPropertyID":129,
+    "Name":"Selenium content",
+    "ReferenceUnitName":"kg"
+  },
+  {
+    "FlowPropertyID":131,
+    "Name":"Radon content",
+    "ReferenceUnitName":"kg"
+  },
+  {
+    "FlowPropertyID":132,
+    "Name":"Calcium content",
+    "ReferenceUnitName":"kg"
+  },
+  {
+    "FlowPropertyID":133,
+    "Name":"Boron content",
+    "ReferenceUnitName":"kg"
+  },
+  {
+    "FlowPropertyID":134,
+    "Name":"Osmium content",
+    "ReferenceUnitName":"kg"
+  },
+  {
+    "FlowPropertyID":135,
+    "Name":"Zinc content",
+    "ReferenceUnitName":"kg"
+  },
+  {
+    "FlowPropertyID":137,
+    "Name":"Vanadium content",
+    "ReferenceUnitName":"kg"
+  },
+  {
+    "FlowPropertyID":139,
+    "Name":"Mass CO2-equivalents",
+    "ReferenceUnitName":"kg"
+  },
+  {
+    "FlowPropertyID":140,
+    "Name":"Krypton content (mass)",
+    "ReferenceUnitName":"kg"
+  },
+  {
+    "FlowPropertyID":141,
+    "Name":"Lanthanum content",
+    "ReferenceUnitName":"kg"
+  },
+  {
+    "FlowPropertyID":142,
+    "Name":"Water content (mass)",
+    "ReferenceUnitName":"kg"
+  },
+  {
+    "FlowPropertyID":144,
+    "Name":"Tungsten content",
+    "ReferenceUnitName":"kg"
+  },
+  {
+    "FlowPropertyID":145,
+    "Name":"Bismuth content",
+    "ReferenceUnitName":"kg"
+  },
+  {
+    "FlowPropertyID":146,
+    "Name":"Beryllium content",
+    "ReferenceUnitName":"kg"
+  },
+  {
+    "FlowPropertyID":147,
+    "Name":"Xenon content",
+    "ReferenceUnitName":"kg"
+  },
+  {
+    "FlowPropertyID":148,
+    "Name":"Lithium content",
+    "ReferenceUnitName":"kg"
+  },
+  {
+    "FlowPropertyID":149,
+    "Name":"Scarcity adjusted mass of water used",
+    "ReferenceUnitName":"kg"
+  },
+  {
+    "FlowPropertyID":152,
+    "Name":"Molybdenum content",
+    "ReferenceUnitName":"kg"
+  },
+  {
+    "FlowPropertyID":153,
+    "Name":"Terbium content",
+    "ReferenceUnitName":"kg"
+  },
+  {
+    "FlowPropertyID":156,
+    "Name":"Chlorine content (mass)",
+    "ReferenceUnitName":"kg"
+  },
+  {
+    "FlowPropertyID":157,
+    "Name":"Iridium content",
+    "ReferenceUnitName":"kg"
+  },
+  {
+    "FlowPropertyID":159,
+    "Name":"Platinum content",
+    "ReferenceUnitName":"kg"
+  },
+  {
+    "FlowPropertyID":161,
+    "Name":"Iron content",
+    "ReferenceUnitName":"kg"
+  },
+  {
+    "FlowPropertyID":165,
+    "Name":"Strontium content",
+    "ReferenceUnitName":"kg"
+  },
+  {
+    "FlowPropertyID":167,
+    "Name":"Oxygen content (mass)",
+    "ReferenceUnitName":"kg"
+  },
+  {
+    "FlowPropertyID":168,
+    "Name":"Palladium content",
+    "ReferenceUnitName":"kg"
+  },
+  {
+    "FlowPropertyID":169,
+    "Name":"Gallium content",
+    "ReferenceUnitName":"kg"
+  },
+  {
+    "FlowPropertyID":170,
+    "Name":"Cobalt content",
+    "ReferenceUnitName":"kg"
+  },
+  {
+    "FlowPropertyID":171,
+    "Name":"Helium content (mass)",
+    "ReferenceUnitName":"kg"
+  },
+  {
+    "FlowPropertyID":173,
+    "Name":"Praseodym content",
+    "ReferenceUnitName":"kg"
+  },
+  {
+    "FlowPropertyID":175,
+    "Name":"Sulfur content",
+    "ReferenceUnitName":"kg"
+  },
+  {
+    "FlowPropertyID":176,
+    "Name":"Thallium content",
+    "ReferenceUnitName":"kg"
+  },
+  {
+    "FlowPropertyID":177,
+    "Name":"Uranium content",
+    "ReferenceUnitName":"kg"
+  },
+  {
+    "FlowPropertyID":178,
+    "Name":"EI99",
+    "ReferenceUnitName":" HA"
+  },
+  {
+    "FlowPropertyID":180,
+    "Name":"EI99",
+    "ReferenceUnitName":" IA"
+  },
+  {
+    "FlowPropertyID":181,
+    "Name":"Magnesium content",
+    "ReferenceUnitName":"kg"
+  },
+  {
+    "FlowPropertyID":182,
+    "Name":"Europium content",
+    "ReferenceUnitName":"kg"
+  },
+  {
+    "FlowPropertyID":184,
+    "Name":"Mass N-equivalents",
+    "ReferenceUnitName":"kg"
+  },
+  {
+    "FlowPropertyID":187,
+    "Name":"Mass CFC11-equivalents",
+    "ReferenceUnitName":"kg"
+  },
+  {
+    "FlowPropertyID":189,
+    "Name":"Mass PM2.5-equivalents",
+    "ReferenceUnitName":"kg"
+  },
+  {
+    "FlowPropertyID":190,
+    "Name":"Arsenic content",
+    "ReferenceUnitName":"kg"
+  },
+  {
+    "FlowPropertyID":194,
+    "Name":"EDIP 1997",
+    "ReferenceUnitName":" Hazardous waste"
+  },
+  {
+    "FlowPropertyID":196,
+    "Name":"Proactinium content",
+    "ReferenceUnitName":"kg"
+  },
+  {
+    "FlowPropertyID":198,
+    "Name":"Bromine content",
+    "ReferenceUnitName":"kg"
+  },
+  {
+    "FlowPropertyID":199,
+    "Name":"Neodymium content",
+    "ReferenceUnitName":"kg"
+  },
+  {
+    "FlowPropertyID":200,
+    "Name":"Lutetium content",
+    "ReferenceUnitName":"kg"
+  },
+  {
+    "FlowPropertyID":201,
+    "Name":"EDIP 1997",
+    "ReferenceUnitName":" Slag and ashes"
+  },
+  {
+    "FlowPropertyID":202,
+    "Name":"Aluminium content",
+    "ReferenceUnitName":"kg"
+  },
+  {
+    "FlowPropertyID":203,
+    "Name":"Niobium content",
+    "ReferenceUnitName":"kg"
+  },
+  {
+    "FlowPropertyID":204,
+    "Name":"Neon content (mass)",
+    "ReferenceUnitName":"kg"
+  },
+  {
+    "FlowPropertyID":206,
+    "Name":"Cadmium content",
+    "ReferenceUnitName":"kg"
+  },
+  {
+    "FlowPropertyID":207,
+    "Name":"Scandium content",
+    "ReferenceUnitName":"kg"
+  },
+  {
+    "FlowPropertyID":208,
+    "Name":"Rhodium content",
+    "ReferenceUnitName":"kg"
+  },
+  {
+    "FlowPropertyID":210,
+    "Name":"Sodium content",
+    "ReferenceUnitName":"kg"
+  },
+  {
+    "FlowPropertyID":211,
+    "Name":"Gadolinium content",
+    "ReferenceUnitName":"kg"
+  },
+  {
+    "FlowPropertyID":212,
+    "Name":"Samarium content",
+    "ReferenceUnitName":"kg"
+  },
+  {
+    "FlowPropertyID":213,
+    "Name":"Erbium content",
+    "ReferenceUnitName":"kg"
+  },
+  {
+    "FlowPropertyID":214,
+    "Name":"EDIP 1997",
+    "ReferenceUnitName":" Gypsum"
+  },
+  {
+    "FlowPropertyID":217,
+    "Name":"Tellurium content",
+    "ReferenceUnitName":"kg"
+  },
+  {
+    "FlowPropertyID":218,
+    "Name":"Chromium content",
+    "ReferenceUnitName":"kg"
+  },
+  {
+    "FlowPropertyID":219,
+    "Name":"Nickel content",
+    "ReferenceUnitName":"kg"
+  },
+  {
+    "FlowPropertyID":220,
+    "Name":"Hydrogen content (mass)",
+    "ReferenceUnitName":"kg"
+  },
+  {
+    "FlowPropertyID":226,
+    "Name":"Gold content",
+    "ReferenceUnitName":"kg"
+  },
+  {
+    "FlowPropertyID":228,
+    "Name":"Carbon content",
+    "ReferenceUnitName":"kg"
+  },
+  {
+    "FlowPropertyID":231,
+    "Name":"EDIP 1997",
+    "ReferenceUnitName":" Bulk waste"
+  },
+  {
+    "FlowPropertyID":232,
+    "Name":"Hydrocarbon content (new)",
+    "ReferenceUnitName":"kg"
+  },
+  {
+    "FlowPropertyID":233,
+    "Name":"Phenanthrene content (new)",
+    "ReferenceUnitName":"kg"
+  },
+  {
+    "FlowPropertyID":234,
+    "Name":"Polychlorinated biphenyl content (new)",
+    "ReferenceUnitName":"kg"
+  },
+  {
+    "FlowPropertyID":235,
+    "Name":"Polycyclic aromatic hydrocarbon content (new)",
+    "ReferenceUnitName":"kg"
+  },
+  {
+    "FlowPropertyID":236,
+    "Name":"Ash content (new)",
+    "ReferenceUnitName":"kg"
+  },
+  {
+    "FlowPropertyID":237,
+    "Name":"Glycols content (new)",
+    "ReferenceUnitName":"kg"
+  },
+  {
+    "FlowPropertyID":238,
+    "Name":"Halogens content (new)",
+    "ReferenceUnitName":"kg"
+  },
+  {
+    "FlowPropertyID":18,
+    "Name":"Avoided Energy",
+    "ReferenceUnitName":"MJ-Av"
+  },
+  {
+    "FlowPropertyID":41,
+    "Name":"Displaced Product",
+    "ReferenceUnitName":"kgD"
+  },
+  {
+    "FlowPropertyID":11,
+    "Name":"Groundwater Replenishment (Transf.)",
+    "ReferenceUnitName":"(mm*m2)/a"
+  },
+  {
+    "FlowPropertyID":14,
+    "Name":"Groundwater Replenishment Indicator (GWR Transf.))",
+    "ReferenceUnitName":"(mm*m2)/a"
+  },
+  {
+    "FlowPropertyID":3,
+    "Name":"Physicochemical Filtration Indicator (PCF (Occ.))",
+    "ReferenceUnitName":"(cmol*m2*a)/kg"
+  },
+  {
+    "FlowPropertyID":22,
+    "Name":"Physicochemical Filtration (Occ.)",
+    "ReferenceUnitName":"(cmol*m2*a)/kg"
+  },
+  {
+    "FlowPropertyID":6,
+    "Name":"Biotic Production (Occ.)",
+    "ReferenceUnitName":"kg"
+  },
+  {
+    "FlowPropertyID":21,
+    "Name":"Biotic Production Indicator (BP (Occ.))",
+    "ReferenceUnitName":"kg"
+  },
+  {
+    "FlowPropertyID":5,
+    "Name":"Criteria Pollutants",
+    "ReferenceUnitName":"kg"
+  },
+  {
+    "FlowPropertyID":17,
+    "Name":"Indium (E)",
+    "ReferenceUnitName":"kg"
+  },
+  {
+    "FlowPropertyID":19,
+    "Name":"Other fuels and auxiliary means (unspecified)",
+    "ReferenceUnitName":"kg"
+  },
+  {
+    "FlowPropertyID":20,
+    "Name":"C_wt",
+    "ReferenceUnitName":"kg"
+  },
+  {
+    "FlowPropertyID":23,
+    "Name":"Mass",
+    "ReferenceUnitName":"kg"
+  },
+  {
+    "FlowPropertyID":33,
+    "Name":"Lubricants (unspecified)",
+    "ReferenceUnitName":"kg"
+  },
+  {
+    "FlowPropertyID":38,
+    "Name":"Water_wt",
+    "ReferenceUnitName":"kg"
+  },
+  {
+    "FlowPropertyID":39,
+    "Name":"Fuels (unspecified)",
+    "ReferenceUnitName":"kg"
+  },
+  {
+    "FlowPropertyID":49,
+    "Name":"Mass Fraction",
+    "ReferenceUnitName":"kg"
+  },
+  {
+    "FlowPropertyID":53,
+    "Name":"Other materials and material compounds (unspecified)",
+    "ReferenceUnitName":"kg"
+  },
+  {
+    "FlowPropertyID":42,
+    "Name":"Duration",
+    "ReferenceUnitName":"a"
+  },
+  {
+    "FlowPropertyID":75,
+    "Name":"Disability Adjusted Life Years (DALY)",
+    "ReferenceUnitName":"a"
+  },
+  {
+    "FlowPropertyID":28,
+    "Name":"Area",
+    "ReferenceUnitName":"sqm"
+  },
+  {
+    "FlowPropertyID":48,
+    "Name":"Biotic Production Indicator (BP (Transf.))",
+    "ReferenceUnitName":"kg/a"
+  },
+  {
+    "FlowPropertyID":52,
+    "Name":"Biotic Production (Transf.)",
+    "ReferenceUnitName":"kg/a"
+  },
+  {
+    "FlowPropertyID":30,
+    "Name":"Volume",
+    "ReferenceUnitName":"m3"
+  },
+  {
+    "FlowPropertyID":119,
+    "Name":"Marginal increase of costs",
+    "ReferenceUnitName":"EUR"
+  },
+  {
+    "FlowPropertyID":24,
+    "Name":"Energy (net calorific value)",
+    "ReferenceUnitName":"MJ"
+  },
+  {
+    "FlowPropertyID":26,
+    "Name":"Energy (gross calorific value)",
+    "ReferenceUnitName":"MJ"
+  },
+  {
+    "FlowPropertyID":27,
+    "Name":"Activity",
+    "ReferenceUnitName":"Bq"
+  },
+  {
+    "FlowPropertyID":29,
+    "Name":"Areatime",
+    "ReferenceUnitName":"m2*yr"
+  },
+  {
+    "FlowPropertyID":104,
+    "Name":"Moles H+-equivalents",
+    "ReferenceUnitName":"mol"
+  },
+  {
+    "FlowPropertyID":158,
+    "Name":"Moles N-equivalents",
+    "ReferenceUnitName":"mol"
+  },
+  {
+    "FlowPropertyID":2,
+    "Name":"Mechanical Filtration (Transf.)",
+    "ReferenceUnitName":"cm*m2/d"
+  },
+  {
+    "FlowPropertyID":8,
+    "Name":"Mechanical Filtration Indicator (MF (Transf.))",
+    "ReferenceUnitName":"cm*m2/d"
+  },
+  {
+    "FlowPropertyID":31,
+    "Name":"Imputed Mass",
+    "ReferenceUnitName":"kg-Im"
+  },
+  {
+    "FlowPropertyID":105,
+    "Name":"CML2001 - Dec. 07",
+    "ReferenceUnitName":" Photochem. Ozone Creation Potential (POCP)"
+  },
+  {
+    "FlowPropertyID":96,
+    "Name":"ReCiPe Endpoint (H) - Marine ecotoxicity",
+    "ReferenceUnitName":"species.yr"
+  },
+  {
+    "FlowPropertyID":151,
+    "Name":"ReCiPe 1.07 Endpoint (H) - Freshwater ecotoxicity",
+    "ReferenceUnitName":"species.yr"
+  },
+  {
+    "FlowPropertyID":154,
+    "Name":"ReCiPe 1.07 Endpoint (H) - Terrestrial ecotoxicity",
+    "ReferenceUnitName":"species.yr"
+  },
+  {
+    "FlowPropertyID":174,
+    "Name":"ReCiPe Endpoint (H) - Freshwater ecotoxicity",
+    "ReferenceUnitName":"species.yr"
+  },
+  {
+    "FlowPropertyID":205,
+    "Name":"ReCiPe Endpoint (H) - Terrestrial ecotoxicity",
+    "ReferenceUnitName":"species.yr"
+  },
+  {
+    "FlowPropertyID":216,
+    "Name":"ReCiPe 1.07 Endpoint (H) - Marine ecotoxicity",
+    "ReferenceUnitName":"species.yr"
+  },
+  {
+    "FlowPropertyID":94,
+    "Name":"TRACI",
+    "ReferenceUnitName":" Human Health Non Cancer Water"
+  },
+  {
+    "FlowPropertyID":179,
+    "Name":"CML2001 - Dec. 07",
+    "ReferenceUnitName":" Global Warming Potential (GWP 100 years)"
+  },
+  {
+    "FlowPropertyID":123,
+    "Name":"TRACI 2.0",
+    "ReferenceUnitName":" Human Health Non Cancer Water"
+  },
+  {
+    "FlowPropertyID":150,
+    "Name":"TRACI 2.0",
+    "ReferenceUnitName":" Human Health Cancer Water"
+  },
+  {
+    "FlowPropertyID":127,
+    "Name":"TRACI 2.1",
+    "ReferenceUnitName":" Ecotoxicity (recommended)"
+  },
+  {
+    "FlowPropertyID":225,
+    "Name":"USEtox",
+    "ReferenceUnitName":" Ecotoxicity (recommended)"
+  },
+  {
+    "FlowPropertyID":68,
+    "Name":"CML2001 - Dec. 07",
+    "ReferenceUnitName":" Marine Aquatic Ecotoxicity Pot. (MAETP inf.)"
+  },
+  {
+    "FlowPropertyID":84,
+    "Name":"CML2001",
+    "ReferenceUnitName":" Freshwater Aquatic Ecotoxicity Pot. (FAETP inf.)"
+  },
+  {
+    "FlowPropertyID":89,
+    "Name":"CML2001 - Nov. 2010",
+    "ReferenceUnitName":" Freshwater Aquatic Ecotoxicity Pot. (FAETP inf.)"
+  },
+  {
+    "FlowPropertyID":90,
+    "Name":"CML2001 - Nov. 2010",
+    "ReferenceUnitName":" Marine Aquatic Ecotoxicity Pot. (MAETP inf.)"
+  },
+  {
+    "FlowPropertyID":103,
+    "Name":"CML2001 - Nov. 09",
+    "ReferenceUnitName":" Marine Aquatic Ecotoxicity Pot. (MAETP inf.)"
+  },
+  {
+    "FlowPropertyID":125,
+    "Name":"CML2001 - Nov. 09",
+    "ReferenceUnitName":" Freshwater Aquatic Ecotoxicity Pot. (FAETP inf.)"
+  },
+  {
+    "FlowPropertyID":130,
+    "Name":"CML2001 - Dec. 07",
+    "ReferenceUnitName":" Freshwater Aquatic Ecotoxicity Pot. (FAETP inf.)"
+  },
+  {
+    "FlowPropertyID":183,
+    "Name":"CML2001",
+    "ReferenceUnitName":" Marine Aquatic Ecotoxicity Pot. (MAETP inf.)"
+  },
+  {
+    "FlowPropertyID":188,
+    "Name":"ReCiPe Endpoint (H) - Human toxicity",
+    "ReferenceUnitName":"DALY"
+  },
+  {
+    "FlowPropertyID":230,
+    "Name":"ReCiPe 1.07 Endpoint (H) - Human toxicity",
+    "ReferenceUnitName":"DALY"
+  },
+  {
+    "FlowPropertyID":164,
+    "Name":"CML2001 - Dec. 07",
+    "ReferenceUnitName":" Abiotic Depletion (ADP)"
+  },
+  {
+    "FlowPropertyID":98,
+    "Name":"ReCiPe 1.07 Midpoint (H) - Human toxicity",
+    "ReferenceUnitName":"kg 1"
+  },
+  {
+    "FlowPropertyID":193,
+    "Name":"ReCiPe Midpoint (H) - Human toxicity",
+    "ReferenceUnitName":"kg 1"
+  },
+  {
+    "FlowPropertyID":209,
+    "Name":"CML2001 - Dec. 07",
+    "ReferenceUnitName":" Eutrophication Potential (EP)"
+  },
+  {
+    "FlowPropertyID":124,
+    "Name":"CML2001 - Dec. 07",
+    "ReferenceUnitName":" Ozone Layer Depletion Potential (ODP"
+  },
+  {
+    "FlowPropertyID":192,
+    "Name":"EDIP 1997",
+    "ReferenceUnitName":" Human toxicity water"
+  },
+  {
+    "FlowPropertyID":223,
+    "Name":"I02+ v2.1 - Aquatic ecotoxicity - Midpoint",
+    "ReferenceUnitName":"kg TEG-Eq. to water"
+  },
+  {
+    "FlowPropertyID":71,
+    "Name":"TRACI",
+    "ReferenceUnitName":" Ecotoxcity Water"
+  },
+  {
+    "FlowPropertyID":227,
+    "Name":"I02+ v2.1 - Terrestrial ecotoxicity - Midpoint",
+    "ReferenceUnitName":"kg TEG-Eq. to soil"
+  },
+  {
+    "FlowPropertyID":107,
+    "Name":"ReCiPe 1.07 Midpoint (H) - Freshwater ecotoxicity",
+    "ReferenceUnitName":"kg 1"
+  },
+  {
+    "FlowPropertyID":222,
+    "Name":"ReCiPe Midpoint (H) - Freshwater ecotoxicity",
+    "ReferenceUnitName":"kg 1"
+  },
+  {
+    "FlowPropertyID":95,
+    "Name":"ReCiPe 1.07 Midpoint (H) - Terrestrial ecotoxicity",
+    "ReferenceUnitName":"kg 1"
+  },
+  {
+    "FlowPropertyID":191,
+    "Name":"ReCiPe Midpoint (H) - Terrestrial ecotoxicity",
+    "ReferenceUnitName":"kg 1"
+  },
+  {
+    "FlowPropertyID":163,
+    "Name":"I02+ v2.1 - Non-carcinogens - Midpoint",
+    "ReferenceUnitName":"kg C2H3Cl-Eq. to air"
+  },
+  {
+    "FlowPropertyID":195,
+    "Name":"CML2001 - Dec. 07",
+    "ReferenceUnitName":" Acidification Potential (AP)"
+  },
+  {
+    "FlowPropertyID":67,
+    "Name":"CML2001 - Dec. 07",
+    "ReferenceUnitName":" Human Toxicity Potential (HTP inf.)"
+  },
+  {
+    "FlowPropertyID":136,
+    "Name":"CML2001 - Nov. 09",
+    "ReferenceUnitName":" Human Toxicity Potential (HTP inf.)"
+  },
+  {
+    "FlowPropertyID":166,
+    "Name":"CML2001 - Nov. 2010",
+    "ReferenceUnitName":" Human Toxicity Potential (HTP inf.)"
+  },
+  {
+    "FlowPropertyID":215,
+    "Name":"CML2001",
+    "ReferenceUnitName":" Human Toxicity Potential (HTP inf.)"
+  },
+  {
+    "FlowPropertyID":88,
+    "Name":"TRACI 2.0",
+    "ReferenceUnitName":" Ecotoxicity Water"
+  },
+  {
+    "FlowPropertyID":101,
+    "Name":"USEtox",
+    "ReferenceUnitName":" Human toxicity"
+  },
+  {
+    "FlowPropertyID":114,
+    "Name":"TRACI 2.1",
+    "ReferenceUnitName":" Human toxicity"
+  },
+  {
+    "FlowPropertyID":118,
+    "Name":"TRACI 2.1",
+    "ReferenceUnitName":" Human toxicity"
+  },
+  {
+    "FlowPropertyID":197,
+    "Name":"USEtox",
+    "ReferenceUnitName":" Human toxicity"
+  },
+  {
+    "FlowPropertyID":66,
+    "Name":"CML2001",
+    "ReferenceUnitName":" Terrestric Ecotoxicity Potential (TETP inf.)"
+  },
+  {
+    "FlowPropertyID":69,
+    "Name":"CML2001 - Nov. 2010",
+    "ReferenceUnitName":" Terrestric Ecotoxicity Potential (TETP inf.)"
+  },
+  {
+    "FlowPropertyID":82,
+    "Name":"CML2001 - Nov. 09",
+    "ReferenceUnitName":" Terrestric Ecotoxicity Potential (TETP inf.)"
+  },
+  {
+    "FlowPropertyID":92,
+    "Name":"CML2001 - Dec. 07",
+    "ReferenceUnitName":" Terrestric Ecotoxicity Potential (TETP inf.)"
+  },
+  {
+    "FlowPropertyID":57,
+    "Name":"ReCiPe Midpoint (H) - Marine ecotoxicity",
+    "ReferenceUnitName":"kg 1"
+  },
+  {
+    "FlowPropertyID":143,
+    "Name":"ReCiPe 1.07 Midpoint (H) - Marine ecotoxicity",
+    "ReferenceUnitName":"kg 1"
+  },
+  {
+    "FlowPropertyID":186,
+    "Name":"I02+ v2.1 - Carcinogens - Midpoint",
+    "ReferenceUnitName":"kg C2H3Cl-Eq. to air"
+  }
+]
