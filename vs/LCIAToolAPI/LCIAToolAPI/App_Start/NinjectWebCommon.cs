@@ -83,6 +83,7 @@ namespace LCAToolAPI.App_Start
             kernel.Bind<IFragmentTraversal>().To<FragmentTraversal>();
             kernel.Bind<IScenarioParamService>().To<ScenarioParamService>();
             kernel.Bind<IParamService>().To<ParamService>();
+            kernel.Bind<IFlowFlowPropertyService>().To<FlowFlowPropertyService>();
         }
 
         public static void RegisterNinject(HttpConfiguration configuration)

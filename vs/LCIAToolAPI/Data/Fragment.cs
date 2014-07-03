@@ -11,9 +11,9 @@ namespace Data
     {
         public Fragment()
         {
-        //    FragmentFlows = new HashSet<FragmentFlow>();
-        //    FragmentNodeFragments = new HashSet<FragmentNodeFragment>();
-        //    FragmentStages = new HashSet<FragmentStage>();
+            FragmentFlows = new HashSet<FragmentFlow>();
+            FragmentNodeFragments = new HashSet<FragmentNodeFragment>();
+            FragmentStages = new HashSet<FragmentStage>();
         }
 
         [DatabaseGenerated(DatabaseGeneratedOption.None)]
@@ -28,12 +28,12 @@ namespace Data
 
         public virtual FragmentFlow FragmentFlow { get; set; }
 
-        //public virtual ILCDEntity ILCDEntity { get; set; }
+        public virtual ILCDEntity ILCDEntity { get; set; }
 
         public virtual ICollection<FragmentFlow> FragmentFlows { get; set; }
 
         public virtual ICollection<FragmentNodeFragment> FragmentNodeFragments { get; set; }
 
-        //public virtual ICollection<FragmentStage> FragmentStages { get; set; }
+        public virtual ICollection<FragmentStage> FragmentStages { get; set; }
     }
 }

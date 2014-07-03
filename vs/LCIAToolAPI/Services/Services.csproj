@@ -129,8 +129,9 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Class1.cs" />
     <Compile Include="DependencyParamService.cs" />
+    <Compile Include="FlowFlowPropertyService.cs" />
+    <Compile Include="FlowPropertyParamService.cs" />
     <Compile Include="FlowService.cs" />
     <Compile Include="FragmentFlowService.cs" />
     <Compile Include="FragmentService.cs" />
@@ -138,6 +139,7 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="IDependencyParamService.cs" />
+    <Compile Include="IFlowFlowPropertyService.cs" />
     <Compile Include="IFlowService.cs" />
     <Compile Include="IFragmentFlowService.cs" />
     <Compile Include="IFragmentService.cs" />

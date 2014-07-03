@@ -20,12 +20,15 @@ namespace Services
         private readonly IScenarioParamService _scenarioParamService;
         [Inject]
         private readonly IParamService _paramService;
+        [Inject]
+        private readonly IFlowFlowPropertyService _flowFlowPropertyService;
+
         int fragmentId = 1;
 
         public FragmentTraversal(IFragmentFlowService fragmentFlowService,
             IDependencyParamService dependencyParamService,
             IScenarioParamService scenarioParamService,
-            IParamService paramService)
+            IParamService paramService, IFlowFlowPropertyService flowFlowPropertyService)
         {
             if (fragmentFlowService == null)
             {
@@ -55,6 +58,13 @@ namespace Services
 
             _paramService = paramService;
 
+            if (flowFlowPropertyService == null)
+            {
+                throw new ArgumentNullException("flowFlowPropertyService is null");
+            }
+
+            _flowFlowPropertyService = flowFlowPropertyService;
+
 
         }
 
@@ -79,7 +89,7 @@ namespace Services
            .Join(dependencyParams, ppc => ppc.pc.ParamID, c => c.ParamID, (ppc, c) => new { ppc, c })
            .Select(m => new DependencyParam
            {
-               ParamID = m.ppc.p.ParamID, // or m.ppc.pc.ProdId
+               ParamID = m.ppc.p.ParamID,
                FragmentFlowID = m.c.FragmentFlowID,
                Value = m.c.Value
            }).ToList();
@@ -159,6 +169,44 @@ namespace Services
 
         }
 
-        
+        public IEnumerable<FlowPropertyParamModel> ApplyFlowPropertyParam(int scenarioId = 0)
+        {
+
+            //get fragment flows by fragmentId
+            var fragmentFlows = _fragmentFlowService.Query().Filter(q => q.FragmentID == fragmentId).Get().ToList();
+
+            //get flow flow Properties
+            var flowFlowProperties = _flowFlowPropertyService.Query().Get().ToList();
+
+             //get params - can't name it params as it's a reserved word
+            var parameters = _paramService.Query().Get().ToList();
+
+            //get scenario params by id
+            var scenarioParams = _scenarioParamService.Query().Filter(q => q.ScenarioID == scenarioId).Get().ToList();
+
+            // first, determine the correct FlowFlowPropertyID
+            var query = fragmentFlows
+           .Join(flowFlowProperties, p => p.FlowID, pc => pc.FlowID, (p, pc) => new { p, pc })
+           .Where(p => p.p.ReferenceFlowPropertyID == p.pc.FlowPropertyID)
+           .Select(m => new FlowPropertyParamModel
+           {
+               FragmentFlowID = m.p.FragmentFlowID,
+               FragmentID = m.p.FragmentID,
+               Name = m.p.Name,
+               FragmentStageID = m.p.FragmentStageID ?? 0,
+               ReferenceFlowPropertyID = m.p.ReferenceFlowPropertyID,
+               NodeTypeID = m.p.NodeTypeID,
+               FlowID = m.p.FlowID,
+               DirectionID = m.p.DirectionID,
+               Quantity = m.p.Quantity,
+               ParentFragmentFlowID = m.p.ParentFragmentFlowID,
+               MeanValue = (m.pc.MeanValue == null ? 0 : m.pc.MeanValue)
+           }).AsEnumerable();
+
+            return query;
+
+
+
+        }
     }
 }

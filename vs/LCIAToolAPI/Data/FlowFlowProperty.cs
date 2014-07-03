@@ -33,5 +33,7 @@ namespace Data
         public virtual Flow Flow { get; set; }
 
         public virtual ICollection<FlowPropertyParam> FlowPropertyParams { get; set; }
+
+        public virtual FlowProperty FlowProperty { get; set; }
     }
 }

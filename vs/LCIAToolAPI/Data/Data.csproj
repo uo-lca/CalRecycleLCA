@@ -164,6 +164,11 @@
     <Compile Include="IndicatorType.cs" />
     <Compile Include="LCIA.cs" />
     <Compile Include="LCIAMethod.cs" />
+    <Compile Include="Migrations\201407032003394_InitialCreate.cs" />
+    <Compile Include="Migrations\201407032003394_InitialCreate.Designer.cs">
+      <DependentUpon>201407032003394_InitialCreate.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="NodeCache.cs" />
     <Compile Include="NodeDissipationParam.cs" />
     <Compile Include="NodeEmissionParam.cs" />
@@ -196,7 +201,11 @@
     </None>
     <None Include="packages.config" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <EmbeddedResource Include="Migrations\201407032003394_InitialCreate.resx">
+      <DependentUpon>201407032003394_InitialCreate.cs</DependentUpon>
+    </EmbeddedResource>
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
     <PreBuildEvent>if exist "$(TargetPath).locked" del "$(TargetPath).locked"

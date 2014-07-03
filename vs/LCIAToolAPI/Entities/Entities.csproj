@@ -130,6 +130,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Models\DependencyParamModel.cs" />
+    <Compile Include="Models\FlowPropertyParamModel.cs" />
     <Compile Include="Models\FragmentTraversalModel.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

@@ -11,5 +11,6 @@ namespace Services
     public interface IFragmentTraversal
     {
         IEnumerable<DependencyParamModel> ApplyDependencyParam(int scenarioId = 0);
+        IEnumerable<FlowPropertyParamModel> ApplyFlowPropertyParam(int scenarioId = 0);
     }
 }

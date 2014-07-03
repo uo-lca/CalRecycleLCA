@@ -12,6 +12,7 @@ namespace Data
         public FlowProperty()
         {
             Flows = new HashSet<Flow>();
+            FlowFlowProperties = new HashSet<FlowFlowProperty>();
             FlowPropertyEmissions = new HashSet<FlowPropertyEmission>();
             FragmentFlows = new HashSet<FragmentFlow>();
             LCIAMethods = new HashSet<LCIAMethod>();
@@ -27,6 +28,8 @@ namespace Data
         public int? ILCDEntityID { get; set; }
 
         public virtual ICollection<Flow> Flows { get; set; }
+
+        public virtual ICollection<FlowFlowProperty> FlowFlowProperties { get; set; }
 
         public virtual ILCDEntity ILCDEntity { get; set; }
 
