@@ -5,7 +5,7 @@
 /*global d3, window, console, Spinner */
 
 var LCA = {
-    baseURI: "http://kbcalr.isber.ucsb.edu/api/",
+    baseURI: "http://publictest.calrecycle.ca.gov/lciatool/api/",
     testDataFolder: "TestData/",
     loadedData: [],
     spinner: null
@@ -27,6 +27,7 @@ LCA.init = function (callback) {
     //        callback.call();
     //    }
     //});
+
     callback.call();
 };
 
@@ -68,7 +69,7 @@ LCA.startSpinner = function startSpinner(tgtElementId) {
  */
 LCA.loadData = function (resourceName, useTestData, callback) {
    
-    if (resourceName in LCA.loadedData && LCA.loadedData[resourceName].length > 0) {
+    if (resourceName in LCA.loadedData) {
         callback.call();
         return false;
     }
@@ -81,6 +82,7 @@ LCA.loadData = function (resourceName, useTestData, callback) {
         if (error) {
             window.alert("Error executing GET on " + jsonURL);
             console.error(error);
+            LCA.loadedData[resourceName] = null;
         } else {
             LCA.loadedData[resourceName] = jsonData;
         }
