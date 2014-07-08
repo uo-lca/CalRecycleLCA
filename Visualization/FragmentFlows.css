@@ -1,0 +1,13 @@
+
+
+.node rect {
+    cursor: pointer;
+  fill-opacity: .9;
+  shape-rendering: crispEdges;
+}
+
+.node text {
+  text-shadow: 0 1px 0 #fff;
+}
+
+

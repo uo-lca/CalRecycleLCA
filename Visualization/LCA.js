@@ -93,6 +93,39 @@ LCA.loadData = function (resourceName, useTestData, callback) {
 
 /**
  * Prepare select element. Load with data and initialize selection
+ * @param {Array}  objects          Array of objects with ID and Name
+ * @param {String} selectID         SELECT HTML element id
+ * @param {String} oidName          Property name of object ID field.
+ * @param {function} changeHandler  Function for handling selection update.
+ * @param {Number} initialValue     Default value (selected object ID).
+ */
+LCA.loadSelectionList = function (objects, selectID, oidName, changeHandler, initialValue) {
+
+    objects.sort(LCA.compareNames);
+
+    var selectOptions = d3.select(selectID)
+        .on("change", changeHandler)
+        .selectAll("option")
+        .data(objects)
+        .enter()
+        .append("option")
+        .attr("value", function (d) {
+            return d[oidName];
+        })
+        .text(function (d) {
+            return d.Name;
+        });
+    //
+    // Initialize selection
+    //
+    selectOptions.filter(function (d) {
+        return d[oidName] === initialValue;
+    })
+        .attr("selected", true);
+};
+
+/**
+ * Prepare select element. Load with data and initialize selection
  * @param {String} jsonURL          URL for JSON data (web API endpoint or file)
  * @param {String} selectID         SELECT HTML element id
  * @param {String} oidName          Property name of object ID field.

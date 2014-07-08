@@ -28,10 +28,12 @@ function FragmentFlows() {
      * sankey variables
      */
     var sankey = d3.sankey()
-        .nodeWidth(15)
+        .nodeWidth(30)
         .nodePadding(10)
         .size([width, height]),
         graph = {};
+    var selectedFlowPropertyID = 0,
+        fragFlowFlowProperties = [];
 
     /**
      * Initial preparation of svg element.
@@ -46,9 +48,28 @@ function FragmentFlows() {
     }
 
     /**
+     * Update links in sankey diagram with data related to selected flow property
+     */
+    function updateLinks() {
+        var updatedLinks = graph.links.map(function (link) {
+            link.value = 1;
+            fragFlowFlowProperties.forEach(function (ffp) {
+                if (ffp.FlowPropertyID === selectedFlowPropertyID && ffp.FlowID === link.id) {
+                    link.value = 2;
+                }
+            });
+            return link;
+        });
+        graph.links = updatedLinks;
+        sankey.links(graph.links).layout();
+
+        svg.selectAll(".link")
+          .data(graph.links);
+    }
+
+    /**
      * Create or refresh sankey diagram with graph data
      */
-
     function updateSankey() {
 
         var link, node, bars,
@@ -82,19 +103,7 @@ function FragmentFlows() {
             .attr("class", "node")
             .attr("transform", function (d) {
                 return "translate(" + d.x + "," + d.y + ")";
-            })
-            .call(d3.behavior.drag()
-                .origin(function (d) {
-                    return d;
-                })
-                .on("dragstart", function () {
-                    this.parentNode.appendChild(this);
-                })
-                .on("drag", function dragmove(d) {
-                    d3.select(this).attr("transform", "translate(" + d.x + "," + (d.y = Math.max(0, Math.min(height - d.dy, d3.event.y))) + ")");
-                    sankey.relayout();
-                    link.attr("d", path);
-                }));
+            });
 
         bars = node.append("rect")
             .attr("height", function (d) {
@@ -111,23 +120,10 @@ function FragmentFlows() {
                 return d3.rgb(d.color).darker(2);
             });
 
-        //node.append("text")
-        //    .attr("x", -6)
-        //    .attr("y", function (d) {
-        //        return d.dy / 2;
-        //    })
-        //    .attr("dy", ".35em")
-        //    .attr("text-anchor", "end")
-        //    .attr("transform", null)
-        //    .text(function (d) {
-        //        return d.label;
-        //    })
-        //    .filter(function (d) {
-        //        return d.x < width / 2;
-        //    })
-        //    .attr("x", 6 + sankey.nodeWidth())
-        //    .attr("text-anchor", "start");
-
+        node.append("title")
+            .text(function (d) {
+                return d.name;
+            });
     }
 
     /**
@@ -137,31 +133,50 @@ function FragmentFlows() {
         var positiveFlows = data.filter(function (f) {
             return (f.Quantity > 0);
         });
-        var nodeIndex = 0;
+        var nodeIndex = 0,
+            reverseIndex = []; // map FragmentFlowID to graph.nodes and graph.links
         graph.nodes = [];
         graph.links = [];
+
         // Create root node
         graph.nodes.push({
             id: 0,
+            name: "Root Node",
             type: 2
         });
+        reverseIndex[0] = { node: 0 };
         // Add a node for every flow
         positiveFlows.forEach(function (element) {
             var node = {
-                id: element.FragmentFlowID,
+                id: element.NodeID,
                 type: element.NodeTypeID
             };
-            graph.nodes.push(node);
+            // TODO : get process and fragment names
+            switch (element.NodeTypeID) {
+                case 1:
+                    node.name = "Process Node " + node.id;
+                    break;
+                case 2:
+                    node.name = "Fragment Node " + node.id;
+                    break;
+                case 3:
+                    node.name = "InputOutput Node";
+                    break;
+                case 4:
+                    node.name = "Background Node";
+                    break;
+                default:
+                    return "Invalid Node Type";
+            }
+            reverseIndex[element.FragmentFlowID] = { node: graph.nodes.push(node) - 1 };
         });
         // Add a link for every flow. source and target are indexes into nodes array.
         positiveFlows.forEach(function (element) {
             var link, parentIndex;
             ++nodeIndex;
-            for (parentIndex = 0;
-                parentIndex < graph.nodes.length && (element.ParentFragmentFlowID !== graph.nodes[parentIndex].id) ;
-                parentIndex++) {
-            }
+            parentIndex = reverseIndex[element.ParentFragmentFlowID].node;
             link = {
+                id: element.FlowID,
                 name: element.Name,
                 value: element.Quantity,
             };
@@ -191,16 +206,52 @@ function FragmentFlows() {
      * Callback function for data load.
      */
     function onDataLoaded() {
-        if (("flowproperties" in LCA.loadedData) && ("fragmentflows" in LCA.loadedData)) {
-            // All requests have been executed
-            if (LCA.spinner) {
-                LCA.spinner.stop();
-            }
-            if (LCA.loadedData.flowproperties !== null && LCA.loadedData.fragmentflows !== null) {
-                // All requests executed successfully
-                buildGraph(LCA.loadedData.fragmentflows);
-            } 
+        if (("flowproperties" in LCA.loadedData) 
+            && ("fragmentflows" in LCA.loadedData) 
+            && ("flowflowproperties" in LCA.loadedData)) {
+                // All requests have been executed
+                if (LCA.spinner) {
+                    LCA.spinner.stop();
+                }
+                if (LCA.loadedData.flowproperties !== null 
+                    && LCA.loadedData.fragmentflows !== null
+                    && LCA.loadedData.flowflowproperties !== null) {
+                    // All requests executed successfully
+                    prepareFragmentFlowPropertyList();
+                    buildGraph(LCA.loadedData.fragmentflows);
+                } 
         }
+    }
+
+    /**
+     * Change event handler for property type selection list.
+     * Triggers sankey link update
+     */
+    function onPropertyTypeChange() {
+        selectedFlowPropertyID = parseInt(this.options[this.selectedIndex].value);
+        updateLinks();
+    }
+
+    /**
+     * Populate flow property selection list with flow properties 
+     * related to flows in fragment.
+     */
+    function prepareFragmentFlowPropertyList() {
+        var fragFlowProperties = LCA.loadedData.flowproperties.filter(function (fp) {
+            var filteredFlowFlowProperties = LCA.loadedData.flowflowproperties.filter(function (ffp) {
+                var filteredFragmentFlows = LCA.loadedData.fragmentflows.filter(function (ff) {
+                    if (fp.FlowPropertyID === ffp.FlowPropertyID && ffp.FlowID === ff.FlowID) {
+                        fragFlowFlowProperties.push(ffp);
+                        return true;
+                    } else {
+                        return false;
+                    }
+                });
+                return (filteredFragmentFlows && filteredFragmentFlows.length > 0);
+            });
+            return (filteredFlowFlowProperties && filteredFlowFlowProperties.length > 0);
+        });
+        LCA.loadSelectionList(fragFlowProperties, "#ptSelect", "FlowPropertyID", onPropertyTypeChange, selectedFlowPropertyID);
     }
 
     /**
@@ -214,8 +265,7 @@ function FragmentFlows() {
         LCA.startSpinner("chartcontainer");
         LCA.loadData("flowproperties", true, onDataLoaded);
         LCA.loadData("fragmentflows", true, onDataLoaded);
-        //LCA.prepareSelect(processesURL, "#ptSelect", "ProcessID",
-        //    onProcessChange, selectedProcessID);
+        LCA.loadData("flowflowproperties", true, onDataLoaded);
     }
 
     LCA.init(init);
