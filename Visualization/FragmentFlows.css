@@ -1,5 +1,7 @@
 
-
+/**
+  * Override sankey style appropriate for movable nodes.
+  */
 .node rect {
     cursor: pointer;
   fill-opacity: .9;

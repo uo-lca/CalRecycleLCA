@@ -39,6 +39,7 @@ LCA.compareNames = function (a, b) {
 };
 
 LCA.startSpinner = function startSpinner(tgtElementId) {
+    
     var opts = {
         lines: 6, // The number of lines to draw
         length: 3, // The length of each line
@@ -54,8 +55,8 @@ LCA.startSpinner = function startSpinner(tgtElementId) {
         hwaccel: false, // Whether to use hardware acceleration
         className: 'spinner', // The CSS class to assign to the spinner
         zIndex: 2e9, // The z-index (defaults to 2000000000)
-        top: 'auto', // Top position relative to parent in px
-        left: 'auto' // Left position relative to parent in px
+        top: '50%', // Top position relative to parent in px
+        left: '50%' // Left position relative to parent in px
     },
     target = window.document.getElementById(tgtElementId);
     LCA.spinner = new Spinner(opts).spin(target);

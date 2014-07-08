@@ -32,7 +32,7 @@ function FragmentFlows() {
         .nodePadding(10)
         .size([width, height]),
         graph = {};
-    var selectedFlowPropertyID = 0,
+    var selectedFlowPropertyID = 23,
         fragFlowFlowProperties = [];
 
     /**
@@ -119,66 +119,88 @@ function FragmentFlows() {
             .style("stroke", function (d) {
                 return d3.rgb(d.color).darker(2);
             });
-
-        node.append("title")
+        node.append("text")
+            .attr("x", -6)
+            .attr("y", function (d) {
+                return d.dy / 2;
+            })
+            .attr("dy", ".35em")
+            .attr("text-anchor", "end")
+            .attr("transform", null)
             .text(function (d) {
                 return d.name;
-            });
+            })
+            .filter(function (d) {
+                return d.x < width / 2;
+            })
+            .attr("x", 6 + sankey.nodeWidth())
+            .attr("text-anchor", "start");
     }
 
     /**
      * Build graph from fragment flow data
      */
     function buildGraph(data) {
-        var positiveFlows = data.filter(function (f) {
-            return (f.Quantity > 0);
-        });
+        //var positiveFlows = data.filter(function (f) {
+        //    return (f.Quantity > 0);
+        //});
         var nodeIndex = 0,
-            reverseIndex = []; // map FragmentFlowID to graph.nodes and graph.links
+            reverseIndex = [], // map FragmentFlowID to graph.nodes and graph.links
+            relFlows = fragFlowFlowProperties.filter(function (ffp) {
+                return (ffp.FlowPropertyID === selectedFlowPropertyID);
+            }),
+            graphData = data.filter(function (ff) {
+                return relFlows.some(function (rf) {
+                    return (rf.FlowID === ff.FlowID);
+                });
+           });
+
         graph.nodes = [];
         graph.links = [];
 
         // Create root node
         graph.nodes.push({
             id: 0,
-            name: "Root Node",
+            name: "",
             type: 2
         });
         reverseIndex[0] = { node: 0 };
         // Add a node for every flow
-        positiveFlows.forEach(function (element) {
+        graphData.forEach(function (element) {
             var node = {
                 id: element.NodeID,
-                type: element.NodeTypeID
+                type: element.NodeTypeID,
+                name: element.Name
             };
             // TODO : get process and fragment names
-            switch (element.NodeTypeID) {
-                case 1:
-                    node.name = "Process Node " + node.id;
-                    break;
-                case 2:
-                    node.name = "Fragment Node " + node.id;
-                    break;
-                case 3:
-                    node.name = "InputOutput Node";
-                    break;
-                case 4:
-                    node.name = "Background Node";
-                    break;
-                default:
-                    return "Invalid Node Type";
-            }
+            //switch (element.NodeTypeID) {
+            //    case 1:
+            //        node.name = "Process Node " + node.id;
+            //        break;
+            //    case 2:
+            //        node.name = "Fragment Node " + node.id;
+            //        break;
+            //    case 3:
+            //        node.name = "InputOutput Node";
+            //        break;
+            //    case 4:
+            //        node.name = "Background Node";
+            //        break;
+            //    default:
+            //        return "Invalid Node Type";
+            //}
             reverseIndex[element.FragmentFlowID] = { node: graph.nodes.push(node) - 1 };
         });
+        
         // Add a link for every flow. source and target are indexes into nodes array.
-        positiveFlows.forEach(function (element) {
+        graphData.forEach(function (element) {
             var link, parentIndex;
             ++nodeIndex;
             parentIndex = reverseIndex[element.ParentFragmentFlowID].node;
             link = {
                 id: element.FlowID,
                 name: element.Name,
-                value: element.Quantity,
+                value: Math.abs(element.Quantity),
             };
             if (element.DirectionID === 1) {
                 link.source = nodeIndex;
@@ -210,9 +232,7 @@ function FragmentFlows() {
             && ("fragmentflows" in LCA.loadedData) 
             && ("flowflowproperties" in LCA.loadedData)) {
                 // All requests have been executed
-                if (LCA.spinner) {
-                    LCA.spinner.stop();
-                }
+                
                 if (LCA.loadedData.flowproperties !== null 
                     && LCA.loadedData.fragmentflows !== null
                     && LCA.loadedData.flowflowproperties !== null) {
@@ -220,6 +240,9 @@ function FragmentFlows() {
                     prepareFragmentFlowPropertyList();
                     buildGraph(LCA.loadedData.fragmentflows);
                 } 
+        }
+        if (LCA.spinner) {
+            LCA.spinner.stop();
         }
     }
 
@@ -229,7 +252,7 @@ function FragmentFlows() {
      */
     function onPropertyTypeChange() {
         selectedFlowPropertyID = parseInt(this.options[this.selectedIndex].value);
-        updateLinks();
+        //updateLinks();
     }
 
     /**
@@ -237,19 +260,16 @@ function FragmentFlows() {
      * related to flows in fragment.
      */
     function prepareFragmentFlowPropertyList() {
-        var fragFlowProperties = LCA.loadedData.flowproperties.filter(function (fp) {
-            var filteredFlowFlowProperties = LCA.loadedData.flowflowproperties.filter(function (ffp) {
-                var filteredFragmentFlows = LCA.loadedData.fragmentflows.filter(function (ff) {
-                    if (fp.FlowPropertyID === ffp.FlowPropertyID && ffp.FlowID === ff.FlowID) {
-                        fragFlowFlowProperties.push(ffp);
-                        return true;
-                    } else {
-                        return false;
-                    }
-                });
-                return (filteredFragmentFlows && filteredFragmentFlows.length > 0);
+        fragFlowFlowProperties = LCA.loadedData.flowflowproperties.filter(function (ffp) {
+            return LCA.loadedData.fragmentflows.some(function (ff) {
+                return (ffp.FlowID === ff.FlowID);
             });
-            return (filteredFlowFlowProperties && filteredFlowFlowProperties.length > 0);
+        });
+
+        var fragFlowProperties = LCA.loadedData.flowproperties.filter(function (fp) {
+            return fragFlowFlowProperties.some(function (ffp) {
+                return (fp.FlowPropertyID === ffp.FlowPropertyID); 
+            });
         });
         LCA.loadSelectionList(fragFlowProperties, "#ptSelect", "FlowPropertyID", onPropertyTypeChange, selectedFlowPropertyID);
     }
