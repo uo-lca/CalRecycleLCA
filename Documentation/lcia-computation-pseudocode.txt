@@ -64,6 +64,8 @@ Fragment.ComputeNodeScores( ScenarioID, ListOfLCIAMethods L )
       {
         for j in missing_L
 	{
+	  // match flow and direction => Background.Direction is given
+          // w.r.t. the foreground (i.e. electricity is an Input)
 	  bid = SELECT BackgroundID FROM B 
 	        WHERE B.FlowID = i.FlowID
 		  AND B.DirectionID = i.DirectionID

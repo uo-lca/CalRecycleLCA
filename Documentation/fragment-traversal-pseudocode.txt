@@ -21,7 +21,6 @@ Traverse(ScenarioID)
   myflows = applyParam ( myflows, ScenarioID, FlowPropertyParam,
   	    	       	 FlowFlowPropertyID, meanValue );
 
-  RootNode = ReferenceFlow.FragmentFlowID;
   float activity = 1;
   
   Ref_Flow = this.ReferenceFragmentFlowID; //
