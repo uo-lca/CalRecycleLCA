@@ -1,11 +1,11 @@
 [
-  {
+    {
     "FragmentFlowID":86,
     "Name":"Natural gas mix",
     "FlowID":779,
     "ReferenceFlowPropertyID":23,
     "NodeTypeID":1,
-    "DirectionID":2,
+    "DirectionID":1,
     "Quantity":1,
     "ParentFragmentFlowID":110,
     "NodeID":10
@@ -38,7 +38,7 @@
     "FlowID":874,
     "ReferenceFlowPropertyID":24,
     "NodeTypeID":1,
-    "DirectionID":2,
+    "DirectionID":1,
     "Quantity":49,
     "ParentFragmentFlowID":110,
     "NodeID":34
@@ -49,7 +49,7 @@
     "FlowID":635,
     "ReferenceFlowPropertyID":30,
     "NodeTypeID":1,
-    "DirectionID":2,
+    "DirectionID":1,
     "Quantity":1.360544,
     "ParentFragmentFlowID":110,
     "NodeID":126
@@ -126,7 +126,7 @@
     "FlowID":684,
     "ReferenceFlowPropertyID":24,
     "NodeTypeID":1,
-    "DirectionID":2,
+    "DirectionID":1,
     "Quantity":0.0002921652,
     "ParentFragmentFlowID":90,
     "NodeID":11
@@ -170,7 +170,7 @@
     "FlowID":698,
     "ReferenceFlowPropertyID":24,
     "NodeTypeID":1,
-    "DirectionID":2,
+    "DirectionID":1,
     "Quantity":0.0007330002,
     "ParentFragmentFlowID":90,
     "NodeID":2
@@ -203,7 +203,7 @@
     "FlowID":793,
     "ReferenceFlowPropertyID":24,
     "NodeTypeID":1,
-    "DirectionID":2,
+    "DirectionID":1,
     "Quantity":0.01421752,
     "ParentFragmentFlowID":90,
     "NodeID":6
@@ -236,7 +236,7 @@
     "FlowID":801,
     "ReferenceFlowPropertyID":24,
     "NodeTypeID":1,
-    "DirectionID":2,
+    "DirectionID":1,
     "Quantity":3.30416E-05,
     "ParentFragmentFlowID":90,
     "NodeID":8

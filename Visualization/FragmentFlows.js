@@ -73,7 +73,13 @@ function FragmentFlows() {
     function updateSankey() {
 
         var link, node, bars,
-            path = sankey.link();
+            path = sankey.link(),
+            // Set of FlowIDs related to current fragment and flow property 
+            flowSet = d3.set(fragFlowFlowProperties.filter(function (ffp) {
+                return (ffp.FlowPropertyID === selectedFlowPropertyID);
+            }).map(function (rf) {
+                return rf.FlowID;
+            }));
 
         svg.selectAll("g").remove();
         sankey.nodes(graph.nodes)
@@ -135,25 +141,25 @@ function FragmentFlows() {
             })
             .attr("x", 6 + sankey.nodeWidth())
             .attr("text-anchor", "start");
+        //
+        //  Change links for fragment flows not in flowSet
+        //  - display as thin dashed line.
+        //
+        link.filter(function(d) {
+            return (!flowSet.has(d.id));
+        })
+        .style("stroke-width", 1)
+        .style("stroke-dasharray", "5,5");
+   
     }
 
     /**
-     * Build graph from fragment flow data
+     * Build sankey graph from fragment flow data
+     * @param {Array}  data          fragment flow data
      */
     function buildGraph(data) {
-        //var positiveFlows = data.filter(function (f) {
-        //    return (f.Quantity > 0);
-        //});
         var nodeIndex = 0,
-            reverseIndex = [], // map FragmentFlowID to graph.nodes and graph.links
-            relFlows = fragFlowFlowProperties.filter(function (ffp) {
-                return (ffp.FlowPropertyID === selectedFlowPropertyID);
-            }),
-            graphData = data.filter(function (ff) {
-                return relFlows.some(function (rf) {
-                    return (rf.FlowID === ff.FlowID);
-                });
-           });
+            reverseIndex = []; // map FragmentFlowID to graph.nodes and graph.links
 
         graph.nodes = [];
         graph.links = [];
@@ -164,44 +170,27 @@ function FragmentFlows() {
             name: "",
             type: 2
         });
-        reverseIndex[0] = { node: 0 };
+        reverseIndex[0] = 0;
         // Add a node for every flow
-        graphData.forEach(function (element) {
+        data.forEach(function (element) {
             var node = {
                 id: element.NodeID,
                 type: element.NodeTypeID,
                 name: element.Name
             };
-            // TODO : get process and fragment names
-            //switch (element.NodeTypeID) {
-            //    case 1:
-            //        node.name = "Process Node " + node.id;
-            //        break;
-            //    case 2:
-            //        node.name = "Fragment Node " + node.id;
-            //        break;
-            //    case 3:
-            //        node.name = "InputOutput Node";
-            //        break;
-            //    case 4:
-            //        node.name = "Background Node";
-            //        break;
-            //    default:
-            //        return "Invalid Node Type";
-            //}
-            reverseIndex[element.FragmentFlowID] = { node: graph.nodes.push(node) - 1 };
+            reverseIndex[element.FragmentFlowID] = graph.nodes.push(node) - 1;
         });
         
         // Add a link for every flow. source and target are indexes into nodes array.
-        graphData.forEach(function (element) {
+        data.forEach(function (element) {
             var link, parentIndex;
             ++nodeIndex;
-            parentIndex = reverseIndex[element.ParentFragmentFlowID].node;
+            parentIndex = reverseIndex[element.ParentFragmentFlowID];
             link = {
                 id: element.FlowID,
                 name: element.Name,
-                value: Math.abs(element.Quantity),
-            };
+                value: Math.abs(element.Quantity)   // TODO : replace with NodeWeight when available
+           };
             if (element.DirectionID === 1) {
                 link.source = nodeIndex;
                 link.target = parentIndex;
@@ -215,15 +204,6 @@ function FragmentFlows() {
         updateSankey();
     }
 
-    ///**
-    // * Change event handler for process selection list.
-    // * Triggers LCIA computation update.
-    // */
-    //function onProcessChange() {
-    //    selectedProcessID = this.options[this.selectedIndex].value;
-    //    processName = this.options[this.selectedIndex].text;
-    //    displayResults();
-    //}
     /**
      * Callback function for data load.
      */
@@ -252,7 +232,7 @@ function FragmentFlows() {
      */
     function onPropertyTypeChange() {
         selectedFlowPropertyID = parseInt(this.options[this.selectedIndex].value);
-        //updateLinks();
+        buildGraph(LCA.loadedData.fragmentflows);
     }
 
     /**
