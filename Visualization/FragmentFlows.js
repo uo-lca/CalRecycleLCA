@@ -238,7 +238,7 @@ function FragmentFlows() {
         selectedFlowPropertyID = parseInt(this.options[this.selectedIndex].value);
         // IE does not display link style changes - need to recreate svg.
         // updateLinks();
-        buildGraph(LCA.loadedData.fragmentflows);
+        updateSankey();
     }
 
     /**
