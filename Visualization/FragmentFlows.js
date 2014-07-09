@@ -48,23 +48,27 @@ function FragmentFlows() {
     }
 
     /**
-     * Update links in sankey diagram with data related to selected flow property
+     * Update link appearance in sankey diagram.
+     * When the fragment flow does not have the selected flow property,
+     * draw a thin dashed line.
      */
-    function updateLinks() {
-        var updatedLinks = graph.links.map(function (link) {
-            link.value = 1;
-            fragFlowFlowProperties.forEach(function (ffp) {
-                if (ffp.FlowPropertyID === selectedFlowPropertyID && ffp.FlowID === link.id) {
-                    link.value = 2;
-                }
-            });
-            return link;
-        });
-        graph.links = updatedLinks;
-        sankey.links(graph.links).layout();
+    function updateLinks() {      
+        // Set of FlowIDs related to current fragment and flow property 
+        var flowSet = d3.set(fragFlowFlowProperties.filter(function (ffp) {
+                return (ffp.FlowPropertyID === selectedFlowPropertyID);
+            }).map(function (rf) {
+                return rf.FlowID;
+            }));
 
-        svg.selectAll(".link")
-          .data(graph.links);
+        var links = svg.selectAll(".link")
+          .style("stroke-width", function (d) {
+              return flowSet.has(d.id) ? Math.max(1, d.dy) : 1;
+          })
+          .style("stroke-dasharray", function (d) {
+              return flowSet.has(d.id) ? "0,0" : "5,5";
+          });
+        console.debug("Updated links...");
+        console.debug(links);
     }
 
     /**
@@ -232,6 +236,8 @@ function FragmentFlows() {
      */
     function onPropertyTypeChange() {
         selectedFlowPropertyID = parseInt(this.options[this.selectedIndex].value);
+        // IE does not display link style changes - need to recreate svg.
+        // updateLinks();
         buildGraph(LCA.loadedData.fragmentflows);
     }
 
