@@ -12,12 +12,15 @@ Traverse(ScenarioID)
 
   myflows = this.flows; // (I have no idea what language I'm writing)
     
-  myflows = applyDependencyParam ( myflows, ScenarioID );
-  
-  // fpflows now has an additional field from FlowFlowProperty.MeanValue
-  fpflows = applyFlowPropertyParam ( myflows, ScenarioID );
+  // Add on FlowFlowPropertyID
+  fpflows = lookupFlowProperty ( myflows )
 
-  RootNode = ReferenceFlow.FragmentFlowID;
+  myflows = applyParam ( myflows, ScenarioID, DependencyParam,
+  	    	         FragmentFlowID, Quantity );
+  
+  myflows = applyParam ( myflows, ScenarioID, FlowPropertyParam,
+  	    	       	 FlowFlowPropertyID, meanValue );
+
   float activity = 1;
   
   Ref_Flow = this.ReferenceFragmentFlowID; //
@@ -28,6 +31,25 @@ Traverse(ScenarioID)
 }
 
 
+fp_flows=lookupFlowProperty(flows)
+{
+  // This function returns an augmented flows table that includes
+  // a field containing the FlowFlowProperty record that
+  // matches both FlowID and FlowPropertyID in each flows record. Adds
+  // FlowFlowPropertyID and meanValue fields.
+
+  // first, determine the correct FlowFlowPropertyID
+  fp_flows = SELECT flows.*,
+  	     ffp.FlowFlowPropertyID,
+  	     ffp.meanValue
+	     FROM flows INNER JOIN FlowFlowProperty ffp
+  	     ON flows.FlowID = ffp.FlowID
+	     WHERE flows.FlowPropertyID = ffp.FlowPropertyID
+
+  return fp_flows;
+}
+
+/* ***************************************************************
 e=applyDependencyParam(flows,ScenarioID)
 {
   // This function returns modified flows table that contains
@@ -51,41 +73,71 @@ e=applyDependencyParam(flows,ScenarioID)
 
   return e;
 }
+****************************************************************** */
 
-fp_flows=applyFlowPropertyParam(flows,ScenarioID)
-{
-  // This function returns an augmented flows table that includes
-  // a field containing the FlowFlowProperty.MeanValue field that
-  // matches both FlowID and FlowPropertyID in each flows record.
-  // also applies scenario-specific flow property parameterization.
+e=applyParam(flows,ScenarioID,ParamTable,LookupField,ReplaceField)
+{ 
+  // This function returns modified flows table that contains
+  // scenario-specific parameterization for all relationships
+  //
+  // generic param override: on input table flows, find params belonging 
+  // to the named ParamTable; join on LookupField; replace ReplaceField
+  // with ParamTable.Value
+  //
+  // ParamTable is one of:
+  //  - DependencyParam
+  //  - FlowPropertyParam
+  //  - CompositionParam
+  //  - ProcessDissipationParam
+  //  - NodeDissipationParam
+  //  - ProcessEmissionParam
+  //  - NodeEmissionParam
+  //  - CharacterizationParam
 
-  // first, determine the correct FlowFlowPropertyID
-  fp_flows = SELECT flows.*,
-  	     ffp.MeanValue
-	     FROM flows INNER JOIN FlowFlowProperty ffp
-  	     ON flows.FlowID = ffp.FlowID
-	     WHERE flows.FlowPropertyID = ffp.FlowPropertyID
-  
-  // next, see if there are any relevant flow property params
   ParamList params = ScenarioParam.* WHERE ScenarioID = @ScenarioID
-  	    	     		     AND FragmentID = @FragmentID
-  fp_params = INNER JOIN params->Param->FlowPropertyParam // type 4
-  
-  // then attach the param values (if there are any) to fp_flows
-  fp_flows = SELECT fp_flows.*,
+  my_params = INNER JOIN params->Param->@ParamTable
+
+  // then attach the param values (if there are any) to flows
+  e = SELECT flows.*,
       	     fp_params.Value AS ParamValue,
-      	     FROM fp_flows 
+      	     FROM flows 
       	     LEFT OUTER JOIN fp_params 
-	     ON fp_flows.FlowFlowPropertyID = fp_params.FlowFlowPropertyID
-        
+	     ON flows.@LookupField = fp_params.@LookupField
+
   // take the param values as defaults:
-  UPDATE fp_flows.MeanValue with fp_flows.ParamValue 
-  	 where fp_flows.ParamValue is not null;
+  UPDATE e.@ReplaceField with e.ParamValue 
+  	 where e.ParamValue is not null;
 
   DROP field ParamValue; 
 
-  return fp_flows;
+  return e;
 }
+
+e=applyNodeParam(flows,ScenarioID,FragmentFlowID,ParamTable,LookupField,ReplaceField) 
+{ 
+  // this is just like applyParam, but has scope limited to a single node
+
+  ParamList params = ScenarioParam.* WHERE ScenarioID = @ScenarioID
+  my_params = INNER JOIN params->Param->@ParamTable
+  	      WHERE @ParamTable.FragmentFlowID = @FragmentFlowID
+
+  // then attach the param values (if there are any) to flows
+  e = SELECT flows.*,
+      	     fp_params.Value AS ParamValue,
+      	     FROM flows 
+      	     LEFT OUTER JOIN fp_params 
+	     ON flows.@LookupField = fp_params.@LookupField
+
+  // take the param values as defaults:
+  UPDATE e.@ReplaceField with e.ParamValue 
+  	 where e.ParamValue is not null;
+
+  DROP field ParamValue; 
+
+  return e;
+}
+
+
 
 
 Fragment.node_recurse(flows, ScenarioID, current_flow, activity)

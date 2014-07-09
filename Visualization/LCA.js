@@ -5,7 +5,7 @@
 /*global d3, window, console, Spinner */
 
 var LCA = {
-    baseURI: "http://kbcalr.isber.ucsb.edu/api/",
+    baseURI: "http://publictest.calrecycle.ca.gov/lciatool/api/",
     testDataFolder: "TestData/",
     loadedData: [],
     spinner: null
@@ -27,6 +27,7 @@ LCA.init = function (callback) {
     //        callback.call();
     //    }
     //});
+
     callback.call();
 };
 
@@ -38,6 +39,7 @@ LCA.compareNames = function (a, b) {
 };
 
 LCA.startSpinner = function startSpinner(tgtElementId) {
+    
     var opts = {
         lines: 6, // The number of lines to draw
         length: 3, // The length of each line
@@ -53,8 +55,8 @@ LCA.startSpinner = function startSpinner(tgtElementId) {
         hwaccel: false, // Whether to use hardware acceleration
         className: 'spinner', // The CSS class to assign to the spinner
         zIndex: 2e9, // The z-index (defaults to 2000000000)
-        top: 'auto', // Top position relative to parent in px
-        left: 'auto' // Left position relative to parent in px
+        top: '50%', // Top position relative to parent in px
+        left: '50%' // Left position relative to parent in px
     },
     target = window.document.getElementById(tgtElementId);
     LCA.spinner = new Spinner(opts).spin(target);
@@ -68,7 +70,7 @@ LCA.startSpinner = function startSpinner(tgtElementId) {
  */
 LCA.loadData = function (resourceName, useTestData, callback) {
    
-    if (resourceName in LCA.loadedData && LCA.loadedData[resourceName].length > 0) {
+    if (resourceName in LCA.loadedData) {
         callback.call();
         return false;
     }
@@ -81,12 +83,46 @@ LCA.loadData = function (resourceName, useTestData, callback) {
         if (error) {
             window.alert("Error executing GET on " + jsonURL);
             console.error(error);
+            LCA.loadedData[resourceName] = null;
         } else {
             LCA.loadedData[resourceName] = jsonData;
         }
         callback.call();
     });
     return true;
+};
+
+/**
+ * Prepare select element. Load with data and initialize selection
+ * @param {Array}  objects          Array of objects with ID and Name
+ * @param {String} selectID         SELECT HTML element id
+ * @param {String} oidName          Property name of object ID field.
+ * @param {function} changeHandler  Function for handling selection update.
+ * @param {Number} initialValue     Default value (selected object ID).
+ */
+LCA.loadSelectionList = function (objects, selectID, oidName, changeHandler, initialValue) {
+
+    objects.sort(LCA.compareNames);
+
+    var selectOptions = d3.select(selectID)
+        .on("change", changeHandler)
+        .selectAll("option")
+        .data(objects)
+        .enter()
+        .append("option")
+        .attr("value", function (d) {
+            return d[oidName];
+        })
+        .text(function (d) {
+            return d.Name;
+        });
+    //
+    // Initialize selection
+    //
+    selectOptions.filter(function (d) {
+        return d[oidName] === initialValue;
+    })
+        .attr("selected", true);
 };
 
 /**

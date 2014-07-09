@@ -19,7 +19,7 @@ ComputeBackground( ScenarioID, ListOfLCIAMethods L)
     {
       case 'Process'
       {
-	inventory = ComputeProcessLCI( bk.TargetID, ScenarioID );
+	inventory = ComputeProcessLCI( bk.TargetID, <null>, ScenarioID );
         for j in missing_L
 	{
 	  LCIA = ComputeProcessLCIA ( inventory, ScenarioID, j );

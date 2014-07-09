@@ -405,7 +405,7 @@ The following tables are required:
    Background - New Table ### PLEASE REVIEW
     * BackgroundID
     * FlowID
-    * DirectionID
+    * DirectionID (w.r.t. the foreground; i.e. Electricity is an Input)
     * NodeTypeID (only Process or Fragment allowed)
     * TargetID (NOT foreign key- interpret as ProcessID or FragmentID)
 
