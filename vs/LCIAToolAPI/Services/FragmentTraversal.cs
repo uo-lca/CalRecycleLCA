@@ -22,13 +22,34 @@ namespace Services
         private readonly IParamService _paramService;
         [Inject]
         private readonly IFlowFlowPropertyService _flowFlowPropertyService;
+        [Inject]
+        private readonly IFlowPropertyParamService _flowPropertyParamService;
+        [Inject]
+        private readonly IFragmentService _fragmentService;
+        [Inject]
+        private readonly IFlowService _flowService;
+        [Inject]
+        private readonly INodeCacheService _nodeCacheService;
+        [Inject]
+        private readonly IFragmentNodeFragmentService _fragmentNodeFragmentService;
 
-        int fragmentId = 1;
+        [Inject]
+        private readonly IService<Fragment> _service;
+
+        int fragmentId = 2;
+        double activity = 0;
 
         public FragmentTraversal(IFragmentFlowService fragmentFlowService,
             IDependencyParamService dependencyParamService,
             IScenarioParamService scenarioParamService,
-            IParamService paramService, IFlowFlowPropertyService flowFlowPropertyService)
+            IParamService paramService,
+            IFlowFlowPropertyService flowFlowPropertyService,
+            IFlowPropertyParamService flowPropertyParamService,
+            IFragmentService fragmentService,
+            IFlowService flowService,
+            INodeCacheService nodeCacheService,
+            IFragmentNodeFragmentService fragmentNodeFragmentService, 
+            IService<Fragment> service)
         {
             if (fragmentFlowService == null)
             {
@@ -65,6 +86,49 @@ namespace Services
 
             _flowFlowPropertyService = flowFlowPropertyService;
 
+            if (flowPropertyParamService == null)
+            {
+                throw new ArgumentNullException("flowPropertyParamService is null");
+            }
+
+            _flowPropertyParamService = flowPropertyParamService;
+
+            if (fragmentService == null)
+            {
+                throw new ArgumentNullException("fragmentService is null");
+            }
+
+            _fragmentService = fragmentService;
+
+            if (flowService == null)
+            {
+                throw new ArgumentNullException("flowService is null");
+            }
+
+            _flowService = flowService;
+
+            if (nodeCacheService == null)
+            {
+                throw new ArgumentNullException("nodeCacheService is null");
+            }
+
+            _nodeCacheService = nodeCacheService;
+
+            if (fragmentNodeFragmentService == null)
+            {
+                throw new ArgumentNullException("fragmentNodeFragmentService is null");
+            }
+
+            _fragmentNodeFragmentService = fragmentNodeFragmentService;
+        }
+
+        public void Traverse(int scenarioId = 0)
+        {
+
+            ApplyDependencyParam(scenarioId);
+            ApplyFlowPropertyParam(scenarioId);
+            refFlow();
+            NodeRecurse(scenarioId, refFlow(), activity);
 
         }
 
@@ -178,14 +242,14 @@ namespace Services
             //get flow flow Properties
             var flowFlowProperties = _flowFlowPropertyService.Query().Get().ToList();
 
-             //get params - can't name it params as it's a reserved word
+            //get params - can't name it params as it's a reserved word
             var parameters = _paramService.Query().Get().ToList();
 
             //get scenario params by id
             var scenarioParams = _scenarioParamService.Query().Filter(q => q.ScenarioID == scenarioId).Get().ToList();
 
             // first, determine the correct FlowFlowPropertyID
-            var query = fragmentFlows
+            var flowPropertyFlows = ApplyDependencyParam()
            .Join(flowFlowProperties, p => p.FlowID, pc => pc.FlowID, (p, pc) => new { p, pc })
            .Where(p => p.p.ReferenceFlowPropertyID == p.pc.FlowPropertyID)
            .Select(m => new FlowPropertyParamModel
@@ -195,6 +259,7 @@ namespace Services
                Name = m.p.Name,
                FragmentStageID = m.p.FragmentStageID ?? 0,
                ReferenceFlowPropertyID = m.p.ReferenceFlowPropertyID,
+               FlowFlowPropertyID = m.pc.FlowFlowPropertyID,
                NodeTypeID = m.p.NodeTypeID,
                FlowID = m.p.FlowID,
                DirectionID = m.p.DirectionID,
@@ -203,10 +268,127 @@ namespace Services
                MeanValue = (m.pc.MeanValue == null ? 0 : m.pc.MeanValue)
            }).AsEnumerable();
 
-            return query;
+            //return query;
 
+            //get flowPropertyParams
+            var flowPropertyParams = _flowPropertyParamService.Query().Get().ToList();
 
+            //get scenario specific params
+            var scenarioSpecific = scenarioParams
+           .Join(parameters, p => p.ParamID, pc => pc.ParamID, (p, pc) => new { p, pc })
+           .Join(flowPropertyParams, ppc => ppc.pc.ParamID, c => c.ParamID, (ppc, c) => new { ppc, c })
+           .Select(m => new FlowPropertyParam
+           {
+               ParamID = m.ppc.p.ParamID,
+               FlowPropertyParamID = m.c.FlowPropertyParamID,
+               FlowFlowPropertyID = m.c.FlowFlowPropertyID,
+               Value = m.c.Value
+           }).ToList();
+
+            // generate scenario-specific edge table.  The idea is that we use the
+            // edge weights specified in the default FragmentEdge table, unless they
+            // have been overridden by scenario params
+            var edges = flowPropertyFlows.GroupJoin(scenarioSpecific,
+            ff => ff.FlowFlowPropertyID,
+            dp => dp.FlowFlowPropertyID,
+            (ff, dp) =>
+                new { FragmentFlow = ff, FlowPropertyParam = dp.DefaultIfEmpty() })
+                    .SelectMany(a => a.FlowPropertyParam.
+                    Select(b => new FlowPropertyParamModel
+                    {
+                        FragmentFlowID = a.FragmentFlow.FragmentFlowID,
+                        FragmentID = a.FragmentFlow.FragmentID,
+                        Name = a.FragmentFlow.Name,
+                        FragmentStageID = a.FragmentFlow.FragmentStageID ?? 0,
+                        ReferenceFlowPropertyID = a.FragmentFlow.ReferenceFlowPropertyID,
+                        NodeTypeID = a.FragmentFlow.NodeTypeID,
+                        FlowID = a.FragmentFlow.FlowID,
+                        DirectionID = a.FragmentFlow.DirectionID,
+                        Quantity = a.FragmentFlow.Quantity,
+                        ParentFragmentFlowID = a.FragmentFlow.ParentFragmentFlowID,
+                        MeanValue = (b == null ? 0 : b.Value),
+                        FlowFlowPropertyID = a.FragmentFlow.FlowFlowPropertyID
+                    })).ToList();
+
+            //return result;
+
+            //take the param values as defaults:
+            var defaults = edges
+           .Where(p => p.MeanValue != 0);
+
+            //loop through list of edges and update quantity to value where a value is present for value 
+            foreach (var item in defaults)
+            {
+                item.Quantity = item.MeanValue;
+            }
+
+            edges.RemoveAll(p => p.MeanValue != 0);
+
+            //return updated list of edges
+            return edges
+               .Select(ic => new FlowPropertyParamModel
+               {
+                   FragmentFlowID = ic.FragmentFlowID,
+                   FragmentID = ic.FragmentID,
+                   Name = ic.Name,
+                   FragmentStageID = ic.FragmentStageID,
+                   ReferenceFlowPropertyID = ic.ReferenceFlowPropertyID,
+                   NodeTypeID = ic.NodeTypeID,
+                   FlowID = ic.FlowID,
+                   DirectionID = ic.DirectionID,
+                   Quantity = ic.Quantity,
+                   ParentFragmentFlowID = ic.ParentFragmentFlowID,
+                   MeanValue = ic.MeanValue,
+                   FlowFlowPropertyID = ic.FlowFlowPropertyID
+               })
+           .AsQueryable<FlowPropertyParamModel>();
 
         }
+
+        public int refFlow()
+        {
+            return Convert.ToInt32(_fragmentService.Query().Filter(q => q.FragmentID == fragmentId).Get().FirstOrDefault());
+        }
+
+        public void NodeRecurse(int scenarioId, int refFlow, double? activity)
+        {
+            var theflow = ApplyFlowPropertyParam().Where(q => q.ReferenceFlowPropertyID == refFlow).AsEnumerable();
+
+            var fragmentNodeFragment = _fragmentNodeFragmentService.Query().Get().AsQueryable();
+           
+            double? nodeWeight = theflow.Select(x => x.Quantity).FirstOrDefault();
+            double? nodeConv = theflow.Select(x => x.MeanValue).FirstOrDefault();
+            int? nodeTypeID = theflow.Select(x => x.NodeTypeID).FirstOrDefault();
+
+            activity = activity * nodeWeight * nodeConv;
+
+            NodeCache nodeCache = new NodeCache();
+            nodeCache.FragmentFlowID = refFlow;
+            nodeCache.ScenarioID = scenarioId;
+            nodeCache.NodeWeight = activity;
+
+            _nodeCacheService.Insert(nodeCache);
+
+            switch (nodeTypeID)
+            {
+                case 1: //process
+                    var dependencies = ApplyFlowPropertyParam().Where(q => q.ParentFragmentFlowID == refFlow);
+                    foreach (var item in dependencies)
+                    {
+                        NodeRecurse(scenarioId, item.FragmentFlowID, activity);
+                    }
+                    break;
+                case 2: //fragment
+                //waiting for some questions to be answered.  Looks like this might not have been updated when we got rid of the FragmentNode table 
+                     //var theNode = theflow.Join(fragmentNodeFragment, p => p., pc => pc.FragmentNodeFragmentID, (p, pc) => new { p, pc })
+                    break;
+                default:
+                    //Console.WriteLine("Default case");
+                    break;
+            }
+
+        }
+
+      
     }
 }

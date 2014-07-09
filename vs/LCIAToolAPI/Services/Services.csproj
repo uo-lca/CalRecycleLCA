@@ -134,23 +134,29 @@
     <Compile Include="FlowPropertyParamService.cs" />
     <Compile Include="FlowService.cs" />
     <Compile Include="FragmentFlowService.cs" />
+    <Compile Include="FragmentNodeFragmentService.cs" />
     <Compile Include="FragmentService.cs" />
     <Compile Include="FragmentTraversal.cs">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="HelperClasses\ApplyParam.cs" />
     <Compile Include="IDependencyParamService.cs" />
     <Compile Include="IFlowFlowPropertyService.cs" />
+    <Compile Include="IFlowPropertyParamService.cs" />
     <Compile Include="IFlowService.cs" />
     <Compile Include="IFragmentFlowService.cs" />
+    <Compile Include="IFragmentNodeFragmentService.cs" />
     <Compile Include="IFragmentService.cs" />
     <Compile Include="IFragmentTraversal.cs">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="INodeCacheService.cs" />
     <Compile Include="IParamService.cs" />
     <Compile Include="IScenarioParamService.cs">
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="IService.cs" />
+    <Compile Include="NodeCacheService.cs" />
     <Compile Include="ParamService.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="ScenarioParamService.cs">

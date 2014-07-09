@@ -29,5 +29,7 @@ namespace Entities.Models
         public int? ParentFragmentFlowID { get; set; }
 
         public double? MeanValue { get; set; }
+
+        public int? FlowFlowPropertyID { get; set; }
     }
 }
