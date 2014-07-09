@@ -190,10 +190,13 @@ Fragment.node_recurse(flows, ScenarioID, current_flow, activity)
       dependencies = MatchDependencies(flows,IOFlows); 
       */
 
+      // there's an outer join in here somewhere
+      UPDATE flows.Quantity with dependencies.Quantity 
+         WHERE flows.FragmentFlowID = dependencies.FragmentFlowID
 
       for i in dependencies
       { 
-        node_recurse(flows, ScenarioID, i.ParentFragmentFlowID, activity )
+        node_recurse(flows, ScenarioID, i.FragmentFlowID, activity )
       }
 
     }
