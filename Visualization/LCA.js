@@ -7,13 +7,29 @@
 var LCA = {
     baseURI: "http://publictest.calrecycle.ca.gov/lciatool/api/",
     testDataFolder: "TestData/",
-    loadedData: [],
-    spinner: null
+    loadedData: [],  // Data loaded via web API (or from TestData)
+    spinner: null,
+    indexedData: [], // Associative arrays of loaded data, ID -> data object
+    enumData: []     // Associative arrays of enum data, ID -> name
+};
+
+/**
+ * Create an associative array for enumerated data type (JavaScript has no enum type)
+ * Key for first value is 1 and is incremented by 1 for each of the subsequent values.
+ * @param {Array} values	Array of string values
+ * @return {Array} the associative array.
+ */
+LCA.createEnumData = function (values) {
+    var enumData = [];
+    for (var i=0; i < values.length; ++i) {
+        enumData[i+1] = values[i];
+    }
+    return enumData;
 };
 
 /**
  * Initialize LCA module object
- * @param {function} callback	Function to call after module is sucessfully initialized
+ * @param {function} callback	Function to call after module is successfully initialized
  */
 LCA.init = function (callback) {
     // Load configurable settings
@@ -27,6 +43,7 @@ LCA.init = function (callback) {
     //        callback.call();
     //    }
     //});
+    LCA.enumData.nodeTypes = LCA.createEnumData(["Process", "Fragment", "InputOutput", "Background"]);
 
     callback.call();
 };
@@ -60,6 +77,22 @@ LCA.startSpinner = function startSpinner(tgtElementId) {
     },
     target = window.document.getElementById(tgtElementId);
     LCA.spinner = new Spinner(opts).spin(target);
+};
+
+/**
+ * Create an associative array for loaded data.
+ * @param {String} resourceName	    Loaded data resource name
+ * @param {String} indexProperty    Data property to be used as key
+ */
+LCA.indexData = function (resourceName, indexProperty) {
+
+    if (resourceName in LCA.loadedData && LCA.loadedData[resourceName] !== null) {
+        var indexedData = [];
+        LCA.loadedData[resourceName].forEach( function(d) {
+            indexedData[+d[indexProperty]] = d;
+        });
+        LCA.indexedData[resourceName] = indexedData;
+    }
 };
 
 /**
