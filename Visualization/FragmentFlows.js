@@ -2,9 +2,14 @@
  * Fragment Flow visualization using sankey diagram
  */
 
+/* Reference paths for Visual Studio Intellisense */
+/// <reference path="LCA.js" />
+/// <reference path="d3.min.js" />
+/// <reference path="sankey.js" />
+
 function FragmentFlows() {
 
-    // library globals
+    // library globals - used to avoid jslint errors
     /*global d3, window, colorbrewer, LCA, console */
 
     // Current selections
@@ -79,12 +84,11 @@ function FragmentFlows() {
      */
     function getNodeName(ffData) {
         var nodeName = LCA.enumData.nodeTypes[ffData.NodeTypeID];
-        switch(+ffData.NodeTypeID) {
+        switch (ffData.NodeTypeID) {
             case 1:
                 if (ffData.NodeID in LCA.indexedData.process) {
                     nodeName = LCA.indexedData.process[ffData.NodeID].Name;
-                }
-                else {
+                } else {
                     console.error("FragmentNode ProcessID: " + ffData.NodeID + " not found.");
                     nodeName += ffData.NodeID;
                 }
@@ -92,8 +96,7 @@ function FragmentFlows() {
             case 2:
                 if (ffData.NodeID in LCA.indexedData.fragments) {
                     nodeName = LCA.indexedData.fragments[ffData.NodeID].Name;
-                }
-                else {
+                } else {
                     console.error("FragmentNode FragmentID: " + ffData.NodeID + " not found.");
                     nodeName +=  ffData.NodeID;
                 }
@@ -107,7 +110,7 @@ function FragmentFlows() {
      */
     function drawSankey() {
 
-        var link, node, bars,
+        var link, node,
             path = sankey.link(),
             // Set of FlowIDs related to current fragment and flow property 
             flowSet = d3.set(fragFlowFlowProperties.filter(function (ffp) {
@@ -179,7 +182,7 @@ function FragmentFlows() {
             .attr("text-anchor", "end")
             .attr("transform", null)
             .text(function (d) {
-                return d.fragmentFlowName;
+                return LCA.shortName(d.fragmentFlowName, 30);
             })
             .filter(function (d) {
                 return d.x < width / 2;

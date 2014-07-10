@@ -1,9 +1,11 @@
 /**
  * Shared module for Used Oil LCA Visualization
  */
-// library globals
+// global directives to JSLint
 /*global d3, window, console, Spinner */
-
+// reference directives to Visual Studio Intellisense
+/// <reference path="d3.min.js" />
+/// <reference path="spin.min.js" />
 var LCA = {
     baseURI: "http://publictest.calrecycle.ca.gov/lciatool/api/",
     testDataFolder: "TestData/",
@@ -21,8 +23,8 @@ var LCA = {
  */
 LCA.createEnumData = function (values) {
     var enumData = [];
-    for (var i=0; i < values.length; ++i) {
-        enumData[i+1] = values[i];
+    for (var i = 0; i < values.length; ++i) {
+        enumData[i + 1] = values[i];
     }
     return enumData;
 };
@@ -44,7 +46,7 @@ LCA.init = function (callback) {
     //    }
     //});
     LCA.enumData.nodeTypes = LCA.createEnumData(["Process", "Fragment", "InputOutput", "Background"]);
-
+    LCA.shortNameBreakChars = d3.set([",", "(", ".", ";"]);
     callback.call();
 };
 
@@ -88,10 +90,35 @@ LCA.indexData = function (resourceName, indexProperty) {
 
     if (resourceName in LCA.loadedData && LCA.loadedData[resourceName] !== null) {
         var indexedData = [];
-        LCA.loadedData[resourceName].forEach( function(d) {
+        LCA.loadedData[resourceName].forEach(function (d) {
             indexedData[+d[indexProperty]] = d;
         });
         LCA.indexedData[resourceName] = indexedData;
+    }
+};
+
+/**
+ * Shorten a name so that it does not exceed maximum length.
+ * Cut-off postion decided in the following order of preference
+ *  1. last position of character in shortNameBreakChars
+ *  2. last position of space char
+ *  3. max length
+ * 
+ * @param {String} name	    The name to be shortened.
+ * @param {String} maxLen   maximum length
+ * @return {String} shortened name
+ */
+LCA.shortName = function (name, maxLen) {
+    if (name.length > maxLen) {
+        var endIndex = - 1;
+        for (var i = maxLen - 1; i > 0 && endIndex === -1; --i) {
+            if (LCA.shortNameBreakChars.has(name.charAt(i))) endIndex = i;
+        }
+        if (endIndex === -1) endIndex = name.lastIndexOf(" ", maxLen -1);
+        if (endIndex === -1) endIndex = maxlen;
+        return name.slice(0, endIndex);
+    } else {
+        return name;
     }
 };
 
@@ -158,6 +185,7 @@ LCA.loadSelectionList = function (objects, selectID, oidName, changeHandler, ini
         .attr("selected", true);
 };
 
+// TODO : replace usage of following function with newer functions above
 /**
  * Prepare select element. Load with data and initialize selection
  * @param {String} jsonURL          URL for JSON data (web API endpoint or file)
