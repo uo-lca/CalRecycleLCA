@@ -115,7 +115,7 @@ LCA.shortName = function (name, maxLen) {
             if (LCA.shortNameBreakChars.has(name.charAt(i))) endIndex = i;
         }
         if (endIndex === -1) endIndex = name.lastIndexOf(" ", maxLen -1);
-        if (endIndex === -1) endIndex = maxlen;
+        if (endIndex === -1) endIndex = maxLen;
         return name.slice(0, endIndex);
     } else {
         return name;

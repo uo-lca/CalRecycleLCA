@@ -6,6 +6,7 @@
 /// <reference path="LCA.js" />
 /// <reference path="d3.min.js" />
 /// <reference path="sankey.js" />
+/// <reference path="d3-tip.js" />
 
 function FragmentFlows() {
 
@@ -15,7 +16,7 @@ function FragmentFlows() {
     // Current selections
     var selectedFragmentID = 2,
         fragmentName = "Natural Gas Supply Mixer";
-    
+
     // SVG margins
     var margin = {
         top: 10,
@@ -39,7 +40,8 @@ function FragmentFlows() {
         graph = {};
     var selectedFlowPropertyID = 23,
         fragFlowFlowProperties = [];
-    var apiResourceNames = ["fragments", "processes", "flowproperties", "fragmentflows", "flowflowproperties"];
+    var apiResourceNames = ["fragments", "processes", "flowproperties", "fragmentflows", "flowflowproperties"],
+        nodeTypes = [];
 
     /**
      * Initial preparation of svg element.
@@ -58,13 +60,13 @@ function FragmentFlows() {
      * When the fragment flow does not have the selected flow property,
      * draw a thin dashed line.
      */
-    function updateLinks() {      
+    function updateLinks() {
         // Set of FlowIDs related to current fragment and flow property 
         var flowSet = d3.set(fragFlowFlowProperties.filter(function (ffp) {
-                return (ffp.FlowPropertyID === selectedFlowPropertyID);
-            }).map(function (rf) {
-                return rf.FlowID;
-            }));
+            return (ffp.FlowPropertyID === selectedFlowPropertyID);
+        }).map(function (rf) {
+            return rf.FlowID;
+        }));
 
         var links = svg.selectAll(".link")
           .style("stroke-width", function (d) {
@@ -83,14 +85,14 @@ function FragmentFlows() {
      * @return {String} the name
      */
     function getNodeName(ffData) {
-        var nodeName = LCA.enumData.nodeTypes[ffData.NodeTypeID];
+        var nodeName = "";
         switch (ffData.NodeTypeID) {
             case 1:
                 if (ffData.NodeID in LCA.indexedData.processes) {
                     nodeName = LCA.indexedData.processes[ffData.NodeID].Name;
                 } else {
                     console.error("FragmentNode ProcessID: " + ffData.NodeID + " not found.");
-                    nodeName += ffData.NodeID;
+                    nodeName = nodeTypes[ffData.NodeTypeID] + ffData.NodeID.toString();
                 }
                 break;
             case 2:
@@ -98,7 +100,7 @@ function FragmentFlows() {
                     nodeName = LCA.indexedData.fragments[ffData.NodeID].Name;
                 } else {
                     console.error("FragmentNode FragmentID: " + ffData.NodeID + " not found.");
-                    nodeName +=  ffData.NodeID;
+                    nodeName = nodeTypes[ffData.NodeTypeID] + ffData.NodeID.toString();
                 }
                 break;
         }
@@ -118,6 +120,15 @@ function FragmentFlows() {
             }).map(function (rf) {
                 return rf.FlowID;
             }));
+        // Initialize tooltip plugin
+        var nodeTip = d3.tip()
+          .attr('class', 'd3-tip')
+          .direction('e')
+          .html(function (d) {
+              return "<strong>" + nodeTypes[d.nodeTypeID] + "</strong>" +
+                 "<p>" + d.nodeName + "</p>";
+          });
+        svg.call(nodeTip);
 
         svg.selectAll("g").remove();
         sankey.nodes(graph.nodes)
@@ -163,13 +174,9 @@ function FragmentFlows() {
             .style("stroke", function (d) {
                 return d3.rgb(d.color).darker(2);
             });
-        //
-        // Node tooltip
-        //
-        node.append("title")
-            .text(function (d) {
-                return d.nodeName;
-            });
+
+        node.on('mouseover', nodeTip.show)
+            .on('mouseout', nodeTip.hide);
         //
         // Position fragment flow name to the right or left of node.
         //
@@ -194,13 +201,11 @@ function FragmentFlows() {
         //  Change links for fragment flows not in flowSet
         //  - display as thin dashed line.
         //
-        link.filter(function(d) {
+        link.filter(function (d) {
             return (!flowSet.has(d.flowID));
         })
         .style("stroke-width", 1)
         .style("stroke-dasharray", "5,5");
-
-   
     }
 
     /**
@@ -218,8 +223,8 @@ function FragmentFlows() {
         graph.nodes.push({
             nodeID: 0,
             fragmentFlowName: "",
-            nodeTypeID: 2,
-            nodeName: "root"
+            nodeTypeID: 0,
+            nodeName: ""
         });
         reverseIndex[0] = 0;
         // Add a node for every flow
@@ -232,7 +237,7 @@ function FragmentFlows() {
             };
             reverseIndex[element.FragmentFlowID] = graph.nodes.push(node) - 1;
         });
-        
+
         // Add a link for every flow. source and target are indexes into nodes array.
         data.forEach(function (element) {
             var link, parentIndex;
@@ -242,7 +247,7 @@ function FragmentFlows() {
                 flowID: element.FlowID,
                 fragmentFlowName: element.Name,
                 value: Math.abs(element.Quantity)   // TODO : replace with NodeWeight when available
-           };
+            };
             if (element.DirectionID === 1) {
                 link.source = nodeIndex;
                 link.target = parentIndex;
@@ -270,14 +275,14 @@ function FragmentFlows() {
      * Callback function for data load.
      */
     function onDataLoaded() {
-        if (apiResourceNames.every( function (n1){
+        if (apiResourceNames.every(function (n1) {
             return n1 in LCA.loadedData;
         })) {
             // All requests executed
             if (LCA.spinner) {
                 LCA.spinner.stop();
             }
-            if (apiResourceNames.every( function (n2) {
+            if (apiResourceNames.every(function (n2) {
                 return LCA.loadedData[n2] !== null;
             })) {
                 // All requests executed successfully
@@ -311,7 +316,7 @@ function FragmentFlows() {
 
         var fragFlowProperties = LCA.loadedData.flowproperties.filter(function (fp) {
             return fragFlowFlowProperties.some(function (ffp) {
-                return (fp.FlowPropertyID === ffp.FlowPropertyID); 
+                return (fp.FlowPropertyID === ffp.FlowPropertyID);
             });
         });
         LCA.loadSelectionList(fragFlowProperties, "#ptSelect", "FlowPropertyID", onPropertyTypeChange, selectedFlowPropertyID);
@@ -321,11 +326,16 @@ function FragmentFlows() {
      * Starting point for FragmentFlows
      */
     function init() {
-        color.range(colorbrewer.Set3[4]);
-        color.domain(d3.keys(LCA.enumData.nodeTypes)); // NodeTypeIDs
+        color.range(colorbrewer.Set3[5]);
+        nodeTypes = LCA.enumData.nodeTypes;
+        nodeTypes[0] = "Root Node";
+    //color.domain(d3.keys(nodeTypes)); // NodeTypeIDs
+        // Assign vibrant colors to processes and fragments
+        color.domain([2,3,4,1,0]);
         prepareSvg();
         d3.select("#fragmentName").text(fragmentName);
         LCA.startSpinner("chartcontainer");
+        //toolTip = LCA.createToolTip(".container");
         LCA.loadData(apiResourceNames[0], true, onFragmentsLoaded);
         LCA.loadData(apiResourceNames[1], true, onProcessesLoaded);
         LCA.loadData(apiResourceNames[2], true, onDataLoaded);
