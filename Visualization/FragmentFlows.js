@@ -41,7 +41,10 @@ function FragmentFlows() {
     var selectedFlowPropertyID = 23,
         fragFlowFlowProperties = [];
     var apiResourceNames = ["fragments", "processes", "flowproperties", "fragmentflows", "flowflowproperties"],
-        nodeTypes = [];
+        nodeTypes = [],
+        fragmentFlows = [];   
+
+    
 
     /**
      * Initial preparation of svg element.
@@ -133,7 +136,7 @@ function FragmentFlows() {
         svg.selectAll("g").remove();
         sankey.nodes(graph.nodes)
             .links(graph.links)
-            .layout(32);
+            .layout(10);
 
         link = svg.append("g").selectAll(".link")
             .data(graph.links)
@@ -146,11 +149,27 @@ function FragmentFlows() {
             .sort(function (a, b) {
                 return b.dy - a.dy;
             });
-        // Tooltip for links <fragment flow name> : <node weight>
+        // Tooltip for links <fragment flow name>
         link.append("title")
             .text(function (d) {
-                return d.fragmentFlowName + " : " + formatNumber(d.value);
+                return d.fragmentFlowName;
             });
+        
+        // Workaround for NaN problem
+        graph.nodes.forEach(function (d) {
+            if (isNaN(d.x)) {
+                console.error("x attribute of node is NaN. Fragment Flow Name:  " + d.fragmentFlowName);
+                d.x = 1;
+            }
+            if (isNaN(d.y)) {
+                console.error("y attribute of node is NaN. Fragment Flow Name:  " + d.fragmentFlowName);
+                d.y = 1;
+            }
+            if (isNaN(d.dy)) {
+                console.error("dy attribute of node is NaN. Fragment Flow Name:  " + d.fragmentFlowName);
+                d.dy = 1;
+            }
+        });
 
         node = svg.append("g").selectAll(".node")
             .data(graph.nodes)
@@ -162,7 +181,7 @@ function FragmentFlows() {
 
         node.append("rect")
             .attr("height", function (d) {
-                return d.dy;
+                return Math.max(1, d.dy);
             })
             .attr({
                 width: sankey.nodeWidth()
@@ -183,7 +202,7 @@ function FragmentFlows() {
         node.append("text")
             .attr("x", -6)
             .attr("y", function (d) {
-                return d.dy / 2;
+                return Math.max(1, d.dy) / 2;
             })
             .attr("dy", ".35em")
             .attr("text-anchor", "end")
@@ -192,7 +211,7 @@ function FragmentFlows() {
                 return LCA.shortName(d.fragmentFlowName, 30);
             })
             .filter(function (d) {
-                return d.x < width / 2;
+                    return d.x < width / 2;
             })
             .attr("x", 6 + sankey.nodeWidth())
             .attr("text-anchor", "start");
@@ -202,7 +221,7 @@ function FragmentFlows() {
         //  - display as thin dashed line.
         //
         link.filter(function (d) {
-            return (!flowSet.has(d.flowID));
+            return ((d.nodeWeight <= 0) || (!flowSet.has(d.flowID)));
         })
         .style("stroke-width", 1)
         .style("stroke-dasharray", "5,5");
@@ -246,7 +265,8 @@ function FragmentFlows() {
             link = {
                 flowID: element.FlowID,
                 fragmentFlowName: element.Name,
-                value: Math.abs(element.Quantity)   // TODO : replace with NodeWeight when available
+                nodeWeight: element.NodeWeight,
+                value: element.NodeWeight > 0 ? element.NodeWeight : Number.MIN_VALUE   // sankey cannot handle 0 values
             };
             if (element.DirectionID === 1) {
                 link.source = nodeIndex;
@@ -287,7 +307,7 @@ function FragmentFlows() {
             })) {
                 // All requests executed successfully
                 prepareFragmentFlowPropertyList();
-                buildGraph(LCA.loadedData.fragmentflows);
+                buildGraph( fragmentFlows);
             }
         }
     }
@@ -309,7 +329,7 @@ function FragmentFlows() {
      */
     function prepareFragmentFlowPropertyList() {
         fragFlowFlowProperties = LCA.loadedData.flowflowproperties.filter(function (ffp) {
-            return LCA.loadedData.fragmentflows.some(function (ff) {
+            return fragmentFlows.some(function (ff) {
                 return (ffp.FlowID === ff.FlowID);
             });
         });
@@ -323,13 +343,42 @@ function FragmentFlows() {
     }
 
     /**
+     * STOPGAP : load node weights from csv and update fragmentflows
+     */
+    function loadNodeWeights() {
+        LCA.indexData("fragmentflows", "FragmentFlowID");
+        d3.csv("TestData/NodeCache_FragmentID=1..2.csv")
+            .row(function (d) { return { FragmentFlowID: +d.FragmentFlowID, NodeWeight: +d.NodeWeight }; })
+            .get(function (error, rows) {
+                if (error) {
+                    console.error(error);
+                } else {
+                    rows.forEach(function(r) {
+                        if (r.FragmentFlowID in LCA.indexedData.fragmentflows) {
+                            var fragFlow = LCA.indexedData.fragmentflows[r.FragmentFlowID];
+                            fragFlow.NodeWeight = r.NodeWeight < 0 ? 0 : r.NodeWeight;
+                        }
+                    });
+                    LCA.indexedData.fragmentflows.forEach(function (ff) {
+                        if (!("NodeWeight" in ff)) {
+                            console.debug("Missing NodeWeight for FragmentFlowID = " + ff.FragmentFlowID);
+                            ff.NodeWeight = 0;                           
+                        }
+                        fragmentFlows.push(ff);
+                    });
+                }
+                onDataLoaded();
+            });
+    }
+
+    /**
      * Starting point for FragmentFlows
      */
     function init() {
         color.range(colorbrewer.Set3[5]);
         nodeTypes = LCA.enumData.nodeTypes;
         nodeTypes[0] = "Root Node";
-    //color.domain(d3.keys(nodeTypes)); // NodeTypeIDs
+        //color.domain(d3.keys(nodeTypes)); // NodeTypeIDs
         // Assign vibrant colors to processes and fragments
         color.domain([2,3,4,1,0]);
         prepareSvg();
@@ -339,7 +388,7 @@ function FragmentFlows() {
         LCA.loadData(apiResourceNames[0], true, onFragmentsLoaded);
         LCA.loadData(apiResourceNames[1], true, onProcessesLoaded);
         LCA.loadData(apiResourceNames[2], true, onDataLoaded);
-        LCA.loadData(apiResourceNames[3], true, onDataLoaded);
+        LCA.loadData(apiResourceNames[3], true, loadNodeWeights);
         LCA.loadData(apiResourceNames[4], true, onDataLoaded);
     }
 
