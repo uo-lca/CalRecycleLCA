@@ -39,7 +39,7 @@ function FragmentFlows() {
         graph = {};
     var selectedFlowPropertyID = 23,
         fragFlowFlowProperties = [];
-    var apiResourceNames = ["fragments", "process", "flowproperties", "fragmentflows", "flowflowproperties"];
+    var apiResourceNames = ["fragments", "processes", "flowproperties", "fragmentflows", "flowflowproperties"];
 
     /**
      * Initial preparation of svg element.
@@ -86,8 +86,8 @@ function FragmentFlows() {
         var nodeName = LCA.enumData.nodeTypes[ffData.NodeTypeID];
         switch (ffData.NodeTypeID) {
             case 1:
-                if (ffData.NodeID in LCA.indexedData.process) {
-                    nodeName = LCA.indexedData.process[ffData.NodeID].Name;
+                if (ffData.NodeID in LCA.indexedData.processes) {
+                    nodeName = LCA.indexedData.processes[ffData.NodeID].Name;
                 } else {
                     console.error("FragmentNode ProcessID: " + ffData.NodeID + " not found.");
                     nodeName += ffData.NodeID;
@@ -262,7 +262,7 @@ function FragmentFlows() {
     }
 
     function onProcessesLoaded() {
-        LCA.indexData("process", "ProcessID");
+        LCA.indexData("processes", "ProcessID");
         onDataLoaded();
     }
 
@@ -327,11 +327,10 @@ function FragmentFlows() {
         d3.select("#fragmentName").text(fragmentName);
         LCA.startSpinner("chartcontainer");
         LCA.loadData(apiResourceNames[0], true, onFragmentsLoaded);
-        LCA.loadData(apiResourceNames[1], false, onProcessesLoaded);
+        LCA.loadData(apiResourceNames[1], true, onProcessesLoaded);
         LCA.loadData(apiResourceNames[2], true, onDataLoaded);
         LCA.loadData(apiResourceNames[3], true, onDataLoaded);
         LCA.loadData(apiResourceNames[4], true, onDataLoaded);
-
     }
 
     LCA.init(init);
