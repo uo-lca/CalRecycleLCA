@@ -181,7 +181,7 @@ Fragment.node_recurse(flows, ScenarioID, current_flow, activity)
 
       // need to set current fragment quantities based on subfragment 
       // inputs and outputs
-      F.map_dependencies(dependencies); // updates dependencies.Quantity
+      F.map_dependencies(dependencies, ScenarioID ); // updates dependencies.Quantity
 
       /*
       // IOFlows is a list of edges.  For every edge that has a
@@ -190,10 +190,13 @@ Fragment.node_recurse(flows, ScenarioID, current_flow, activity)
       dependencies = MatchDependencies(flows,IOFlows); 
       */
 
+      // there's an outer join in here somewhere
+      UPDATE flows.Quantity with dependencies.Quantity 
+         WHERE flows.FragmentFlowID = dependencies.FragmentFlowID
 
       for i in dependencies
       { 
-        node_recurse(flows, ScenarioID, i.ParentFragmentFlowID, activity )
+        node_recurse(flows, ScenarioID, i.FragmentFlowID, activity )
       }
 
     }
@@ -206,7 +209,7 @@ Fragment.node_recurse(flows, ScenarioID, current_flow, activity)
   end // switch NodeType
 }
 
-Fragment.map_dependencies( dep )
+Fragment.map_dependencies( dep, ScenarioID )
 {
   // match local input-output flows to remote dependencies
   // flows = this fragment
@@ -214,14 +217,12 @@ Fragment.map_dependencies( dep )
 
   my_IO = SELECT FlowID, 
   	         DirectionID, 
-		 sum( Quantity ) AS IOsum
-	  FROM flows
+		 sum( NodeWeight ) AS IOsum
+	  FROM flows INNER JOIN NodeCache 
+	    ON flows.FragmentFlowID = NodeCache.FragmentFlowID
 	  WHERE flows.NodeType = 'InputOutput'
+	    AND NodeCache.ScenarioID = @ScenarioID
 	  GROUP BY FlowID, DirectionID;
-
-  dep = CompDir( dep ); // create a new field CompDirID which reverses the
-      		     	// sense of DirectionID: 
-      		     	// 'Input' becomes 'Output' and vice versa
 
   // some error checking here-- dep records should match my_IO records
   // exactly on FlowID and Direction / CompDir
@@ -230,7 +231,7 @@ Fragment.map_dependencies( dep )
   	       my_IO.IOsum
 	FROM dep
 	INNER JOIN my_IO ON dep.FlowID = my_IO.FlowID
-	WHERE dep.CompDirID = my_IO.DirectionID
+	WHERE dep.DirectionID = my_IO.DirectionID
 
 
   UPDATE dep.Quantity WITH dep.IOsum;
