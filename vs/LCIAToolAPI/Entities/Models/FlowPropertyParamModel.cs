@@ -31,5 +31,7 @@ namespace Entities.Models
         public double? MeanValue { get; set; }
 
         public int? FlowFlowPropertyID { get; set; }
+
+        public double? NodeWeight { get; set; }
     }
 }

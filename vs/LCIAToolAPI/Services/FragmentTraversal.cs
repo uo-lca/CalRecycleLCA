@@ -33,10 +33,8 @@ namespace Services
         [Inject]
         private readonly IFragmentNodeFragmentService _fragmentNodeFragmentService;
 
-        [Inject]
-        private readonly IService<Fragment> _service;
 
-        int fragmentId = 2;
+        int? fragmentId = 6;
         double activity = 0;
 
         public FragmentTraversal(IFragmentFlowService fragmentFlowService,
@@ -122,7 +120,7 @@ namespace Services
             _fragmentNodeFragmentService = fragmentNodeFragmentService;
         }
 
-        public void Traverse(int scenarioId = 0)
+        public void Traverse(int fragmentId, int scenarioId = 0)
         {
 
             ApplyDependencyParam(scenarioId);
@@ -372,15 +370,38 @@ namespace Services
             switch (nodeTypeID)
             {
                 case 1: //process
-                    var dependencies = ApplyFlowPropertyParam().Where(q => q.ParentFragmentFlowID == refFlow);
-                    foreach (var item in dependencies)
+                    var processDependencies = ApplyFlowPropertyParam().Where(q => q.ParentFragmentFlowID == refFlow);
+                    foreach (var item in processDependencies)
                     {
                         NodeRecurse(scenarioId, item.FragmentFlowID, activity);
                     }
                     break;
                 case 2: //fragment
-                //waiting for some questions to be answered.  Looks like this might not have been updated when we got rid of the FragmentNode table 
-                     //var theNode = theflow.Join(fragmentNodeFragment, p => p., pc => pc.FragmentNodeFragmentID, (p, pc) => new { p, pc })
+                    var theNode = theflow.Join(fragmentNodeFragment, p => p.FragmentFlowID, pc => pc.FragmentFlowID, (p, pc) => new { p, pc }).AsQueryable();
+                     // flows in current fragment that depend on this node
+
+                    //get the fragmentFlowId from the node
+                    int? currentFlow = theNode.Select(x => x.p.FragmentFlowID).FirstOrDefault();
+                    //get the subFragmentId from the node
+                    int? subFragmentId = theNode.Select(x => x.pc.SubFragmentID).FirstOrDefault();
+
+                    //get the dependencies associated with the node from the flows (these come from the flows after "ApplyDependencyParam" and "ApplyFlowPropertyParam" have been applied)
+                    var fragmentDependencies = ApplyFlowPropertyParam().Where(q => q.ParentFragmentFlowID == currentFlow).AsEnumerable();
+
+                    //get the fragment associated with the subFragmentId - actually don't think we need this.  
+                    //We can just pass the subfragmentid and the scenarioId and call the parent 'Traverse' method
+                    //var subFragment = _fragmentService.Query().Filter(q => q.FragmentID == subFragmentId).Get().AsQueryable();
+                    
+                    //change the value of fragmentId to the value of subFragementId and traverse the subfragment
+                    fragmentId = subFragmentId;
+                    Traverse(scenarioId);
+
+                    if (subFragmentId != null)
+                    {
+                        MapDependencies(fragmentDependencies, scenarioId);
+                    }
+
+
                     break;
                 default:
                     //Console.WriteLine("Default case");
@@ -389,6 +410,45 @@ namespace Services
 
         }
 
-      
+        public IEnumerable<FlowPropertyParamModel> MapDependencies(IEnumerable<FlowPropertyParamModel> dep, int scenarioId=0)
+        {
+            var nodeCache = _nodeCacheService.Query().Get().AsEnumerable();
+
+            var myIO = ApplyFlowPropertyParam()
+                .Join(nodeCache, p => p.FragmentFlowID, pc => pc.FragmentFlowID, (p, pc) => new { p, pc })
+                .Where(q => q.p.NodeTypeID == 3)
+                .Where(q => q.pc.ScenarioID == scenarioId)
+                  .GroupBy(p => new
+                   {
+                       FlowID = p.p.FlowID,
+                       DirectionID = p.p.DirectionID,
+                       NodeWeight = p.pc.NodeWeight
+
+                   })
+                   .Select(p => new
+                   {
+                       FlowID = p.Key.FlowID,
+                       DirectionID = p.Key.DirectionID,
+                       IOSUM = p.Key.NodeWeight
+
+                   }).AsQueryable();
+
+            var newDep = dep.AsEnumerable()
+                .Join(myIO, p => p.FlowID, pc => pc.FlowID, (p, pc) => new { p, pc })
+                .Where(q => q.p.DirectionID == q.pc.DirectionID)
+                 .Select(p => new FlowPropertyParamModel
+                   {
+                       Quantity = p.p.Quantity,
+                       NodeWeight = p.pc.IOSUM
+
+                   }).AsEnumerable();
+
+            foreach (var item in newDep)
+            {
+                item.Quantity = item.NodeWeight;
+            }
+
+            return newDep;
+        }
     }
 }
