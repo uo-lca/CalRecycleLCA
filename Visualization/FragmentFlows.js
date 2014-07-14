@@ -233,7 +233,8 @@ function FragmentFlows() {
      */
     function buildGraph(data) {
         var nodeIndex = 0,
-            reverseIndex = []; // map FragmentFlowID to graph.nodes and graph.links
+            reverseIndex = [], // map FragmentFlowID to graph.nodes and graph.links
+            minVal = 1;
 
         graph.nodes = [];
         graph.links = [];
@@ -255,6 +256,9 @@ function FragmentFlows() {
                 nodeName: getNodeName(element) // Name of referenced object
             };
             reverseIndex[element.FragmentFlowID] = graph.nodes.push(node) - 1;
+            if (element.NodeWeight > 0 && element.NodeWeight < minVal) {
+                minVal = element.NodeWeight;
+            }
         });
 
         // Add a link for every flow. source and target are indexes into nodes array.
@@ -266,7 +270,7 @@ function FragmentFlows() {
                 flowID: element.FlowID,
                 fragmentFlowName: element.Name,
                 nodeWeight: element.NodeWeight,
-                value: element.NodeWeight > 0 ? element.NodeWeight : Number.MIN_VALUE   // sankey cannot handle 0 values
+                value: element.NodeWeight > 0 ? element.NodeWeight : minVal / 2   // sankey cannot handle 0 values
             };
             if (element.DirectionID === 1) {
                 link.source = nodeIndex;
