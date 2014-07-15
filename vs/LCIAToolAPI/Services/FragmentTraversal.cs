@@ -35,7 +35,7 @@ namespace Services
         [Inject]
         private readonly IUnitOfWork _unitOfWork;
 
-        int? fragmentId = 6;
+        int? fragmentId = 7;
         float? activity = 1;
 
         public FragmentTraversal(IFragmentFlowService fragmentFlowService,
