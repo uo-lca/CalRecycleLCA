@@ -9,6 +9,6 @@ namespace Services
 {
     public interface IFlowPropertyParamService : IService<FlowPropertyParam>
     {
-        IEnumerable<FlowPropertyParam> GetFlowPropertyParams(int scenarioId = 0);
+        IEnumerable<FlowPropertyParam> GetFlowPropertyParams(int scenarioId = 1);
     }
 }

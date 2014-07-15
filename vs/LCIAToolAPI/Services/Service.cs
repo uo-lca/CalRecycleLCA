@@ -20,6 +20,8 @@ namespace Services
 
         public virtual void Insert(TEntity entity) { _repository.Insert(entity); }
 
+        public virtual void InsertGraph(TEntity entity) { _repository.InsertGraph(entity); }
+
         public virtual void Update(TEntity entity) { _repository.Update(entity); }
 
         public virtual void Delete(object id) { _repository.Delete(id); }

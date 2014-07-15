@@ -30,6 +30,12 @@ namespace Repository
             return DbSet.Find(id);
         }
 
+        public virtual void InsertGraph(TEntity entity)
+        {
+           
+            DbSet.Add(entity);
+        }
+
         public virtual void Update(TEntity entity)
         {
             DbSet.Attach(entity);
@@ -50,7 +56,9 @@ namespace Repository
 
         public virtual void Insert(TEntity entity)
         {
+            
             DbSet.Attach(entity);
+            
         }
 
         public virtual RepositoryQuery<TEntity> Query()

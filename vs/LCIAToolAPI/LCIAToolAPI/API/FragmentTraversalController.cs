@@ -12,59 +12,58 @@ namespace LCAToolAPI.API
 {
     public class FragmentTraversalController : ApiController
     {
-             //private readonly IFragmentService _fragmentService;
         [Inject]
-        private readonly IFragmentFlowService _fragmentFlowService ;
-        [Inject]
-        private readonly IDependencyParamService _dependencyParamService ;
+        private readonly IFragmentTraversal _fragmentTraversal ;
 
 
-        public FragmentTraversalController(IFragmentFlowService fragmentFlowService, IDependencyParamService dependencyParamService)
+        public FragmentTraversalController(IFragmentTraversal fragmentTraversal)
         {
 
-            if (fragmentFlowService == null)
+            if (fragmentTraversal == null)
             {
-                throw new ArgumentNullException("fragmentFlowService is null");
+                throw new ArgumentNullException("fragmentTraversal is null");
             }
 
-            _fragmentFlowService = fragmentFlowService;
-
-            if (dependencyParamService == null)
-            {
-                throw new ArgumentNullException("dependencyParamService is null");
-            }
-
-            _dependencyParamService = dependencyParamService;
-
+            _fragmentTraversal = fragmentTraversal;
 
         }
 
-        // GET api/<controller>
-        public IEnumerable<string> Get()
+        int scenarioId = 1;
+
+        //GET api/<controller>
+        [System.Web.Http.AcceptVerbs("GET", "POST")]
+        [System.Web.Http.HttpGet]
+        public void Traversal()
         {
-            return new string[] { "value1", "value2" };
+            _fragmentTraversal.Traverse(scenarioId);
         }
 
-        // GET api/<controller>/5
-        public string Get(int id)
-        {
-            return "value";
-        }
+        //// GET api/<controller>
+        //public IEnumerable<string> Get()
+        //{
+        //    return new string[] { "value1", "value2" };
+        //}
 
-        // POST api/<controller>
-        public void Post([FromBody]string value)
-        {
-        }
+        //// GET api/<controller>/5
+        //public string Get(int id)
+        //{
+        //    return "value";
+        //}
 
-        // PUT api/<controller>/5
-        public void Put(int id, [FromBody]string value)
-        {
-        }
+        //// POST api/<controller>
+        //public void Post([FromBody]string value)
+        //{
+        //}
 
-        // DELETE api/<controller>/5
-        public void Delete(int id)
-        {
-        }
+        //// PUT api/<controller>/5
+        //public void Put(int id, [FromBody]string value)
+        //{
+        //}
+
+        //// DELETE api/<controller>/5
+        //public void Delete(int id)
+        //{
+        //}
 
     }
 }

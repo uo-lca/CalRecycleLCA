@@ -1,5 +1,6 @@
 namespace Data
 {
+    using Newtonsoft.Json;
     using System;
     using System.Collections.Generic;
     using System.ComponentModel.DataAnnotations;
@@ -14,6 +15,7 @@ namespace Data
             ScoreCaches = new HashSet<ScoreCache>();
         }
 
+         [Key]
         public int NodeCacheID { get; set; }
 
         public int? FragmentFlowID { get; set; }
@@ -22,8 +24,9 @@ namespace Data
 
         public double? NodeWeight { get; set; }
 
+      
         public virtual FragmentFlow FragmentFlow { get; set; }
-
+        
         public virtual Scenario Scenario { get; set; }
 
         public virtual ICollection<ScoreCache> ScoreCaches { get; set; }
