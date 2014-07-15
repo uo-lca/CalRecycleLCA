@@ -144,6 +144,7 @@
     <Compile Include="C__MigrationHistory.cs" />
     <Compile Include="DataProvider.cs" />
     <Compile Include="DataType.cs" />
+    <Compile Include="DbContextExtension.cs" />
     <Compile Include="DependencyParam.cs" />
     <Compile Include="Direction.cs" />
     <Compile Include="DistributionParam.cs" />
@@ -162,6 +163,7 @@
     <Compile Include="ILCDEntity.cs" />
     <Compile Include="ImpactCategory.cs" />
     <Compile Include="IndicatorType.cs" />
+    <Compile Include="IObjectState.cs" />
     <Compile Include="LCIA.cs" />
     <Compile Include="LCIAMethod.cs" />
     <Compile Include="Migrations\201407032003394_InitialCreate.cs" />
@@ -173,6 +175,7 @@
     <Compile Include="NodeDissipationParam.cs" />
     <Compile Include="NodeEmissionParam.cs" />
     <Compile Include="NodeType.cs" />
+    <Compile Include="ObjectState.cs" />
     <Compile Include="Param.cs" />
     <Compile Include="ParamType.cs" />
     <Compile Include="Process.cs" />

@@ -15,10 +15,10 @@ Traverse(ScenarioID)
   // Add on FlowFlowPropertyID
   fpflows = lookupFlowProperty ( myflows )
 
-  myflows = applyParam ( myflows, ScenarioID, DependencyParam,
+  fpflows = applyParam ( fpflows, ScenarioID, DependencyParam,
   	    	         FragmentFlowID, Quantity );
   
-  myflows = applyParam ( myflows, ScenarioID, FlowPropertyParam,
+  fpflows = applyParam ( fpflows, ScenarioID, FlowPropertyParam,
   	    	       	 FlowFlowPropertyID, meanValue );
 
   float activity = 1;
@@ -181,14 +181,7 @@ Fragment.node_recurse(flows, ScenarioID, current_flow, activity)
 
       // need to set current fragment quantities based on subfragment 
       // inputs and outputs
-      F.map_dependencies(dependencies, ScenarioID ); // updates dependencies.Quantity
-
-      /*
-      // IOFlows is a list of edges.  For every edge that has a
-      // corresponding entry in our local edge table, follow it.  
-      IOFlows = F.InputOutput(ScenarioID)
-      dependencies = MatchDependencies(flows,IOFlows); 
-      */
+      dependencies = F.map_dependencies(dependencies, ScenarioID ); // updates dependencies.Quantity
 
       // there's an outer join in here somewhere
       UPDATE flows.Quantity with dependencies.Quantity 
@@ -212,8 +205,8 @@ Fragment.node_recurse(flows, ScenarioID, current_flow, activity)
 Fragment.map_dependencies( dep, ScenarioID )
 {
   // match local input-output flows to remote dependencies
-  // flows = this fragment
-  // dependencies = remote fragment
+  // flows = this fragment (the subfragment)
+  // dependencies = parent fragment
 
   my_IO = SELECT FlowID, 
   	         DirectionID, 

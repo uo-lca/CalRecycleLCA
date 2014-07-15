@@ -9,7 +9,7 @@ namespace Data
     [Table("ScenarioParam")]
     public partial class ScenarioParam
     {
-        [DatabaseGenerated(DatabaseGeneratedOption.None)]
+        //[DatabaseGenerated(DatabaseGeneratedOption.None)]
         public int ScenarioParamID { get; set; }
 
         public int? ScenarioID { get; set; }

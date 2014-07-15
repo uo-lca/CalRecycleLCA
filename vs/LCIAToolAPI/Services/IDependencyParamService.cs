@@ -9,7 +9,7 @@ namespace Services
 {
     public interface IDependencyParamService: IService<DependencyParam>
     {
-        IEnumerable<DependencyParam> GetDependencyParams(int scenarioId = 0);
+        IEnumerable<DependencyParam> GetDependencyParams(int scenarioId = 1);
 
     }
 }

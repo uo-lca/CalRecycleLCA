@@ -32,10 +32,11 @@ namespace Services
         private readonly INodeCacheService _nodeCacheService;
         [Inject]
         private readonly IFragmentNodeFragmentService _fragmentNodeFragmentService;
+        [Inject]
+        private readonly IUnitOfWork _unitOfWork;
 
-
-        int? fragmentId = 6;
-        double activity = 0;
+        int? fragmentId = 7;
+        float? activity = 1;
 
         public FragmentTraversal(IFragmentFlowService fragmentFlowService,
             IDependencyParamService dependencyParamService,
@@ -46,8 +47,8 @@ namespace Services
             IFragmentService fragmentService,
             IFlowService flowService,
             INodeCacheService nodeCacheService,
-            IFragmentNodeFragmentService fragmentNodeFragmentService, 
-            IService<Fragment> service)
+            IFragmentNodeFragmentService fragmentNodeFragmentService,
+            IUnitOfWork unitOfWork)
         {
             if (fragmentFlowService == null)
             {
@@ -118,9 +119,16 @@ namespace Services
             }
 
             _fragmentNodeFragmentService = fragmentNodeFragmentService;
+
+            if (unitOfWork == null)
+            {
+                throw new ArgumentNullException("unitOfWork is null");
+            }
+
+            _unitOfWork = unitOfWork;
         }
 
-        public void Traverse(int fragmentId, int scenarioId = 0)
+        public void Traverse(int scenarioId = 1)
         {
 
             ApplyDependencyParam(scenarioId);
@@ -130,7 +138,7 @@ namespace Services
 
         }
 
-        public IEnumerable<DependencyParamModel> ApplyDependencyParam(int scenarioId = 0)
+        public IEnumerable<DependencyParamModel> ApplyDependencyParam(int scenarioId = 1)
         {
 
             //get fragment flows by fragmentId
@@ -177,6 +185,7 @@ namespace Services
                             DirectionID = a.FragmentFlow.DirectionID,
                             Quantity = a.FragmentFlow.Quantity,
                             ParentFragmentFlowID = a.FragmentFlow.ParentFragmentFlowID,
+                            //Value = (b == null ? 0 : b.Value)
                             Value = (b == null ? 0 : b.Value)
                         })).ToList();
 
@@ -231,7 +240,7 @@ namespace Services
 
         }
 
-        public IEnumerable<FlowPropertyParamModel> ApplyFlowPropertyParam(int scenarioId = 0)
+        public IEnumerable<FlowPropertyParamModel> ApplyFlowPropertyParam(int scenarioId = 1)
         {
 
             //get fragment flows by fragmentId
@@ -263,7 +272,8 @@ namespace Services
                DirectionID = m.p.DirectionID,
                Quantity = m.p.Quantity,
                ParentFragmentFlowID = m.p.ParentFragmentFlowID,
-               MeanValue = (m.pc.MeanValue == null ? 0 : m.pc.MeanValue)
+               //MeanValue = (m.pc.MeanValue == null ? 0 : m.pc.MeanValue)
+               MeanValue = (m.pc.MeanValue)
            }).AsEnumerable();
 
             //return query;
@@ -345,27 +355,32 @@ namespace Services
 
         public int refFlow()
         {
-            return Convert.ToInt32(_fragmentService.Query().Filter(q => q.FragmentID == fragmentId).Get().FirstOrDefault());
+            return Convert.ToInt32(_fragmentService.Query().Filter(q => q.FragmentID == fragmentId).Get().FirstOrDefault().ReferenceFragmentFlowID);
         }
 
         public void NodeRecurse(int scenarioId, int refFlow, double? activity)
         {
-            var theflow = ApplyFlowPropertyParam().Where(q => q.ReferenceFlowPropertyID == refFlow).AsEnumerable();
+            var theflow = ApplyFlowPropertyParam().Where(q => q.ParentFragmentFlowID == refFlow).AsEnumerable();
 
             var fragmentNodeFragment = _fragmentNodeFragmentService.Query().Get().AsQueryable();
-           
+
             double? nodeWeight = theflow.Select(x => x.Quantity).FirstOrDefault();
             double? nodeConv = theflow.Select(x => x.MeanValue).FirstOrDefault();
             int? nodeTypeID = theflow.Select(x => x.NodeTypeID).FirstOrDefault();
 
             activity = activity * nodeWeight * nodeConv;
 
-            NodeCache nodeCache = new NodeCache();
-            nodeCache.FragmentFlowID = refFlow;
-            nodeCache.ScenarioID = scenarioId;
-            nodeCache.NodeWeight = activity;
 
-            _nodeCacheService.Insert(nodeCache);
+            var nodeCache = new NodeCache
+            {
+                ScenarioID = scenarioId,
+                FragmentFlowID = refFlow,
+                NodeWeight = activity
+
+            };
+            _nodeCacheService.InsertGraph(nodeCache);
+            _unitOfWork.Save();
+
 
             switch (nodeTypeID)
             {
@@ -373,12 +388,12 @@ namespace Services
                     var processDependencies = ApplyFlowPropertyParam().Where(q => q.ParentFragmentFlowID == refFlow);
                     foreach (var item in processDependencies)
                     {
-                        NodeRecurse(scenarioId, item.FragmentFlowID, activity);
+                        NodeRecurse(1, item.FragmentFlowID, activity);
                     }
                     break;
                 case 2: //fragment
                     var theNode = theflow.Join(fragmentNodeFragment, p => p.FragmentFlowID, pc => pc.FragmentFlowID, (p, pc) => new { p, pc }).AsQueryable();
-                     // flows in current fragment that depend on this node
+                    // flows in current fragment that depend on this node
 
                     //get the fragmentFlowId from the node
                     int? currentFlow = theNode.Select(x => x.p.FragmentFlowID).FirstOrDefault();
@@ -391,7 +406,7 @@ namespace Services
                     //get the fragment associated with the subFragmentId - actually don't think we need this.  
                     //We can just pass the subfragmentid and the scenarioId and call the parent 'Traverse' method
                     //var subFragment = _fragmentService.Query().Filter(q => q.FragmentID == subFragmentId).Get().AsQueryable();
-                    
+
                     //change the value of fragmentId to the value of subFragementId and traverse the subfragment
                     fragmentId = subFragmentId;
                     Traverse(scenarioId);
@@ -401,37 +416,67 @@ namespace Services
                         MapDependencies(fragmentDependencies, scenarioId);
                     }
 
+                    //update each flow quantity with the fragmentDependency quantity
+                    var updateFlows = ApplyFlowPropertyParam().Join(fragmentDependencies, p => p.FragmentFlowID, pc => pc.FragmentFlowID, (p, pc) => new { p, pc }).AsQueryable();
+                    foreach (var item in updateFlows)
+                    {
+                        item.p.Quantity = item.pc.Quantity;
+                    }
+
+                    //recurse again
+                    foreach (var item in fragmentDependencies)
+                    {
+                        NodeRecurse(scenarioId, item.FragmentFlowID, activity);
+                    }
 
                     break;
-                default:
-                    //Console.WriteLine("Default case");
+                case 3: //InputOutput
+                    // nothing to do - cache value specifies input/output quantity
+                    break;
+
+                case 4: //background
+                    //nothing to do - background fragments have already been traversed
                     break;
             }
 
         }
 
-        public IEnumerable<FlowPropertyParamModel> MapDependencies(IEnumerable<FlowPropertyParamModel> dep, int scenarioId=0)
+        public IEnumerable<FlowPropertyParamModel> MapDependencies(IEnumerable<FlowPropertyParamModel> dep, int scenarioId = 1)
         {
             var nodeCache = _nodeCacheService.Query().Get().AsEnumerable();
 
+            //Get distinct flows, their direction ids a
             var myIO = ApplyFlowPropertyParam()
                 .Join(nodeCache, p => p.FragmentFlowID, pc => pc.FragmentFlowID, (p, pc) => new { p, pc })
                 .Where(q => q.p.NodeTypeID == 3)
                 .Where(q => q.pc.ScenarioID == scenarioId)
-                  .GroupBy(p => new
-                   {
-                       FlowID = p.p.FlowID,
-                       DirectionID = p.p.DirectionID,
-                       NodeWeight = p.pc.NodeWeight
+                .Select(t => new {t.p.FlowID, t.p.DirectionID, t.pc.NodeWeight})
+             .GroupBy(t => new 
+             {
+                 t.FlowID, 
+                 t.DirectionID,
+                 t.NodeWeight
+             })
+             .Select(group => new  { 
+                       FlowID = group.Key.FlowID, 
+                       DirectionID = group.Key.DirectionID,
+                       IOSUM = group.Sum(a => a.NodeWeight)
+             });
 
-                   })
-                   .Select(p => new
-                   {
-                       FlowID = p.Key.FlowID,
-                       DirectionID = p.Key.DirectionID,
-                       IOSUM = p.Key.NodeWeight
+                  //.GroupBy(p => new
+                  // {
+                  //     FlowID = p.p.FlowID,
+                  //     DirectionID = p.p.DirectionID,
+                  //     NodeWeight = p.pc.NodeWeight
 
-                   }).AsQueryable();
+                  // })
+                  // .Select(p => new
+                  // {
+                  //     FlowID = p.Key.FlowID,
+                  //     DirectionID = p.Key.DirectionID,
+                  //     IOSUM = p.Key.NodeWeight
+
+                  // }).AsQueryable();
 
             var newDep = dep.AsEnumerable()
                 .Join(myIO, p => p.FlowID, pc => pc.FlowID, (p, pc) => new { p, pc })
