@@ -22,6 +22,7 @@ namespace LcaDataLoader {
             using (DbContextWrapper dbContext = new DbContextWrapper()) {
                 LoadAppend(Path.Combine(dirName, "append"), dbContext);
                 LoadFragments(Path.Combine(dirName, "fragments"), dbContext);
+                LoadScenarios(Path.Combine(dirName, "scenarios"), dbContext);
             }
         }
 
@@ -315,7 +316,7 @@ namespace LcaDataLoader {
             FragmentNodeProcess ent = dbContext.CreateEntityWithID<FragmentNodeProcess>(id);
             if (ent != null) {
                 ent.FragmentFlowID = Convert.ToInt32(row["FragmentFlowID"]);
-                ent.ProcessID = Convert.ToInt32(row["ProcessID"]);
+                ent.ProcessID =  dbContext.GetIlcdEntityID<LcaDataModel.Process>(row["ProcessUUID"]);
                 isImported = (dbContext.SaveChanges() > 0);
             }
             return isImported;
@@ -328,6 +329,47 @@ namespace LcaDataLoader {
             if (ent != null) {
                 ent.FragmentFlowID = Convert.ToInt32(row["FragmentFlowID"]);
                 ent.SubFragmentID = Convert.ToInt32(row["SubFragmentID"]);
+                isImported = (dbContext.SaveChanges() > 0);
+            }
+            return isImported;
+        }
+
+        private static bool ImportUser(Row row, DbContextWrapper dbContext) {
+            bool isImported = false;
+            int id = Convert.ToInt32(row["UserID"]);
+            User ent = dbContext.CreateEntityWithID<User>(id);
+            if (ent != null) {
+                ent.Name = row["Name"];
+                ent.CanLogin = row["CanLogin"].Equals("1");
+                ent.CanEditScenarios = row["CanEditScenarios"].Equals("1");
+                ent.CanEditFragments = row["CanEditFragments"].Equals("1");
+                ent.CanEditBackground = row["CanEditBackground"].Equals("1");
+                ent.CanAppend = row["CanAppend"].Equals("1");
+                isImported = (dbContext.SaveChanges() > 0);
+            }
+            return isImported;
+        }
+
+        private static bool ImportScenarioGroup(Row row, DbContextWrapper dbContext) {
+            bool isImported = false;
+            int id = Convert.ToInt32(row["ScenarioGroupID"]);
+            ScenarioGroup ent = dbContext.CreateEntityWithID<ScenarioGroup>(id);
+            if (ent != null) {
+                ent.Name = row["Name"];
+                ent.OwnedBy = Convert.ToInt32(row["OwnedBy"]);
+                ent.VisibilityID = Convert.ToInt32(row["VisibilityID"]);
+                isImported = (dbContext.SaveChanges() > 0);
+            }
+            return isImported;
+        }
+
+        private static bool ImportScenario(Row row, DbContextWrapper dbContext) {
+            bool isImported = false;
+            int id = Convert.ToInt32(row["ScenarioID"]);
+            Scenario ent = dbContext.CreateEntityWithID<Scenario>(id);
+            if (ent != null) {
+                ent.Name = row["Name"];
+                ent.ScenarioGroupID = Convert.ToInt32(row["ScenarioGroupID"]);
                 isImported = (dbContext.SaveChanges() > 0);
             }
             return isImported;
@@ -415,6 +457,24 @@ namespace LcaDataLoader {
             }
             else {
                 Program.Logger.WarnFormat("Fragment folder, {0}, does not exist.", dirName);
+            }
+        }
+
+        /// <summary>
+        /// Load CSV files in scenarios directory
+        /// </summary>
+        /// <param name="dirName">Full path name of scenarios directory</param>
+        /// <param name="dbContext">Object containing current DbContext</param>
+        public static void LoadScenarios(string dirName, DbContextWrapper dbContext) {
+            if (Directory.Exists(dirName)) {
+                Program.Logger.InfoFormat("Load scenario files in {0}...", dirName);
+                UpdateDataProvider(DataProviderEnum.scenarios, dirName, dbContext);
+                ImportCSV(Path.Combine(dirName, "User.csv"), ImportUser, dbContext);
+                ImportCSV(Path.Combine(dirName, "ScenarioGroup.csv"), ImportScenarioGroup, dbContext);
+                ImportCSV(Path.Combine(dirName, "Scenario.csv"), ImportScenario, dbContext);
+            }
+            else {
+                Program.Logger.WarnFormat("Scenarios folder, {0}, does not exist.", dirName);
             }
         }
     }
