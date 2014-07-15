@@ -6,7 +6,7 @@
     "ReferenceFlowPropertyID":23,
     "NodeTypeID":1,
     "DirectionID":1,
-    "Quantity":1,
+    "NodeWeight":1,
     "ParentFragmentFlowID":110,
     "NodeID":10
   },
@@ -17,7 +17,7 @@
     "ReferenceFlowPropertyID":24,
     "NodeTypeID":3,
     "DirectionID":1,
-    "Quantity":0.01965078,
+    "NodeWeight":0.01965078,
     "ParentFragmentFlowID":86,
     "NodeID":0
   },
@@ -28,7 +28,7 @@
     "ReferenceFlowPropertyID":24,
     "NodeTypeID":3,
     "DirectionID":1,
-    "Quantity":0.001867416,
+    "NodeWeight":0.001867416,
     "ParentFragmentFlowID":86,
     "NodeID":0
   },
@@ -39,7 +39,7 @@
     "ReferenceFlowPropertyID":24,
     "NodeTypeID":1,
     "DirectionID":1,
-    "Quantity":49,
+    "NodeWeight":49,
     "ParentFragmentFlowID":110,
     "NodeID":34
   },
@@ -50,7 +50,7 @@
     "ReferenceFlowPropertyID":30,
     "NodeTypeID":1,
     "DirectionID":1,
-    "Quantity":1.360544,
+    "NodeWeight":1.360544,
     "ParentFragmentFlowID":110,
     "NodeID":126
   },
@@ -61,7 +61,7 @@
     "ReferenceFlowPropertyID":23,
     "NodeTypeID":3,
     "DirectionID":1,
-    "Quantity":1.681861E-08,
+    "NodeWeight":1.681861E-08,
     "ParentFragmentFlowID":90,
     "NodeID":0
   },
@@ -72,7 +72,7 @@
     "ReferenceFlowPropertyID":23,
     "NodeTypeID":3,
     "DirectionID":1,
-    "Quantity":0.0003916662,
+    "NodeWeight":0.0003916662,
     "ParentFragmentFlowID":90,
     "NodeID":0
   },
@@ -83,7 +83,7 @@
     "ReferenceFlowPropertyID":23,
     "NodeTypeID":3,
     "DirectionID":1,
-    "Quantity":3.283834E-05,
+    "NodeWeight":3.283834E-05,
     "ParentFragmentFlowID":90,
     "NodeID":0
   },
@@ -94,7 +94,7 @@
     "ReferenceFlowPropertyID":23,
     "NodeTypeID":3,
     "DirectionID":1,
-    "Quantity":0.0002637457,
+    "NodeWeight":0.0002637457,
     "ParentFragmentFlowID":90,
     "NodeID":0
   },
@@ -105,7 +105,7 @@
     "ReferenceFlowPropertyID":23,
     "NodeTypeID":3,
     "DirectionID":1,
-    "Quantity":0.002872907,
+    "NodeWeight":0.002872907,
     "ParentFragmentFlowID":90,
     "NodeID":0
   },
@@ -116,7 +116,7 @@
     "ReferenceFlowPropertyID":23,
     "NodeTypeID":3,
     "DirectionID":1,
-    "Quantity":0.0229425,
+    "NodeWeight":0.0229425,
     "ParentFragmentFlowID":90,
     "NodeID":0
   },
@@ -127,7 +127,7 @@
     "ReferenceFlowPropertyID":24,
     "NodeTypeID":1,
     "DirectionID":1,
-    "Quantity":0.0002921652,
+    "NodeWeight":0.0002921652,
     "ParentFragmentFlowID":90,
     "NodeID":11
   },
@@ -138,7 +138,7 @@
     "ReferenceFlowPropertyID":24,
     "NodeTypeID":3,
     "DirectionID":1,
-    "Quantity":0.001186893,
+    "NodeWeight":0.001186893,
     "ParentFragmentFlowID":97,
     "NodeID":0
   },
@@ -149,7 +149,7 @@
     "ReferenceFlowPropertyID":24,
     "NodeTypeID":3,
     "DirectionID":1,
-    "Quantity":0.000112807,
+    "NodeWeight":0.000112807,
     "ParentFragmentFlowID":97,
     "NodeID":0
   },
@@ -160,7 +160,7 @@
     "ReferenceFlowPropertyID":24,
     "NodeTypeID":3,
     "DirectionID":1,
-    "Quantity":0.001217718,
+    "NodeWeight":0.001217718,
     "ParentFragmentFlowID":90,
     "NodeID":0
   },
@@ -171,7 +171,7 @@
     "ReferenceFlowPropertyID":24,
     "NodeTypeID":1,
     "DirectionID":1,
-    "Quantity":0.0007330002,
+    "NodeWeight":0.0007330002,
     "ParentFragmentFlowID":90,
     "NodeID":2
   },
@@ -182,7 +182,7 @@
     "ReferenceFlowPropertyID":24,
     "NodeTypeID":3,
     "DirectionID":1,
-    "Quantity":-4.783886E-07,
+    "NodeWeight":-4.783886E-07,
     "ParentFragmentFlowID":101,
     "NodeID":0
   },
@@ -193,7 +193,7 @@
     "ReferenceFlowPropertyID":24,
     "NodeTypeID":3,
     "DirectionID":1,
-    "Quantity":-4.544968E-08,
+    "NodeWeight":-4.544968E-08,
     "ParentFragmentFlowID":101,
     "NodeID":0
   },
@@ -204,7 +204,7 @@
     "ReferenceFlowPropertyID":24,
     "NodeTypeID":1,
     "DirectionID":1,
-    "Quantity":0.01421752,
+    "NodeWeight":0.01421752,
     "ParentFragmentFlowID":90,
     "NodeID":6
   },
@@ -215,7 +215,7 @@
     "ReferenceFlowPropertyID":24,
     "NodeTypeID":3,
     "DirectionID":1,
-    "Quantity":0.000790937,
+    "NodeWeight":0.000790937,
     "ParentFragmentFlowID":104,
     "NodeID":0
   },
@@ -226,7 +226,7 @@
     "ReferenceFlowPropertyID":24,
     "NodeTypeID":3,
     "DirectionID":1,
-    "Quantity":7.518325E-05,
+    "NodeWeight":7.518325E-05,
     "ParentFragmentFlowID":104,
     "NodeID":0
   },
@@ -237,7 +237,7 @@
     "ReferenceFlowPropertyID":24,
     "NodeTypeID":1,
     "DirectionID":1,
-    "Quantity":3.30416E-05,
+    "NodeWeight":3.30416E-05,
     "ParentFragmentFlowID":90,
     "NodeID":8
   },
@@ -248,7 +248,7 @@
     "ReferenceFlowPropertyID":15,
     "NodeTypeID":3,
     "DirectionID":1,
-    "Quantity":0.06141327,
+    "NodeWeight":0.06141327,
     "ParentFragmentFlowID":90,
     "NodeID":0
   },
@@ -259,7 +259,7 @@
     "ReferenceFlowPropertyID":15,
     "NodeTypeID":3,
     "DirectionID":1,
-    "Quantity":94.85431,
+    "NodeWeight":94.85431,
     "ParentFragmentFlowID":90,
     "NodeID":0
   },
@@ -270,7 +270,7 @@
     "ReferenceFlowPropertyID":23,
     "NodeTypeID":1,
     "DirectionID":1,
-    "Quantity":0.3333333,
+    "NodeWeight":0.3333333,
     "ParentFragmentFlowID":0,
     "NodeID":145
   }
