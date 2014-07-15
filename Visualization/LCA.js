@@ -87,14 +87,16 @@ LCA.startSpinner = function startSpinner(tgtElementId) {
  * @param {String} indexProperty    Data property to be used as key
  */
 LCA.indexData = function (resourceName, indexProperty) {
-
     if (resourceName in LCA.loadedData && LCA.loadedData[resourceName] !== null) {
         var indexedData = [];
         LCA.loadedData[resourceName].forEach(function (d) {
             indexedData[+d[indexProperty]] = d;
         });
-        LCA.indexedData[resourceName] = indexedData;
+        return indexedData;
     }
+    else {
+        return null;
+    }   
 };
 
 /**
@@ -128,7 +130,7 @@ LCA.shortName = function (name, maxLen) {
  * @param {Boolean} useTestData     Load json file for testing
  * @param {Function} callback       Function to call when done
  */
-LCA.loadData = function (resourceName, useTestData, callback) {
+LCA.loadData = function (resourceName, useTestData, callback, paramString) {
    
     if (resourceName in LCA.loadedData) {
         callback.call();
@@ -136,6 +138,9 @@ LCA.loadData = function (resourceName, useTestData, callback) {
     }
     
     var jsonURL = (useTestData ? LCA.testDataFolder : LCA.baseURI) + resourceName;
+    if (paramString) {
+        jsonURL += paramString;
+    }
     if (useTestData) {
         jsonURL += ".json";
     }
