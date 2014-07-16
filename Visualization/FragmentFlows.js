@@ -14,8 +14,8 @@ function FragmentFlows() {
     /*global d3, window, colorbrewer, LCA, console */
 
     // Current selections
-    var selectedFragmentID = 6,
-        fragmentName = "Natural Gas Supply Mixer";
+    var selectedFragmentID = 2,
+        fragmentName = "";
 
     // SVG margins
     var margin = {
