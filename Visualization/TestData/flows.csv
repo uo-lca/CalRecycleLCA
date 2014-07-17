@@ -1,0 +1,1263 @@
+﻿FlowID,Name,CASNumber,FlowTypeID,ReferenceFlowPropertyID
+1,"Electricity from lignite",               ,1,24
+2,"Avoided Base Oil",               ,1,36
+3,"US: Dummy_Disposal, lignite coal combustion byproducts, to unspecified reuse",               ,1,23
+4,"Transformation, from dump site, inert material landfill",               ,2,28
+5,"UO_Light distillates",               ,1,23
+6,"Hazardous waste (deposited)",               ,2,23
+7,"phosphorus",007723-14-0    ,2,23
+8,"carbon dioxide",000124-38-9    ,2,23
+9,"platinum",007440-06-4    ,2,23
+10,"potassium",007440-09-7    ,2,23
+11,"potassium chloride",007447-40-7    ,2,23
+12,"primary energy from geothermics",               ,2,24
+13,"primary energy from hydro power",               ,2,24
+14,"primary energy from solar energy",               ,2,24
+15,"primary energy from wind power",               ,2,24
+16,"UO_Transfer to DK",               ,1,23
+17,"Acids, unspecified",               ,2,23
+18,"UO_Dow Therm A",               ,1,23
+19,"urban, discontinuously built",               ,2,29
+20,"pentachlorophenol",000087-86-5    ,2,23
+21,"waste heat",               ,2,24
+22,"waste heat",               ,2,24
+23,"waste heat",               ,2,24
+24,"waste heat",               ,2,24
+25,"xenon-137",014835-21-3    ,2,27
+26,"xenon-138",015751-81-2    ,2,27
+27,"volatile organic compound",               ,2,23
+28,"volatile organic compound",               ,2,23
+29,"(2,4-dichlorophenoxy)acetic acid",000094-75-7    ,2,23
+30,"acenaphthene",000083-32-9    ,2,23
+31,"acenaphthene",000083-32-9    ,2,23
+32,"acenaphthylene",000208-96-8    ,2,23
+33,"acenaphthylene",000208-96-8    ,2,23
+34,"acid (as H+)",012408-02-5    ,2,23
+35,"acrolein",000107-02-8    ,2,23
+36,"acryolonitrile",000107-13-1    ,2,23
+37,"acryolonitrile",000107-13-1    ,2,23
+38,"particles (PM10)",               ,2,23
+39,"antimony",007440-36-0    ,2,23
+40,"antimony",007440-36-0    ,2,23
+41,"benzaldehyde",000100-52-7    ,2,23
+42,"benzene",000071-43-2    ,2,23
+43,"benzene",000071-43-2    ,2,23
+44,"benzo[a]pyrene",000050-32-8    ,2,23
+45,"benzylchloride",000100-44-7    ,2,23
+46,"calcium",007440-70-2    ,2,23
+47,"carbofuran",001563-66-2    ,2,23
+48,"calcium carbonate",000471-34-1    ,2,23
+49,"carbon dioxide",000124-38-9    ,2,23
+50,"carbon disulfide",000075-15-0    ,2,23
+51,"carbon disulfide",000075-15-0    ,2,23
+52,"carbon monoxide",000630-08-0    ,2,23
+53,"carbon-14",014762-75-5    ,2,27
+54,"carbon-14",014762-75-5    ,2,27
+55,"carbonate",003812-32-6    ,2,23
+56,"cerium-141",013967-74-3    ,2,27
+57,"clay",070694-09-6    ,2,23
+58,"cobalt",007440-48-4    ,2,23
+59,"cumene",000098-82-8    ,2,23
+60,"particles (PM2.5)",               ,2,23
+61,"dibenz[a,h]anthracene",000053-70-3    ,2,23
+62,"acetic acid",000064-19-7    ,2,23
+63,"acetic acid",000064-19-7    ,2,23
+64,"2,3,7,8-tetrachlorodibenzo-p-dioxin",001746-01-6    ,2,23
+65,"HFC-143",000430-66-0    ,2,23
+66,"HFC-152a",000075-37-6    ,2,23
+67,"1,2-dibromoethane",000106-93-4    ,2,23
+68,"1,2-dibromoethane",000106-93-4    ,2,23
+69,"bromide",024959-67-9    ,2,23
+70,"HFC-116",000076-16-4    ,2,23
+71,"mercaptan",000075-08-1    ,2,23
+72,"ethanol",000064-17-5    ,2,23
+73,"ethyl amine",000075-04-7    ,2,23
+74,"ethylene",000074-85-1    ,2,23
+75,"ethylene oxide",000075-21-8    ,2,23
+76,"fenpiclonil",074738-17-3    ,2,23
+77,"natural aggregate",               ,2,23
+78,"fluoride",016984-48-8    ,2,23
+79,"fluoride",016984-48-8    ,2,23
+80,"fluoride",016984-48-8    ,2,23
+81,"fluoride",016984-48-8    ,2,23
+82,"fluoride",016984-48-8    ,2,23
+83,"fluorine",007782-41-4    ,2,23
+84,"fluorine",007782-41-4    ,2,23
+85,"fluorine",007782-41-4    ,2,23
+86,"sodium",007440-23-5    ,2,23
+87,"formaldehyde",000050-00-0    ,2,23
+88,"formic acid",000064-18-6    ,2,23
+89,"gallium",007440-55-3    ,2,23
+90,"granite",               ,2,23
+91,"carbon",007782-42-5    ,2,23
+92,"helium",007440-59-7    ,2,23
+93,"hexamethylene diamine",000124-09-4    ,2,23
+94,"hexane",000110-54-3    ,2,23
+95,"hydrogen",001333-74-0    ,2,23
+96,"hydrogen arsenide",007784-42-1    ,2,23
+97,"hydrogen peroxide",007722-84-1    ,2,23
+98,"hydrogen sulfide",007783-06-4    ,2,23
+99,"hydrogen sulfide",007783-06-4    ,2,23
+100,"hydrogen sulfide",007783-06-4    ,2,23
+101,"hydrogen-3",010028-17-8    ,2,27
+102,"hydrogen-3",010028-17-8    ,2,27
+103,"hydrogen-3",010028-17-8    ,2,27
+104,"hydroxide",014280-30-9    ,2,23
+105,"nitrous oxide",010024-97-2    ,2,23
+106,"hypochlorite",014380-61-1    ,2,23
+107,"hypochlorite",014380-61-1    ,2,23
+108,"indium",007440-74-6    ,2,23
+109,"iodide",020461-54-5    ,2,23
+110,"iodide",020461-54-5    ,2,23
+111,"xenon-131",014683-11-5    ,2,27
+112,"xenon-133",014932-42-4    ,2,27
+113,"xenon-135",014995-62-1    ,2,27
+114,"zinc",007440-66-6    ,2,23
+115,"zinc",007440-66-6    ,2,23
+116,"zinc",007440-66-6    ,2,23
+117,"zinc",007440-66-6    ,2,23
+118,"zinc-65",013982-39-3    ,2,27
+119,"zirconium",007440-67-7    ,2,23
+120,"zirconium-95",013967-71-0    ,2,27
+121,"particles (PM2.5 - PM10)",               ,2,23
+122,"sodium",007440-23-5    ,2,23
+123,"sodium",007440-23-5    ,2,23
+124,"chloride",016887-00-6    ,2,23
+125,"chloride",016887-00-6    ,2,23
+126,"chromium VI",018540-29-9    ,2,23
+127,"acetic acid",000064-19-7    ,2,23
+128,"acetone",000067-64-1    ,2,23
+129,"acetone",000067-64-1    ,2,23
+130,"bis(n-octyl) phthalate",000117-84-0    ,2,23
+131,"ammonia",007664-41-7    ,2,23
+132,"ammonia",007664-41-7    ,2,23
+133,"ammonium",014798-03-9    ,2,23
+134,"tar",008007-45-2    ,2,23
+135,"tin oxide",001332-29-2    ,2,23
+136,"iodine-131",010043-66-0    ,2,27
+137,"iodine-133",014834-67-4    ,2,27
+138,"iodine-133",014834-67-4    ,2,27
+139,"iron",007439-89-6    ,2,23
+140,"iron",007439-89-6    ,2,23
+141,"iron",007439-89-6    ,2,23
+142,"iron",007439-89-6    ,2,23
+143,"iron",007439-89-6    ,2,23
+144,"iron",007439-89-6    ,2,23
+145,"iron-59",014596-12-4    ,2,27
+146,"isobutanol",000078-83-1    ,2,23
+147,"isoprene",000078-79-5    ,2,23
+148,"krypton-85",013983-27-2    ,2,27
+149,"krypton-87",014809-68-8    ,2,27
+150,"lead-210",014255-04-0    ,2,27
+151,"mancozeb",008018-01-7    ,2,23
+152,"mercury",007439-97-6    ,2,23
+153,"metaldehyde",009002-91-9    ,2,23
+154,"methane",000074-82-8    ,2,23
+155,"CFC-13",000075-72-9    ,2,23
+156,"dichloromethane",000075-09-2    ,2,23
+157,"dichloromethane",000075-09-2    ,2,23
+158,"bentonite",001302-78-9    ,2,23
+159,"chloroform",000067-66-3    ,2,23
+160,"HCFC-21",000075-43-4    ,2,23
+161,"cadmium",007440-43-9    ,2,23
+162,"cadmium",007440-43-9    ,2,23
+163,"R-40",000074-87-3    ,2,23
+164,"R-40",000074-87-3    ,2,23
+165,"FC-14",000075-73-0    ,2,23
+166,"anthracene",000120-12-7    ,2,23
+167,"antimony",007440-36-0    ,2,23
+168,"antimony",007440-36-0    ,2,23
+169,"antimony",007440-36-0    ,2,23
+170,"antimony",007440-36-0    ,2,23
+171,"methyl acetate",000079-20-9    ,2,23
+172,"cobalt-58",013981-38-9    ,2,27
+173,"cobalt-60",010198-40-0    ,2,27
+174,"ammonia",007664-41-7    ,2,23
+175,"m-xylene",000108-38-3    ,2,23
+176,"nickel",007440-02-0    ,2,23
+177,"nickel",007440-02-0    ,2,23
+178,"nickel",007440-02-0    ,2,23
+179,"niobium-95",013967-76-5    ,2,27
+180,"nitrate",014797-55-8    ,2,23
+181,"nitrite",014797-65-0    ,2,23
+182,"nitrite",014797-65-0    ,2,23
+183,"nitrite",014797-65-0    ,2,23
+184,"dinitrogen",007727-37-9    ,2,23
+185,"nitrogen dioxide",010102-44-0    ,2,23
+186,"nitrogen monoxide",010102-43-9    ,2,23
+187,"o-cresol",000095-48-7    ,2,23
+188,"octane",000111-65-9    ,2,23
+189,"orbencarb",034622-58-7    ,2,23
+190,"oxygen",007782-44-7    ,2,23
+191,"o-xylene",000095-47-6    ,2,23
+192,"ozone",010028-15-6    ,2,23
+193,"phenol",000108-95-2    ,2,23
+194,"phenol",000108-95-2    ,2,23
+195,"2,4-dichlorophenol",000120-83-2    ,2,23
+196,"phosphate",014265-44-2    ,2,23
+197,"phosphate",014265-44-2    ,2,23
+198,"phosphate",014265-44-2    ,2,23
+199,"phosphate",014265-44-2    ,2,23
+200,"phosphine",007803-51-2    ,2,23
+201,"polonium-210",013981-52-7    ,2,27
+202,"polonium-210",013981-52-7    ,2,27
+203,"potassium",007440-09-7    ,2,23
+204,"potassium",007440-09-7    ,2,23
+205,"potassium",007440-09-7    ,2,23
+206,"potassium-40",013966-00-2    ,2,27
+207,"potassium-40",013966-00-2    ,2,27
+208,"potassium-40",013966-00-2    ,2,27
+209,"ammonium",014798-03-9    ,2,23
+210,"antimonite",               ,2,23
+211,"arsenic trioxide",001327-53-3    ,2,23
+212,"barium sulfate",007727-43-7    ,2,23
+213,"bauxite",001318-16-7    ,2,23
+214,"biological oxygen demand",               ,2,23
+215,"biological oxygen demand",               ,2,23
+216,"polychlorinated biphenyls",001336-36-3    ,2,23
+217,"borax",012447-40-4    ,2,23
+218,"calcium chloride",010043-52-4    ,2,23
+219,"chemical oxygen demand",               ,2,23
+220,"chemical oxygen demand",               ,2,23
+221,"cinnabar",019122-79-3    ,2,23
+222,"colemanite",001318-33-8    ,2,23
+223,"diatomite",068855-54-9    ,2,23
+224,"fluorspar",014542-23-5    ,2,23
+225,"gypsum",007778-18-9    ,2,23
+226,"baryte",007727-43-7    ,2,23
+227,"hydrogen chloride",007647-01-0    ,2,23
+228,"hydrogen fluoride",007664-39-3    ,2,23
+229,"decane",000124-18-5    ,2,23
+230,"decane",000124-18-5    ,2,23
+231,"decane",000124-18-5    ,2,23
+232,"polycyclic aromatic hydrocarbons",               ,2,23
+233,"polycyclic aromatic hydrocarbons",               ,2,23
+234,"polycyclic aromatic hydrocarbons",               ,2,23
+235,"propylene oxide",000075-56-9    ,2,23
+236,"propylene oxide",000075-56-9    ,2,23
+237,"protactinium-234",015100-28-4    ,2,27
+238,"CFC-114",000076-14-2    ,2,23
+239,"radium-224",013233-32-4    ,2,27
+240,"radium-226",013982-63-3    ,2,27
+241,"radium-226",013982-63-3    ,2,27
+242,"radium-228",015262-20-1    ,2,27
+243,"radium-228",015262-20-1    ,2,27
+244,"scandium",007440-20-2    ,2,23
+245,"scandium",007440-20-2    ,2,23
+246,"selenium",007782-49-2    ,2,23
+247,"selenium",007782-49-2    ,2,23
+248,"selenium",007782-49-2    ,2,23
+249,"selenium",007782-49-2    ,2,23
+250,"silver-110",014391-76-5    ,2,27
+251,"styrene",000100-42-5    ,2,23
+252,"sulfur",007704-34-9    ,2,23
+253,"sulfur",007704-34-9    ,2,23
+254,"tert-butyl methyl ether",001634-04-4    ,2,23
+255,"tert-butyl methyl ether",001634-04-4    ,2,23
+256,"tert-butyl methyl ether",001634-04-4    ,2,23
+257,"tebutam",035256-85-0    ,2,23
+258,"technetium-99",014133-76-7    ,2,27
+259,"teflubenzuron",083121-18-0    ,2,23
+260,"thallium",007440-28-0    ,2,23
+261,"thallium",007440-28-0    ,2,23
+262,"thallium",007440-28-0    ,2,23
+263,"thorium-228",014274-82-9    ,2,27
+264,"thorium-228",014274-82-9    ,2,27
+265,"thorium-230",014269-63-7    ,2,27
+266,"thorium-230",014269-63-7    ,2,27
+267,"thorium-232",007440-29-1    ,2,27
+268,"thorium-232",007440-29-1    ,2,27
+269,"toluene",000108-88-3    ,2,23
+270,"tin",007440-31-5    ,2,23
+271,"tin",007440-31-5    ,2,23
+272,"titanium",007440-32-6    ,2,23
+273,"titanium",007440-32-6    ,2,23
+274,"titanium",007440-32-6    ,2,23
+275,"titanium",007440-32-6    ,2,23
+276,"toluene",000108-88-3    ,2,23
+277,"2,4-dinitrotoluene",000121-14-2    ,2,23
+278,"thorium-234",015065-10-8    ,2,27
+279,"thorium-234",015065-10-8    ,2,27
+280,"tin",007440-31-5    ,2,23
+281,"tin",007440-31-5    ,2,23
+282,"chromium",007440-47-3    ,2,23
+283,"chromium",007440-47-3    ,2,23
+284,"triethylene glycol",000112-27-6    ,2,23
+285,"triethylene glycol",000112-27-6    ,2,23
+286,"trimethylamine",000075-50-3    ,2,23
+287,"manganese",007439-96-5    ,2,23
+288,"manganese",007439-96-5    ,2,23
+289,"manganese",007439-96-5    ,2,23
+290,"manganese",007439-96-5    ,2,23
+291,"manganese",007439-96-5    ,2,23
+292,"carbon dioxide (biogenic)",000124-38-9    ,2,23
+293,"uranium-235",015117-96-1    ,2,27
+294,"uranium-235",015117-96-1    ,2,27
+295,"uranium-238",007440-61-1    ,2,27
+296,"beta-butyrolactone",003068-88-0    ,2,23
+297,"beta-butyrolactone",003068-88-0    ,2,23
+298,"2-chloro-1-phenylethanone",000532-27-4    ,2,23
+299,"krypton-88",014995-61-0    ,2,27
+300,"krypton-89",016316-03-3    ,2,27
+301,"carbon-14",014762-75-5    ,2,27
+302,"carbonate",003812-32-6    ,2,23
+303,"dimethylamine",000124-40-3    ,2,23
+304,"chromium",007440-47-3    ,2,23
+305,"chromium",007440-47-3    ,2,23
+306,"chromium",007440-47-3    ,2,23
+307,"chromium",007440-47-3    ,2,23
+308,"chromium III",016065-83-1    ,2,23
+309,"chromium III",016065-83-1    ,2,23
+310,"pentane",000109-66-0    ,2,23
+311,"palladium",007440-05-3    ,2,23
+312,"boron",007440-42-8    ,2,23
+313,"boron",007440-42-8    ,2,23
+314,"boron",007440-42-8    ,2,23
+315,"boron",007440-42-8    ,2,23
+316,"bromate",015541-45-4    ,2,23
+317,"methyl ethyl ketone",000078-93-3    ,2,23
+318,"cobalt",007440-48-4    ,2,23
+319,"cumene",000098-82-8    ,2,23
+320,"ammonia",007664-41-7    ,2,23
+321,"ethyl benzene",000100-41-4    ,2,23
+322,"hexachlorobenzene",000118-74-1    ,2,23
+323,"hexachlorobenzene",000118-74-1    ,2,23
+324,"non-methane volatile organic compounds",               ,2,23
+325,"calcium",007440-70-2    ,2,23
+326,"pentan-1-ol",000071-41-0    ,2,23
+327,"chlorosulphuric acid",007790-94-5    ,2,23
+328,"Docosane",000629-97-0    ,2,23
+329,"Ethylene Glycol displaced",               ,1,41
+330,"Water (sea water from technosphere, waste water)",               ,2,23
+331,"Water,turbine use, unspecified natural origin",007732-18-5    ,2,30
+332,"Transformation, from tropical rain forest",               ,2,28
+333,"RER: natural gas, high pressure, at consumer",               ,1,24
+334,"to traffic area, rail/road embankment",               ,2,28
+335,"2-methyl-2-butene",000513-35-9    ,2,23
+336,"hexadecane",000544-76-3    ,2,23
+337,"quartz sand",014808-60-7    ,2,23
+338,"raw pumice",               ,2,23
+339,"Wood, soft, standing",               ,2,30
+340,"Avoided No 6 Residual Oil",               ,1,36
+341,"Radioactive isotopes (unspecific)",               ,2,27
+342,"Land Transformation",               ,2,28
+343,"Transformation, to industrial area, vegetation",               ,2,28
+344,"Copper (+II)",015158-11-9    ,2,23
+345,"Used Oil to Informal Management",               ,1,12
+346,"Lost or Unknown",               ,1,12
+347,"pentan-1-ol",000071-41-0    ,2,23
+348,"Occup. as Forest land",               ,2,29
+349,"Used Oil to Gray Market ",               ,1,23
+350,"formamide",000075-12-7    ,2,23
+351,"Waste to Disposal",               ,1,12
+352,"arsenic V",061805-96-7    ,2,23
+353,"MRO: electricity, natural gas, at power plant",               ,1,24
+354,"Copper (+II)",015158-11-9    ,2,23
+355,"UO_223 Collected",               ,1,23
+356,"Nickel ion (+III)",022541-64-6    ,2,23
+357,"rhenium",007440-15-5    ,2,23
+358,"rhodium",007440-16-6    ,2,23
+359,"2-hexanone",000591-78-6    ,2,23
+360,"river water",007732-18-5    ,2,23
+361,"ruthenium",007440-18-8    ,2,23
+362,"sand",               ,2,23
+363,"sea water",007732-18-5    ,2,23
+364,"silicon",007440-21-3    ,2,23
+365,"silver",007440-22-4    ,2,23
+366,"slate",               ,2,23
+367,"sodium chloride",007647-14-5    ,2,23
+368,"sodium nitrate",007631-99-4    ,2,23
+369,"sodium sulfate",007757-82-6    ,2,23
+370,"soil",               ,2,23
+371,"No. 2 Distillate",               ,1,23
+372,"Energy, potential (in hydropower reservoir), converted",               ,2,24
+373,"UO Local Collection",               ,1,23
+374,"RFO to Combustion",               ,1,12
+375,"formamide",000075-12-7    ,2,23
+376,"Suspended solids, unspecified",               ,2,23
+377,"Erosion Resistance",               ,2,4
+378,"to shrub land",               ,2,28
+379,"Benzal chloride",000098-87-3    ,2,23
+380,"Avoided Electricity",               ,1,18
+381,"Electricity WECC",               ,1,24
+382,"US: Transport, ocean freighter, average fuel mix",               ,1,15
+383,"US: Dummy_Disposal, solid waste, unspecified, to unspecified treatment",               ,1,23
+384,"traffic area, rail/road embankment",               ,2,29
+385,"stone",               ,2,23
+386,"sulfur",007704-34-9    ,2,23
+387,"talc",014807-96-6    ,2,23
+388,"tantalum",007440-25-7    ,2,23
+389,"tellurium",013494-80-9    ,2,23
+390,"Asphalt Product",               ,1,12
+391,"Lead-210/kg",014255-04-0    ,2,23
+392,"CH: disposal, hazardous waste, 25% water, to hazardous waste incineration",               ,1,23
+393,"Lead (+II)",014280-50-3    ,2,23
+394,"UO_Transfer to MDO",               ,1,23
+395,"Water (river water from technosphere, waste water)",               ,2,23
+396,"nitrogen trifluoride",007783-54-2    ,2,23
+397,"Waste (deposited)",               ,2,23
+398,"arsenic V",061805-96-7    ,2,23
+399,"from forest",               ,2,28
+400,"High radioactive waste",               ,2,23
+401,"UO_Marine Diesel Oil",               ,1,23
+402,"Occupation, industrial area, benthos",               ,2,29
+403,"Hydrochloric acid",007664-39-3    ,2,23
+404,"magnesium",007439-95-4    ,2,23
+405,"magnesium",007439-95-4    ,2,23
+406,"sodium",007440-23-5    ,2,23
+407,"tungsten",007440-33-7    ,2,23
+408,"sulfur",007704-34-9    ,2,23
+409,"oxygen",007782-44-7    ,2,23
+410,"tar",008007-45-2    ,2,23
+411,"acid (as H+)",012408-02-5    ,2,23
+412,"acid (as H+)",012408-02-5    ,2,23
+413,"acid (as H+)",012408-02-5    ,2,23
+414,"tin",007440-31-5    ,2,23
+415,"titanium",007440-32-6    ,2,23
+416,"Water (rain water)",               ,2,23
+417,"US: Dummy_Transport, pipeline, unspecified",               ,1,15
+418,"Avoided Natural Gas",               ,1,36
+419,"from industrial area",               ,2,28
+420,"Avoided Gasoline",               ,1,36
+421,"Secondary fuel",               ,1,24
+422,"Volume occupied, final repository for radioactive waste",               ,2,30
+423,"UO_re-refined base oil",               ,1,23
+424,"construction site",               ,2,29
+425,"to industrial area",               ,2,28
+426,"Pit Methane (in MJ)",000074-82-8    ,2,24
+427,"UO_Hydrotx Catalyst",               ,1,23
+428,"Transformation, to forest, intensive, clear-cutting",               ,2,28
+429,"lanthanum-140",013981-28-7    ,2,27
+430,"antimony-125",014234-35-6    ,2,27
+431,"antimony-125",014234-35-6    ,2,27
+432,"phosphate",014265-44-2    ,2,23
+433,"phosphate",014265-44-2    ,2,23
+434,"nitrate",014797-55-8    ,2,23
+435,"US: Liquefied petroleum gas, combusted in industrial boiler",               ,1,30
+436,"acetyl chloride",000075-36-5    ,2,23
+437,"Bitumen Displaced",               ,1,41
+438,"arsenic V",061805-96-7    ,2,23
+439,"Tantalum",007440-25-7    ,2,23
+440,"Groundwater Replenishment",               ,2,11
+441,"Ammonium chloride",012125-02-9    ,2,23
+442,"to forest",               ,2,28
+443,"US: electricity, production mix US",               ,1,24
+444,"UO_EG LERT Bottoms",               ,1,23
+445,"CH: process-specific burdens, hazardous waste incineration plant",               ,1,23
+446,"Used Oil, for collection",               ,1,23
+447,"CH: residual material landfill facility",               ,1,1
+448,"bromide",024959-67-9    ,2,23
+449,"uranium",007440-61-1    ,2,24
+450,"vanadium",007440-62-2    ,2,23
+451,"water",007732-18-5    ,2,23
+452,"wood;  14.7 MJ/kg",               ,2,24
+453,"Lactic acid",000050-21-5    ,2,23
+454,"Energy, kinetic (in wind), converted",               ,2,24
+455,"Boron trifluoride",007637-07-2    ,2,23
+456,"Sodium hydroxide",001310-73-2    ,2,23
+457,"Hexaflourosilicates",016961-83-4    ,2,23
+458,"Nickel (+II)",014701-22-5    ,2,23
+459,"Used oil, improperly disposed",               ,1,23
+460,"Occupation, forest, intensive, normal",               ,2,29
+461,"Collectable Dry Used Oil",               ,1,12
+462,"UO_Hazardous Waste Incineration (25% water)",               ,1,23
+463,"Kline PCMO Recoverable",               ,1,30
+464,"Transformation, from dump site, slag compartment",               ,2,28
+465,"Nickel (+II)",014701-22-5    ,2,23
+466,"Mechanical Filtration",               ,2,46
+467,"Electricity Displaced",               ,1,13
+468,"UO_Transfer to ReRe",               ,1,23
+469,"US: Electricity, biomass, at power plant",               ,1,24
+470,"Different pollutants",               ,2,23
+471,"isopropylamine",000075-31-0    ,2,23
+472,"propylamine",000107-10-8    ,2,23
+473,"CH: iron (III) chloride, 40% in H2O, at plant",007705-08-0    ,1,23
+474,"to traffic area, road network",               ,2,28
+475,"Recycled Oil Reprocessed",               ,1,12
+476,"Clean gas",               ,2,23
+477,"US: Natural gas, combusted in industrial boiler",               ,1,30
+478,"UO_Asphalt Flux",               ,1,23
+479,"US: Dummy_Disposal, solid waste, unspecified, to sanitary landfill",               ,1,23
+480,"Mechanical Filtration",               ,2,2
+481,"Methane (biotic)",000074-82-8    ,2,23
+482,"nitrate",014797-55-8    ,2,23
+483,"uranium-234",013966-29-5    ,2,27
+484,"uranium-238",007440-61-1    ,2,27
+485,"uranium-238",007440-61-1    ,2,27
+486,"vanadium",007440-62-2    ,2,23
+487,"vanadium",007440-62-2    ,2,23
+488,"vanadium",007440-62-2    ,2,23
+489,"vanadium",007440-62-2    ,2,23
+490,"vanadium",007440-62-2    ,2,23
+491,"vinyl acetate",000108-05-4    ,2,23
+492,"bromine",007726-95-6    ,2,23
+493,"bromine",007726-95-6    ,2,23
+494,"bromine",007726-95-6    ,2,23
+495,"bromine",007726-95-6    ,2,23
+496,"bromine",007726-95-6    ,2,23
+497,"aniline",000062-53-3    ,2,23
+498,"total organic carbon",               ,2,23
+499,"total organic carbon",               ,2,23
+500,"cresol",001319-77-3    ,2,23
+501,"cresol",001319-77-3    ,2,23
+502,"m-cresol",000108-39-4    ,2,23
+503,"chromium III",016065-83-1    ,2,23
+504,"chromium III",016065-83-1    ,2,23
+505,"chromium VI",018540-29-9    ,2,23
+506,"chromium VI",018540-29-9    ,2,23
+507,"sulfide",018496-25-8    ,2,23
+508,"sulfide",018496-25-8    ,2,23
+509,"para-cresol",000106-44-5    ,2,23
+510,"acetylene",000074-86-2    ,2,23
+511,"feldspar",012168-80-8    ,2,23
+512,"lead",007439-92-1    ,2,23
+513,"lead",007439-92-1    ,2,23
+514,"lead",007439-92-1    ,2,23
+515,"lead",007439-92-1    ,2,23
+516,"lead-210",014255-04-0    ,2,27
+517,"chlorothalonil",001897-45-6    ,2,23
+518,"ethane",000074-84-0    ,2,23
+519,"hydrogen peroxide",007722-84-1    ,2,23
+520,"strontium",007440-24-6    ,2,23
+521,"strontium",007440-24-6    ,2,23
+522,"strontium",007440-24-6    ,2,23
+523,"strontium-89",014158-27-1    ,2,27
+524,"strontium-90",010098-97-2    ,2,27
+525,"chloride",016887-00-6    ,2,23
+526,"zinc oxide",001314-13-2    ,2,23
+527,"sulfate",014808-79-8    ,2,23
+528,"benzo[g,h,i]perylene",000191-24-2    ,2,23
+529,"benzo[k]fluoranthene",000207-08-9    ,2,23
+530,"benzo[k]fluoranthene",000207-08-9    ,2,23
+531,"benzo[k]fluoranthene",000207-08-9    ,2,23
+532,"n-butane",000106-97-8    ,2,23
+533,"n-butanol",000071-36-3    ,2,23
+534,"n-butanol",000071-36-3    ,2,23
+535,"tungsten",007440-33-7    ,2,23
+536,"tungsten",007440-33-7    ,2,23
+537,"zinc",007440-66-6    ,2,23
+538,"barium",007440-39-3    ,2,23
+539,"barium-140",014798-08-4    ,2,27
+540,"copper",007440-50-8    ,2,23
+541,"methacrylic acid",000079-41-4    ,2,23
+542,"sulfur trioxide",007446-11-9    ,2,23
+543,"sulfite",014265-45-3    ,2,23
+544,"antimony-122",014374-79-9    ,2,27
+545,"antimony-124",014683-10-4    ,2,27
+546,"antimony-124",014683-10-4    ,2,27
+547,"barium-140",014798-08-4    ,2,27
+548,"basalt",               ,2,23
+549,"benomyl",017804-35-2    ,2,23
+550,"ethyl acetate",000141-78-6    ,2,23
+551,"ethyl acetate",000141-78-6    ,2,23
+552,"n-butyl-acetate",000123-86-4    ,2,23
+553,"n-butyl-acetate",000123-86-4    ,2,23
+554,"ethylenediamine",000107-15-3    ,2,23
+555,"ethylenediamine",000107-15-3    ,2,23
+556,"sulfate",014808-79-8    ,2,23
+557,"lead-210",014255-04-0    ,2,27
+558,"curium",007440-51-9    ,2,27
+559,"carbetamide",016118-49-3    ,2,23
+560,"butadiene",000106-99-0    ,2,23
+561,"aldrin",000309-00-2    ,2,23
+562,"HFC-245fa",000460-73-1    ,2,23
+563,"platinum",007440-06-4    ,2,23
+564,"plutonium-238",013981-16-3    ,2,27
+565,"aniline",000062-53-3    ,2,23
+566,"butene",025167-67-3    ,2,23
+567,"butene",025167-67-3    ,2,23
+568,"cerium-141",013967-74-3    ,2,27
+569,"cerium-144",014762-78-8    ,2,27
+570,"cesium",007440-46-2    ,2,23
+571,"cesium",007440-46-2    ,2,23
+572,"cesium-134",013967-70-9    ,2,27
+573,"cesium-134",013967-70-9    ,2,27
+574,"cesium-134",013967-70-9    ,2,27
+575,"cesium-136",014234-29-8    ,2,27
+576,"cesium-137",010045-97-3    ,2,27
+577,"cesium-137",010045-97-3    ,2,27
+578,"cesium-137",010045-97-3    ,2,27
+579,"chlorate",014866-68-3    ,2,23
+580,"chlorine",007782-50-5    ,2,23
+581,"chlorine",007782-50-5    ,2,23
+582,"chlorine",007782-50-5    ,2,23
+583,"toluene",000108-88-3    ,2,23
+584,"1,2-dichlorobenzene",000095-50-1    ,2,23
+585,"1,2-dichlorobenzene",000095-50-1    ,2,23
+586,"biphenyl",000092-52-4    ,2,23
+587,"biphenyl",000092-52-4    ,2,23
+588,"acetophenone",000098-86-2    ,2,23
+589,"chromium VI",018540-29-9    ,2,23
+590,"chromium VI",018540-29-9    ,2,23
+591,"chromium-51",014392-02-0    ,2,27
+592,"chromium-51",014392-02-0    ,2,27
+593,"HFC-32",000075-10-5    ,2,23
+594,"benzene",000071-43-2    ,2,23
+595,"beryllium",007440-41-7    ,2,23
+596,"tert-butylamine",000075-64-9    ,2,23
+597,"Lactic acid",000050-21-5    ,2,23
+598,"Chlorosilane, trimethyl-",000075-77-4    ,2,23
+599,"Physicochemical Filtration",               ,2,22
+600,"chloroacetic acid",000079-11-8    ,2,23
+601,"UO_221 Collected",               ,1,23
+602,"Water (waste water, untreated)",               ,1,23
+603,"RER: natural gas, burned in industrial furnace low-NOx >100kW",               ,1,24
+604,"Diesel",               ,1,23
+605,"chloramide",010599-90-3    ,2,23
+606,"US: Transport, pipeline, natural gas",               ,1,15
+607,"Natural Gas Mix",               ,1,23
+608,"WECC: electricity, natural gas, at power plant",               ,1,24
+609,"Erosion Resistance",               ,2,34
+610,"Transformation, to dump site, benthos",               ,2,28
+611,"Formate",               ,2,23
+612,"Gasoline (regular, CA)",               ,1,23
+613,"Transport, MHD Truck Class 6",               ,1,15
+614,"Wood, hard, standing",               ,2,30
+615,"UO_Waste Water non hazardous for treatment",               ,1,23
+616,"Electricity from hard coal",               ,1,24
+617,"UO_Transfer to Evergreen",               ,1,23
+618,"2-nitrotoluene",000088-72-2    ,2,23
+619,"UO_Transfer to Rejuv",               ,1,23
+620,"Energy carrier",               ,1,23
+621,"US: Dummy_Transport, pipeline, coal slurry",               ,1,15
+622,"UO_Transfer to Haz Waste Incineration",               ,1,23
+623,"US: Dummy_Disposal, ash and flue gas desulfurization sludge, to unspecified reuse",               ,1,23
+624,"Facility Emissions",               ,1,23
+625,"dump site",               ,2,29
+626,"Overburden (deposited)",               ,2,23
+627,"zinc",007440-66-6    ,2,23
+628,"zirconium",007440-67-7    ,2,23
+629,"from shrub land",               ,2,28
+630,"Methanesulfonic acid",000075-75-2    ,2,23
+631,"Oil sand (100% bitumen) (in MJ)",               ,2,24
+632,"Land Occupation",               ,2,29
+633,"Used Oil to Boiler on-site",               ,1,23
+634,"Volume occupied, reservoir",               ,2,51
+635,"US: Natural gas, at consumer",               ,1,30
+636,"US: Transport, barge, average fuel mix",               ,1,15
+637,"to traffic area, rail network",               ,2,28
+638,"to mineral extraction site",               ,2,28
+639,"Re-refined Base Oil",               ,1,12
+640,"UO_Transfer to OOS Rere",               ,1,23
+641,"Borate",               ,2,23
+642,"Transformation, to dump site, slag compartment",               ,2,28
+643,"Heavy fuel oil (3.5 wt.% S, CA)",               ,1,23
+644,"Disposal Services",               ,1,23
+645,"Transformation, to water courses, artificial",               ,2,28
+646,"Transformation, from dump site, sanitary landfill",               ,2,28
+647,"Inorganic dissolved matter (unspecified)",               ,2,23
+648,"US: Natural gas, processed, at plant",               ,1,30
+649,"UO_Transfer to Haz Landfill",               ,1,23
+650,"Kline HDMO Demand",               ,1,30
+651,"Rejuvenated Dielectric fluid",               ,1,12
+652,"Water (evapotranspiration)",               ,2,23
+653,"UO_Middle distillates",               ,1,23
+654,"CH: process-specific burdens, residual material landfill",               ,1,23
+655,"Collected UO Water Content",               ,1,12
+656,"UO_Generic PAH, combustion",               ,2,23
+657,"Solids (suspended)",               ,2,23
+658,"arsenic V",061805-96-7    ,2,23
+659,"Transformation, to forest, intensive, short-cycle",               ,2,28
+660,"Yttrium",               ,2,23
+661,"Scenario On",               ,1,1
+662,"Nickel (+II)",014701-22-5    ,2,23
+663,"UO_222 Collected",               ,1,23
+664,"MFA On",               ,1,1
+665,"UO_Combustion - NG Elemental Emissions",               ,1,49
+666,"Volume occupied, final repository for low-active radioactive waste",               ,2,30
+667,"Transformation, from arable, non-irrigated, fallow",               ,2,28
+668,"Transformation, from sea and ocean",               ,2,28
+669,"Biotic Production",               ,2,6
+670,"UO_Hazardous Waste to Landfill",               ,1,23
+671,"Occupation, industrial area, built up",               ,2,29
+672,"UO_Transfer to POTW",               ,1,23
+673,"vermiculite",               ,2,23
+674,"CH: cement, unspecified, at plant",               ,1,23
+675,"UO_Pre-processed",               ,1,31
+676,"lakes, artificial",               ,2,29
+677,"Anthranilic acid",000118-92-3    ,2,23
+678,"Transformation, to water bodies, artificial",               ,2,28
+679,"US: Dummy_Disposal, anthracite coal combustion byproducts, to unspecified reuse",               ,1,23
+680,"Transformation, to dump site, inert material landfill",               ,2,28
+681,"Occupation, permanent crop, fruit, intensive",               ,2,29
+682,"to pasture/meadow",               ,2,28
+683,"Secondary fuel renewable",               ,1,24
+684,"US: Dummy_Electricity, at wind power plant, unspecified",               ,1,24
+685,"Ethylene Glycol",               ,1,12
+686,"from arable, non-irrigated",               ,2,28
+687,"Electricity",               ,1,24
+688,"Base Oil Displaced",               ,1,41
+689,"Nickel (+II)",014701-22-5    ,2,23
+690,"UO_Exports",               ,1,23
+691,"Chloroacetyl chloride",000079-04-9    ,2,23
+692,"Transformation, from industrial area, benthos",               ,2,28
+693,"UO_Combustion - Emitted Fraction - Metals",               ,1,49
+694,"Radioactive tailings",               ,2,23
+695,"shrub land",               ,2,29
+696,"CH: transport, lorry 20-28t, fleet average",               ,1,37
+697,"UO_Used Antifreeze",               ,1,23
+698,"US: Dummy_Electricity, geothermal, unspecified",               ,1,24
+699,"Recycled Oil Exported",               ,1,12
+700,"Zinc (+II)",023713-49-7    ,2,23
+701,"Occupation, forest, intensive, short-cycle",               ,2,29
+702,"Transformation, to heterogeneous, agricultural",               ,2,28
+703,"traffic area, road network",               ,2,29
+704,"to arable",               ,2,28
+705,"Groundwater Replenishment",               ,2,9
+706,"US: Transport, combination truck, average fuel mix",               ,1,15
+707,"UO_Light ends",               ,1,23
+708,"US: Dummy_Disposal, solid waste, unspecified, to underground deposit",               ,1,23
+709,"Kline Industrial Recoverable",               ,1,30
+710,"from arable",               ,2,28
+711,"DE: disposal, hazardous waste, 0% water, to underground deposit",               ,1,23
+712,"Carbon, in organic matter, in soil",007440-44-0    ,2,23
+713,"arable, non-irrigated",               ,2,29
+714,"Transport, Rail",               ,1,15
+715,"2-Aminopropanol",002749-11-3    ,2,23
+716,"CH: hazardous waste incineration plant",               ,1,1
+717,"UO_RFO",               ,1,23
+718,"UO_Ethylene Glycol",               ,1,23
+719,"urea",000057-13-6    ,2,23
+720,"Used Oil Landfilled",               ,1,12
+721,"Gasoline (regular)",               ,1,23
+722,"RER: sodium hydroxide, 50% in H2O, production mix, at plant",001310-73-2    ,1,23
+723,"Avoided No 2 Distillate",               ,1,36
+724,"from pasture/meadow, intensive",               ,2,28
+725,"Pit gas ecoinvent",               ,2,25
+726,"UO_Oily Water",               ,1,23
+727,"rivers, artificial",               ,2,29
+728,"Eicosane",000112-95-8    ,2,23
+729,"to dump site",               ,2,28
+730,"US: Liquefied petroleum gas, at refinery",               ,1,30
+731,"US: Residual fuel oil, combusted in industrial boiler",               ,1,30
+732,"UO_Generic NMVOC, combustion (non PAH)",               ,2,23
+733,"Light Fuel",               ,1,12
+734,"Volume occupied, underground deposit",               ,2,30
+735,"UO to Onsite Combustion",               ,1,12
+736,"1,1,2-trichlorotrifluoroethane",000076-13-1    ,2,23
+737,"propylamine",000107-10-8    ,2,23
+738,"GLO: chemicals inorganic, at plant",               ,1,23
+739,"Transformation, from forest, intensive, clear-cutting",               ,2,28
+740,"Medium radioactive wastes",               ,2,23
+741,"No. 6 Residual oil",               ,1,23
+742,"Transformation, to arable, non-irrigated, fallow",               ,2,28
+743,"Radioactive emissions (general)",               ,2,27
+744,"CH: quicklime, milled, packed, at plant",001305-62-0    ,1,23
+745,"CH: calcium chloride, CaCl2, at regional storage",010043-52-4    ,1,23
+746,"Transformation, from industrial area, built up",               ,2,28
+747,"Heavy fuel oil (3.5 wt.% S)",               ,1,23
+748,"to arable, non-irrigated",               ,2,28
+749,"Used oil, improperly disposed, landfill route",               ,1,23
+750,"Physicochemical Filtration",               ,2,35
+751,"2-Aminopropanol",002749-11-3    ,2,23
+752,"Tin (+IV)",022537-50-4    ,2,23
+753,"UO_Combustion - Emitted Fraction - Halogens",               ,1,49
+754,"Wood, primary forest, standing",               ,2,30
+755,"dipropylamine",000142-84-7    ,2,23
+756,"mineral extraction site",               ,2,29
+757,"UO_Antifreeze liquid to haz waste incineration",               ,1,23
+758,"from mineral extraction site",               ,2,28
+759,"Different pollutants",               ,2,23
+760,"UO_transfer to OOS RFO",               ,1,23
+761,"chloramide",010599-90-3    ,2,23
+762,"Kline HDMO Recoverable",               ,1,30
+763,"Carbon dioxide, land transformation",000124-38-9    ,2,23
+764,"Kline PCMO Demand",               ,1,30
+765,"US: Dummy_Electricity, fossil, unspecified, at power plant",               ,1,24
+766,"UO_Transfer Losses",               ,1,23
+767,"RFO to Boiler",               ,1,23
+768,"Transformation, to unknown",               ,2,28
+769,"Water, salt, sole",007732-18-5    ,2,30
+770,"Radioactive isotopes (unspecific)",               ,2,27
+771,"Transformation, to permanent crop, fruit, intensive",               ,2,28
+772,"RER: transport, freight, rail",               ,1,37
+773,"Electricity Custom",               ,1,24
+774,"Bitumen (CA)",               ,1,23
+775,"Electricity from nuclear energy",               ,1,24
+776,"Transport, HHD Truck Class 8b",               ,1,15
+777,"Transformation, from industrial area, vegetation",               ,2,28
+778,"Used Oil on-site combustion",               ,1,23
+779,"Natural gas, at consumer USA",               ,1,23
+780,"Metal ions (unspecific)",               ,2,23
+781,"RER: industrial furnace, natural gas",               ,1,1
+782,"UO_Water Content Feedback",               ,1,31
+783,"Crude oil, at consumer USA",               ,1,23
+784,"Energy, solar, converted",               ,2,24
+785,"Oil sand (10% bitumen) (in MJ)",               ,2,24
+786,"tert-butylamine",000075-64-9    ,2,23
+787,"chloroacetic acid",000079-11-8    ,2,23
+788,"isopropylamine",000075-31-0    ,2,23
+789,"Diesel (CA)",               ,1,23
+790,"Nitrogen organic bounded",               ,2,23
+791,"Hexaflourosilicates",016961-83-4    ,2,23
+792,"from forest, extensive",               ,2,28
+793,"US: Dummy_Electricity, hydropower, at power plant, unspecified",               ,1,24
+794,"Inorganic salts and acids (unspecified)",               ,2,23
+795,"Used Oil to Space heater on-site",               ,1,23
+796,"Electricity US",               ,1,24
+797,"Cyanoacetic acid",000372-09-8    ,2,23
+798,"UO_Transfer to OOS MDO",               ,1,23
+799,"Lanthanides",007439-91-0    ,2,23
+800,"arsenic V",061805-96-7    ,2,23
+801,"US: Dummy_Electricity, photovoltaic, unspecified",               ,1,24
+802,"Fuels Displaced",               ,1,13
+803,"GLO: chemicals organic, at plant",               ,1,23
+804,"Water (river water from technosphere, turbined)",               ,2,23
+805,"Steam (MJ)",               ,1,24
+806,"Transformation, to sea and ocean",               ,2,28
+807,"Tailings (deposited)",               ,2,23
+808,"UO_Transfer to RFO",               ,1,23
+809,"total organic carbon",               ,2,23
+810,"particles (PM10)",               ,2,23
+811,"total organic carbon",               ,2,23
+812,"waste heat",               ,2,24
+813,"cyanide",000057-12-5    ,2,23
+814,"formic acid",000064-18-6    ,2,23
+815,"HCFC-140",000071-55-6    ,2,23
+816,"methylamine",000074-89-5    ,2,23
+817,"Lubricating oil",               ,1,23
+818,"RER: natural gas, burned in boiler modulating >100kW",               ,1,24
+819,"Kline Industrial Demand",               ,1,30
+820,"UO Transport",               ,1,15
+821,"CH: disposal, used mineral oil, 10% water, to hazardous waste incineration",               ,1,23
+822,"Energy, gross calorific value, in biomass, primary forest",               ,2,26
+823,"to urban, discontinuously built",               ,2,28
+824,"RER: hydrochloric acid, 30% in H2O, at plant",007647-01-0    ,1,23
+825,"US: Transport, train, diesel powered",               ,1,15
+826,"UO_Thermal energy from Natural Gas ",               ,1,24
+827,"Energy supply (inverted)",               ,1,23
+828,"traffic area, rail network",               ,2,29
+829,"Electricity from natural gas",               ,1,24
+830,"from pasture/meadow",               ,2,28
+831,"ethyl amine",000075-04-7    ,2,23
+832,"trimethylamine",000075-50-3    ,2,23
+833,"olivine",019086-72-7    ,2,23
+834,"osmium",007440-04-2    ,2,23
+835,"oxygen",007782-44-7    ,2,23
+836,"propionic acid",000079-09-4    ,2,23
+837,"methyl acetate",000079-20-9    ,2,23
+838,"palladium",007440-05-3    ,2,23
+839,"methacrylate",000096-33-3    ,2,23
+840,"peat;  8.4 MJ/kg",               ,2,24
+841,"Biotic Production",               ,2,52
+842,"Transformation, to industrial area, built up",               ,2,28
+843,"Transformation, to forest, intensive, normal",               ,2,28
+844,"UO_Natural Gas",               ,1,23
+845,"Uranium oxide (U3O8), 332 GJ per kg, in ore",               ,2,23
+846,"2-Nitrobenzoic acid",000552-16-9    ,2,23
+847,"Methyl borate",000121-43-7    ,2,23
+848,"UO_lost",               ,1,30
+849,"Avoided Bitumen",               ,1,36
+850,"RFO to Furnace",               ,1,23
+851,"Nickel (+II)",014701-22-5    ,2,23
+852,"forest, intensive",               ,2,29
+853,"Transformation, from dump site, residual material landfill",               ,2,28
+854,"industrial area",               ,2,29
+855,"methyl lactate",000547-64-8    ,2,23
+856,"Electricity from heavy fuel oil",               ,1,24
+857,"Occup. as Convent. arable land",               ,2,29
+858,"RER: natural gas, burned in boiler condensing modulating >100kW",               ,1,24
+859,"Bitumen",               ,1,23
+860,"Used Oil Collected",               ,1,12
+861,"Lubricating oil (CA)",               ,1,23
+862,"Low radioactive wastes",               ,2,23
+863,"US: Residual fuel oil, at refinery",               ,1,30
+864,"chlorosulphuric acid",007790-94-5    ,2,23
+865,"CH: disposal, cement, hydrated, 0% water, to residual material landfill",               ,1,23
+866,"Transformation, to industrial area, benthos",               ,2,28
+867,"dimethyl malonate",000108-59-8    ,2,23
+868,"to forest, intensive",               ,2,28
+869,"methyl formate",000107-31-3    ,2,23
+870,"1-pentene",000109-67-1    ,2,23
+871,"diethylamine",000109-89-7    ,2,23
+872,"dodecane",000112-40-3    ,2,23
+873,"Transformation, from unknown",               ,2,28
+874,"RNA: natural gas, at consumer",               ,1,24
+875,"Occupation, dump site, benthos",               ,2,29
+876,"Occupation, industrial area, vegetation",               ,2,29
+877,"UO_feedstock water",               ,1,23
+878,"Transport, LHD2 Truck",               ,1,15
+879,"Spoil (deposited)",               ,2,23
+880,"dipropylamine",000142-84-7    ,2,23
+881,"CFC-11",000075-69-4    ,2,23
+882,"HFC-23",000075-46-7    ,2,23
+883,"manganese",007439-96-5    ,2,23
+884,"manganese-54",013966-31-9    ,2,27
+885,"manganese-54",013966-31-9    ,2,27
+886,"sulfur",007704-34-9    ,2,23
+887,"sulfur",007704-34-9    ,2,23
+888,"fluoranthene",000206-44-0    ,2,23
+889,"formaldehyde",000050-00-0    ,2,23
+890,"CFC-12",000075-71-8    ,2,23
+891,"m-xylene",000108-38-3    ,2,23
+892,"strontium-90",010098-97-2    ,2,27
+893,"hydrazine",000302-01-2    ,2,23
+894,"lead dioxide",001309-60-0    ,2,23
+895,"2,4-dimethylphenol",000105-67-9    ,2,23
+896,"zinc-65",013982-39-3    ,2,27
+897,"caprolactam",000105-60-2    ,2,23
+898,"phenanthrene",000085-01-8    ,2,23
+899,"phenanthrene",000085-01-8    ,2,23
+900,"1-pentene",000109-67-1    ,2,23
+901,"acrylic acid",000079-10-7    ,2,23
+902,"1,3,5-trimethylbenzene",000108-67-8    ,2,23
+903,"cadmium",007440-43-9    ,2,23
+904,"cadmium",007440-43-9    ,2,23
+905,"cadmium",007440-43-9    ,2,23
+906,"cadmium",007440-43-9    ,2,23
+907,"calcium",007440-70-2    ,2,23
+908,"pentachlorobenzene",000608-93-5    ,2,23
+909,"benzo[a]anthracene",000056-55-3    ,2,23
+910,"benzo[a]anthracene",000056-55-3    ,2,23
+911,"benzo[a]anthracene",000056-55-3    ,2,23
+912,"molybdenum",007439-98-7    ,2,23
+913,"gold",007440-57-5    ,2,23
+914,"chlorobenzene",000108-90-7    ,2,23
+915,"chlorobenzene",000108-90-7    ,2,23
+916,"ethyl benzene",000100-41-4    ,2,23
+917,"ethyl benzene",000100-41-4    ,2,23
+918,"anthracene",000120-12-7    ,2,23
+919,"anthracene",000120-12-7    ,2,23
+920,"2-methyl-2-butene",000513-35-9    ,2,23
+921,"argon",007440-37-1    ,2,23
+922,"argon-41",014163-25-8    ,2,27
+923,"chloroethane",000075-00-3    ,2,23
+924,"atrazine",001912-24-9    ,2,23
+925,"HFC-125",000354-33-6    ,2,23
+926,"ethanol",000064-17-5    ,2,23
+927,"tetrachloroethene",000127-18-4    ,2,23
+928,"tetrachloroethene",000127-18-4    ,2,23
+929,"tetrachloroethene",000127-18-4    ,2,23
+930,"diethylamine",000109-89-7    ,2,23
+931,"trichloroethene",000079-01-6    ,2,23
+932,"isobutanol",000078-83-1    ,2,23
+933,"ethylene",000074-85-1    ,2,23
+934,"ethylene oxide",000075-21-8    ,2,23
+935,"vinyl chloride",000075-01-4    ,2,23
+936,"vinyl chloride",000075-01-4    ,2,23
+937,"cobalt",007440-48-4    ,2,23
+938,"cobalt",007440-48-4    ,2,23
+939,"cobalt",007440-48-4    ,2,23
+940,"cobalt",007440-48-4    ,2,23
+941,"cobalt",007440-48-4    ,2,23
+942,"cobalt-57",013981-50-5    ,2,27
+943,"cobalt-58",013981-38-9    ,2,27
+944,"isophorone",000078-59-1    ,2,23
+945,"dimethylamine",000124-40-3    ,2,23
+946,"fluoranthene",000206-44-0    ,2,23
+947,"fluoranthene",000206-44-0    ,2,23
+948,"fluorene",000086-73-7    ,2,23
+949,"furan",000110-00-9    ,2,23
+950,"glutaraldehyde",000111-30-8    ,2,23
+951,"glyphosate",001071-83-6    ,2,23
+952,"glyphosate",001071-83-6    ,2,23
+953,"heptane",000142-82-5    ,2,23
+954,"naphthalene",000091-20-3    ,2,23
+955,"naphthalene",000091-20-3    ,2,23
+956,"hexane",000110-54-3    ,2,23
+957,"hexane",000110-54-3    ,2,23
+958,"hydrocyanic acid",000074-90-8    ,2,23
+959,"hydrocyanic acid",000074-90-8    ,2,23
+960,"linuron",000330-55-2    ,2,23
+961,"HFC-134a",000811-97-2    ,2,23
+962,"tributyltin oxide",000056-35-9    ,2,23
+963,"zirconium-95",013967-71-0    ,2,27
+964,"crude oil; 42.3 MJ/kg",               ,2,24
+965,"brown coal;  11.9 MJ/kg",               ,2,24
+966,"natural gas;  44.1 MJ/kg",               ,2,24
+967,"sulfide",018496-25-8    ,2,23
+968,"hard coal;  26.3 MJ/kg",               ,2,24
+969,"biomass;  14.7 MJ/kg",               ,2,24
+970,"inert rock",               ,2,23
+971,"particles (> PM10)",               ,2,23
+972,"particles (> PM10)",               ,2,23
+973,"silicium tetrafluoride",007783-61-1    ,2,23
+974,"particles (> PM10)",               ,2,23
+975,"aluminium",007429-90-5    ,2,23
+976,"aluminium",007429-90-5    ,2,23
+977,"aluminium",007429-90-5    ,2,23
+978,"aluminium",007429-90-5    ,2,23
+979,"aluminium",007429-90-5    ,2,23
+980,"1,2-dichloroethane",000107-06-2    ,2,23
+981,"1,2-dichloroethane",000107-06-2    ,2,23
+982,"molybdenum",007439-98-7    ,2,23
+983,"molybdenum",007439-98-7    ,2,23
+984,"molybdenum",007439-98-7    ,2,23
+985,"molybdenum",007439-98-7    ,2,23
+986,"beryllium",007440-41-7    ,2,23
+987,"beryllium",007440-41-7    ,2,23
+988,"beryllium",007440-41-7    ,2,23
+989,"beryllium",007440-41-7    ,2,23
+990,"cobalt-60",010198-40-0    ,2,27
+991,"cobalt-60",010198-40-0    ,2,27
+992,"copper",007440-50-8    ,2,23
+993,"copper",007440-50-8    ,2,23
+994,"copper",007440-50-8    ,2,23
+995,"acetaldehyde",000075-07-0    ,2,23
+996,"acetaldehyde",000075-07-0    ,2,23
+997,"chrysene",000218-01-9    ,2,23
+998,"chrysene",000218-01-9    ,2,23
+999,"chrysene",000218-01-9    ,2,23
+1000,"asbestos (white)",012001-29-5    ,2,23
+1001,"iodide",020461-54-5    ,2,23
+1002,"iodine",007553-56-2    ,2,23
+1003,"iodine",007553-56-2    ,2,23
+1004,"iodine-129",015046-84-1    ,2,27
+1005,"cyanide",000057-12-5    ,2,23
+1006,"cyanide",000057-12-5    ,2,23
+1007,"cyclohexane",000110-82-7    ,2,23
+1008,"iodine-129",015046-84-1    ,2,27
+1009,"iodine-131",010043-66-0    ,2,27
+1010,"iodine-131",010043-66-0    ,2,27
+1011,"iridium",007439-88-5    ,2,23
+1012,"iron",007439-89-6    ,2,23
+1013,"barium",007440-39-3    ,2,23
+1014,"barium",007440-39-3    ,2,23
+1015,"barium",007440-39-3    ,2,23
+1016,"barium",007440-39-3    ,2,23
+1017,"barium",007440-39-3    ,2,23
+1018,"dolomite",069227-00-5    ,2,23
+1019,"isopropanol",000067-63-0    ,2,23
+1020,"isopropanol",000067-63-0    ,2,23
+1021,"lithium",007439-93-2    ,2,23
+1022,"butylene glycol",000110-63-4    ,2,23
+1023,"butylene glycol",000110-63-4    ,2,23
+1024,"mercury",007439-97-6    ,2,23
+1025,"mercury",007439-97-6    ,2,23
+1026,"mercury",007439-97-6    ,2,23
+1027,"mercury",007439-97-6    ,2,23
+1028,"mercury",007439-97-6    ,2,23
+1029,"methacrylate",000096-33-3    ,2,23
+1030,"lanthanum-140",013981-28-7    ,2,27
+1031,"Halon-1001",000074-83-9    ,2,23
+1032,"Halon-1211",000353-59-3    ,2,23
+1033,"Halon-1301",000075-63-8    ,2,23
+1034,"HCFC-22",000075-45-6    ,2,23
+1035,"CFC-10",000056-23-5    ,2,23
+1036,"CFC-10",000056-23-5    ,2,23
+1037,"methanol",000067-56-1    ,2,23
+1038,"methanol",000067-56-1    ,2,23
+1039,"methanol",000067-56-1    ,2,23
+1040,"methylamine",000074-89-5    ,2,23
+1041,"potassium",007440-09-7    ,2,23
+1042,"chloride",016887-00-6    ,2,23
+1043,"hydrogen iodide",010034-85-2    ,2,23
+1044,"lead",007439-92-1    ,2,23
+1045,"methyl isobutyl ketone",000108-10-1    ,2,23
+1046,"methyl methacrylate",000080-62-6    ,2,23
+1047,"monoethanolamine",000141-43-5    ,2,23
+1048,"naphthalene",000091-20-3    ,2,23
+1049,"napropamide",015299-99-7    ,2,23
+1050,"bentazone",025057-89-0    ,2,23
+1051,"nitrobenzene",000098-95-3    ,2,23
+1052,"nitrobenzene",000098-95-3    ,2,23
+1053,"sodium",007440-23-5    ,2,23
+1054,"chloride",016887-00-6    ,2,23
+1055,"nitrate",014797-55-8    ,2,23
+1056,"nitrate",014797-55-8    ,2,23
+1057,"lithium",007439-93-2    ,2,23
+1058,"phenol",000108-95-2    ,2,23
+1059,"pentachlorophenol",000087-86-5    ,2,23
+1060,"pirimicarb",023103-98-2    ,2,23
+1061,"plutonium",007440-07-5    ,2,27
+1062,"plutonium",007440-07-5    ,2,27
+1063,"polonium-210",013981-52-7    ,2,27
+1064,"adsorbable organic halogen compounds",               ,2,23
+1065,"adsorbable organic halogen compounds",               ,2,23
+1066,"air",               ,2,23
+1067,"ammonium",014798-03-9    ,2,23
+1068,"hydrocarbons (unspecified)",               ,2,23
+1069,"hydrocarbons (unspecified)",               ,2,23
+1070,"hydrogen bromide",010035-10-6    ,2,23
+1071,"hydrogen chloride",007647-01-0    ,2,23
+1072,"hydrogen fluoride",007664-39-3    ,2,23
+1073,"kaolin",001332-58-7    ,2,23
+1074,"kieserite",014567-64-7    ,2,23
+1075,"magnesite",000546-93-0    ,2,23
+1076,"magnesium",007439-95-4    ,2,23
+1077,"magnesium",007439-95-4    ,2,23
+1078,"magnesium",007439-95-4    ,2,23
+1079,"dinitrogen",007727-37-9    ,2,23
+1080,"decane",000124-18-5    ,2,23
+1081,"polycyclic aromatic hydrocarbons",               ,2,23
+1082,"propanal",000123-38-6    ,2,23
+1083,"propane",000074-98-6    ,2,23
+1084,"1,2-dichloropropane",000078-87-5    ,2,23
+1085,"propene",000115-07-1    ,2,23
+1086,"propene",000115-07-1    ,2,23
+1087,"propionic acid",000079-09-4    ,2,23
+1088,"propylene glycol monomethyl ether acetate",000108-65-6    ,2,23
+1089,"aluminium",007429-90-5    ,2,23
+1090,"2,3,7,8-tetrachlorodibenzo-p-dioxin",001746-01-6    ,2,23
+1091,"protactinium-234",015100-28-4    ,2,27
+1092,"indeno(1,2,3-cd)pyrene",000193-39-5    ,2,23
+1093,"HCFC-124",002837-89-0    ,2,23
+1094,"radium-224",013233-32-4    ,2,27
+1095,"radium-226",013982-63-3    ,2,27
+1096,"radium-228",015262-20-1    ,2,27
+1097,"radon-220",022481-48-7    ,2,27
+1098,"radon-222",014859-67-7    ,2,27
+1099,"radon-222",014859-67-7    ,2,27
+1100,"rhodium",007440-16-6    ,2,23
+1101,"rubidium",007440-17-7    ,2,23
+1102,"aclonifen",074070-46-5    ,2,23
+1103,"ruthenium-103",013968-53-1    ,2,27
+1104,"ruthenium-103",013968-53-1    ,2,27
+1105,"ruthenium-106",013967-48-1    ,2,27
+1106,"ruthenium-106",013967-48-1    ,2,27
+1107,"scandium",007440-20-2    ,2,23
+1108,"selenium",007782-49-2    ,2,23
+1109,"silver",007440-22-4    ,2,23
+1110,"silver",007440-22-4    ,2,23
+1111,"silver",007440-22-4    ,2,23
+1112,"silver",007440-22-4    ,2,23
+1113,"silver-110",014391-76-5    ,2,27
+1114,"sodium-24",013982-04-2    ,2,27
+1115,"water vapour",007732-18-5    ,2,23
+1116,"strontium",007440-24-6    ,2,23
+1117,"strontium",007440-24-6    ,2,23
+1118,"strontium",007440-24-6    ,2,23
+1119,"molybdenum",007439-98-7    ,2,23
+1120,"molybdenum-99",014119-15-4    ,2,27
+1121,"sulfur dioxide",007446-09-5    ,2,23
+1122,"sulfur hexafluoride",002551-62-4    ,2,23
+1123,"sulfur trioxide",007446-11-9    ,2,23
+1124,"sulfate",014808-79-8    ,2,23
+1125,"sulfate",014808-79-8    ,2,23
+1126,"sulfate",014808-79-8    ,2,23
+1127,"tellurium",013494-80-9    ,2,23
+1128,"tellurium-123",014304-80-4    ,2,27
+1129,"tellurium-132",014234-28-7    ,2,27
+1130,"thiram",000137-26-8    ,2,23
+1131,"thorium-228",014274-82-9    ,2,27
+1132,"o-chlorotoluene",000095-49-8    ,2,23
+1133,"o-chlorotoluene",000095-49-8    ,2,23
+1134,"americium-241",086954-36-1    ,2,27
+1135,"magnesium chloride",007786-30-3    ,2,23
+1136,"acenaphthylene",000208-96-8    ,2,23
+1137,"cypermethrin",052315-07-8    ,2,23
+1138,"acetonitrile",000075-05-8    ,2,23
+1139,"acetonitrile",000075-05-8    ,2,23
+1140,"xylene (all isomers)",001330-20-7    ,2,23
+1141,"xylene (all isomers)",001330-20-7    ,2,23
+1142,"xylene (all isomers)",001330-20-7    ,2,23
+1143,"uranium-234",013966-29-5    ,2,27
+1144,"uranium-234",013966-29-5    ,2,27
+1145,"ground water",007732-18-5    ,2,23
+1146,"lake water",007732-18-5    ,2,23
+1147,"copper",007440-50-8    ,2,23
+1148,"lead",007439-92-1    ,2,23
+1149,"boron",007440-42-8    ,2,23
+1150,"used air",               ,2,23
+1151,"volatile organic compound",               ,2,23
+1152,"chloroform",000067-66-3    ,2,23
+1153,"manganese",007439-96-5    ,2,23
+1154,"carbon dioxide",000124-38-9    ,2,23
+1155,"methyl ethyl ketone",000078-93-3    ,2,23
+1156,"methyl formate",000107-31-3    ,2,23
+1157,"metribuzin",021087-64-9    ,2,23
+1158,"metolachlor",051218-45-2    ,2,23
+1159,"chlorine",007782-50-5    ,2,23
+1160,"chlorine",007782-50-5    ,2,23
+1161,"bromoform",000075-25-2    ,2,23
+1162,"dimethyl sulphate",000077-78-1    ,2,23
+1163,"Thermal energy (MJ)",               ,1,24
+1164,"Water (river water from technosphere, cooling water)",               ,2,23
+1165,"UCTE: electricity, low voltage, production UCTE, at grid",               ,1,24
+1166,"RER: phosphoric acid, industrial grade, 85% in H2O, at plant",007664-38-2    ,1,23
+1167,"antimony",007440-36-0    ,2,23
+1168,"fluorine",007782-41-4    ,2,23
+1169,"hydrogen sulfide",007783-06-4    ,2,23
+1170,"hydrogen sulfide",007783-06-4    ,2,23
+1171,"hydrogen sulfide",007783-06-4    ,2,23
+1172,"polychlorinated biphenyls",001336-36-3    ,2,23
+1173,"polychlorinated biphenyls",001336-36-3    ,2,23
+1174,"polycyclic aromatic hydrocarbons",               ,2,23
+1175,"thallium",007440-28-0    ,2,23
+1176,"thallium",007440-28-0    ,2,23
+1177,"thallium",007440-28-0    ,2,23
+1178,"tin",007440-31-5    ,2,23
+1179,"titanium",007440-32-6    ,2,23
+1180,"Used oil, improperly disposed, storm drain, filtered",               ,1,23
+1181,"surface water",007732-18-5    ,2,23
+1182,"Used oil, improperly disposed, incineration ash",               ,1,23
+1183,"Used oil, improperly disposed, soil route",               ,1,23
+1184,"Used oil, improperly disposed, POTW biosolids, incineration",               ,1,23
+1185,"nitrate",014797-55-8    ,2,23
+1186,"Used oil, improperly disposed, at POTW",               ,1,23
+1187,"Used oil, improperly disposed, landfill to incinerator",               ,1,23
+1188,"Used oil, improperly disposed, water route",               ,1,23
+1189,"Iron chloride",               ,1,23
+1190,"Used oil, improperly disposed, to agricultural soil",               ,1,23
+1191,"vanadium",007440-62-2    ,2,23
+1192,"chromium III",016065-83-1    ,2,23
+1193,"chromium VI",018540-29-9    ,2,23
+1194,"polychlorinated biphenyls",001336-36-3    ,2,23
+1195,"beryllium",007440-41-7    ,2,23
+1196,"Used oil, improperly disposed, storm drain",               ,1,23
+1197,"Municipal solid waste deposition",               ,1,23
+1198,"Waste incineration of municipal solid waste (MSW)",               ,1,23
+1199,"Used oil, improperly disposed, to sea water",               ,1,23
+1200,"Used oil, improperly disposed, POTW biosolids, agriculture",               ,1,23
+1201,"Used Oil Dumped to Water",               ,1,12
+1202,"Used oil, improperly disposed, storm drain, filtered, filter sludge",               ,1,23
+1203,"Used Oil Dumped to Soil",               ,1,12
+1204,"Used oil",               ,1,23
+1205,"Used oil, improperly disposed, POTW biosolids, landfill",               ,1,23
+1206,"Hydrated lime dry slaked",001305-62-0    ,1,23
+1207,"Phosphoric acid",007664-38-2    ,1,23
+1208,"UO to Incineration",               ,1,12
+1209,"Used oil, improperly disposed, dry weather diversion",               ,1,23
+1210,"Used oil, improperly disposed, to fresh water",               ,1,23
+1211,"Used oil, improperly disposed, landfill, collection",               ,1,15
+1212,"Used oil, improperly disposed, POTW liquid",               ,1,23
+1213,"Used oil, improperly disposed, storm drain, unfiltered",               ,1,23
+1214,"Used oil, improperly disposed, to industrial soil",               ,1,23
+1215,"Used oil, improperly disposed, sewer",               ,1,23
+1216,"phenanthrene",000085-01-8    ,2,23
+1217,"phenanthrene",000085-01-8    ,2,23
+1218,"silver",007440-22-4    ,2,23
+1219,"phenanthrene",000085-01-8    ,2,23
+1220,"polychlorinated biphenyls",001336-36-3    ,2,23
+1221,"selenium",007782-49-2    ,2,23
+1222,"silver",007440-22-4    ,2,23
+1223,"molybdenum",007439-98-7    ,2,23
+1224,"primary energy from waves",               ,2,24
+1225,"mancozeb",008018-01-7    ,2,23
+1226,"atrazine",001912-24-9    ,2,23
+1227,"trifluralin",001582-09-8    ,2,23
+1228,"fipronil",120068-37-3    ,2,23
+1229,"fipronil",120068-37-3    ,2,23
+1230,"pyrite",001309-36-0    ,2,23
+1231,"Water (groundwater from technosphere, waste water)",               ,2,23
+1232,"Water (sea water from technosphere, cooling water)",               ,2,23
+1233,"Slag (deposited)",               ,2,23
+1234,"Demolition waste (deposited)",               ,2,23
+1235,"dimethenamid",087674-68-8    ,2,23
+1236,"dimethenamid",087674-68-8    ,2,23
+1237,"lasso",015972-60-8    ,2,23
+1238,"acetochlor",034256-82-1    ,2,23
+1239,"acetochlor",034256-82-1    ,2,23
+1240,"deltamethrin",052918-63-5    ,2,23
+1241,"deltamethrin",052918-63-5    ,2,23
+1242,"trifluralin",001582-09-8    ,2,23
+1243,"benomyl",017804-35-2    ,2,23
+1244,"Plutonium as residual product",007440-07-5    ,1,23
+1245,"Avoided Ethylene Glycol",               ,1,36
+1246,"Waste radioactive",               ,1,23
+1247,"Uranium depleted",007440-61-1    ,1,23
+1248,"Slag (Uranium conversion)",               ,1,23
+1249,"Transport (ELCD)",               ,1,15
+1250,"CaF2 (low radioactice)",007789-75-5    ,1,23
+1251,"mancozeb",008018-01-7    ,2,23
+1252,"terbufos",013071-79-9    ,2,23
+1253,"terbufos",013071-79-9    ,2,23
+1254,"atrazine",001912-24-9    ,2,23
+1255,"glyphosate",001071-83-6    ,2,23
+1256,"glyphosate",001071-83-6    ,2,23
+1257,"methomyl",016752-77-5    ,2,23
+1258,"methomyl",016752-77-5    ,2,23
+1259,"dicamba",001918-00-9    ,2,23
+1260,"dicamba",001918-00-9    ,2,23
+1261,"benomyl",017804-35-2    ,2,23
+1262,"",68476-33-5     ,1,23

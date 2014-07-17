@@ -24,7 +24,7 @@ function FragmentFlows() {
         bottom: 30,
         left: 20
     },
-        width = 800 - margin.left - margin.right,   // diagram width
+        width = 700 - margin.left - margin.right,   // diagram width
         height = 600 - margin.top - margin.bottom;  // diagram height
 
     var formatNumber = d3.format("^.2g"),
@@ -107,6 +107,20 @@ function FragmentFlows() {
                 break;
         }
         return nodeName;
+    }
+
+    function displayFlows(node) {
+        d3.select("table").remove();
+        // TODO : move this into tooltip
+        var table = d3.select("#chartcontainer").append("table"); 
+            flowData = [];
+        node.sourceLinks.forEach( function (l) {
+            flowData.push(LCA.indexedData.flows[l.flowID]);
+        });
+        node.targetLinks.forEach(function (l) {
+            flowData.push(LCA.indexedData.flows[l.flowID]);
+        });
+        LCA.tabulate(table, flowData, ["Name","CASNumber"]);       
     }
 
     /**
@@ -192,9 +206,18 @@ function FragmentFlows() {
             .style("stroke", function (d) {
                 return d3.rgb(d.color).darker(2);
             });
-
-        node.on('mouseover', nodeTip.show)
-            .on('mouseout', nodeTip.hide);
+        var ntElement = d3.select(".d3-tip");
+        node.on('mouseover', function(d) {      
+            ntElement.transition()
+                .duration(200);
+            nodeTip.show(d);
+        })
+            .on('mouseout', function (d) {
+                ntElement.transition()
+                .duration(500);
+            nodeTip.hide(d);
+            })
+            .on('click', displayFlows);
         //
         // Position fragment flow name to the right or left of node.
         //
@@ -378,6 +401,26 @@ function FragmentFlows() {
     }
 
     /**
+     * STOPGAP : load flows from csv
+     */
+    function loadFlows() {
+        d3.csv("TestData/flows.csv")
+        .row(function (d) { return { FlowID: +d.FlowID, Name: d.Name, CASNumber: d.CASNumber, FlowTypeID: +d.FlowTypeID, ReferenceFlowPropertyID: +d.ReferenceFlowPropertyID }; })
+        .get(function (error, data) {
+            if (error) {
+                window.alert("Error loading flows.");
+                console.error(error);
+                LCA.loadedData.flows = null;
+            } else {
+                LCA.loadedData.flows = data;
+            }
+            LCA.indexedData.flows = LCA.indexData("flows", "FlowID");
+            onDataLoaded();
+        });
+        
+    }
+
+    /**
      * Starting point for FragmentFlows
      */
     function init() {
@@ -391,9 +434,10 @@ function FragmentFlows() {
         
         LCA.startSpinner("chartcontainer");
         //toolTip = LCA.createToolTip(".container");
-        apiResourceNames = ["fragments", "processes", "flowproperties", "fragmentflows", "flowflowproperties"];
+        apiResourceNames = ["fragments", "processes", "flowproperties", "fragmentflows", "flowflowproperties", "flows"];
         LCA.loadData(apiResourceNames[0], true, onFragmentsLoaded);
         LCA.loadData(apiResourceNames[1], true, onProcessesLoaded);
+        loadFlows();
         LCA.loadData(apiResourceNames[2], true, onDataLoaded);
         LCA.loadData(apiResourceNames[3], true, onFragmentFlowsLoaded, "." + selectedFragmentID);
         LCA.loadData(apiResourceNames[4], true, onDataLoaded);
