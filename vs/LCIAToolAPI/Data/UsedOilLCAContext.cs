@@ -8,15 +8,16 @@ namespace Data
 
     public partial class UsedOilLCAContext : DbContext, IDbContext
     {
-              static UsedOilLCAContext()
-    {
-        Database.SetInitializer<UsedOilLCAContext>(null);
-    }
+
+        static UsedOilLCAContext()
+        {
+            Database.SetInitializer<UsedOilLCAContext>(null);
+        }
 
         public UsedOilLCAContext()
             : base("name=UsedOilLCAContext")
         {
-            //turned off the because caused infinite loop.  Grrrr.
+            //turned off these because caused infinite loop and interfere with Json serialization.  Grrrr.
             this.Configuration.LazyLoadingEnabled = false;
             this.Configuration.ProxyCreationEnabled = false;
         }
@@ -51,65 +52,62 @@ namespace Data
             }
         }
 
-        public DbSet<C__MigrationHistory> C__MigrationHistory { get; set; }
-        public DbSet<Background> Backgrounds { get; set; }
-        public DbSet<BackgroundCache> BackgroundCaches { get; set; }
-        public DbSet<Category> Categories { get; set; }
-        public DbSet<CategorySystem> CategorySystems { get; set; }
-        public DbSet<CharacterizationParam> CharacterizationParams { get; set; }
-        public DbSet<Classification> Classifications { get; set; }
-        public DbSet<CompositionData> CompositionDatas { get; set; }
-        public DbSet<CompositionParam> CompositionParams { get; set; }
-        public DbSet<CompostionModel> CompostionModels { get; set; }
-        public DbSet<DataProvider> DataProviders { get; set; }
-        public DbSet<DataType> DataTypes { get; set; }
-        public DbSet<DependencyParam> DependencyParams { get; set; }
-        public DbSet<Direction> Directions { get; set; }
-        public DbSet<DistributionParam> DistributionParams { get; set; }
-        public DbSet<Flow> Flows { get; set; }
-        public DbSet<FlowFlowProperty> FlowFlowProperties { get; set; }
-        public DbSet<FlowProperty> FlowProperties { get; set; }
-        public DbSet<FlowPropertyEmission> FlowPropertyEmissions { get; set; }
-        public DbSet<FlowPropertyParam> FlowPropertyParams { get; set; }
-        public DbSet<FlowType> FlowTypes { get; set; }
-        public DbSet<Fragment> Fragments { get; set; }
-        public DbSet<FragmentFlow> FragmentFlows { get; set; }
-        public DbSet<FragmentNodeFragment> FragmentNodeFragments { get; set; }
-        public DbSet<FragmentNodeProcess> FragmentNodeProcesses { get; set; }
-        public DbSet<FragmentStage> FragmentStages { get; set; }
-        public DbSet<ILCDEntity> ILCDEntities { get; set; }
-        public DbSet<ImpactCategory> ImpactCategories { get; set; }
-        public DbSet<IndicatorType> IndicatorTypes { get; set; }
-        public DbSet<LCIA> LCIAs { get; set; }
-        public DbSet<LCIAMethod> LCIAMethods { get; set; }
-        public DbSet<NodeCache> NodeCaches { get; set; }
-        public DbSet<NodeDissipationParam> NodeDissipationParams { get; set; }
-        public DbSet<NodeEmissionParam> NodeEmissionParams { get; set; }
-        public DbSet<NodeType> NodeTypes { get; set; }
-        public DbSet<Param> Params { get; set; }
-        public DbSet<ParamType> ParamTypes { get; set; }
-        public DbSet<Process> Processes { get; set; }
-        public DbSet<ProcessDissipation> ProcessDissipations { get; set; }
-        public DbSet<ProcessDissipationParam> ProcessDissipationParams { get; set; }
-        public DbSet<ProcessEmissionParam> ProcessEmissionParams { get; set; }
-        public DbSet<ProcessFlow> ProcessFlows { get; set; }
-        public DbSet<ProcessType> ProcessTypes { get; set; }
-        public DbSet<ReferenceType> ReferenceTypes { get; set; }
-        public DbSet<Scenario> Scenarios { get; set; }
-        public DbSet<ScenarioBackground> ScenarioBackgrounds { get; set; }
-        public DbSet<ScenarioGroup> ScenarioGroups { get; set; }
-        public DbSet<ScenarioParam> ScenarioParams { get; set; }
-        public DbSet<ScoreCache> ScoreCaches { get; set; }
-        public DbSet<UnitConversion> UnitConversions { get; set; }
-        public DbSet<UnitGroup> UnitGroups { get; set; }
-        public DbSet<User> Users { get; set; }
-        public DbSet<Visibility> Visibilities { get; set; }
+        public virtual DbSet<C__MigrationHistory> C__MigrationHistory { get; set; }
+        public virtual DbSet<Background> Backgrounds { get; set; }
+        public virtual DbSet<BackgroundCache> BackgroundCaches { get; set; }
+        public virtual DbSet<Category> Categories { get; set; }
+        public virtual DbSet<CategorySystem> CategorySystems { get; set; }
+        public virtual DbSet<CharacterizationParam> CharacterizationParams { get; set; }
+        public virtual DbSet<Classification> Classifications { get; set; }
+        public virtual DbSet<CompositionData> CompositionDatas { get; set; }
+        public virtual DbSet<CompositionParam> CompositionParams { get; set; }
+        public virtual DbSet<CompostionModel> CompostionModels { get; set; }
+        public virtual DbSet<DataProvider> DataProviders { get; set; }
+        public virtual DbSet<DataType> DataTypes { get; set; }
+        public virtual DbSet<DependencyParam> DependencyParams { get; set; }
+        public virtual DbSet<Direction> Directions { get; set; }
+        public virtual DbSet<DistributionParam> DistributionParams { get; set; }
+        public virtual DbSet<Flow> Flows { get; set; }
+        public virtual DbSet<FlowFlowProperty> FlowFlowProperties { get; set; }
+        public virtual DbSet<FlowProperty> FlowProperties { get; set; }
+        public virtual DbSet<FlowPropertyEmission> FlowPropertyEmissions { get; set; }
+        public virtual DbSet<FlowPropertyParam> FlowPropertyParams { get; set; }
+        public virtual DbSet<FlowType> FlowTypes { get; set; }
+        public virtual DbSet<Fragment> Fragments { get; set; }
+        public virtual DbSet<FragmentFlow> FragmentFlows { get; set; }
+        public virtual DbSet<FragmentNodeFragment> FragmentNodeFragments { get; set; }
+        public virtual DbSet<FragmentNodeProcess> FragmentNodeProcesses { get; set; }
+        public virtual DbSet<FragmentStage> FragmentStages { get; set; }
+        public virtual DbSet<ILCDEntity> ILCDEntities { get; set; }
+        public virtual DbSet<ImpactCategory> ImpactCategories { get; set; }
+        public virtual DbSet<IndicatorType> IndicatorTypes { get; set; }
+        public virtual DbSet<LCIA> LCIAs { get; set; }
+        public virtual DbSet<LCIAMethod> LCIAMethods { get; set; }
+        public virtual DbSet<NodeCache> NodeCaches { get; set; }
+        public virtual DbSet<NodeDissipationParam> NodeDissipationParams { get; set; }
+        public virtual DbSet<NodeEmissionParam> NodeEmissionParams { get; set; }
+        public virtual DbSet<NodeType> NodeTypes { get; set; }
+        public virtual DbSet<Param> Params { get; set; }
+        public virtual DbSet<ParamType> ParamTypes { get; set; }
+        public virtual DbSet<Process> Processes { get; set; }
+        public virtual DbSet<ProcessDissipation> ProcessDissipations { get; set; }
+        public virtual DbSet<ProcessDissipationParam> ProcessDissipationParams { get; set; }
+        public virtual DbSet<ProcessEmissionParam> ProcessEmissionParams { get; set; }
+        public virtual DbSet<ProcessFlow> ProcessFlows { get; set; }
+        public virtual DbSet<ProcessType> ProcessTypes { get; set; }
+        public virtual DbSet<ReferenceType> ReferenceTypes { get; set; }
+        public virtual DbSet<Scenario> Scenarios { get; set; }
+        public virtual DbSet<ScenarioBackground> ScenarioBackgrounds { get; set; }
+        public virtual DbSet<ScenarioGroup> ScenarioGroups { get; set; }
+        public virtual DbSet<ScenarioParam> ScenarioParams { get; set; }
+        public virtual DbSet<ScoreCache> ScoreCaches { get; set; }
+        public virtual DbSet<UnitConversion> UnitConversions { get; set; }
+        public virtual DbSet<UnitGroup> UnitGroups { get; set; }
+        public virtual DbSet<User> Users { get; set; }
+        public virtual DbSet<Visibility> Visibilities { get; set; }
 
         protected override void OnModelCreating(DbModelBuilder modelBuilder)
         {
-
-           
-
             modelBuilder.Entity<Category>()
                 .Property(e => e.ExternalClassID)
                 .IsUnicode(false);

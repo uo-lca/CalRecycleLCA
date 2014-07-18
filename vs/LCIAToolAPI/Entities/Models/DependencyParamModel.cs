@@ -36,5 +36,7 @@ namespace Entities.Models
         public int? ParamID { get; set; }
 
         public double? Value { get; set; }
+
+        public double? ParamValue { get; set; }
     }
 }

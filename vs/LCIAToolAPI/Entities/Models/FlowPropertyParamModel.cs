@@ -33,5 +33,10 @@ namespace Entities.Models
         public int? FlowFlowPropertyID { get; set; }
 
         public double? NodeWeight { get; set; }
+
+        public double? Value { get; set; }
+
+        public double? ParamValue { get; set; }
+
     }
 }
