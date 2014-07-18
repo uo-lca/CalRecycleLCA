@@ -35,7 +35,7 @@ namespace Services
         [Inject]
         private readonly IUnitOfWork _unitOfWork;
 
-        int? fragmentId = 7;
+        int? fragmentId =11;
         float? activity = 1;
 
         public FragmentTraversal(IFragmentFlowService fragmentFlowService,
@@ -186,7 +186,7 @@ namespace Services
                             Quantity = a.FragmentFlow.Quantity,
                             ParentFragmentFlowID = a.FragmentFlow.ParentFragmentFlowID,
                             //Value = (b == null ? 0 : b.Value)
-                            Value = (b == null ? 0 : b.Value)
+                            ParamValue = (b == null ? -1 : b.Value)
                         })).ToList();
 
             //select them into a model so that the list can be updated.  
@@ -204,21 +204,21 @@ namespace Services
                     DirectionID = ic.DirectionID,
                     Quantity = ic.Quantity,
                     ParentFragmentFlowID = ic.ParentFragmentFlowID,
-                    Value = ic.Value
+                    ParamValue = ic.ParamValue
                 })
             .ToList<DependencyParamModel>();
 
             //take the param values as defaults:
             var defaults = edges
-           .Where(p => p.Value != 0);
+           .Where(p => p.ParamValue != -1);
 
             //loop through list of edges and update quantity to value where a value is present for value 
             foreach (var item in defaults)
             {
-                item.Quantity = item.Value;
+                item.Quantity = item.ParamValue;
             }
 
-            edges.RemoveAll(p => p.Value != 0);
+            edges.RemoveAll(p => p.ParamValue != -1);
 
             //return updated list of edges
             return edges
@@ -272,6 +272,7 @@ namespace Services
                DirectionID = m.p.DirectionID,
                Quantity = m.p.Quantity,
                ParentFragmentFlowID = m.p.ParentFragmentFlowID,
+               Value = m.p.Value,
                //MeanValue = (m.pc.MeanValue == null ? 0 : m.pc.MeanValue)
                MeanValue = (m.pc.MeanValue)
            }).AsEnumerable();
@@ -300,37 +301,38 @@ namespace Services
             ff => ff.FlowFlowPropertyID,
             dp => dp.FlowFlowPropertyID,
             (ff, dp) =>
-                new { FragmentFlow = ff, FlowPropertyParam = dp.DefaultIfEmpty() })
+                new { FlowPropertyParamModel = ff, FlowPropertyParam = dp.DefaultIfEmpty() })
                     .SelectMany(a => a.FlowPropertyParam.
                     Select(b => new FlowPropertyParamModel
                     {
-                        FragmentFlowID = a.FragmentFlow.FragmentFlowID,
-                        FragmentID = a.FragmentFlow.FragmentID,
-                        Name = a.FragmentFlow.Name,
-                        FragmentStageID = a.FragmentFlow.FragmentStageID ?? 0,
-                        ReferenceFlowPropertyID = a.FragmentFlow.ReferenceFlowPropertyID,
-                        NodeTypeID = a.FragmentFlow.NodeTypeID,
-                        FlowID = a.FragmentFlow.FlowID,
-                        DirectionID = a.FragmentFlow.DirectionID,
-                        Quantity = a.FragmentFlow.Quantity,
-                        ParentFragmentFlowID = a.FragmentFlow.ParentFragmentFlowID,
-                        MeanValue = (b == null ? 0 : b.Value),
-                        FlowFlowPropertyID = a.FragmentFlow.FlowFlowPropertyID
+                        FragmentFlowID =a.FlowPropertyParamModel.FragmentFlowID,
+                        FragmentID = a.FlowPropertyParamModel.FragmentID,
+                        Name = a.FlowPropertyParamModel.Name,
+                        FragmentStageID = a.FlowPropertyParamModel.FragmentStageID ?? 0,
+                        ReferenceFlowPropertyID = a.FlowPropertyParamModel.ReferenceFlowPropertyID,
+                        NodeTypeID = a.FlowPropertyParamModel.NodeTypeID,
+                        FlowID = a.FlowPropertyParamModel.FlowID,
+                        DirectionID = a.FlowPropertyParamModel.DirectionID,
+                        Quantity = a.FlowPropertyParamModel.Quantity,
+                        ParentFragmentFlowID = a.FlowPropertyParamModel.ParentFragmentFlowID,
+                        ParamValue = (b == null ? -1 : b.Value),
+                        MeanValue = a.FlowPropertyParamModel.MeanValue,
+                        FlowFlowPropertyID = a.FlowPropertyParamModel.FlowFlowPropertyID
                     })).ToList();
 
             //return result;
 
             //take the param values as defaults:
             var defaults = edges
-           .Where(p => p.MeanValue != 0);
+           .Where(p => p.ParamValue != -1);
 
             //loop through list of edges and update quantity to value where a value is present for value 
             foreach (var item in defaults)
             {
-                item.Quantity = item.MeanValue;
+                item.MeanValue = item.ParamValue;
             }
 
-            edges.RemoveAll(p => p.MeanValue != 0);
+            edges.RemoveAll(p => p.ParamValue != -1);
 
             //return updated list of edges
             return edges
@@ -360,7 +362,7 @@ namespace Services
 
         public void NodeRecurse(int scenarioId, int refFlow, double? activity)
         {
-            var theflow = ApplyFlowPropertyParam().Where(q => q.ParentFragmentFlowID == refFlow).AsEnumerable();
+            var theflow = ApplyFlowPropertyParam().Where(q => q.FragmentFlowID == refFlow).AsEnumerable();
 
             var fragmentNodeFragment = _fragmentNodeFragmentService.Query().Get().AsQueryable();
 
@@ -368,6 +370,7 @@ namespace Services
             double? nodeConv = theflow.Select(x => x.MeanValue).FirstOrDefault();
             int? nodeTypeID = theflow.Select(x => x.NodeTypeID).FirstOrDefault();
 
+            //changed activity to activityNodeWeight as code was restting activity to 0
             activity = activity * nodeWeight * nodeConv;
 
 
