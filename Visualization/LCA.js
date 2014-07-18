@@ -124,25 +124,37 @@ LCA.shortName = function (name, maxLen) {
 };
 
 /**
- * Display data in an HTML table. 
- * Extracted from http://www.d3noob.org/2013/02/add-html-table-to-your-d3js-graph.html. 
+ * Append a table, table header and table body
+ * @param {Object} parSelection     d3 selection after which to append table
+ * @param {Array} columns           column header names
+ * @returns {Object}     d3 selection containing table body
  */
-LCA.tabulate = function (table, data, columns) {
-    var thead = table.append("thead"),
+LCA.createTable = function (parSelection, columns) {
+    var table = parSelection.append("table"),
+        thead = table.append("thead"),
         tbody = table.append("tbody");
-
     // append the header row
-    thead.append("tr")
-        .selectAll("th")
-        .data(columns)
-        .enter()
-        .append("th")
+        thead.append("tr")
+            .selectAll("th")
+            .data(columns)
+            .enter()
+            .append("th")
             .text(function (column) { return column; });
+        return tbody;
+};
 
+/**
+ * Display data in table body
+ * @param {Object} tbody    d3 selection containing table body
+ * @param {Array} data      data indexed by column header names
+ * @param {Array} columns   column header names
+ */
+LCA.updateTable = function (tbody, data, columns) {
     // create a row for each object in the data
     var rows = tbody.selectAll("tr")
-        .data(data)
-        .enter()
+        .data(data);
+
+     rows.enter()
         .append("tr");
 
     // create a cell in each row for each column
@@ -154,10 +166,10 @@ LCA.tabulate = function (table, data, columns) {
         })
         .enter()
         .append("td")
-        //.attr("style", "font-family: Courier")
         .html(function (d) { return d.value; });
 
-    return table;
+    // remove rows that have no data
+    rows.exit().remove();
 };
 
 /**

@@ -12,4 +12,11 @@
   text-shadow: 0 1px 0 #fff;
 }
 
+.vis-panel {
+    display: inline-block;
+    vertical-align: top;
+    width: 500px;
+    font-size: 0.8em;
+}
+
 

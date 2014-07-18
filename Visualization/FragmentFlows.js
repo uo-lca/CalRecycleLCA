@@ -41,7 +41,10 @@ function FragmentFlows() {
     var selectedFlowPropertyID = 23,
         fragFlowFlowProperties = [];
     var apiResourceNames = ["fragments", "processes", "flowproperties", "fragmentflows", "flowflowproperties"],
-        nodeTypes = [];   
+        nodeTypes = [],
+        flowTables = [],
+        flowColumns = ["Name", "CASNumber"],
+        panelSelection;   
 
     
 
@@ -55,6 +58,25 @@ function FragmentFlows() {
             .attr("height", height + margin.top + margin.bottom)
             .append("g")
             .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+    }
+
+    /**
+      * Initial preparation of svg element.
+      */
+      function prepareNodeView() {
+          panelSelection = d3.select("#chartcontainer")
+              .append("div")
+              .classed("vis-panel", true);
+        panelSelection.append("h2")
+            .text("Node Details");
+        panelSelection.append("p")
+            .append("h3")
+            .text("Input Flows");
+        flowTables[0] = LCA.createTable(panelSelection, flowColumns);
+        panelSelection.append("p")
+            .append("h3")
+            .text("Output Flows");
+        flowTables[1] = LCA.createTable(panelSelection, flowColumns);
     }
 
     /**
@@ -110,17 +132,17 @@ function FragmentFlows() {
     }
 
     function displayFlows(node) {
-        d3.select("table").remove();
-        // TODO : move this into tooltip
-        var table = d3.select("#chartcontainer").append("table"); 
-            flowData = [];
-        node.sourceLinks.forEach( function (l) {
-            flowData.push(LCA.indexedData.flows[l.flowID]);
-        });
+        var inputFlows = [],
+            outputFlows = [];
+
         node.targetLinks.forEach(function (l) {
-            flowData.push(LCA.indexedData.flows[l.flowID]);
+            inputFlows.push(LCA.indexedData.flows[l.flowID]);
         });
-        LCA.tabulate(table, flowData, ["Name","CASNumber"]);       
+        LCA.updateTable(flowTables[0], inputFlows, flowColumns);
+        node.sourceLinks.forEach(function(l) {
+            outputFlows.push(LCA.indexedData.flows[l.flowID]);
+        });
+        LCA.updateTable(flowTables[1], outputFlows, flowColumns);
     }
 
     /**
@@ -167,7 +189,7 @@ function FragmentFlows() {
             .text(function (d) {
                 return d.fragmentFlowName;
             });
-        
+
         // Workaround for NaN problem
         graph.nodes.forEach(function (d) {
             if (isNaN(d.x)) {
@@ -207,17 +229,17 @@ function FragmentFlows() {
                 return d3.rgb(d.color).darker(2);
             });
         var ntElement = d3.select(".d3-tip");
-        node.on('mouseover', function(d) {      
+        node.on('mouseover', function (d) {
             ntElement.transition()
                 .duration(200);
             nodeTip.show(d);
-        })
-            .on('mouseout', function (d) {
-                ntElement.transition()
-                .duration(500);
-            nodeTip.hide(d);
-            })
-            .on('click', displayFlows);
+            displayFlows(d);
+        });
+            //.on('mouseout', function (d) {
+            //    ntElement.transition()
+            //    .duration(500);
+            //    nodeTip.hide(d);
+            //});
         //
         // Position fragment flow name to the right or left of node.
         //
@@ -233,7 +255,7 @@ function FragmentFlows() {
                 return LCA.shortName(d.fragmentFlowName, 30);
             })
             .filter(function (d) {
-                    return d.x < width / 2;
+                return d.x < width / 2;
             })
             .attr("x", 6 + sankey.nodeWidth())
             .attr("text-anchor", "start");
@@ -247,6 +269,8 @@ function FragmentFlows() {
         })
         .style("stroke-width", 1)
         .style("stroke-dasharray", "5,5");
+
+        displayFlows(graph.nodes[0]);
     }
 
     /**
@@ -431,7 +455,7 @@ function FragmentFlows() {
         // Assign vibrant colors to processes and fragments
         color.domain([2,3,4,1,0]);
         prepareSvg();
-        
+        prepareNodeView();
         LCA.startSpinner("chartcontainer");
         //toolTip = LCA.createToolTip(".container");
         apiResourceNames = ["fragments", "processes", "flowproperties", "fragmentflows", "flowflowproperties", "flows"];
