@@ -1,5 +1,5 @@
 [
-    {
+  {
     "FragmentFlowID":86,
     "Name":"Natural gas mix",
     "FlowID":779,
@@ -8,7 +8,7 @@
     "DirectionID":1,
     "NodeWeight":1,
     "ParentFragmentFlowID":110,
-    "NodeID":10
+    "NodeID":176
   },
   {
     "FragmentFlowID":87,
@@ -41,7 +41,7 @@
     "DirectionID":1,
     "NodeWeight":49,
     "ParentFragmentFlowID":110,
-    "NodeID":34
+    "NodeID":127
   },
   {
     "FragmentFlowID":90,
@@ -52,7 +52,7 @@
     "DirectionID":1,
     "NodeWeight":1.360544,
     "ParentFragmentFlowID":110,
-    "NodeID":126
+    "NodeID":73
   },
   {
     "FragmentFlowID":91,
@@ -129,7 +129,7 @@
     "DirectionID":1,
     "NodeWeight":0.0002921652,
     "ParentFragmentFlowID":90,
-    "NodeID":11
+    "NodeID":177
   },
   {
     "FragmentFlowID":98,
@@ -173,7 +173,7 @@
     "DirectionID":1,
     "NodeWeight":0.0007330002,
     "ParentFragmentFlowID":90,
-    "NodeID":2
+    "NodeID":168
   },
   {
     "FragmentFlowID":102,
@@ -206,7 +206,7 @@
     "DirectionID":1,
     "NodeWeight":0.01421752,
     "ParentFragmentFlowID":90,
-    "NodeID":6
+    "NodeID":172
   },
   {
     "FragmentFlowID":105,
@@ -239,7 +239,7 @@
     "DirectionID":1,
     "NodeWeight":3.30416E-05,
     "ParentFragmentFlowID":90,
-    "NodeID":8
+    "NodeID":174
   },
   {
     "FragmentFlowID":108,
@@ -272,6 +272,6 @@
     "DirectionID":1,
     "NodeWeight":0.3333333,
     "ParentFragmentFlowID":0,
-    "NodeID":145
+    "NodeID":92
   }
 ]

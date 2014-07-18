@@ -88,12 +88,35 @@ namespace LcaDataModel {
         }
     }
 
+    public partial class Scenario : IEntity {
+        [NotMapped]
+        public int ID {
+            get { return ScenarioID; }
+            set { ScenarioID = value; }
+        }
+    }
+
+    public partial class ScenarioGroup : IEntity {
+        [NotMapped]
+        public int ID {
+            get { return ScenarioGroupID; }
+            set { ScenarioGroupID = value; }
+        }
+    }
 
     public partial class UnitConversion : IEntity {
         [NotMapped]
         public int ID {
             get { return UnitConversionID; }
             set { UnitConversionID = value; }
+        }
+    }
+
+    public partial class User : IEntity {
+        [NotMapped]
+        public int ID {
+            get { return UserID; }
+            set { UserID = value; }
         }
     }
 
