@@ -43,23 +43,18 @@ namespace LCIAToolAPI.API
 
         }
 
-
-
-
          //GET api/<controller>
         [System.Web.Http.AcceptVerbs("GET", "POST")]
         [System.Web.Http.HttpGet]
-        public IEnumerable<Fragment> ImpactCategoryDDL()
+        public IEnumerable<Fragment> GetFragments()
         
         {
-
-            var processes = _fragmentService.GetFragments();
-            return processes;
-
-
+            return _fragmentService.GetFragments();
         }
 
-      
+        public Fragment GetFragment(int id) {
+            return _fragmentService.GetFragment(id);
+        }
 
 
     }

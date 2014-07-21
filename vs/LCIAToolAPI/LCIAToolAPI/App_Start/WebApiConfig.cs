@@ -39,12 +39,16 @@ namespace LCIAToolAPI.App_Start
             GlobalConfiguration.Configuration.Formatters.JsonFormatter.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Serialize;
             GlobalConfiguration.Configuration.Formatters.JsonFormatter.SerializerSettings.PreserveReferencesHandling = Newtonsoft.Json.PreserveReferencesHandling.Objects;
 
+            //config.Routes.MapHttpRoute(
+            //name: "DefaultApi",
+            //routeTemplate: "api/{controller}/{id}/{impactCategoryId}",
+            //defaults: new { id = RouteParameter.Optional, impactCategoryId = RouteParameter.Optional }
+            //);
             config.Routes.MapHttpRoute(
-            name: "DefaultApi",
-            routeTemplate: "api/{controller}/{id}/{impactCategoryId}",
-            defaults: new { id = RouteParameter.Optional, impactCategoryId = RouteParameter.Optional }
+            name: "Fragment",
+            routeTemplate: "api/fragments/{id}",
+            defaults: new { controller = "fragment", id = RouteParameter.Optional}
             );
-
         }
     }
 }

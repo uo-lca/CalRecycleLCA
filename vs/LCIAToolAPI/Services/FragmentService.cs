@@ -26,5 +26,8 @@ namespace Services
             return _repository.GetFragments();
         }
 
+        public Fragment GetFragment(int id) {
+            return _repository.GetFragment(id);
+        }
     }
 }

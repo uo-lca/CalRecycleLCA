@@ -10,5 +10,7 @@ namespace Services
     public interface IFragmentService : IService<Fragment>
     {
         IEnumerable<Fragment> GetFragments();
+
+        Fragment GetFragment(int id);
     }
 }
