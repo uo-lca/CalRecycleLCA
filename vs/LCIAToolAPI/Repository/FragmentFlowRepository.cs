@@ -14,6 +14,8 @@ namespace Repository
             var fragmentFlows =
        fragmentFlowRepository
             .Query()
+            .Include(i => i.FragmentNodeFragments)
+            .Include(i => i.FragmentNodeProcesses)
             .OrderBy(q => q
                 .OrderBy(c => c.FlowID)
                 .ThenBy(c => c.Name))

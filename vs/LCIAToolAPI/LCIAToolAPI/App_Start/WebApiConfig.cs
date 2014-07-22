@@ -44,11 +44,21 @@ namespace LCIAToolAPI.App_Start
             //routeTemplate: "api/{controller}/{id}/{impactCategoryId}",
             //defaults: new { id = RouteParameter.Optional, impactCategoryId = RouteParameter.Optional }
             //);
+
+            config.MapHttpAttributeRoutes();
+            // Convention-based routing.
+            //config.Routes.MapHttpRoute(
+            //    name: "DefaultApi",
+            //    routeTemplate: "api/{controller}/{id}",
+            //    defaults: new { id = RouteParameter.Optional }
+            //);
+
             config.Routes.MapHttpRoute(
             name: "Fragment",
             routeTemplate: "api/fragments/{id}",
-            defaults: new { controller = "fragment", id = RouteParameter.Optional}
+            defaults: new { controller = "fragment", id = RouteParameter.Optional }
             );
+            
         }
     }
 }
