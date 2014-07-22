@@ -28,12 +28,13 @@ namespace LCAToolAPI.API
 
         }
 
-        int scenarioId = 1;
+        //int scenarioId = 1;
 
         //GET api/<controller>
+        [Route("api/scenarios/{scenarioID}/updatecaches")]
         [System.Web.Http.AcceptVerbs("GET", "POST")]
         [System.Web.Http.HttpGet]
-        public void Traversal()
+        public void Traversal(int scenarioId)
         {
             _fragmentTraversal.Traverse(scenarioId);
         }
