@@ -16,7 +16,7 @@ namespace LCAToolAPI
 
         protected void Page_Load(object sender, EventArgs e)
         {
-            fpTest.DataSource = Model.ApplyFlowPropertyParam(0);
+            fpTest.DataSource = Model.ApplyFlowPropertyParam(fragmentId:11);
             fpTest.DataBind();
         }
     }

@@ -18,7 +18,7 @@ namespace LCAToolAPI
         protected void Page_Load(object sender, EventArgs e)
         {
             Stopwatch sw = Stopwatch.StartNew();
-            Model.Traverse(1);
+            Model.Traverse(11, 1);
             sw.Stop();
             Label1.Text = sw.Elapsed.Seconds.ToString();
         }

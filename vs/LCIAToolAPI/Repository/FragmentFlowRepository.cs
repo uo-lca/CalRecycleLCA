@@ -16,6 +16,7 @@ namespace Repository
             .Query()
             .Include(i => i.FragmentNodeFragments)
             .Include(i => i.FragmentNodeProcesses)
+            .Include(i => i.NodeCaches)          
             .OrderBy(q => q
                 .OrderBy(c => c.FlowID)
                 .ThenBy(c => c.Name))
