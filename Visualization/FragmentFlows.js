@@ -423,7 +423,10 @@ function FragmentFlows() {
         nodeTypes[0] = "Root Node";
         //color.domain(d3.keys(nodeTypes)); // NodeTypeIDs
         // Assign vibrant colors to processes and fragments
-        color.domain([2,3,4,1,0]);
+        color.domain([2, 3, 4, 1, 0]);
+        if ("fragmentID" in LCA.urlVars) {
+            selectedFragmentID = LCA.urlVars.fragmentID;
+        }
         prepareSvg();
         prepareNodeView();
         LCA.startSpinner("chartcontainer");

@@ -12,7 +12,8 @@ var LCA = {
     loadedData: [],  // Data loaded via web API (or from TestData)
     spinner: null,
     indexedData: [], // Associative arrays of loaded data, ID -> data object
-    enumData: []     // Associative arrays of enum data, ID -> name
+    enumData: [],    // Associative arrays of enum data, ID -> name
+    urlVars: []     // Associative array of parameters in querystring
 };
 
 /**
@@ -47,6 +48,7 @@ LCA.init = function (callback) {
     //});
     LCA.enumData.nodeTypes = LCA.createEnumData(["Process", "Fragment", "InputOutput", "Background"]);
     LCA.shortNameBreakChars = d3.set([",", "(", ".", ";"]);
+    LCA.loadUrlVars();
     callback.call();
 };
 
@@ -236,6 +238,19 @@ LCA.loadSelectionList = function (objects, selectID, oidName, changeHandler, ini
         return d[oidName] === initialValue;
     })
         .attr("selected", true);
+};
+
+/**
+ * Read current page's URL variables and store them as an associative array.
+ */
+LCA.loadUrlVars = function() {
+    var hash;
+    var hashes = window.location.href.slice(window.location.href.indexOf('?') + 1).split('&');
+    for (var i = 0; i < hashes.length; i++) {
+        hash = hashes[i].split('=');
+        LCA.urlVars.push(hash[0]);
+        LCA.urlVars[hash[0]] = hash[1];
+    }
 };
 
 // TODO : replace usage of following function with newer functions above
