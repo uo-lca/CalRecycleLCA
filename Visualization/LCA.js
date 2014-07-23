@@ -7,7 +7,7 @@
 /// <reference path="d3.min.js" />
 /// <reference path="spin.min.js" />
 var LCA = {
-    baseURI: "http://publictest.calrecycle.ca.gov/lciatool/api/",
+    baseURI: "http://localhost:60393/api/",
     testDataFolder: "TestData/",
     loadedData: [],  // Data loaded via web API (or from TestData)
     spinner: null,
@@ -32,7 +32,7 @@ LCA.createEnumData = function (values) {
 /**
  * Initialize LCA module object
  * @param {function} callback	Function to call after module is successfully initialized
- */
+ */ 
 LCA.init = function (callback) {
     // Load configurable settings
     // IIS won't allow this. Hard code setting above.
@@ -178,17 +178,17 @@ LCA.updateTable = function (tbody, data, columns) {
  * @param {Boolean} useTestData     Load json file for testing
  * @param {Function} callback       Function to call when done
  */
-LCA.loadData = function (resourceName, useTestData, callback, paramString) {
+LCA.loadData = function (resourceName, useTestData, callback, routePrefix) {
    
     if (resourceName in LCA.loadedData) {
         callback.call();
         return false;
     }
-    
-    var jsonURL = (useTestData ? LCA.testDataFolder : LCA.baseURI) + resourceName;
-    if (paramString) {
-        jsonURL += paramString;
-    }
+    var jsonURL = (useTestData ? LCA.testDataFolder : LCA.baseURI);
+    if (arguments.length === 4) {
+        jsonURL = jsonURL + routePrefix + "/"
+    }   
+    jsonURL += resourceName;
     if (useTestData) {
         jsonURL += ".json";
     }
