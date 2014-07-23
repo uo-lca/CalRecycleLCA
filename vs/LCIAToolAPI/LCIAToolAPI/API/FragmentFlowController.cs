@@ -36,34 +36,28 @@ namespace LCAToolAPI.API
 
         }
 
-        int? GetNodeID(FragmentFlow ff) {
-            switch (ff.NodeTypeID) {
-                case 1: return ff.FragmentNodeProcesses.FirstOrDefault().FragmentNodeProcessID;
-                case 2: return ff.FragmentNodeFragments.FirstOrDefault().FragmentNodeFragmentID;
-            }
-            return null;
-
-        }
-
         [Route("api/fragments/{fragmentID}/fragmentflows")]
         [System.Web.Http.HttpGet]
-        public IEnumerable<FragmentFlowModel> GetFragmentFlows(int fragmentID)
-        
-        {
+        public IEnumerable<FragmentFlowModel> GetFragmentFlows(int fragmentID)  {
             // TODO : Traversal of all fragments should be done at web api start up time.
             //        In the meantime, call api/fragments/{fragmentID}/scenarios/{scenarioID}/traverse
             //        before getting fragmentflows
 
             IEnumerable<FragmentFlow> ffData = _fragmentFlowService.GetFragmentFlows(fragmentID);
+            int? nullID = null;
             return ffData.Select(ff => new FragmentFlowModel {
-                fragmentFlowID = ff.FragmentFlowID,
-                fragmentID = ff.FragmentID,
-                fragmentStageID = ff.FragmentStageID,
-                name = ff.Name,
-                referenceFlowPropertyID = ff.ReferenceFlowPropertyID,
-                nodeTypeID = ff.NodeTypeID,
-                nodeWeight = (ff.NodeCaches.Count == 0) ? 0 : ff.NodeCaches.FirstOrDefault().NodeWeight,
-                nodeID = GetNodeID(ff)
+                FragmentFlowID = ff.FragmentFlowID,
+                FragmentID = ff.FragmentID,
+                FragmentStageID = ff.FragmentStageID,
+                Name = ff.Name,
+                ReferenceFlowPropertyID = ff.ReferenceFlowPropertyID,
+                NodeTypeID = ff.NodeTypeID,
+                // TODO : All fragment flows should have a node cache according to BK. 
+                // If that is true, then Traverse has a bug. Currently, not all fragment flows have a node cache after traversal.
+                ScenarioID = (ff.NodeCaches.Count == 0) ? nullID : ff.NodeCaches.FirstOrDefault().ScenarioID,
+                NodeWeight = (ff.NodeCaches.Count == 0) ? null : ff.NodeCaches.FirstOrDefault().NodeWeight,  
+                ProcessID = (ff.NodeTypeID == 1) ? ff.FragmentNodeProcesses.FirstOrDefault().FragmentNodeProcessID : nullID,
+                SubFragmentID = (ff.NodeTypeID == 2) ? ff.FragmentNodeFragments.FirstOrDefault().FragmentNodeFragmentID : nullID
             });
         }
     }

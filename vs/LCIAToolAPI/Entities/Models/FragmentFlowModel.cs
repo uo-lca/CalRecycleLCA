@@ -6,30 +6,43 @@ using System.Threading.Tasks;
 using Newtonsoft.Json;
 
 namespace Entities.Models {
-    // JSON model for fragmentflows
+    /// <summary>
+    /// FragmentFlowModel - Used for producing fragmentflows web service data.
+    /// Simplifies database model by omitting unused relationships and
+    /// embedding related data. 
+    ///
+    /// Maintains Pascal case of properties in Data model. These are automatically converted to
+    /// camel case during JSON serialization.
+    /// </summary>
     public class FragmentFlowModel
     {
-        public int fragmentFlowID { get; set; }
-        
-        public int? fragmentID { get; set; }
-        
-        public string name { get; set; }
+        //
+        // Data Model Properties
+        //
+        public int FragmentFlowID { get; set; }
 
-        public int? fragmentStageID { get; set; }
+        public int? FragmentID { get; set; }
 
-        public int? referenceFlowPropertyID { get; set; }
+        public string Name { get; set; }
 
-        public int? nodeTypeID { get; set; }
+        public int? FragmentStageID { get; set; }
 
-        public int? flowID { get; set; }
+        public int? ReferenceFlowPropertyID { get; set; }
 
-        public int? directionID { get; set; }
+        public int? NodeTypeID { get; set; }
 
-        public int? parentFragmentFlowID { get; set; }
+        public int? FlowID { get; set; }
 
-        public int? nodeID { get; set; }    // ID of process or fragment related to node
+        public int? DirectionID { get; set; }
 
-        public double? nodeWeight { get; set; } // derived from related NodeCache
+        public int? ParentFragmentFlowID { get; set; }
+        //
+        // Properties from related objects
+        //
+        public int? ProcessID { get; set; }     // FragmentNodeProcess.ProcessID, when NodeType is Process
+        public int? SubFragmentID { get; set; } // FragmentNodeFragment.SubFragmentID, when NodeType is Fragment
+        public int? ScenarioID { get; set; }    // NodeCache.ScenarioID
+        public double? NodeWeight { get; set; } // NodeCache.NodeWeight
 
     }
 }
