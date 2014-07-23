@@ -52,6 +52,9 @@ namespace LCAToolAPI.API
                 Name = ff.Name,
                 ReferenceFlowPropertyID = ff.ReferenceFlowPropertyID,
                 NodeTypeID = ff.NodeTypeID,
+                DirectionID = ff.DirectionID,
+                FlowID = ff.FlowID,
+                ParentFragmentFlowID = ff.ParentFragmentFlowID,
                 // TODO : All fragment flows should have a node cache according to BK. 
                 // If that is true, then Traverse has a bug. Currently, not all fragment flows have a node cache after traversal.
                 ScenarioID = (ff.NodeCaches.Count == 0) ? nullID : ff.NodeCaches.FirstOrDefault().ScenarioID,
