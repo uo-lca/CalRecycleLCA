@@ -18,6 +18,8 @@ using Ninject.Extensions.Logging;
 
 namespace LCAToolAPI.API
 {
+    // TODO : delete this class after changing Visualization to use FragmentLinkController
+
     public class FragmentFlowController : ApiController
     {
         [Inject]

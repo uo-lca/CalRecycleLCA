@@ -6,7 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 
 namespace Services {
-    interface IFragmentLinkService {
+    public interface IFragmentLinkService {
         IEnumerable<FragmentLink> GetFragmentLinks(int fragmentId, int scenarioId);
     }
 }

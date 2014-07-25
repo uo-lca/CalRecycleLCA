@@ -6,16 +6,17 @@ using System.Threading.Tasks;
 
 namespace Entities.Models {
     /// <summary>
-    /// LinkMagnitude - associates Flow Property with Flow Magnitude.
+    /// LinkMagnitude - associates Flow Property with Magnitude (Sankey link width).
     /// Embedded in FragmentLink model.
     /// </summary>
     public class LinkMagnitude {
-        public int? FlowPropertyID { get; set; }
-        public double? FlowMagnitiude { get; set; }
+        public int FlowPropertyID { get; set; }
+        public double Magnitiude { get; set; }  // NodeCache.FlowMagnitude * FlowFlowProperty.MeanValue
+                                                
     }
     
     /// <summary>
-    /// FragmentLink - model for sankey diagram link 
+    /// FragmentLink - model for Sankey diagram link 
     /// Contains collection of LinkMagnitude objects.
     /// </summary>
     public class FragmentLink {
