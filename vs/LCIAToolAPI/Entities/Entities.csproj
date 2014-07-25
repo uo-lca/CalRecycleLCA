@@ -130,6 +130,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Models\DependencyParamModel.cs" />
+    <Compile Include="Models\ProcessModel.cs" />
     <Compile Include="Models\FlowPropertyModel.cs" />
     <Compile Include="Models\FlowModel.cs" />
     <Compile Include="Models\FlowPropertyParamModel.cs" />

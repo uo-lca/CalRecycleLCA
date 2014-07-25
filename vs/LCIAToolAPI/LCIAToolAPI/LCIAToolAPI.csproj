@@ -237,6 +237,7 @@
     <Content Include="Scripts\jquery-1.8.3.min.js" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="API\ProcessController.cs" />
     <Compile Include="API\FlowPropertyController.cs" />
     <Compile Include="API\FragmentController.cs" />
     <Compile Include="API\FragmentFlowController.cs" />

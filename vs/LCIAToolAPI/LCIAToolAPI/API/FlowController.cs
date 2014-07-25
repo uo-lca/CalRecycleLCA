@@ -20,7 +20,7 @@ namespace LCAToolAPI.API
 
             if (flowService == null)
             {
-                throw new ArgumentNullException("fragmentLink is null");
+                throw new ArgumentNullException("flowService is null");
             }
 
             _flowService = flowService;

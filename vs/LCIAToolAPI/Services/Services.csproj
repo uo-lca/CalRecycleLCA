@@ -133,6 +133,8 @@
     <Compile Include="FlowFlowPropertyService.cs" />
     <Compile Include="FlowPropertyParamService.cs" />
     <Compile Include="FlowPropertyService.cs" />
+    <Compile Include="IProcessService.cs" />
+    <Compile Include="ProcessService.cs" />
     <Compile Include="FlowService.cs" />
     <Compile Include="FragmentFlowService.cs" />
     <Compile Include="FragmentLinkService.cs" />
