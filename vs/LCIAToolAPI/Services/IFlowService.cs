@@ -1,4 +1,5 @@
 ﻿using Data;
+using Entities.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,6 +10,6 @@ namespace Services
 {
     public interface IFlowService : IService<Flow>
     {
-        IEnumerable<Flow> GetFlowsInFragment(int fragmentId);            
+        IEnumerable<FlowModel> GetFlowsByFragment(int fragmentId);            
     }
 }

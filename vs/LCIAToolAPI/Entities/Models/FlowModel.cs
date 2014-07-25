@@ -17,7 +17,7 @@ namespace Entities.Models {
         public int FlowID { get; set; }
         public string Name { get; set; }
         public string CASNumber { get; set; }
-        public int? ReferenceFlowPropertyID { get; set; }
-        public int? FlowTypeID { get; set; }
+        public int ReferenceFlowPropertyID { get; set; }
+        public int FlowTypeID { get; set; }
     }
 }
