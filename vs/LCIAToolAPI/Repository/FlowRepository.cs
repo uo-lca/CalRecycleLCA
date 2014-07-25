@@ -9,6 +9,8 @@ namespace Repository
 {
     public static class FlowRepository
     {
-        
+        public static IEnumerable<Flow> GetFlows(this IRepository<Flow> flowRepository) {
+            return flowRepository.GetRepository<Flow>().Queryable();
+        }
     }
 }

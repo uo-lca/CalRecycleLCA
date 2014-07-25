@@ -9,6 +9,6 @@ namespace Services
 {
     public interface IFlowService : IService<Flow>
     {
-            
+        IEnumerable<Flow> GetFlowsInFragment(int fragmentId);            
     }
 }
