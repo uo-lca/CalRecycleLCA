@@ -130,6 +130,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="FlowPropertyParamRepository.cs" />
+    <Compile Include="FlowPropertyRepository.cs" />
     <Compile Include="FlowRepository.cs" />
     <Compile Include="FragmentFlowRepository.cs" />
     <Compile Include="FragmentRepository.cs" />
