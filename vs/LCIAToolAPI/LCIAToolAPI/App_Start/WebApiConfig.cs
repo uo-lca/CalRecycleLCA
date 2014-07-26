@@ -56,11 +56,6 @@ namespace LCIAToolAPI.App_Start
             //    defaults: new { id = RouteParameter.Optional }
             //);
 
-            config.Routes.MapHttpRoute(
-            name: "Fragment",
-            routeTemplate: "api/fragments/{id}",
-            defaults: new { controller = "fragment", id = RouteParameter.Optional }
-            );
             
         }
     }
