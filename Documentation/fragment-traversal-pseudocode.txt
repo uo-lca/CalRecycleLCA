@@ -47,7 +47,7 @@ success = NodeRecurse( fragment_flow_id, scenario_id, flow_magnitude )
   { // convert the inflow to the reference property of the term flow
     term_flow = SELECT * FROM Flow WHERE FlowID = TermFlowID
     
-    Conv = SELECT ffp.MeanValue AS Default, fpp.Value AS Subs
+    conv = SELECT ffp.MeanValue AS Default, fpp.Value AS Subs
     	        FROM FlowFlowProperty ffp
     	      	INNER JOIN FlowPropertyParam fpp ON FlowFlowPropertyID
 		INNER JOIN ScenarioParam on fpp.ParamID
@@ -55,14 +55,16 @@ success = NodeRecurse( fragment_flow_id, scenario_id, flow_magnitude )
                   AND FlowPropertyID = term_flow.ReferenceFlowPropertyID
 		  AND ScenarioID = scenario_id
 
-    if Conv.Subs is not null
-      node_conv = Conv.Subs;
+    if conv.Subs is not null
+      node_conv = conv.Subs;
     else
-      node_conv = Conv.Default;
+      node_conv = conv.Default;
   }
 
   node_scale = 1 / inflow.Result;
   node_weight = flow_magnitude * node_conv * node_scale;
+
+  SetNodeCache( fragment_flow_id, scenario_id, flow_magnitude, node_weight );
   
   // now map outgoing fragment edges to other product flows
   outflows = SELECT ff.FragmentFlowID, ff.FlowID, ff.DirectionID,
@@ -76,14 +78,15 @@ success = NodeRecurse( fragment_flow_id, scenario_id, flow_magnitude )
                AND ff.DirectionID = nf.DirectionID
                AND sp.ScenarioID = @ScenarioID ;
 
-  UPDATE outflows.Result = outflows.ParamValue where ParamValue is not null
-
   if isempty (outflows)
     success = true;
   else
   { // recursion
     for i in outflows
     {
+      if i.ParamValue is not null
+        i.Result = i.ParamValue;
+
       if i.Result is null
       {
         catch exception!
@@ -92,12 +95,11 @@ success = NodeRecurse( fragment_flow_id, scenario_id, flow_magnitude )
       	      		      i.Result );
     }
   }
-  SetNodeCache( fragment_flow_id, scenario_id, flow_magnitude, node_weight );
 }
 
 ## ------------------------------------------------------------------------
 
-node_flows = get_scenario_product_flows ( TheFragmentFlow, scenario_id)
+node_flows = get_scenario_product_flows ( the_fragment_flow, scenario_id)
 {
   // input is a single FragmentFlow record
   //
@@ -106,19 +108,19 @@ node_flows = get_scenario_product_flows ( TheFragmentFlow, scenario_id)
   // DirectionID
   // Result (from ProcessFlow)
 
-  switch TheFragmentFlow.NodeTypeID
+  switch the_fragment_flow.NodeTypeID
   {
     case {3,4} // InputOutput, Background
     {
-      node_flows.FlowID = TheFragmentFlow.FlowID;
-      node_flows.DirectionID = comp ( TheFragmentFlow.DirectionID );
+      node_flows.FlowID = the_fragment_flow.FlowID;
+      node_flows.DirectionID = comp ( the_fragment_flow.DirectionID );
       node_flows.Result = 1;
     }
     case 1 // Process
     {
-      TheFragmentFlow = SELECT fnp.ProcessID AS Default,
+      the_fragment_flow = SELECT fnp.ProcessID AS Default,
       		      	       ps.ProcessID as Subs
-      		      FROM TheFragmentFlow 
+      		      FROM the_fragment_flow 
       		      INNER JOIN FragmentNodeProcess 
       		      LEFT OUTER JOIN  ProcessSubstitution
 
@@ -136,9 +138,9 @@ node_flows = get_scenario_product_flows ( TheFragmentFlow, scenario_id)
     }
     case 2 // Fragment
     {
-      TheFragmentFlow = SELECT fnf.FragmentID AS Default,
+      the_fragment_flow = SELECT fnf.FragmentID AS Default,
       		      	       fs.FragmentID as Subs
-      		      FROM TheFragmentFlow 
+      		      FROM the_fragment_flow 
       		      INNER JOIN FragmentNodeFragment fnf
       		      LEFT OUTER JOIN  FragmentSubstitution fs
 		        WHERE fs.ScenarioID = scenario_id
@@ -186,15 +188,15 @@ node_flows = get_scenario_product_flows ( TheFragmentFlow, scenario_id)
 
 ## ------------------------------------------------------------------------
 
-term_flow_id = GetTermFlow( TheFragmentFlow )
-switch TheFragmentFlow.NodeTypeID
+term_flow_id = GetTermFlow( the_fragment_flow )
+switch the_fragment_flow.NodeTypeID
 {
   case {3,4}
-    term_flow_id = TheFragmentFlow.FlowID;
+    term_flow_id = the_fragment_flow.FlowID;
   case 1
-    term_flow_id = TheFragmentFlow -> FragmentNodeProcess.FlowID;
+    term_flow_id = the_fragment_flow -> FragmentNodeProcess.FlowID;
   case 2
-    term_flow_id = TheFragmentFlow -> FragmentNodeFragment.FlowID;
+    term_flow_id = the_fragment_flow -> FragmentNodeFragment.FlowID;
 }
 
 
