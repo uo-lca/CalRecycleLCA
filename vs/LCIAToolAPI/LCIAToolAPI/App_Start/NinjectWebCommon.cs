@@ -81,8 +81,11 @@ namespace LCAToolAPI.App_Start
             kernel.Bind<IFragmentFlowService>().To<FragmentFlowService>();
             kernel.Bind<IDependencyParamService>().To<DependencyParamService>();
             kernel.Bind<IFragmentTraversal>().To<FragmentTraversal>();
+            kernel.Bind<IFragmentLinkService>().To<FragmentLinkService>();
             kernel.Bind<IScenarioParamService>().To<ScenarioParamService>();
             kernel.Bind<IParamService>().To<ParamService>();
+            kernel.Bind<IProcessService>().To<ProcessService>();
+            kernel.Bind<IFlowPropertyService>().To<FlowPropertyService>();
             kernel.Bind<IFlowPropertyParamService>().To<FlowPropertyParamService>();
             kernel.Bind<IFlowFlowPropertyService>().To<FlowFlowPropertyService>();
             kernel.Bind<IFlowService>().To<FlowService>();

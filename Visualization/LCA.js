@@ -7,12 +7,13 @@
 /// <reference path="d3.min.js" />
 /// <reference path="spin.min.js" />
 var LCA = {
-    baseURI: "http://publictest.calrecycle.ca.gov/lciatool/api/",
+    baseURI: "http://localhost:60393/api/",
     testDataFolder: "TestData/",
     loadedData: [],  // Data loaded via web API (or from TestData)
     spinner: null,
     indexedData: [], // Associative arrays of loaded data, ID -> data object
-    enumData: []     // Associative arrays of enum data, ID -> name
+    enumData: [],    // Associative arrays of enum data, ID -> name
+    urlVars: []     // Associative array of parameters in querystring
 };
 
 /**
@@ -32,7 +33,7 @@ LCA.createEnumData = function (values) {
 /**
  * Initialize LCA module object
  * @param {function} callback	Function to call after module is successfully initialized
- */
+ */ 
 LCA.init = function (callback) {
     // Load configurable settings
     // IIS won't allow this. Hard code setting above.
@@ -47,6 +48,7 @@ LCA.init = function (callback) {
     //});
     LCA.enumData.nodeTypes = LCA.createEnumData(["Process", "Fragment", "InputOutput", "Background"]);
     LCA.shortNameBreakChars = d3.set([",", "(", ".", ";"]);
+    LCA.loadUrlVars();
     callback.call();
 };
 
@@ -124,25 +126,37 @@ LCA.shortName = function (name, maxLen) {
 };
 
 /**
- * Display data in an HTML table. 
- * Extracted from http://www.d3noob.org/2013/02/add-html-table-to-your-d3js-graph.html. 
+ * Append a table, table header and table body
+ * @param {Object} parSelection     d3 selection after which to append table
+ * @param {Array} columns           column header names
+ * @returns {Object}     d3 selection containing table body
  */
-LCA.tabulate = function (table, data, columns) {
-    var thead = table.append("thead"),
+LCA.createTable = function (parSelection, columns) {
+    var table = parSelection.append("table"),
+        thead = table.append("thead"),
         tbody = table.append("tbody");
-
     // append the header row
-    thead.append("tr")
-        .selectAll("th")
-        .data(columns)
-        .enter()
-        .append("th")
+        thead.append("tr")
+            .selectAll("th")
+            .data(columns)
+            .enter()
+            .append("th")
             .text(function (column) { return column; });
+        return tbody;
+};
 
+/**
+ * Display data in table body
+ * @param {Object} tbody    d3 selection containing table body
+ * @param {Array} data      data indexed by column header names
+ * @param {Array} columns   column header names
+ */
+LCA.updateTable = function (tbody, data, columns) {
     // create a row for each object in the data
     var rows = tbody.selectAll("tr")
-        .data(data)
-        .enter()
+        .data(data);
+
+     rows.enter()
         .append("tr");
 
     // create a cell in each row for each column
@@ -154,10 +168,10 @@ LCA.tabulate = function (table, data, columns) {
         })
         .enter()
         .append("td")
-        //.attr("style", "font-family: Courier")
         .html(function (d) { return d.value; });
 
-    return table;
+    // remove rows that have no data
+    rows.exit().remove();
 };
 
 /**
@@ -166,17 +180,17 @@ LCA.tabulate = function (table, data, columns) {
  * @param {Boolean} useTestData     Load json file for testing
  * @param {Function} callback       Function to call when done
  */
-LCA.loadData = function (resourceName, useTestData, callback, paramString) {
+LCA.loadData = function (resourceName, useTestData, callback, routePrefix) {
    
     if (resourceName in LCA.loadedData) {
         callback.call();
         return false;
     }
-    
-    var jsonURL = (useTestData ? LCA.testDataFolder : LCA.baseURI) + resourceName;
-    if (paramString) {
-        jsonURL += paramString;
-    }
+    var jsonURL = (useTestData ? LCA.testDataFolder : LCA.baseURI);
+    if (arguments.length === 4) {
+        jsonURL = jsonURL + routePrefix + "/"
+    }   
+    jsonURL += resourceName;
     if (useTestData) {
         jsonURL += ".json";
     }
@@ -224,6 +238,19 @@ LCA.loadSelectionList = function (objects, selectID, oidName, changeHandler, ini
         return d[oidName] === initialValue;
     })
         .attr("selected", true);
+};
+
+/**
+ * Read current page's URL variables and store them as an associative array.
+ */
+LCA.loadUrlVars = function() {
+    var hash;
+    var hashes = window.location.href.slice(window.location.href.indexOf('?') + 1).split('&');
+    for (var i = 0; i < hashes.length; i++) {
+        hash = hashes[i].split('=');
+        LCA.urlVars.push(hash[0]);
+        LCA.urlVars[hash[0]] = hash[1];
+    }
 };
 
 // TODO : replace usage of following function with newer functions above

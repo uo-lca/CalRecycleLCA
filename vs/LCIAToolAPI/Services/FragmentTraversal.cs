@@ -35,7 +35,6 @@ namespace Services
         [Inject]
         private readonly IUnitOfWork _unitOfWork;
 
-        int? fragmentId =11;
         float? activity = 1;
 
         public FragmentTraversal(IFragmentFlowService fragmentFlowService,
@@ -128,21 +127,20 @@ namespace Services
             _unitOfWork = unitOfWork;
         }
 
-        public void Traverse(int scenarioId = 1)
+        public void Traverse(int fragmentID, int scenarioId = 1)
         {
 
-            ApplyDependencyParam(scenarioId);
-            ApplyFlowPropertyParam(scenarioId);
-            refFlow();
-            NodeRecurse(scenarioId, refFlow(), activity);
+            ApplyDependencyParam(fragmentID, scenarioId);
+            ApplyFlowPropertyParam(fragmentID, scenarioId);
+            NodeRecurse(scenarioId, refFlow(fragmentID), activity, fragmentID);
 
         }
 
-        public IEnumerable<DependencyParamModel> ApplyDependencyParam(int scenarioId = 1)
+        public IEnumerable<DependencyParamModel> ApplyDependencyParam(int fragmentID, int scenarioId = 1)
         {
 
             //get fragment flows by fragmentId
-            var fragmentFlows = _fragmentFlowService.Query().Filter(q => q.FragmentID == fragmentId).Get().ToList();
+            var fragmentFlows = _fragmentFlowService.Query().Filter(q => q.FragmentID == fragmentID).Get().ToList();
 
             //get scenario params by id
             var scenarioParams = _scenarioParamService.Query().Filter(q => q.ScenarioID == scenarioId).Get().ToList();
@@ -240,11 +238,11 @@ namespace Services
 
         }
 
-        public IEnumerable<FlowPropertyParamModel> ApplyFlowPropertyParam(int scenarioId = 1)
+        public IEnumerable<FlowPropertyParamModel> ApplyFlowPropertyParam(int fragmentID, int scenarioId = 1)
         {
 
             //get fragment flows by fragmentId
-            var fragmentFlows = _fragmentFlowService.Query().Filter(q => q.FragmentID == fragmentId).Get().ToList();
+            var fragmentFlows = _fragmentFlowService.Query().Filter(q => q.FragmentID == fragmentID).Get().ToList();
 
             //get flow flow Properties
             var flowFlowProperties = _flowFlowPropertyService.Query().Get().ToList();
@@ -256,7 +254,7 @@ namespace Services
             var scenarioParams = _scenarioParamService.Query().Filter(q => q.ScenarioID == scenarioId).Get().ToList();
 
             // first, determine the correct FlowFlowPropertyID
-            var flowPropertyFlows = ApplyDependencyParam()
+            var flowPropertyFlows = ApplyDependencyParam(fragmentID, scenarioId)
            .Join(flowFlowProperties, p => p.FlowID, pc => pc.FlowID, (p, pc) => new { p, pc })
            .Where(p => p.p.ReferenceFlowPropertyID == p.pc.FlowPropertyID)
            .Select(m => new FlowPropertyParamModel
@@ -355,14 +353,14 @@ namespace Services
 
         }
 
-        public int refFlow()
+        public int refFlow(int fragmentID)
         {
-            return Convert.ToInt32(_fragmentService.Query().Filter(q => q.FragmentID == fragmentId).Get().FirstOrDefault().ReferenceFragmentFlowID);
+            return Convert.ToInt32(_fragmentService.Query().Filter(q => q.FragmentID == fragmentID).Get().FirstOrDefault().ReferenceFragmentFlowID);
         }
 
-        public void NodeRecurse(int scenarioId, int refFlow, double? activity)
+        public void NodeRecurse(int scenarioId, int refFlow, double? activity, int fragmentID)
         {
-            var theflow = ApplyFlowPropertyParam().Where(q => q.FragmentFlowID == refFlow).AsEnumerable();
+            var theflow = ApplyFlowPropertyParam(fragmentID, scenarioId).Where(q => q.FragmentFlowID == refFlow).AsEnumerable();
 
             var fragmentNodeFragment = _fragmentNodeFragmentService.Query().Get().AsQueryable();
 
@@ -388,10 +386,10 @@ namespace Services
             switch (nodeTypeID)
             {
                 case 1: //process
-                    var processDependencies = ApplyFlowPropertyParam().Where(q => q.ParentFragmentFlowID == refFlow);
+                    var processDependencies = ApplyFlowPropertyParam(fragmentID, scenarioId).Where(q => q.ParentFragmentFlowID == refFlow);
                     foreach (var item in processDependencies)
                     {
-                        NodeRecurse(1, item.FragmentFlowID, activity);
+                        NodeRecurse(1, item.FragmentFlowID, activity, fragmentID);
                     }
                     break;
                 case 2: //fragment
@@ -404,23 +402,23 @@ namespace Services
                     int? subFragmentId = theNode.Select(x => x.pc.SubFragmentID).FirstOrDefault();
 
                     //get the dependencies associated with the node from the flows (these come from the flows after "ApplyDependencyParam" and "ApplyFlowPropertyParam" have been applied)
-                    var fragmentDependencies = ApplyFlowPropertyParam().Where(q => q.ParentFragmentFlowID == currentFlow).AsEnumerable();
+                    var fragmentDependencies = ApplyFlowPropertyParam(fragmentID, scenarioId).Where(q => q.ParentFragmentFlowID == currentFlow).AsEnumerable();
 
                     //get the fragment associated with the subFragmentId - actually don't think we need this.  
                     //We can just pass the subfragmentid and the scenarioId and call the parent 'Traverse' method
                     //var subFragment = _fragmentService.Query().Filter(q => q.FragmentID == subFragmentId).Get().AsQueryable();
 
                     //change the value of fragmentId to the value of subFragementId and traverse the subfragment
-                    fragmentId = subFragmentId;
-                    Traverse(scenarioId);
+                    fragmentID = Convert.ToInt32(subFragmentId);
+                    Traverse(fragmentID, scenarioId);
 
                     if (subFragmentId != null)
                     {
-                        MapDependencies(fragmentDependencies, scenarioId);
+                        MapDependencies(fragmentDependencies, fragmentID, scenarioId);
                     }
 
                     //update each flow quantity with the fragmentDependency quantity
-                    var updateFlows = ApplyFlowPropertyParam().Join(fragmentDependencies, p => p.FragmentFlowID, pc => pc.FragmentFlowID, (p, pc) => new { p, pc }).AsQueryable();
+                    var updateFlows = ApplyFlowPropertyParam(fragmentID, scenarioId).Join(fragmentDependencies, p => p.FragmentFlowID, pc => pc.FragmentFlowID, (p, pc) => new { p, pc }).AsQueryable();
                     foreach (var item in updateFlows)
                     {
                         item.p.Quantity = item.pc.Quantity;
@@ -429,7 +427,7 @@ namespace Services
                     //recurse again
                     foreach (var item in fragmentDependencies)
                     {
-                        NodeRecurse(scenarioId, item.FragmentFlowID, activity);
+                        NodeRecurse(scenarioId, item.FragmentFlowID, activity, fragmentID);
                     }
 
                     break;
@@ -444,12 +442,12 @@ namespace Services
 
         }
 
-        public IEnumerable<FlowPropertyParamModel> MapDependencies(IEnumerable<FlowPropertyParamModel> dep, int scenarioId = 1)
+        public IEnumerable<FlowPropertyParamModel> MapDependencies(IEnumerable<FlowPropertyParamModel> dep, int fragmentID, int scenarioId = 1)
         {
             var nodeCache = _nodeCacheService.Query().Get().AsEnumerable();
 
             //Get distinct flows, their direction ids a
-            var myIO = ApplyFlowPropertyParam()
+            var myIO = ApplyFlowPropertyParam(fragmentID, scenarioId)
                 .Join(nodeCache, p => p.FragmentFlowID, pc => pc.FragmentFlowID, (p, pc) => new { p, pc })
                 .Where(q => q.p.NodeTypeID == 3)
                 .Where(q => q.pc.ScenarioID == scenarioId)

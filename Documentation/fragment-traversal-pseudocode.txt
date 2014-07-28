@@ -1,3 +1,225 @@
+==========
+Mon Jul 28 00:32:01 -0700 2014
+
+New version is simpler:
+
+bool success = FragmentTraverse ( fragment_id, scenario_id )
+{
+  // ref_flow is a FragmentFlowID value
+  ref_flow = SELECT FragmentFlowID FROM FragmentFlow
+             WHERE FragmentID = @fragment_id 
+               AND ParentFragmentFlowID IS NULL
+
+  activity = 1;
+
+  // check to see if node has been traversed
+  chk = SELECT * FROM NodeCache
+        WHERE FragmentFlowID = ref_flow
+	  AND ScenarioID = scenario_id;
+
+  if isempty(chk)
+    success = NodeRecurse( ref_flow, scenario_id, activity );
+}
+
+## ------------------------------------------------------------------------
+
+success = NodeRecurse( fragment_flow_id, scenario_id, flow_magnitude )
+{
+  the_flow = SELECT * FROM FragmentFlow 
+             WHERE FragmentFlowID = fragment_flow_id
+
+  // node_flows: FlowID, DirectionID, Result
+  node_flows = GetScenarioProductFlows( the_flow, scenario_id );
+
+  term_flow_id = GetTermFlow( the_flow );
+
+  // determine flow mapping
+  inflow = SELECT * FROM node_flows 
+           WHERE FlowID = term_flow_id 
+	   AND DirectionID = comp( the_flow.DirectionID );
+  // comp is complement (1 'Input' vs 2 'Output' )
+
+  node_outflows = node_flows EXCLUDE inflow ; // ????
+
+  if the_flow.FlowID == term_flow_id
+     node_conv = 1;
+  else
+  { // convert the inflow to the reference property of the term flow
+    term_flow = SELECT * FROM Flow WHERE FlowID = TermFlowID
+    
+    conv = SELECT ffp.MeanValue AS Default, fpp.Value AS Subs
+    	        FROM FlowFlowProperty ffp
+    	      	INNER JOIN FlowPropertyParam fpp ON FlowFlowPropertyID
+		INNER JOIN ScenarioParam on fpp.ParamID
+                WHERE FlowID = the_flow.FlowID
+                  AND FlowPropertyID = term_flow.ReferenceFlowPropertyID
+		  AND ScenarioID = scenario_id
+
+    if conv.Subs is not null
+      node_conv = conv.Subs;
+    else
+      node_conv = conv.Default;
+  }
+
+  node_scale = 1 / inflow.Result;
+  node_weight = flow_magnitude * node_conv * node_scale;
+
+  SetNodeCache( fragment_flow_id, scenario_id, flow_magnitude, node_weight );
+  
+  // now map outgoing fragment edges to other product flows
+  outflows = SELECT ff.FragmentFlowID, ff.FlowID, ff.DirectionID,
+                    nf.Result,
+                    dp.Value AS ParamValue
+             FROM FragmentFlow ff 
+             LEFT OUTER JOIN node_flows nf ON ff.FlowID = nf.FlowID
+             LEFT OUTER JOIN DependencyParam dp -> ScenarioParam sp
+               ON ff.FragmentFlowID = dp.FragmentFlowID
+             WHERE ParentFragmentFlowID = @FragmentFlowID
+               AND ff.DirectionID = nf.DirectionID
+               AND sp.ScenarioID = @ScenarioID ;
+
+  if isempty (outflows)
+    success = true;
+  else
+  { // recursion
+    for i in outflows
+    {
+      if i.ParamValue is not null
+        i.Result = i.ParamValue;
+
+      if i.Result is null
+      {
+        catch exception!
+      }
+      success = node_recurse( i.FragmentFlowID, scenario_id, node_weight *
+      	      		      i.Result );
+    }
+  }
+}
+
+## ------------------------------------------------------------------------
+
+node_flows = get_scenario_product_flows ( the_fragment_flow, scenario_id)
+{
+  // input is a single FragmentFlow record
+  //
+  // output is a struct with fields:
+  // FlowID
+  // DirectionID
+  // Result (from ProcessFlow)
+
+  switch the_fragment_flow.NodeTypeID
+  {
+    case {3,4} // InputOutput, Background
+    {
+      node_flows.FlowID = the_fragment_flow.FlowID;
+      node_flows.DirectionID = comp ( the_fragment_flow.DirectionID );
+      node_flows.Result = 1;
+    }
+    case 1 // Process
+    {
+      the_fragment_flow = SELECT fnp.ProcessID AS Default,
+      		      	       ps.ProcessID as Subs
+      		      FROM the_fragment_flow 
+      		      INNER JOIN FragmentNodeProcess 
+      		      LEFT OUTER JOIN  ProcessSubstitution
+
+      if Subs is not null
+      	process_id = Subs;
+      else
+        process_id = Default;
+     
+      node_flows = SELECT pf.FlowID,
+                              pf.DirectionID,
+                              pf.Result
+                          FROM ProcessFlow pf 
+                          INNER JOIN Flow f ON pf.FlowID = f.FlowID
+                          WHERE pf.ProcessID = process_id AND f.FlowTypeID = 1
+    }
+    case 2 // Fragment
+    {
+      the_fragment_flow = SELECT fnf.FragmentID AS Default,
+      		      	       fs.FragmentID as Subs
+      		      FROM the_fragment_flow 
+      		      INNER JOIN FragmentNodeFragment fnf
+      		      LEFT OUTER JOIN  FragmentSubstitution fs
+		        WHERE fs.ScenarioID = scenario_id
+
+      if Subs is not null
+      	fragment_id = Subs;
+      else
+        fragment_id = Default;
+
+      // recursive traversal
+      FragmentTraverse( fragment_id, scenario_id);
+
+      // pull cache values 
+      // in SQL it's a bit complicated:
+      // first we make a table of flows with cache values:
+      node_flows = SELECT ff.FlowID AS FlowID,
+                          ff.DirectionID AS DirectionID,
+                          nc.FlowMagnitude AS FlowMagnitude,
+                          fnf.FlowID AS RefFlowID
+                   FROM FragmentFlow ff
+                   INNER JOIN NodeCache nc ON ff.FragmentFlowID = nc.FragmentFlowID 
+                   LEFT OUTER JOIN FragmentNodeFragment fnf ON ff.FragmentFlowID = fnf.FragmentFlowID
+                   WHERE ff.FragmentID = FID 
+                     AND ( ff.NodeTypeID = 3 OR ff.FlowID IS NULL )
+                     AND nc.ScenarioID = scenario_id
+      
+      // next we need to modify the table to fix the reference flow (FlowID = null) and
+      // make it appear like an InputOutput flow
+    
+      update node_flows.FlowID = node_flows.RefFlowID 
+             AND node_flows.DirectionID = comp(node_flows.DirectionID) 
+             WHERE node_flows.FlowID IS NULL
+     
+      // Finally we need to group flows by distinct FlowID + DirectionID
+    
+      node_flows = select FlowID, DirectionID,
+                           sum(FlowMagnitude) AS Result
+                           FROM node_flows
+                           GROUP BY FlowID, DirectionID
+     
+      // and that's it.
+    }
+  }
+}      
+
+## ------------------------------------------------------------------------
+
+term_flow_id = GetTermFlow( the_fragment_flow )
+switch the_fragment_flow.NodeTypeID
+{
+  case {3,4}
+    term_flow_id = the_fragment_flow.FlowID;
+  case 1
+    term_flow_id = the_fragment_flow -> FragmentNodeProcess.FlowID;
+  case 2
+    term_flow_id = the_fragment_flow -> FragmentNodeFragment.FlowID;
+}
+
+
+     
+
+###########################################################################
+###########################################################################
+END Mon 07-28 01:11:05 -0700
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+--------------
 ### Fragment Traversal with Parameters
 ## updated Mon 06-16 11:22:24 -0700
 

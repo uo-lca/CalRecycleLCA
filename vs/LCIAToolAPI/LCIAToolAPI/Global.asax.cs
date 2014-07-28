@@ -22,7 +22,9 @@ namespace LCIAToolAPI
     {
         protected void Application_Start(object sender, EventArgs e)
         {
-            WebApiConfig.Register(GlobalConfiguration.Configuration);
+            // Not compatible with attribute routing.
+            //WebApiConfig.Register(GlobalConfiguration.Configuration);
+            GlobalConfiguration.Configure(WebApiConfig.Register);
             AreaRegistration.RegisterAllAreas();
             XmlConfigurator.Configure();
             NinjectWebCommon.RegisterNinject(GlobalConfiguration.Configuration);

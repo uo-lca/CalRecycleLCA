@@ -14,11 +14,16 @@ namespace Repository
             var fragmentFlows =
        fragmentFlowRepository
             .Query()
-            .OrderBy(q => q
-                .OrderBy(c => c.FlowID)
-                .ThenBy(c => c.Name))
+            .Include(i => i.FragmentNodeFragments)
+            .Include(i => i.FragmentNodeProcesses)
+            .Include(i => i.NodeCaches)
+            .Include(i => i.Flow.FlowFlowProperties)
+                //.OrderBy(q => q
+                //    .OrderBy(c => c.FlowID)
+                //    .ThenBy(c => c.Name))
             .Filter(q => q.FragmentID == fragmentId)
-            .GetPage();
+                //.GetPage();
+            .Get();
 
             return fragmentFlows;
         }

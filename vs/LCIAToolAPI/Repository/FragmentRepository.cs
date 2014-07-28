@@ -25,6 +25,9 @@ namespace Repository
             return fragments.AsEnumerable();
         }
 
+        public static Fragment GetFragment(this IRepository<Fragment> fragmentRepository, int fragmentId) {
+            return fragmentRepository.FindById(fragmentId);
+        }
        
     }
 }

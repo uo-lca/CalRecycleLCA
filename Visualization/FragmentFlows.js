@@ -41,7 +41,10 @@ function FragmentFlows() {
     var selectedFlowPropertyID = 23,
         fragFlowFlowProperties = [];
     var apiResourceNames = ["fragments", "processes", "flowproperties", "fragmentflows", "flowflowproperties"],
-        nodeTypes = [];   
+        nodeTypes = [],
+        flowTables = [],
+        flowColumns = ["Name", "CASNumber"],
+        panelSelection;   
 
     
 
@@ -55,6 +58,25 @@ function FragmentFlows() {
             .attr("height", height + margin.top + margin.bottom)
             .append("g")
             .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+    }
+
+    /**
+      * Initial preparation of svg element.
+      */
+      function prepareNodeView() {
+          panelSelection = d3.select("#chartcontainer")
+              .append("div")
+              .classed("vis-panel", true);
+        panelSelection.append("h2")
+            .text("Node Details");
+        panelSelection.append("p")
+            .append("h3")
+            .text("Input Flows");
+        flowTables[0] = LCA.createTable(panelSelection, flowColumns);
+        panelSelection.append("p")
+            .append("h3")
+            .text("Output Flows");
+        flowTables[1] = LCA.createTable(panelSelection, flowColumns);
     }
 
     /**
@@ -82,45 +104,21 @@ function FragmentFlows() {
     }
 
     /**
-     * Look up name of entity referenced by NodeID in fragment flow data
-     * @param {Array}  ffData          fragment flow data
-     * @return {String} the name
+     * Update flowTables with flows related to a graph node
+     * @param {Object}  node    Reference to graph node
      */
-    function getNodeName(ffData) {
-        var nodeName = "";
-        switch (ffData.NodeTypeID) {
-            case 1:
-                if (ffData.NodeID in LCA.indexedData.processes) {
-                    nodeName = LCA.indexedData.processes[ffData.NodeID].Name;
-                } else {
-                    console.error("FragmentNode ProcessID: " + ffData.NodeID + " not found.");
-                    nodeName = nodeTypes[ffData.NodeTypeID] + ffData.NodeID.toString();
-                }
-                break;
-            case 2:
-                if (ffData.NodeID in LCA.indexedData.fragments) {
-                    nodeName = LCA.indexedData.fragments[ffData.NodeID].Name;
-                } else {
-                    console.error("FragmentNode FragmentID: " + ffData.NodeID + " not found.");
-                    nodeName = nodeTypes[ffData.NodeTypeID] + ffData.NodeID.toString();
-                }
-                break;
-        }
-        return nodeName;
-    }
-
     function displayFlows(node) {
-        d3.select("table").remove();
-        // TODO : move this into tooltip
-        var table = d3.select("#chartcontainer").append("table"); 
-            flowData = [];
-        node.sourceLinks.forEach( function (l) {
-            flowData.push(LCA.indexedData.flows[l.flowID]);
-        });
+        var inputFlows = [],
+            outputFlows = [];
+
         node.targetLinks.forEach(function (l) {
-            flowData.push(LCA.indexedData.flows[l.flowID]);
+            inputFlows.push(LCA.indexedData.flows[l.flowID]);
         });
-        LCA.tabulate(table, flowData, ["Name","CASNumber"]);       
+        LCA.updateTable(flowTables[0], inputFlows, flowColumns);
+        node.sourceLinks.forEach(function(l) {
+            outputFlows.push(LCA.indexedData.flows[l.flowID]);
+        });
+        LCA.updateTable(flowTables[1], outputFlows, flowColumns);
     }
 
     /**
@@ -167,7 +165,7 @@ function FragmentFlows() {
             .text(function (d) {
                 return d.fragmentFlowName;
             });
-        
+
         // Workaround for NaN problem
         graph.nodes.forEach(function (d) {
             if (isNaN(d.x)) {
@@ -207,17 +205,17 @@ function FragmentFlows() {
                 return d3.rgb(d.color).darker(2);
             });
         var ntElement = d3.select(".d3-tip");
-        node.on('mouseover', function(d) {      
+        node.on('mouseover', function (d) {
             ntElement.transition()
                 .duration(200);
             nodeTip.show(d);
-        })
-            .on('mouseout', function (d) {
-                ntElement.transition()
-                .duration(500);
-            nodeTip.hide(d);
-            })
-            .on('click', displayFlows);
+            displayFlows(d);
+        });
+            //.on('mouseout', function (d) {
+            //    ntElement.transition()
+            //    .duration(500);
+            //    nodeTip.hide(d);
+            //});
         //
         // Position fragment flow name to the right or left of node.
         //
@@ -233,7 +231,7 @@ function FragmentFlows() {
                 return LCA.shortName(d.fragmentFlowName, 30);
             })
             .filter(function (d) {
-                    return d.x < width / 2;
+                return d.x < width / 2;
             })
             .attr("x", 6 + sankey.nodeWidth())
             .attr("text-anchor", "start");
@@ -247,6 +245,8 @@ function FragmentFlows() {
         })
         .style("stroke-width", 1)
         .style("stroke-dasharray", "5,5");
+
+        displayFlows(graph.nodes[0]);
     }
 
     /**
@@ -255,7 +255,7 @@ function FragmentFlows() {
      */
     function buildGraph(data) {
         var nodeIndex = 0,
-            reverseIndex = [], // map FragmentFlowID to graph.nodes and graph.links
+            reverseIndex = [], // map fragmentFlowID to graph.nodes and graph.links
             minVal = 1;
 
         graph.nodes = [];
@@ -263,7 +263,6 @@ function FragmentFlows() {
 
         // Create root node
         graph.nodes.push({
-            nodeID: 0,
             fragmentFlowName: "",
             nodeTypeID: 0,
             nodeName: ""
@@ -272,29 +271,46 @@ function FragmentFlows() {
         // Add a node for every flow
         data.forEach(function (element) {
             var node = {
-                nodeID: element.NodeID,
-                nodeTypeID: element.NodeTypeID,
-                fragmentFlowName: element.Name,    // Fragment flow name
-                nodeName: getNodeName(element) // Name of referenced object
+                nodeTypeID: element.nodeTypeID,
+                fragmentFlowName: element.name,    // Fragment flow name
+                nodeName: "" // Name of referenced object, if any
             };
-            reverseIndex[element.FragmentFlowID] = graph.nodes.push(node) - 1;
-            if (element.NodeWeight > 0 && element.NodeWeight < minVal) {
-                minVal = element.NodeWeight;
+            if ("processID" in element) {
+                node.processID = element.processID;
+                if (node.processID in LCA.indexedData.processes) {
+                    node.nodeName = LCA.indexedData.processes[node.processID].Name;
+                }
+            }
+            if ("subFragmentID" in element) {
+                node.subFragmentID = element.subFragmentID;
+                if (node.subFragmentID in LCA.indexedData.fragments) {
+                    node.nodeName = LCA.indexedData.fragments[node.subFragmentID].name;
+                }
+            }
+            reverseIndex[element.fragmentFlowID] = graph.nodes.push(node) - 1;
+            if (element.nodeWeight > 0 && element.nodeWeight < minVal) {
+                minVal = element.nodeWeight;
             }
         });
 
         // Add a link for every flow. source and target are indexes into nodes array.
         data.forEach(function (element) {
-            var link, parentIndex;
+            var link, parentIndex = 0, nodeWeight = 0, parentFragmentFlowID = 0;
             ++nodeIndex;
-            parentIndex = reverseIndex[element.ParentFragmentFlowID];
+            if ("parentFragmentFlowID" in element) {
+                parentIndex = reverseIndex[element.parentFragmentFlowID];
+            }
+            if ("nodeWeight" in element) {
+                nodeWeight = element.nodeWeight;
+            }
+            
             link = {
-                flowID: element.FlowID,
-                fragmentFlowName: element.Name,
-                nodeWeight: element.NodeWeight,
-                value: element.NodeWeight > 0 ? element.NodeWeight : minVal / 2   // sankey cannot handle 0 values
+                flowID: element.flowID,
+                fragmentFlowName: element.name,
+                nodeWeight: nodeWeight,
+                value: nodeWeight > 0 ? nodeWeight : minVal / 2   // sankey cannot handle values <= 0
             };
-            if (element.DirectionID === 1) {
+            if (element.directionID === 1) {
                 link.source = nodeIndex;
                 link.target = parentIndex;
             } else {
@@ -308,8 +324,8 @@ function FragmentFlows() {
     }
 
     function onFragmentsLoaded() {
-        LCA.indexedData.fragments = LCA.indexData("fragments", "FragmentID");
-        fragmentName = LCA.indexedData.fragments[selectedFragmentID].Name;
+        LCA.indexedData.fragments = LCA.indexData("fragments", "fragmentID");
+        fragmentName = LCA.indexedData.fragments[selectedFragmentID].name;
         d3.select("#fragmentName").text(fragmentName);
         onFragmentFlowsLoaded();
     }
@@ -359,7 +375,7 @@ function FragmentFlows() {
         var fragmentFlows = LCA.indexedData.fragments[selectedFragmentID].fragmentFlows;
         fragFlowFlowProperties = LCA.loadedData.flowflowproperties.filter(function (ffp) {
             return fragmentFlows.some(function (ff) {
-                return (ffp.FlowID === ff.FlowID);
+                return (ffp.FlowID === ff.flowID);
             });
         });
 
@@ -373,31 +389,9 @@ function FragmentFlows() {
 
     function onFragmentFlowsLoaded() {
         if ("fragments" in LCA.indexedData && apiResourceNames[3] in LCA.loadedData) {
-            LCA.indexedData.fragments[selectedFragmentID].fragmentFlows = LCA.indexData(apiResourceNames[3], "FragmentFlowID");
-            loadNodeWeights();
+            LCA.indexedData.fragments[selectedFragmentID].fragmentFlows = LCA.indexData(apiResourceNames[3], "fragmentFlowID");
+            onDataLoaded();
         }
-    }
-
-    /**
-     * STOPGAP : load node weights from csv and update fragmentflows
-     */
-    function loadNodeWeights() {
-        var fragmentFlows = LCA.indexedData.fragments[selectedFragmentID].fragmentFlows;
-        d3.csv("TestData/NodeCache_FragmentID=1..2.csv")
-            .row(function (d) { return { FragmentFlowID: +d.FragmentFlowID, NodeWeight: +d.NodeWeight }; })
-            .get(function (error, rows) {
-                if (error) {
-                    console.error(error);
-                } else {
-                    rows.forEach(function(r) {
-                        if (r.FragmentFlowID in fragmentFlows) {
-                            var fragFlow = fragmentFlows[r.FragmentFlowID];
-                            fragFlow.NodeWeight = r.NodeWeight < 0 ? 0 : r.NodeWeight;
-                        }
-                    });
-                }
-                onDataLoaded();
-            });
     }
 
     /**
@@ -429,17 +423,20 @@ function FragmentFlows() {
         nodeTypes[0] = "Root Node";
         //color.domain(d3.keys(nodeTypes)); // NodeTypeIDs
         // Assign vibrant colors to processes and fragments
-        color.domain([2,3,4,1,0]);
+        color.domain([2, 3, 4, 1, 0]);
+        if ("fragmentID" in LCA.urlVars) {
+            selectedFragmentID = LCA.urlVars.fragmentID;
+        }
         prepareSvg();
-        
+        prepareNodeView();
         LCA.startSpinner("chartcontainer");
         //toolTip = LCA.createToolTip(".container");
         apiResourceNames = ["fragments", "processes", "flowproperties", "fragmentflows", "flowflowproperties", "flows"];
-        LCA.loadData(apiResourceNames[0], true, onFragmentsLoaded);
+        LCA.loadData(apiResourceNames[0], false, onFragmentsLoaded);
         LCA.loadData(apiResourceNames[1], true, onProcessesLoaded);
         loadFlows();
         LCA.loadData(apiResourceNames[2], true, onDataLoaded);
-        LCA.loadData(apiResourceNames[3], true, onFragmentFlowsLoaded, "." + selectedFragmentID);
+        LCA.loadData(apiResourceNames[3], false, onFragmentFlowsLoaded, "fragments/" + selectedFragmentID);
         LCA.loadData(apiResourceNames[4], true, onDataLoaded);
     }
 

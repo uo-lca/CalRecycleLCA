@@ -33,18 +33,30 @@ namespace LCIAToolAPI.App_Start
 
             GlobalConfiguration.Configuration.Formatters.JsonFormatter.SerializerSettings = new JsonSerializerSettings();
             GlobalConfiguration.Configuration.Formatters.JsonFormatter.SerializerSettings.NullValueHandling = NullValueHandling.Ignore;
+            GlobalConfiguration.Configuration.Formatters.JsonFormatter.SerializerSettings.ContractResolver = 
+                new Newtonsoft.Json.Serialization.CamelCasePropertyNamesContractResolver();
+                                                                                                                
             GlobalConfiguration.Configuration.Formatters.JsonFormatter.SerializerSettings.Formatting = Formatting.Indented;
 
 
             GlobalConfiguration.Configuration.Formatters.JsonFormatter.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Serialize;
-            GlobalConfiguration.Configuration.Formatters.JsonFormatter.SerializerSettings.PreserveReferencesHandling = Newtonsoft.Json.PreserveReferencesHandling.Objects;
+            GlobalConfiguration.Configuration.Formatters.JsonFormatter.SerializerSettings.PreserveReferencesHandling = // Newtonsoft.Json.PreserveReferencesHandling.Objects;
+                                                                                                                       Newtonsoft.Json.PreserveReferencesHandling.None;
+            //config.Routes.MapHttpRoute(
+            //name: "DefaultApi",
+            //routeTemplate: "api/{controller}/{id}/{impactCategoryId}",
+            //defaults: new { id = RouteParameter.Optional, impactCategoryId = RouteParameter.Optional }
+            //);
 
-            config.Routes.MapHttpRoute(
-            name: "DefaultApi",
-            routeTemplate: "api/{controller}/{id}/{impactCategoryId}",
-            defaults: new { id = RouteParameter.Optional, impactCategoryId = RouteParameter.Optional }
-            );
+            config.MapHttpAttributeRoutes();
+            // Convention-based routing.
+            //config.Routes.MapHttpRoute(
+            //    name: "DefaultApi",
+            //    routeTemplate: "api/{controller}/{id}",
+            //    defaults: new { id = RouteParameter.Optional }
+            //);
 
+            
         }
     }
 }

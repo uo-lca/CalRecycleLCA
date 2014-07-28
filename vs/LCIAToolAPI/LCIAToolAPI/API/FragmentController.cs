@@ -24,11 +24,8 @@ namespace LCIAToolAPI.API
     public class FragmentController : ApiController
     {
 
-        //private readonly IFragmentService _fragmentService;
         [Inject]
         private readonly IFragmentService _fragmentService;
-
-
 
         public FragmentController(IFragmentService fragmentService)
         {
@@ -40,26 +37,20 @@ namespace LCIAToolAPI.API
 
             _fragmentService = fragmentService;
 
-
         }
 
-
-
-
-         //GET api/<controller>
-        [System.Web.Http.AcceptVerbs("GET", "POST")]
+        [Route("api/fragments")]
         [System.Web.Http.HttpGet]
-        public IEnumerable<Fragment> ImpactCategoryDDL()
-        
+        public IEnumerable<FragmentModel> GetFragments()      
         {
-
-            var processes = _fragmentService.GetFragments();
-            return processes;
-
-
+            return _fragmentService.GetFragments();
         }
 
-      
+        [Route("api/fragments/{fragmentID:int}")]
+        [System.Web.Http.HttpGet]
+        public FragmentModel GetFragment(int fragmentID) {
+            return _fragmentService.GetFragment(fragmentID);
+        }
 
 
     }

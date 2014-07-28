@@ -132,8 +132,12 @@
     <Compile Include="DependencyParamService.cs" />
     <Compile Include="FlowFlowPropertyService.cs" />
     <Compile Include="FlowPropertyParamService.cs" />
+    <Compile Include="FlowPropertyService.cs" />
+    <Compile Include="IProcessService.cs" />
+    <Compile Include="ProcessService.cs" />
     <Compile Include="FlowService.cs" />
     <Compile Include="FragmentFlowService.cs" />
+    <Compile Include="FragmentLinkService.cs" />
     <Compile Include="FragmentNodeFragmentService.cs" />
     <Compile Include="FragmentService.cs" />
     <Compile Include="FragmentTraversal.cs">
@@ -143,8 +147,10 @@
     <Compile Include="IDependencyParamService.cs" />
     <Compile Include="IFlowFlowPropertyService.cs" />
     <Compile Include="IFlowPropertyParamService.cs" />
+    <Compile Include="IFlowPropertyService.cs" />
     <Compile Include="IFlowService.cs" />
     <Compile Include="IFragmentFlowService.cs" />
+    <Compile Include="IFragmentLinkService.cs" />
     <Compile Include="IFragmentNodeFragmentService.cs" />
     <Compile Include="IFragmentService.cs" />
     <Compile Include="IFragmentTraversal.cs">

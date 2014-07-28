@@ -8,8 +8,8 @@ using System.Threading.Tasks;
 
 namespace Services
 {
-    public interface IFlowService : IService<Flow>
+    public interface IFlowPropertyService : IService<FlowProperty>
     {
-        IEnumerable<FlowModel> GetFlowsByFragment(int fragmentId);            
+        IEnumerable<FlowPropertyModel> GetFlowPropertiesByFragment(int fragmentId);            
     }
 }
