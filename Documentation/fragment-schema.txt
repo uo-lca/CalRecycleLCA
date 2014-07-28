@@ -124,30 +124,31 @@ The following tables are required:
     Indicator types represented in ILCD LCIA methods.
 
    NodeType (enumeration)
-    * NodeTypeID [1 | 2 | 3 | 4]
-    * Name: [Process | Fragment | InputOutput | Background]
+    * NodeTypeID [1 | 2 | 3 | 4 | 5]
+    * Name: [Process | Fragment | InputOutput | Background | Cutoff]
 
     A Node's NodeType specifies how the node resolves its reference flow:
     to a database process, to a subfragment, to an external input/output,
-    or to a background process.
+    or to a background process.  Background processes can be further
+    specified as 'cutoff' flows, not modeled at all.
 
    ParamType (enumeration)
     * ParamTypeID: [1 | 2 | 3 
       	     | 4 
-	     | 5
+	     | 
 	     | 6 | 7 
 	     | 8 | 9
 	     | 10 ]
 
     * Name: [Dependency | Conservation | Distribution
       	     | FlowProperty 
-	     | CompositionProperty 
+	     | 
 	     | ProcessDissipation | NodeDissipation
 	     | ProcessEmission | NodeEmission
 	     | LCIAFactor ]
 
     Different parameter types must be handled at different points in the
-    tree traversal / LCIA computation.  
+    tree traversal / LCIA computation.  Note: Type 5 is not used.
 
    Visibility (enumeration)
     * VisibilityID : [ 1 | 2 ]
@@ -429,16 +430,15 @@ The following tables are required:
    FragmentFlow
     * FragmentFlowID (equals FragmentEdgeID) (was FragmentNodeID)
     * FragmentID (FK to Fragment)
-      edge fields (moved from FragmentEdge) :
+   ---edge fields (moved from FragmentEdge) :
+    * ParentFragmentFlowID (FK to FragmentFlowID) (was Origin) (moved to first)
     * FlowID (FK to Flow; FlowType must be Intermediate)
     * DirectionID (FK to Direction, w.r.t. origin node)
-    * Quantity (or NULL if Origin NodeType is Fragment) (wrt unity activity
-   of parent
-    * ParentFragmentFlowID (FK to FragmentFlowID) (was Origin) (moved to last)
-      node fields:
+    X Quantity (or NULL if Origin NodeType is Fragment)
+   ---node fields:
     * Name - of process occurring at terminus (or flow name for IO/background)
     * FragmentStageID (was StageID) (FK to FragmentStage: FragmentID must match)
-    * ReferenceFlowPropertyID (FK to FlowPropertyID) - of edge terminating at node
+    X ReferenceFlowPropertyID (FK to FlowPropertyID) - of node inflow
     * NodeTypeID (FK to NodeType)
 
     * DocID
@@ -446,10 +446,15 @@ The following tables are required:
     A FragmentFlowID corresponds to the observation of a flow and its
     terminus.
 
+    The FragmentFlowID identified as Fragment.ReferenceFragmentFlowID is
+    the reference flow for its fragment-- this record has null
+    ParentFragmentFlowID and FlowID fields.
+
    FragmentNodeProcess
     * FragmentNodeProcessID
     * FragmentFlowID
     * ProcessID (FK to Process.ProcessID)
+    + FlowID (FK)
 
     * DocID
 
@@ -459,6 +464,7 @@ The following tables are required:
     * FragmentNodeFragmentID
     * FragmentFlowID
     * SubfragmentID
+    + FlowID (FK)
 
     * DocID
 
@@ -540,7 +546,7 @@ The following tables are required:
 
     * DocID
 
-   CompositionParam
+   CompositionParam -- DELETE TABLE
     * CompositionParamID
     * ParamID (FK to Param, ParamTypeID must be 5)
     * FlowFlowPropertyID (FK)
@@ -548,8 +554,8 @@ The following tables are required:
 
     * DocID
 
-    Note: types 4 and 5 both link to FlowFlowPropertyIDs but are used
-    differently during fragment computation.
+    Note: types 4 and 5 both link to FlowFlowPropertyIDs; so type 5 is
+    removed. 
 
    ProcessDissipationParam
     * ProcessDissipationParamID
@@ -592,6 +598,24 @@ The following tables are required:
     * Value (float) unit value of param (phi=0) (aka scenario setting)
 
     * DocID
+
+   ProcessSubstitution - NEW TABLE - PROVISIONAL
+    * ProcessSubstitutionID
+    * ScenarioID (FK to Scenario)
+    * FragmentNodeProcessID (FK)
+    * ProcessID (FK)
+
+    It is a scenario design constraint that the substituted ProcessID must
+    have the same list of product flows as the original ProcessID.
+
+   FragmentSubstitutionParam - NEW TABLE - PROVISIONAL
+    * FragmentSubstitutionParamID
+    * ScenarioID (FK to Scenario)
+    * FragmentNodeFragmentID (FK)
+    * FragmentID (FK)
+
+    It is a scenario design constraint that the substituted FragmentID must
+    have the same list of product flows as the original FragmentID.
 
     A single parameter value can be linked to multiple points in the model-
     but they must all be of the same type (a param with type 1 cannot be
@@ -650,14 +674,11 @@ The following tables are required:
   validate the computations.
 
    NodeCache (Renamed from FragmentScore)
-    % NodeCacheID (was FragmentScoreID)
-    % FragmentFlowID (was FragmentID) (FK to FragmentFlowID)
+    * NodeCacheID (was FragmentScoreID)
+    * FragmentFlowID (was FragmentID) (FK to FragmentFlowID)
     * ScenarioID (FK)
-    X LCIAMethodID - moved to ScoreCache
-    X FragmentNodeStageID - REMOVE
-    X ParamID - REMOVE
-    X ImpactScore - moved to ScoreCache
-    + NodeWeight - relative to the Root node of the parent fragment
+    * NodeWeight - relative to the Root node of the parent fragment
+    + FlowMagnitude - in FragmentFlow.FlowID reference units
       (computed during traversal) 
 
     Size of NodeCache table = # of nodes x # of scenarios 
