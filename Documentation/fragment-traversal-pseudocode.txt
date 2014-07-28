@@ -39,7 +39,7 @@ success = NodeRecurse( fragment_flow_id, scenario_id, flow_magnitude )
 	   AND DirectionID = comp( the_flow.DirectionID );
   // comp is complement (1 'Input' vs 2 'Output' )
 
-  node_outflows = node_flows EXCLUDE inflow ; // ????
+  // THIS IS NOT NECESSARY node_outflows = node_flows EXCLUDE inflow ; // ????
 
   if the_flow.FlowID == term_flow_id
      node_conv = 1;
@@ -67,6 +67,7 @@ success = NodeRecurse( fragment_flow_id, scenario_id, flow_magnitude )
   SetNodeCache( fragment_flow_id, scenario_id, flow_magnitude, node_weight );
   
   // now map outgoing fragment edges to other product flows
+  // NO NEED to EXCLUDE inflows because it will not show up in the join
   outflows = SELECT ff.FragmentFlowID, ff.FlowID, ff.DirectionID,
                     nf.Result,
                     dp.Value AS ParamValue
@@ -99,7 +100,7 @@ success = NodeRecurse( fragment_flow_id, scenario_id, flow_magnitude )
 
 ## ------------------------------------------------------------------------
 
-node_flows = get_scenario_product_flows ( the_fragment_flow, scenario_id)
+node_flows = GetScenarioProductFlows ( the_fragment_flow, scenario_id)
 {
   // input is a single FragmentFlow record
   //
@@ -121,8 +122,9 @@ node_flows = get_scenario_product_flows ( the_fragment_flow, scenario_id)
       the_fragment_flow = SELECT fnp.ProcessID AS Default,
       		      	       ps.ProcessID as Subs
       		      FROM the_fragment_flow 
-      		      INNER JOIN FragmentNodeProcess 
-      		      LEFT OUTER JOIN  ProcessSubstitution
+      		      INNER JOIN FragmentNodeProcess fnp
+      		      LEFT OUTER JOIN  ProcessSubstitution ps
+		        WHERE ps.ScenarioID = scenario_id
 
       if Subs is not null
       	process_id = Subs;
