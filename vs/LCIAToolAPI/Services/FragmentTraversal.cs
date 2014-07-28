@@ -368,7 +368,7 @@ namespace Services
             double? nodeConv = theflow.Select(x => x.MeanValue).FirstOrDefault();
             int? nodeTypeID = theflow.Select(x => x.NodeTypeID).FirstOrDefault();
 
-            //changed activity to activityNodeWeight as code was restting activity to 0
+            //changed activity to activityNodeWeight as code was resetting activity to 0
             activity = activity * nodeWeight * nodeConv;
 
 
