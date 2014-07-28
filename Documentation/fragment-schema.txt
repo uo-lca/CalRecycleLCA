@@ -608,8 +608,8 @@ The following tables are required:
     It is a scenario design constraint that the substituted ProcessID must
     have the same list of product flows as the original ProcessID.
 
-   FragmentSubstitutionParam - NEW TABLE - PROVISIONAL
-    * FragmentSubstitutionParamID
+   FragmentSubstitution - NEW TABLE - PROVISIONAL
+    * FragmentSubstitutionID
     * ScenarioID (FK to Scenario)
     * FragmentNodeFragmentID (FK)
     * FragmentID (FK)
