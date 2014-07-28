@@ -7,17 +7,17 @@ namespace LcaDataModel.Migrations
     {
         public override void Up()
         {
-            //DropForeignKey("dbo.FragmentFlow", "ReferenceFlowPropertyID", "dbo.FlowProperty");
-            //DropIndex("dbo.FragmentFlow", new[] { "ReferenceFlowPropertyID" });
-            //AddColumn("dbo.FragmentNodeFragment", "FlowID", c => c.Int());
-            //AddColumn("dbo.NodeCache", "FlowMagnitude", c => c.Double());
-            //AddColumn("dbo.FragmentNodeProcess", "FlowID", c => c.Int());
-            //CreateIndex("dbo.FragmentNodeFragment", "FlowID");
-            //CreateIndex("dbo.FragmentNodeProcess", "FlowID");
-            //AddForeignKey("dbo.FragmentNodeFragment", "FlowID", "dbo.Flow", "FlowID");
-            //AddForeignKey("dbo.FragmentNodeProcess", "FlowID", "dbo.Flow", "FlowID");
-            //DropColumn("dbo.FragmentFlow", "ReferenceFlowPropertyID");
-            //DropColumn("dbo.FragmentFlow", "Quantity");
+            DropForeignKey("dbo.FragmentFlow", "ReferenceFlowPropertyID", "dbo.FlowProperty");
+            DropIndex("dbo.FragmentFlow", new[] { "ReferenceFlowPropertyID" });
+            AddColumn("dbo.FragmentNodeFragment", "FlowID", c => c.Int());
+            AddColumn("dbo.NodeCache", "FlowMagnitude", c => c.Double());
+            AddColumn("dbo.FragmentNodeProcess", "FlowID", c => c.Int());
+            CreateIndex("dbo.FragmentNodeFragment", "FlowID");
+            CreateIndex("dbo.FragmentNodeProcess", "FlowID");
+            AddForeignKey("dbo.FragmentNodeFragment", "FlowID", "dbo.Flow", "FlowID");
+            AddForeignKey("dbo.FragmentNodeProcess", "FlowID", "dbo.Flow", "FlowID");
+            DropColumn("dbo.FragmentFlow", "ReferenceFlowPropertyID");
+            DropColumn("dbo.FragmentFlow", "Quantity");
         }
         
         public override void Down()

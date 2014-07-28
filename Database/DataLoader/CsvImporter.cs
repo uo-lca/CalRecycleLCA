@@ -311,7 +311,8 @@ namespace LcaDataLoader {
             FragmentNodeProcess ent = dbContext.CreateEntityWithID<FragmentNodeProcess>(id);
             if (ent != null) {
                 ent.FragmentFlowID = Convert.ToInt32(row["FragmentFlowID"]);
-                ent.ProcessID =  dbContext.GetIlcdEntityID<LcaDataModel.Process>(row["ProcessUUID"]);
+                ent.ProcessID = dbContext.GetIlcdEntityID<LcaDataModel.Process>(row["ProcessUUID"]);
+                ent.FlowID = dbContext.GetIlcdEntityID<LcaDataModel.Flow>(row["FlowUUID"]);
                 isImported = (dbContext.SaveChanges() > 0);
             }
             return isImported;
@@ -324,6 +325,7 @@ namespace LcaDataLoader {
             if (ent != null) {
                 ent.FragmentFlowID = Convert.ToInt32(row["FragmentFlowID"]);
                 ent.SubFragmentID = Convert.ToInt32(row["SubFragmentID"]);
+                ent.FlowID = dbContext.GetIlcdEntityID<LcaDataModel.Flow>(row["FlowUUID"]);
                 isImported = (dbContext.SaveChanges() > 0);
             }
             return isImported;

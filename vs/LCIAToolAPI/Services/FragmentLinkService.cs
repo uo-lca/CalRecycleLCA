@@ -28,9 +28,9 @@ namespace Services {
         private ICollection<LinkMagnitude> GetLinkMagnitudes(FragmentFlow ff, int scenarioID) {
             IEnumerable<FlowFlowProperty> ffpData = ff.Flow.FlowFlowProperties;
             IEnumerable<NodeCache> ncData = ff.NodeCaches;
+            // TODO : error handling in case node cache is not built
             NodeCache nodeCache = ncData.Where(nc => nc.ScenarioID == scenarioID).FirstOrDefault();
-            // TODO : use new NodeCache.FlowMagnitude property when available.
-            double flowMagnitude = Convert.ToDouble(nodeCache.NodeWeight); 
+            double flowMagnitude = Convert.ToDouble(nodeCache.FlowMagnitude); 
             return ffpData.Select(ffp => 
                     new LinkMagnitude {
                         FlowPropertyID = Convert.ToInt32(ffp.FlowPropertyID),
