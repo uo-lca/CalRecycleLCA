@@ -6,7 +6,7 @@ using System.Net.Http;
 using System.Web.Http;
 using Repository;
 using Services;
-using Data;
+using LcaDataModel;
 using Entities.Models;
 using System.Web.Http.Services;
 using Ninject;

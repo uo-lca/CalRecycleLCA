@@ -6,7 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Data;
 using System.Data.Entity;
-using Data;
+using LcaDataModel;
 
 
 namespace Repository

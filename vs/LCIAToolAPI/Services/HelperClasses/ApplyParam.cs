@@ -1,4 +1,4 @@
-﻿using Data;
+﻿using LcaDataModel;
 using Entities.Models;
 using Ninject;
 using System;
