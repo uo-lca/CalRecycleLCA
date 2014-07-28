@@ -114,11 +114,12 @@ namespace Services.HelperClasses
                         FragmentID = a.FragmentFlow.FragmentID,
                         Name = a.FragmentFlow.Name,
                         FragmentStageID = a.FragmentFlow.FragmentStageID ?? 0,
-                        ReferenceFlowPropertyID = a.FragmentFlow.ReferenceFlowPropertyID,
+                        // ReferenceFlowPropertyID = a.FragmentFlow.ReferenceFlowPropertyID,
                         NodeTypeID = a.FragmentFlow.NodeTypeID,
                         FlowID = a.FragmentFlow.FlowID,
                         DirectionID = a.FragmentFlow.DirectionID,
-                        Quantity = a.FragmentFlow.Quantity,
+                        // Quantity = a.FragmentFlow.Quantity,
+                        Quantity = 0,   // TODO: implement using new design
                         ParentFragmentFlowID = a.FragmentFlow.ParentFragmentFlowID,
                         Value = (b.c == null ? 0 : b.c.Value)
                     })).ToList();
@@ -132,7 +133,8 @@ namespace Services.HelperClasses
                 FragmentID = ic.FragmentID,
                 Name = ic.Name,
                 FragmentStageID = ic.FragmentStageID,
-                ReferenceFlowPropertyID = ic.ReferenceFlowPropertyID,
+                // ReferenceFlowPropertyID = ic.ReferenceFlowPropertyID,
+                ReferenceFlowPropertyID = null, // TODO : Implement using new design
                 NodeTypeID = ic.NodeTypeID,
                 FlowID = ic.FlowID,
                 DirectionID = ic.DirectionID,

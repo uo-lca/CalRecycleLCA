@@ -22,6 +22,8 @@ namespace LcaDataModel
 
         public double? NodeWeight { get; set; }
 
+        public double? FlowMagnitude { get; set; }
+
         public virtual FragmentFlow FragmentFlow { get; set; }
 
         public virtual Scenario Scenario { get; set; }

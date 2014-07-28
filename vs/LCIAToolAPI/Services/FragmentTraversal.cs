@@ -177,11 +177,11 @@ namespace Services
                             FragmentID = a.FragmentFlow.FragmentID,
                             Name = a.FragmentFlow.Name,
                             FragmentStageID = a.FragmentFlow.FragmentStageID ?? 0,
-                            ReferenceFlowPropertyID = a.FragmentFlow.ReferenceFlowPropertyID,
+                            // ReferenceFlowPropertyID = a.FragmentFlow.ReferenceFlowPropertyID,
                             NodeTypeID = a.FragmentFlow.NodeTypeID,
                             FlowID = a.FragmentFlow.FlowID,
                             DirectionID = a.FragmentFlow.DirectionID,
-                            Quantity = a.FragmentFlow.Quantity,
+                            // Quantity = a.FragmentFlow.Quantity,
                             ParentFragmentFlowID = a.FragmentFlow.ParentFragmentFlowID,
                             //Value = (b == null ? 0 : b.Value)
                             ParamValue = (b == null ? -1 : b.Value)
@@ -196,11 +196,12 @@ namespace Services
                     FragmentID = ic.FragmentID,
                     Name = ic.Name,
                     FragmentStageID = ic.FragmentStageID,
-                    ReferenceFlowPropertyID = ic.ReferenceFlowPropertyID,
+                    // ReferenceFlowPropertyID = ic.ReferenceFlowPropertyID,
+                    ReferenceFlowPropertyID = null, // TODO : Remove from model or populate using new design
                     NodeTypeID = ic.NodeTypeID,
                     FlowID = ic.FlowID,
                     DirectionID = ic.DirectionID,
-                    Quantity = ic.Quantity,
+                    // Quantity = ic.Quantity,
                     ParentFragmentFlowID = ic.ParentFragmentFlowID,
                     ParamValue = ic.ParamValue
                 })

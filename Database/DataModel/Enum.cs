@@ -29,7 +29,7 @@ namespace LcaDataModel {
     }
 
     public enum NodeTypeEnum {
-        Process=1, Fragment, InputOutput, Background
+        Process=1, Fragment, InputOutput, Background, Cutoff
     }
 
     public enum ParamTypeEnum {
@@ -37,7 +37,7 @@ namespace LcaDataModel {
         Conservation,
         Distribution,
         FlowProperty,
-        CompositionProperty, 
+        UNUSED, // Formerly, CompositionProperty
         ProcessDissipation,
         NodeDissipation, 
         ProcessEmission,

@@ -296,14 +296,9 @@ namespace LcaDataLoader {
                 ent.FragmentID = Convert.ToInt32(row["FragmentID"]);
                 ent.FragmentStageID = TransformOptionalID(row["FragmentStageID"]);
                 ent.Name = row["Name"];
-                ent.ReferenceFlowPropertyID = dbContext.GetIlcdEntityID<FlowProperty>(row["ReferenceFlowPropertyUUID"]);
                 ent.NodeTypeID = Convert.ToInt32(row["NodeTypeID"]);
                 ent.FlowID = dbContext.GetIlcdEntityID<Flow>(row["FlowUUID"]);
                 ent.DirectionID = Convert.ToInt32(row["DirectionID"]);
-                if (String.IsNullOrEmpty(row["Quantity"]))
-                    ent.Quantity = null;
-                else
-                    ent.Quantity = Convert.ToDouble(row["Quantity"]);
                 ent.ParentFragmentFlowID = TransformOptionalID(row["ParentFragmentFlowID"]);
                 if (dbContext.SaveChanges() > 0) isImported = true;
             }
