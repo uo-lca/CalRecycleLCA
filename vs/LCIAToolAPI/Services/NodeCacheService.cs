@@ -1,4 +1,4 @@
-﻿using Data;
+﻿using LcaDataModel;
 using Ninject;
 using Repository;
 using System;

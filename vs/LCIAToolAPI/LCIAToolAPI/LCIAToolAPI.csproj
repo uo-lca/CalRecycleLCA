@@ -305,9 +305,9 @@
     <WCFMetadata Include="Service References\" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Data\Data.csproj">
-      <Project>{89bba7e3-14f0-484d-a956-b1146f12a545}</Project>
-      <Name>Data</Name>
+    <ProjectReference Include="..\..\..\Database\DataModel\LcaDataModel.csproj">
+      <Project>{b7f4d17f-6156-457c-8425-8ce5f683cac5}</Project>
+      <Name>LcaDataModel</Name>
     </ProjectReference>
     <ProjectReference Include="..\Entities\Entities.csproj">
       <Project>{bc864533-a57f-4efe-b967-ef8cafc2b2f1}</Project>

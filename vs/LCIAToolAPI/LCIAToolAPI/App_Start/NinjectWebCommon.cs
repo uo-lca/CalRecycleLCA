@@ -14,7 +14,7 @@ namespace LCAToolAPI.App_Start
     using LCAToolAPI.Infrastructure;
     using System.Web.Http;
     using Repository;
-    using Data;
+    using LcaDataModel;
 
     public static class NinjectWebCommon 
     {
