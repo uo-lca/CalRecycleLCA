@@ -52,7 +52,6 @@ namespace LCAToolAPI.API
                 FragmentID = ff.FragmentID,
                 FragmentStageID = ff.FragmentStageID,
                 Name = ff.Name,
-                ReferenceFlowPropertyID = ff.ReferenceFlowPropertyID,
                 NodeTypeID = ff.NodeTypeID,
                 DirectionID = ff.DirectionID,
                 FlowID = ff.FlowID,

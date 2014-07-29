@@ -296,14 +296,9 @@ namespace LcaDataLoader {
                 ent.FragmentID = Convert.ToInt32(row["FragmentID"]);
                 ent.FragmentStageID = TransformOptionalID(row["FragmentStageID"]);
                 ent.Name = row["Name"];
-                ent.ReferenceFlowPropertyID = dbContext.GetIlcdEntityID<FlowProperty>(row["ReferenceFlowPropertyUUID"]);
                 ent.NodeTypeID = Convert.ToInt32(row["NodeTypeID"]);
                 ent.FlowID = dbContext.GetIlcdEntityID<Flow>(row["FlowUUID"]);
                 ent.DirectionID = Convert.ToInt32(row["DirectionID"]);
-                if (String.IsNullOrEmpty(row["Quantity"]))
-                    ent.Quantity = null;
-                else
-                    ent.Quantity = Convert.ToDouble(row["Quantity"]);
                 ent.ParentFragmentFlowID = TransformOptionalID(row["ParentFragmentFlowID"]);
                 if (dbContext.SaveChanges() > 0) isImported = true;
             }
@@ -316,7 +311,8 @@ namespace LcaDataLoader {
             FragmentNodeProcess ent = dbContext.CreateEntityWithID<FragmentNodeProcess>(id);
             if (ent != null) {
                 ent.FragmentFlowID = Convert.ToInt32(row["FragmentFlowID"]);
-                ent.ProcessID =  dbContext.GetIlcdEntityID<LcaDataModel.Process>(row["ProcessUUID"]);
+                ent.ProcessID = dbContext.GetIlcdEntityID<LcaDataModel.Process>(row["ProcessUUID"]);
+                ent.FlowID = dbContext.GetIlcdEntityID<LcaDataModel.Flow>(row["FlowUUID"]);
                 isImported = (dbContext.SaveChanges() > 0);
             }
             return isImported;
@@ -329,6 +325,7 @@ namespace LcaDataLoader {
             if (ent != null) {
                 ent.FragmentFlowID = Convert.ToInt32(row["FragmentFlowID"]);
                 ent.SubFragmentID = Convert.ToInt32(row["SubFragmentID"]);
+                ent.FlowID = dbContext.GetIlcdEntityID<LcaDataModel.Flow>(row["FlowUUID"]);
                 isImported = (dbContext.SaveChanges() > 0);
             }
             return isImported;

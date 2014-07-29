@@ -182,11 +182,6 @@ namespace LcaDataModel
                 .HasForeignKey(e => e.ReferenceFlowProperty);
 
             modelBuilder.Entity<FlowProperty>()
-                .HasMany(e => e.FragmentFlows)
-                .WithOptional(e => e.FlowProperty)
-                .HasForeignKey(e => e.ReferenceFlowPropertyID);
-
-            modelBuilder.Entity<FlowProperty>()
                 .HasMany(e => e.LCIAMethods)
                 .WithOptional(e => e.FlowProperty)
                 .HasForeignKey(e => e.ReferenceQuantity);

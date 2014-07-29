@@ -30,15 +30,11 @@ namespace LcaDataModel
 
         public int? FragmentStageID { get; set; }
 
-        public int? ReferenceFlowPropertyID { get; set; }
-
         public int? NodeTypeID { get; set; }
 
         public int? FlowID { get; set; }
 
         public int? DirectionID { get; set; }
-
-        public double? Quantity { get; set; }
 
         public int? ParentFragmentFlowID { get; set; }
 
@@ -47,8 +43,6 @@ namespace LcaDataModel
         public virtual Direction Direction { get; set; }
 
         public virtual Flow Flow { get; set; }
-
-        public virtual FlowProperty FlowProperty { get; set; }
 
         public virtual ICollection<Fragment> Fragments { get; set; }
 
