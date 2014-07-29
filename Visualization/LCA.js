@@ -56,7 +56,7 @@ LCA.init = function (callback) {
  * Compare function used to sort array of objects by Name.
  */
 LCA.compareNames = function (a, b) {
-    return d3.ascending(a.Name, b.Name);
+    return d3.ascending(a.name, b.name);
 };
 
 LCA.startSpinner = function startSpinner(tgtElementId) {
@@ -115,10 +115,10 @@ LCA.shortName = function (name, maxLen) {
     if (name.length > maxLen) {
         var endIndex = - 1;
         for (var i = maxLen - 1; i > 0 && endIndex === -1; --i) {
-            if (LCA.shortNameBreakChars.has(name.charAt(i))) endIndex = i;
+            if (LCA.shortNameBreakChars.has(name.charAt(i))) { endIndex = i; }
         }
-        if (endIndex === -1) endIndex = name.lastIndexOf(" ", maxLen -1);
-        if (endIndex === -1) endIndex = maxLen;
+        if (endIndex === -1) { endIndex = name.lastIndexOf(" ", maxLen - 1); }
+        if (endIndex === -1) { endIndex = maxLen; }
         return name.slice(0, endIndex);
     } else {
         return name;
@@ -133,15 +133,15 @@ LCA.shortName = function (name, maxLen) {
  */
 LCA.createTable = function (parSelection, columns) {
     var table = parSelection.append("table"),
-        thead = table.append("thead"),
+    //    thead = table.append("thead"),
         tbody = table.append("tbody");
     // append the header row
-        thead.append("tr")
-            .selectAll("th")
-            .data(columns)
-            .enter()
-            .append("th")
-            .text(function (column) { return column; });
+        //thead.append("tr")
+        //    .selectAll("th")
+        //    .data(columns)
+        //    .enter()
+        //    .append("th")
+        //    .text(function (column) { return column; });
         return tbody;
 };
 
@@ -160,7 +160,7 @@ LCA.updateTable = function (tbody, data, columns) {
         .append("tr");
 
     // create a cell in each row for each column
-    var cells = rows.selectAll("td")
+    rows.selectAll("td")
         .data(function (row) {
             return columns.map(function (column) {
                 return { column: column, value: row[column] };
@@ -188,7 +188,7 @@ LCA.loadData = function (resourceName, useTestData, callback, routePrefix) {
     }
     var jsonURL = (useTestData ? LCA.testDataFolder : LCA.baseURI);
     if (arguments.length === 4) {
-        jsonURL = jsonURL + routePrefix + "/"
+        jsonURL = jsonURL + routePrefix + "/";
     }   
     jsonURL += resourceName;
     if (useTestData) {
@@ -229,7 +229,7 @@ LCA.loadSelectionList = function (objects, selectID, oidName, changeHandler, ini
             return d[oidName];
         })
         .text(function (d) {
-            return d.Name;
+            return d.name;
         });
     //
     // Initialize selection
