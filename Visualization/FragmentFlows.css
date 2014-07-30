@@ -28,6 +28,10 @@
     border-style:none;
 }
 
+.vis-panel label {
+    font-weight: bold;
+}
+
 fieldset label {
 	font-weight: bold;
     vertical-align: middle;

@@ -42,10 +42,12 @@ function FragmentFlows() {
         fragFlowFlowProperties = [];
     var apiResourceNames = [],
         nodeTypes = [],
-        flowTables = [],
-        flowColumns = ["Name", "Magnitude"],
-        panelSelection,
-        nodeTip;
+        flowTables = [],    // d3 selection of flow tables
+        flowColumns = ["Name", "Magnitude"],    // Flow table column names
+        panelSelection,     // d3 selection of panel for node information
+        nodeTip,            // tooltip for node, not currently used
+        nodeTypeSelection,  // d3 selection of element to display node type
+        baseValue = 1E-14;  // sankey link base value (replaces 0).
 
     
 
@@ -76,12 +78,19 @@ function FragmentFlows() {
     /**
       * Initial preparation of svg element.
       */
-      function prepareNodeView() {
-          panelSelection = d3.select("#chartcontainer")
+    function prepareNodeView() {
+        var parSelection;
+        panelSelection = d3.select("#chartcontainer")
               .append("div")
               .classed("vis-panel", true);
         panelSelection.append("h2")
             .text("Node Details");
+
+        parSelection = panelSelection.append("p");
+        parSelection.append("label")
+            .text("Node Type: ");
+        nodeTypeSelection = parSelection.append("span");
+
         panelSelection.append("p")
             .append("h3")
             .text("Input Flows");
@@ -121,7 +130,7 @@ function FragmentFlows() {
         nodeLinks.forEach( function (l) {
             if ("flowID" in l) {
                 flow = LCA.indexedData.flows[l.flowID];
-                flowData.push({ Name: flow.name, Magnitude: l.value });
+                flowData.push({ Name: flow.name, Magnitude: l.magnitude });
             }
         });
         LCA.updateTable(flowTable, flowData, flowColumns);
@@ -134,6 +143,19 @@ function FragmentFlows() {
     function displayFlows(node) {
         updateFlowTable(node.targetLinks, flowTables[0]);
         updateFlowTable(node.sourceLinks, flowTables[1]);
+    }
+
+    /**
+     * Update panel with information related to a graph node
+     * @param {Object}  node    Reference to graph node
+     */
+    function displayNodeDetails(node) {
+        var nodeTypeName = "";
+        if ( "nodeTypeID" in node) {
+            nodeTypeName = nodeTypes[node.nodeTypeID];
+        }
+        nodeTypeSelection.text(nodeTypeName);
+        displayFlows(node);
     }
 
     /**
@@ -196,7 +218,7 @@ function FragmentFlows() {
             //ntElement.transition()
             //    .duration(200);
             // nodeTip.show(d);
-            displayFlows(d);
+            displayNodeDetails(d);
         });
             //.on('mouseout', function (d) {
             //    ntElement.transition()
@@ -222,8 +244,17 @@ function FragmentFlows() {
             })
             .attr("x", 6 + sankey.nodeWidth())
             .attr("text-anchor", "start");
+        //
+        //  Change links with 0 of less magnitude
+        //  - display as thin dashed line.
+        //
+        link.filter(function (d) {
+            return (d.magnitude <= 0 );
+        })
+        //.style("stroke-width", 1)
+        .style("stroke-dasharray", "5,5");
 
-        displayFlows(linkedNodes[0]);
+        displayNodeDetails(linkedNodes[0]);
     }
 
     /**
@@ -272,6 +303,7 @@ function FragmentFlows() {
             linkMagnitudes = [];
             nodeIndex = reverseIndex[element.fragmentFlowID];
             if ("parentFragmentFlowID" in element) {
+                var magnitude = 0;
                 parentIndex = reverseIndex[element.parentFragmentFlowID];
 
                 if ("linkMagnitudes" in element) {
@@ -280,23 +312,22 @@ function FragmentFlows() {
                     });
                 }
                 if (linkMagnitudes && linkMagnitudes.length > 0) {
-                    var magnitude = linkMagnitudes[0].magnitude;
-                    if (magnitude > 0) {    // sankey cannot handle values <= 0
-                        link = {
-                            flowID: element.flowID,
-                            fragmentFlowName: element.name,
-                            value: magnitude
-                        };
-                        if (element.directionID === 1) {
-                            link.source = nodeIndex;
-                            link.target = parentIndex;
-                        } else {
-                            link.source = parentIndex;
-                            link.target = nodeIndex;
-                        }
-                        graph.links.push(link);
-                    }
+                    magnitude = linkMagnitudes[0].magnitude;
                 }
+                link = {
+                    flowID: element.flowID,
+                    fragmentFlowName: element.name,
+                    magnitude: magnitude,
+                    value: baseValue + Math.max(magnitude, 0)
+                };
+                if (element.directionID === 1) {
+                    link.source = nodeIndex;
+                    link.target = parentIndex;
+                } else {
+                    link.source = parentIndex;
+                    link.target = nodeIndex;
+                }
+                graph.links.push(link);
             }
         });
         drawSankey();
