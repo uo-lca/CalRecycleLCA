@@ -25,6 +25,7 @@
 
 .vis-panel th {
     background-color: #eee;
+    border-style:none;
 }
 
 fieldset label {

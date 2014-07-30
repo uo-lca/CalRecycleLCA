@@ -43,7 +43,7 @@ function FragmentFlows() {
     var apiResourceNames = [],
         nodeTypes = [],
         flowTables = [],
-        flowColumns = ["name", "magnitude"],
+        flowColumns = ["Name", "Magnitude"],
         panelSelection,
         nodeTip;
 
@@ -121,7 +121,7 @@ function FragmentFlows() {
         nodeLinks.forEach( function (l) {
             if ("flowID" in l) {
                 flow = LCA.indexedData.flows[l.flowID];
-                flowData.push({ name: flow.name, magnitude: l.value });
+                flowData.push({ Name: flow.name, Magnitude: l.value });
             }
         });
         LCA.updateTable(flowTable, flowData, flowColumns);
@@ -364,7 +364,8 @@ function FragmentFlows() {
         if ("flowproperties" in LCA.loadedData) {
             LCA.indexedData.flowProperties = LCA.indexData("flowproperties", "flowPropertyID");
             updateUnit();
-            LCA.loadSelectionList(LCA.loadedData.flowproperties, "#ptSelect", "flowPropertyID", onPropertyTypeChange, selectedFlowPropertyID);
+            LCA.loadSelectionList(LCA.loadedData.flowproperties,
+                "#ptSelect", "flowPropertyID", onPropertyTypeChange, selectedFlowPropertyID);
         }
         onDataLoaded();
     }

@@ -142,7 +142,7 @@ LCA.createTable = function (parSelection, columns) {
             .enter()
             .append("th")
             .text(function (column) { return column; });
-        return tbody;
+        return table;
 };
 
 /**
@@ -151,12 +151,19 @@ LCA.createTable = function (parSelection, columns) {
  * @param {Array} data      data indexed by column header names
  * @param {Array} columns   column header names
  */
-LCA.updateTable = function (tbody, data, columns) {
+LCA.updateTable = function (table, data, columns) {
+
+    if (data.length > 0) {
+        table.select("thead").style("display", "table-header-group");
+    }
+    else {
+        table.select("thead").style("display", "none");
+    }
     // create a row for each object in the data
-    var rows = tbody.selectAll("tr")
+    var rows = table.select("tbody").selectAll("tr")
         .data(data);
 
-     rows.enter()
+    rows.enter()
         .append("tr");
 
     // create a cell in each row for each column
@@ -167,8 +174,9 @@ LCA.updateTable = function (tbody, data, columns) {
             });
         })
         .enter()
-        .append("td")
-        .html(function (d) { return d.value; });
+        .append("td");
+
+    rows.selectAll("td").html(function (d) { return d.value; });
 
     // remove rows that have no data
     rows.exit().remove();
