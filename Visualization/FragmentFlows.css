@@ -15,13 +15,28 @@
 .vis-panel {
     display: inline-block;
     vertical-align: top;
-    width: 500px;
+    width: 310px;
     font-size: 0.8em;
 }
 
-#unitLabel {
-    padding-left: 2em;
-    padding-right: 1em;
+.vis-panel table {
+    width: 300px;
+}
+
+.vis-panel th {
+    background-color: #eee;
+}
+
+fieldset label {
+	font-weight: bold;
+    vertical-align: middle;
+    padding-left: 1.5em;
+}
+
+#refUnitName {
+    display: table-cell;
+    padding: 5px;
+    vertical-align: middle;
 }
 
 

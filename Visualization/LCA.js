@@ -133,15 +133,15 @@ LCA.shortName = function (name, maxLen) {
  */
 LCA.createTable = function (parSelection, columns) {
     var table = parSelection.append("table"),
-    //    thead = table.append("thead"),
+        thead = table.append("thead"),
         tbody = table.append("tbody");
     // append the header row
-        //thead.append("tr")
-        //    .selectAll("th")
-        //    .data(columns)
-        //    .enter()
-        //    .append("th")
-        //    .text(function (column) { return column; });
+        thead.append("tr")
+            .selectAll("th")
+            .data(columns)
+            .enter()
+            .append("th")
+            .text(function (column) { return column; });
         return tbody;
 };
 

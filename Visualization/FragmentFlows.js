@@ -40,10 +40,10 @@ function FragmentFlows() {
         graph = {};
     var selectedFlowPropertyID = 23,
         fragFlowFlowProperties = [];
-    var apiResourceNames = ["fragments", "processes", "flowproperties", "fragmentflows", "flowflowproperties"],
+    var apiResourceNames = [],
         nodeTypes = [],
         flowTables = [],
-        flowColumns = ["name"],
+        flowColumns = ["name", "magnitude"],
         panelSelection,
         nodeTip;
 
@@ -116,26 +116,24 @@ function FragmentFlows() {
         console.debug(links);
     }
 
+    function updateFlowTable(nodeLinks, flowTable) {
+        var flowData = [], flow;
+        nodeLinks.forEach( function (l) {
+            if ("flowID" in l) {
+                flow = LCA.indexedData.flows[l.flowID];
+                flowData.push({ name: flow.name, magnitude: l.value });
+            }
+        });
+        LCA.updateTable(flowTable, flowData, flowColumns);
+    }
+
     /**
      * Update flowTables with flows related to a graph node
      * @param {Object}  node    Reference to graph node
      */
     function displayFlows(node) {
-        var inputFlows = [],
-            outputFlows = [];
-
-        node.targetLinks.forEach(function (l) {
-            if ("flowID" in l) {
-                inputFlows.push(LCA.indexedData.flows[l.flowID]);
-            }
-        });
-        LCA.updateTable(flowTables[0], inputFlows, flowColumns);
-        node.sourceLinks.forEach(function (l) {
-            if ("flowID" in l) {
-                outputFlows.push(LCA.indexedData.flows[l.flowID]);
-            }
-        });
-        LCA.updateTable(flowTables[1], outputFlows, flowColumns);
+        updateFlowTable(node.targetLinks, flowTables[0]);
+        updateFlowTable(node.sourceLinks, flowTables[1]);
     }
 
     /**
