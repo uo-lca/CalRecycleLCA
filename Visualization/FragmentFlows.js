@@ -47,6 +47,7 @@ function FragmentFlows() {
         panelSelection,     // d3 selection of panel for node information
         nodeTip,            // tooltip for node, not currently used
         nodeTypeSelection,  // d3 selection of element to display node type
+        nodeNameSelection,  // d3 selection of element to display fragment/process name
         baseValue = 1E-14;  // sankey link base value (replaces 0).
 
     
@@ -90,6 +91,11 @@ function FragmentFlows() {
         parSelection.append("label")
             .text("Node Type: ");
         nodeTypeSelection = parSelection.append("span");
+    
+        parSelection = panelSelection.append("p");
+        parSelection.append("label")
+            .text("Name: ");
+        nodeNameSelection = parSelection.append("span");
 
         panelSelection.append("p")
             .append("h3")
@@ -150,11 +156,16 @@ function FragmentFlows() {
      * @param {Object}  node    Reference to graph node
      */
     function displayNodeDetails(node) {
-        var nodeTypeName = "";
+        var nodeTypeName = "", nodeName = "";
         if ( "nodeTypeID" in node) {
             nodeTypeName = nodeTypes[node.nodeTypeID];
         }
         nodeTypeSelection.text(nodeTypeName);
+        if ("nodeName" in node) {
+            nodeName = node.nodeName;
+        }
+        nodeNameSelection.text(nodeName);
+
         displayFlows(node);
     }
 
