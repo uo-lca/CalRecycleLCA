@@ -107,30 +107,6 @@ function FragmentFlows() {
         flowTables[1] = LCA.createTable(panelSelection, flowColumns);
     }
 
-    /**
-     * Update link appearance in sankey diagram.
-     * When the fragment flow does not have the selected flow property,
-     * draw a thin dashed line.
-     */
-    function updateLinks() {
-        // Set of FlowIDs related to current fragment and flow property 
-        var flowSet = d3.set(fragFlowFlowProperties.filter(function (ffp) {
-            return (ffp.FlowPropertyID === selectedFlowPropertyID);
-        }).map(function (rf) {
-            return rf.FlowID;
-        }));
-
-        var links = svg.selectAll(".link")
-          .style("stroke-width", function (d) {
-              return flowSet.has(d.flowID) ? Math.max(1, d.dy) : 1;
-          })
-          .style("stroke-dasharray", function (d) {
-              return flowSet.has(d.flowID) ? "0,0" : "5,5";
-          });
-        console.debug("Updated links...");
-        console.debug(links);
-    }
-
     function updateFlowTable(nodeLinks, flowTable) {
         var flowData = [], flow;
         nodeLinks.forEach( function (l) {
@@ -155,7 +131,7 @@ function FragmentFlows() {
      * Update panel with information related to a graph node
      * @param {Object}  node    Reference to graph node
      */
-    function displayNodeDetails(node) {
+    function displayNodeDetails(node, index) {
         var nodeTypeName = "", nodeName = "";
         if ( "nodeTypeID" in node) {
             nodeTypeName = nodeTypes[node.nodeTypeID];
@@ -225,12 +201,7 @@ function FragmentFlows() {
                 return d3.rgb(d.color).darker(2);
             });
         //var ntElement = d3.select(".d3-tip");
-        node.on('mouseover', function (d) {
-            //ntElement.transition()
-            //    .duration(200);
-            // nodeTip.show(d);
-            displayNodeDetails(d);
-        });
+        node.on('mouseover', displayNodeDetails);
             //.on('mouseout', function (d) {
             //    ntElement.transition()
             //    .duration(500);
@@ -265,7 +236,7 @@ function FragmentFlows() {
         //.style("stroke-width", 1)
         .style("stroke-dasharray", "5,5");
 
-        displayNodeDetails(linkedNodes[0]);
+        displayNodeDetails(linkedNodes[0], 0);
     }
 
     /**
@@ -393,8 +364,6 @@ function FragmentFlows() {
         selectedFlowPropertyID = parseInt(this.options[this.selectedIndex].value);
         updateUnit();
         // IE does not display link style changes - need to recreate svg.
-        // updateLinks();
-        //drawSankey();
         buildGraph(LCA.indexedData.fragments[selectedFragmentID].links);
     }
 
@@ -435,8 +404,8 @@ function FragmentFlows() {
         //color.domain(d3.keys(nodeTypes)); // NodeTypeIDs
         // Assign vibrant colors to processes and fragments
         color.domain([2, 3, 4, 1, 0]);
-        if ("fragmentID" in LCA.urlVars) {
-            selectedFragmentID = LCA.urlVars.fragmentID;
+        if ("fragmentid" in LCA.urlVars) {
+            selectedFragmentID = +LCA.urlVars.fragmentid;
         }
         webApiFilter = "fragments/" + selectedFragmentID;
         prepareSvg();
