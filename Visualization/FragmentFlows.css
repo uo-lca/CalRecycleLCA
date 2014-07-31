@@ -4,8 +4,8 @@
   */
 .node rect {
     cursor: pointer;
-  fill-opacity: .9;
-  shape-rendering: crispEdges;
+    shape-rendering: crispEdges;
+    opacity: 1;
 }
 
 .node text {
@@ -13,7 +13,7 @@
 }
 
 .vis-panel {
-    display: inline-block;
+    /*display: inline-block;*/
     vertical-align: top;
     width: 310px;
     font-size: 0.8em;

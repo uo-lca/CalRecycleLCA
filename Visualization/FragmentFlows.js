@@ -38,8 +38,7 @@ function FragmentFlows() {
         .nodePadding(20)
         .size([width, height]),
         graph = {};
-    var selectedFlowPropertyID = 23,
-        fragFlowFlowProperties = [];
+    var selectedFlowPropertyID = 23;
     var apiResourceNames = [],
         nodeTypes = [],
         flowTables = [],    // d3 selection of flow tables
@@ -48,9 +47,7 @@ function FragmentFlows() {
         nodeTip,            // tooltip for node, not currently used
         nodeTypeSelection,  // d3 selection of element to display node type
         nodeNameSelection,  // d3 selection of element to display fragment/process name
-        baseValue = 1E-14;  // sankey link base value (replaces 0).
-
-    
+        baseValue = 1E-14;  // sankey link base value (replaces 0).    
 
     /**
      * Initial preparation of svg element.
@@ -83,7 +80,8 @@ function FragmentFlows() {
         var parSelection;
         panelSelection = d3.select("#chartcontainer")
               .append("div")
-              .classed("vis-panel", true);
+              .classed("vis-panel", true)
+              .style("display", "none");
         panelSelection.append("h2")
             .text("Node Details");
 
@@ -133,7 +131,22 @@ function FragmentFlows() {
      */
     function displayNodeDetails(node, index) {
         var nodeTypeName = "", nodeName = "";
+        svg.selectAll(".node")
+           .transition()
+           .style("opacity", function (d, i) {
+               return i === index ? 1 : 0.1;
+           });
         if ( "nodeTypeID" in node) {
+            nodeTypeName = nodeTypes[node.nodeTypeID];
+        }
+        svg.selectAll(".link")
+            .transition()
+           .style("stroke-opacity", function (l) {
+               return (
+               (l.source.fragmentFlowID === node.fragmentFlowID || l.target.fragmentFlowID === node.fragmentFlowID)
+                ? 0.5 : 0.2);
+           });
+        if ("nodeTypeID" in node) {
             nodeTypeName = nodeTypes[node.nodeTypeID];
         }
         nodeTypeSelection.text(nodeTypeName);
@@ -143,6 +156,7 @@ function FragmentFlows() {
         nodeNameSelection.text(nodeName);
 
         displayFlows(node);
+        panelSelection.style("display", "inline-block");
     }
 
     /**
@@ -236,7 +250,7 @@ function FragmentFlows() {
         //.style("stroke-width", 1)
         .style("stroke-dasharray", "5,5");
 
-        displayNodeDetails(linkedNodes[0], 0);
+        //displayNodeDetails(linkedNodes[0], 0);
     }
 
     /**
@@ -261,6 +275,7 @@ function FragmentFlows() {
         data.forEach(function (element) {
             var node = {
                 nodeTypeID: element.nodeTypeID,
+                fragmentFlowID: element.fragmentFlowID,
                 fragmentFlowName: element.name,    // Fragment flow name
                 nodeName: "" // Name of referenced object, if any
             };
@@ -298,6 +313,7 @@ function FragmentFlows() {
                 }
                 link = {
                     flowID: element.flowID,
+                    fragmentFlowID: element.fragmentFlowID,
                     fragmentFlowName: element.name,
                     magnitude: magnitude,
                     value: baseValue + Math.max(magnitude, 0)
@@ -363,6 +379,9 @@ function FragmentFlows() {
 
         selectedFlowPropertyID = parseInt(this.options[this.selectedIndex].value);
         updateUnit();
+        
+        panelSelection.style("display", "none");
+
         // IE does not display link style changes - need to recreate svg.
         buildGraph(LCA.indexedData.fragments[selectedFragmentID].links);
     }

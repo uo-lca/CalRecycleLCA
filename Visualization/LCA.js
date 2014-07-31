@@ -133,8 +133,8 @@ LCA.shortName = function (name, maxLen) {
  */
 LCA.createTable = function (parSelection, columns) {
     var table = parSelection.append("table"),
-        thead = table.append("thead"),
-        tbody = table.append("tbody");
+        thead = table.append("thead");
+        table.append("tbody");
     // append the header row
         thead.append("tr")
             .selectAll("th")
@@ -147,7 +147,7 @@ LCA.createTable = function (parSelection, columns) {
 
 /**
  * Display data in table body
- * @param {Object} tbody    d3 selection containing table body
+ * @param {Object} table    d3 selection containing table
  * @param {Array} data      data indexed by column header names
  * @param {Array} columns   column header names
  */
@@ -155,8 +155,7 @@ LCA.updateTable = function (table, data, columns) {
 
     if (data.length > 0) {
         table.select("thead").style("display", "table-header-group");
-    }
-    else {
+    } else {
         table.select("thead").style("display", "none");
     }
     // create a row for each object in the data
