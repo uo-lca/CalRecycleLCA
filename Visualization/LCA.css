@@ -23,11 +23,6 @@ fieldset label {
 fieldset p {
     display: table-row;
 }
-#impactScore {
-    display: table-cell;
-    padding: 5px;
-}
-
 
 text {
     font: 10px sans-serif;
