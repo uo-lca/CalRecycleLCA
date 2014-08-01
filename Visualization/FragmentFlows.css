@@ -3,7 +3,7 @@
   * Override sankey style appropriate for movable nodes.
   */
 .node rect {
-    cursor: pointer;
+/*    cursor: pointer;*/
     shape-rendering: crispEdges;
     opacity: 1;
 }

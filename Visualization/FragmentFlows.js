@@ -126,10 +126,13 @@ function FragmentFlows() {
     }
 
     /**
-     * Update panel with information related to a graph node
+     * Respond to mouse over sankey node
+     * Update panel with information related to node
+     * Fade other nodes and unconnected links
+     *
      * @param {Object}  node    Reference to graph node
      */
-    function displayNodeDetails(node, index) {
+    function onMouseOverNode(node, index) {
         var nodeTypeName = "", nodeName = "";
         svg.selectAll(".node")
            .transition()
@@ -215,7 +218,7 @@ function FragmentFlows() {
                 return d3.rgb(d.color).darker(2);
             });
         //var ntElement = d3.select(".d3-tip");
-        node.on('mouseover', displayNodeDetails);
+        node.on('mouseover', onMouseOverNode);
             //.on('mouseout', function (d) {
             //    ntElement.transition()
             //    .duration(500);
@@ -250,7 +253,7 @@ function FragmentFlows() {
         //.style("stroke-width", 1)
         .style("stroke-dasharray", "5,5");
 
-        //displayNodeDetails(linkedNodes[0], 0);
+        //onMouseOverNode(linkedNodes[0], 0);
     }
 
     /**
