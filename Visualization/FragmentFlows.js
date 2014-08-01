@@ -47,7 +47,8 @@ function FragmentFlows() {
         nodeTip,            // tooltip for node, not currently used
         nodeTypeSelection,  // d3 selection of element to display node type
         nodeNameSelection,  // d3 selection of element to display fragment/process name
-        baseValue = 1E-14;  // sankey link base value (replaces 0).    
+        baseValue = 1E-14,  // sankey link base value (replaces 0).
+        curFragment = null; // reference to selected fragment in LCA.indexedData
 
     /**
      * Initial preparation of svg element.
@@ -126,11 +127,12 @@ function FragmentFlows() {
     }
 
     /**
-     * Respond to mouse over sankey node
+     * Respond to mouse over Sankey node
      * Update panel with information related to node
      * Fade other nodes and unconnected links
      *
-     * @param {Object}  node    Reference to graph node
+     * @param {Object}  node    Reference to graph node data
+     * @param {Number}  index   D3 data index
      */
     function onMouseOverNode(node, index) {
         var nodeTypeName = "", nodeName = "";
@@ -190,7 +192,7 @@ function FragmentFlows() {
         // Tooltip for links <fragment flow name>
         link.append("title")
             .text(function (d) {
-                return d.fragmentFlowName;
+                return getFragmentFlowName(d);
             });
         linkedNodes = graph.nodes.filter(function (n) {
             return n.sourceLinks.length > 0 || n.targetLinks.length > 0;
@@ -236,7 +238,7 @@ function FragmentFlows() {
             .attr("text-anchor", "end")
             .attr("transform", null)
             .text(function (d) {
-                return LCA.shortName(d.fragmentFlowName, 30);
+                return LCA.shortName(getFragmentFlowName(d), 30);
             })
             .filter(function (d) {
                 return d.x < width / 2;
@@ -279,7 +281,6 @@ function FragmentFlows() {
             var node = {
                 nodeTypeID: element.nodeTypeID,
                 fragmentFlowID: element.fragmentFlowID,
-                fragmentFlowName: element.name,    // Fragment flow name
                 nodeName: "" // Name of referenced object, if any
             };
             if ("processID" in element) {
@@ -317,7 +318,6 @@ function FragmentFlows() {
                 link = {
                     flowID: element.flowID,
                     fragmentFlowID: element.fragmentFlowID,
-                    fragmentFlowName: element.name,
                     magnitude: magnitude,
                     value: baseValue + Math.max(magnitude, 0)
                 };
@@ -336,8 +336,12 @@ function FragmentFlows() {
 
     function onFragmentsLoaded() {
         LCA.indexedData.fragments = LCA.indexData("fragments", "fragmentID");
-        fragmentName = LCA.indexedData.fragments[selectedFragmentID].name;
-        d3.select("#fragmentName").text(fragmentName);
+        curFragment = LCA.indexedData.fragments[selectedFragmentID];
+        if (curFragment && "name" in curFragment) {
+            d3.select("#fragmentName").text(curFragment.name);
+        } else {
+            window.alert("Fragment with ID = " + selectedFragmentID + " was not loaded.");
+        }
         onFragmentLinksLoaded();
     }
 
@@ -361,7 +365,9 @@ function FragmentFlows() {
                 return LCA.loadedData[n2] !== null;
             })) {
                 // All requests executed successfully
-                buildGraph( LCA.indexedData.fragments[selectedFragmentID].links);
+                if (curFragment) {
+                    buildGraph( curFragment.links);
+                }
             }
         }
     }
@@ -403,9 +409,14 @@ function FragmentFlows() {
         onDataLoaded();
     }
 
+    /**
+     * Invoked after links have been loaded and fragments have loaded and indexed.
+     */
     function onFragmentLinksLoaded() {
         if ("fragments" in LCA.indexedData && apiResourceNames[3] in LCA.loadedData) {
-            LCA.indexedData.fragments[selectedFragmentID].links = LCA.indexData(apiResourceNames[3], "fragmentFlowID");
+            if (curFragment) {
+                curFragment.links = LCA.indexData(apiResourceNames[3], "fragmentFlowID");
+            }
             onDataLoaded();
         }
     }
@@ -413,6 +424,21 @@ function FragmentFlows() {
     function onFlowsLoaded() {
         LCA.indexedData.flows = LCA.indexData("flows", "flowID");
         onDataLoaded();
+    }
+
+    /**
+     * Get name of fragment flow associated with current Sankey node or link
+     * @param {Object} data     d3 data at current node or link
+     * @return the name
+     */
+    function getFragmentFlowName(data) {
+        var name = "";
+        if ("fragmentFlowID" in data) {
+            if ("name" in curFragment.links[data.fragmentFlowID]) {
+                name = curFragment.links[data.fragmentFlowID].name;
+            }
+        }
+        return name;
     }
 
     /**
