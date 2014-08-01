@@ -102,7 +102,7 @@ LCA.indexData = function (resourceName, indexProperty) {
 
 /**
  * Shorten a name so that it does not exceed maximum length.
- * Cut-off postion decided in the following order of preference
+ * Cut-off position decided in the following order of preference
  *  1. last position of character in shortNameBreakChars
  *  2. last position of space char
  *  3. max length
@@ -147,6 +147,7 @@ LCA.createTable = function (parSelection, columns) {
 
 /**
  * Display data in table body
+ * Hide table header when data empty.
  * @param {Object} table    d3 selection containing table
  * @param {Array} data      data indexed by column header names
  * @param {Array} columns   column header names

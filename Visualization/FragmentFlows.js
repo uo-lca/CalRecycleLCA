@@ -42,7 +42,7 @@ function FragmentFlows() {
     var apiResourceNames = [],
         nodeTypes = [],
         flowTables = [],    // d3 selection of flow tables
-        flowColumns = ["Name", "Magnitude"],    // Flow table column names
+        flowColumns = ["Name", "Magnitude", "Unit"],    // Flow table column names
         panelSelection,     // d3 selection of panel for node information
         nodeTip,            // tooltip for node, not currently used
         nodeTypeSelection,  // d3 selection of element to display node type
@@ -105,13 +105,32 @@ function FragmentFlows() {
             .text("Output Flows");
         flowTables[1] = LCA.createTable(panelSelection, flowColumns);
     }
-
+    /**
+     * Update flow table display
+     * For each Sankey link provided, display
+     * flow name, magnitude and unit associated with selected flow property.
+     * If the link does have the selected flow property, display
+     * magnitude and unit for the flow's reference flow property.
+     *
+     * @param {Array}  nodeLinks     Sankey links
+     * @param {Object}  flowTable    D3 table selection
+     */
     function updateFlowTable(nodeLinks, flowTable) {
         var flowData = [], flow;
         nodeLinks.forEach( function (l) {
             if ("flowID" in l) {
+                var flowPropertyID = selectedFlowPropertyID,
+                    magnitude = l.magnitude,
+                    unit = "";
                 flow = LCA.indexedData.flows[l.flowID];
-                flowData.push({ Name: flow.name, Magnitude: l.magnitude });
+                if (l.magnitude === null && "referenceFlowPropertyID" in flow) {
+                    flowPropertyID = flow.referenceFlowPropertyID;
+                    magnitude = getMagnitude(curFragment.links[l.fragmentFlowID], flowPropertyID);
+                }
+                if ("referenceUnitName" in LCA.indexedData.flowProperties[flowPropertyID]) {
+                    unit = LCA.indexedData.flowProperties[flowPropertyID].referenceUnitName;
+                }
+                flowData.push({ Name: flow.name, Magnitude: magnitude, Unit: unit });
             }
         });
         LCA.updateTable(flowTable, flowData, flowColumns);
@@ -162,6 +181,25 @@ function FragmentFlows() {
 
         displayFlows(node);
         panelSelection.style("display", "inline-block");
+    }
+
+    /**
+     * Get magnitude of link with a flow property
+     * @param {Object}  link              Fragment link
+     * @param {Number}  flowPropertyID    flow property key
+     * @return {Number} The magnitude, if link has the flow property. Otherwise, null.
+     */
+    function getMagnitude(link, flowPropertyID) {
+        var magnitude = null;
+        if ("linkMagnitudes" in link) {
+            linkMagnitudes = link.linkMagnitudes.filter(function (lm) {
+                return +lm.flowPropertyID === flowPropertyID;
+            });
+        }
+        if (linkMagnitudes && linkMagnitudes.length > 0) {
+            magnitude = linkMagnitudes[0].magnitude;
+        }
+        return magnitude;
     }
 
     /**
@@ -250,7 +288,7 @@ function FragmentFlows() {
         //  - display as thin dashed line.
         //
         link.filter(function (d) {
-            return (d.magnitude <= 0 );
+            return (d.value === baseValue );
         })
         //.style("stroke-width", 1)
         .style("stroke-dasharray", "5,5");
@@ -300,26 +338,16 @@ function FragmentFlows() {
 
         // Add a link for every flow. source and target are indexes into nodes array.
         data.forEach(function (element) {
-            var link, parentIndex = 0, 
-            linkMagnitudes = [];
+            var link, parentIndex = 0;
             nodeIndex = reverseIndex[element.fragmentFlowID];
             if ("parentFragmentFlowID" in element) {
-                var magnitude = 0;
-                parentIndex = reverseIndex[element.parentFragmentFlowID];
-
-                if ("linkMagnitudes" in element) {
-                    linkMagnitudes = element.linkMagnitudes.filter(function (lm) {
-                        return +lm.flowPropertyID === selectedFlowPropertyID;
-                    });
-                }
-                if (linkMagnitudes && linkMagnitudes.length > 0) {
-                    magnitude = linkMagnitudes[0].magnitude;
-                }
+                var magnitude = getMagnitude(element, selectedFlowPropertyID),
+                    value = (magnitude === null || magnitude <= 0) ? baseValue : baseValue + magnitude;
                 link = {
                     flowID: element.flowID,
                     fragmentFlowID: element.fragmentFlowID,
                     magnitude: magnitude,
-                    value: baseValue + Math.max(magnitude, 0)
+                    value: value
                 };
                 if (element.directionID === 1) {
                     link.source = nodeIndex;
