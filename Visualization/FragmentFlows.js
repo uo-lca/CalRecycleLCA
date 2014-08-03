@@ -190,7 +190,7 @@ function FragmentFlows() {
      * @return {Number} The magnitude, if link has the flow property. Otherwise, null.
      */
     function getMagnitude(link, flowPropertyID) {
-        var magnitude = null;
+        var magnitude = null, linkMagnitudes = [];
         if ("linkMagnitudes" in link) {
             linkMagnitudes = link.linkMagnitudes.filter(function (lm) {
                 return +lm.flowPropertyID === flowPropertyID;
@@ -338,11 +338,12 @@ function FragmentFlows() {
 
         // Add a link for every flow. source and target are indexes into nodes array.
         data.forEach(function (element) {
-            var link, parentIndex = 0;
+            var link, parentIndex;
             nodeIndex = reverseIndex[element.fragmentFlowID];
             if ("parentFragmentFlowID" in element) {
                 var magnitude = getMagnitude(element, selectedFlowPropertyID),
                     value = (magnitude === null || magnitude <= 0) ? baseValue : baseValue + magnitude;
+                parentIndex = reverseIndex[element.parentFragmentFlowID];
                 link = {
                     flowID: element.flowID,
                     fragmentFlowID: element.fragmentFlowID,
