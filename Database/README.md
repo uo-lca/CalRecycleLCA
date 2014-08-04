@@ -3,7 +3,7 @@ Database Initialization Tool
 
 The Database solution contains the following 2 projects:
   * LcaDataLoader - Console app creates and populates a database with data from ILCD archives and CSVs exported from MatLab.
-  * LcaDataModel - Class library containing code first Entity Framework data model used by LcaDataLoader.
+  * LcaDataModel - Class library containing code first Entity Framework data model used by LcaDataLoader and the back end solution (../vs/LCIAToolAPI).
   
 DataImport is a web app that loads individual data files. It is not currently used nor maintained.
 

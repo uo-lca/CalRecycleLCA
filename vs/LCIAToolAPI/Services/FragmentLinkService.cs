@@ -34,25 +34,24 @@ namespace Services {
             return ffpData.Select(ffp => 
                     new LinkMagnitude {
                         FlowPropertyID = Convert.ToInt32(ffp.FlowPropertyID),
-                        Magnitiude = flowMagnitude * Convert.ToDouble(ffp.MeanValue)
+                        Magnitude = flowMagnitude * Convert.ToDouble(ffp.MeanValue)
                 }).ToList();
         }
 
         private FragmentLink CreateFragmentLink(FragmentFlow ff, int scenarioID) {
             Debug.Assert(ff.NodeTypeID != null);
             Debug.Assert(ff.DirectionID != null);
-            Debug.Assert(ff.FlowID != null);
             int? nullID = null;
             return new FragmentLink {
                 FragmentFlowID = ff.FragmentFlowID,
                 Name = ff.Name,
                 NodeTypeID = Convert.ToInt32(ff.NodeTypeID),
                 DirectionID = Convert.ToInt32(ff.DirectionID),
-                FlowID = Convert.ToInt32(ff.FlowID),
+                FlowID = ff.FlowID,
                 ParentFragmentFlowID = ff.ParentFragmentFlowID,
                 ProcessID = (ff.NodeTypeID == 1) ? ff.FragmentNodeProcesses.FirstOrDefault().FragmentNodeProcessID : nullID,
                 SubFragmentID = (ff.NodeTypeID == 2) ? ff.FragmentNodeFragments.FirstOrDefault().FragmentNodeFragmentID : nullID,
-                LinkMagnitudes = GetLinkMagnitudes(ff, scenarioID)
+                LinkMagnitudes = (ff.FlowID == null) ? null : GetLinkMagnitudes(ff, scenarioID)
             };
         }
 
