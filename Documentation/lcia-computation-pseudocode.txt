@@ -1,65 +1,186 @@
 ==========
+Tue Jul 29 11:31:27 -0700 2014
+
+LCIA = ComputeProcessLCIA( inventory, scenario_id, lcia_method_id )
+{
+  // returns LCIA: a list of scores: FlowID, DirectionID, Quantity, Factor,
+  // Result- as specified in the API (flowname can be done separately)
+  // result is an LCIA score from that flow
+
+  // input is inventory: a list of flows
+  // FlowID, DirectionID, Result
+  LCIA = SELECT inventory.FlowID AS FlowID, 
+       	 	inventory.DirectionID AS DirectionID,
+		inventory.Result AS Quantity,
+		inventory.Result * (lcparam.Value == NULL 
+		  	? LCIA.Factor : lcparam.Value) AS Factor,
+		Quantity * Factor AS Result
+		FROM inventory INNER JOIN LCIA 
+		ON inventory.FlowID = LCIA.FlowID
+		LEFT OUTER JOIN
+		(
+		  SELECT chp.LCIAID, chp.Value
+		  FROM CharacterizationParam chp
+		  INNER JOIN ScenarioParam sp ON chp.ParamID = sp.ParamID
+	          WHERE sp.ScenarioID = scenario_id
+		) 
+		lcparam
+		ON LCIA.LCIAID = lcparam.LCIAID
+		WHERE LCIAMethodID = lcia_method_id
+		  AND inventory.DirectionID = LCIA.DirectionID
+		  AND LCIA.Geography IS NULL
+}
+
+
+inventory = ComputeProcessLCI ( process_id, scenario_id )
+{
+  // returns a list of flows: FlowID, DirectionID, Result
+  // Param types: ProcessEmissionParam
+  // FlowPropertyParam + ProcessDissipationParam
+  inventory = SELECT pf.FlowID, pf.DirectionID, 
+  	      (pep.Value == NULL ? pf.Result : pep.Value) AS Result
+  	      FROM ProcessFlow pf
+	      LEFT OUTER JOIN 
+	      (
+	        SELECT pep.ProcessFlowID, pep.Value
+		FROM ProcessEmissionParam pep 
+		INNER JOIN ScenarioParam sp ON pep.ParamID = sp.ParamID
+	        WHERE sp.ScenarioID = scenario_id
+	      )
+	      pep
+	      ON pf.ProcessFlowID = pep.ProcessFlowID
+	      WHERE pf.ProcessID = process_id
+
+  // compute flow property dissipation emissions
+  dissipation = ComputeProcessDissipation( process_id, scenario_id )
+
+  // use dissipation value where present; inventory value elsewhere
+  return ( SELECT i.FlowID AS FlowID, i.DirectionID AS DirectionID, 
+  	      ( d.Result == NULL ? i.Result : d.Result ) AS Result
+	      FROM inventory i
+	      LEFT OUTER JOIN dissipation d on i.FlowID = d.FlowID
+	      WHERE i.DirectionID = d.DirectionID );
+  
+}
+
+
+dissipation = ComputeProcessDissipation( process_id, scenario_id )
+{
+  // returns a list of flows (FlowID, DirectionID, Result) resulting from
+  // flow property dissipation.
+  // inflows is a list of intermediate FlowIDs entering the process
+  inflows = SELECT pf.FlowID FROM ProcessFlow pf
+  	    INNER JOIN Flow ON pf.FlowID = Flow.FlowID
+	    WHERE pf.DirectionID = 1 // Input
+	      AND pf.ProcessID = process_id
+	      AND Flow.FlowTypeID = 1 // Product Flow
+
+  dissipation = SELECT pf.FlowID, pf.DirectionID, 
+  	        ( pdparam.Value == NULL 
+		  ? pd.EmissionFactor : pdparam.Value) AS Factor,
+  	        fpe.Scale * ( fpparam.Value == NULL 
+		  	      ? ffp.MeanValue : fpparam.Value) AS Property,
+		FROM inflows
+		INNER JOIN FlowFlowProperty ffp ON inflows.FlowID = ffp.FlowID
+		INNER JOIN FlowPropertyEmission fpe
+		  ON fpe.FlowPropertyID = ffp.FlowPropertyID
+		INNER JOIN ProcessFlow pf ON fpe.FlowID = pf.FlowID
+		INNER JOIN ProcessDissipation pd 
+		  ON pd.ProcessFlowID = pf.ProcessFlowID
+		LEFT OUTER JOIN
+		(
+	          SELECT pdp.ProcessDissipationID, pdp.Value
+		  FROM ProcessDissipationParam pdp 
+		  INNER JOIN ScenarioParam sp ON pdp.ParamID = sp.ParamID
+	          WHERE sp.ScenarioID = scenario_id
+	        ) pdparam
+		ON pd.ProcessDissipationID = pdparam.ProcessDissipationID
+		LEFT OUTER JOIN
+		(
+	          SELECT fpp.FlowFlowPropertyID, fpp.Value
+		  FROM FlowPropertyParam fpp 
+		  INNER JOIN ScenarioParam sp ON fpp.ParamID = sp.ParamID
+	          WHERE sp.ScenarioID = scenario_id
+	        ) fpparam
+		ON ffp.FlowFlowPropertyID = fpparam.FlowFlowPropertyID
+		WHERE pf.ProcessID = process_id
+
+  return( SELECT pf.FlowID AS FlowID, pf.DirectionID AS DirectionID,
+  	        (Factor * Property) AS Result
+		FROM dissipation );
+}
+
+
+
+
+
+
+
+==========
 Tue Jun 24 11:48:59 -0700 2014
 
-ScenarioInit( ScenarioID )
+Note: Code after this point is deprecated
+
+
+ScenarioInit( scenario_id )
 {
   // run this code any time a scenario is modified
   // "Scenario is modified" means: 
 
-  ClearNodeCache( ScenarioID ); // deletes all records matching
-  		  	       // ScenarioID 
+  ClearNodeCache( scenario_id ); // deletes all records matching
+  		  	       // scenario_id 
 
-  ClearScoreCache( ScenarioID ); // deletes all records matching
-  		       		// ScenarioID 
+  ClearScoreCache( scenario_id ); // deletes all records matching
+  		       		// scenario_id 
 
-  ClearBackgroundCache( ScenarioID ); // deletes all records matching
-  		       		     // ScenarioID 
+  ClearBackgroundCache( scenario_id ); // deletes all records matching
+  		       		     // scenario_id 
 
 }
   
 
-ComputeFragment( FragmentID, ScenarioID, ListOfLCIAMethods L )
+ComputeFragment( fragment_id, scenario_id, list_of_lcia_methods L )
 {
   // top-level function to populate fragment cache data
-  ComputeBackground( ScenarioID, L ); // make sure background is computed
+  ComputeBackground( scenario_id, L ); // make sure background is computed
   		     		      // for all requested LCIA methods
 
   // F is fragment object
-  F = new Fragment( FragmentID ); 
+  F = new Fragment( fragment_id ); 
 
   // next, traverse the fragment -- populates NodeCache
-  F.Traverse( ScenarioID );
+  Traverse( fragment_id, scenario_id );
 
   // now, do LCIA computation
-  F.ComputeNodeScores( ScenarioID, L );
+  F.ComputeNodeScores( scenario_id, L );
 }
 
   
-Fragment.ComputeNodeScores( ScenarioID, ListOfLCIAMethods L )
+ComputeNodeScores( fragment_id, scenario_id, list_of_lcia_methods L )
 {
   // this is actually really easy.
-  // flows is fragment's internal flows table.
-  B = applyScenarioBackground( ScenarioID );
+  B = applyScenarioBackground( scenario_id );
   
-  flows = SELECT * FROM flows 
+  flows = SELECT ff.FragmentFlowID, 
+  	  	 ff.FragmentStageID, 
+		 nc.NodeCacheID,
+		 nc.NodeWeight
+	  FROM FragmentFlow ff
   	  INNER JOIN NodeCache nc 
-	  ON flows.FragmentFlowID = nc.FragmentFlowID
+	  ON ff.FragmentFlowID = nc.FragmentFlowID
+	  WHERE ff.FragmentID = fragment_id
+	    AND ff.NodeType ~= 3 
 
   for i in flows
   {
-    missing_L = SELECT LCIAMethodID 
+    missing_L = SELECT DISTINCT LCIAMethodID 
     	      	FROM L LEFT OUTER JOIN ScoreCache sc
 		  ON L = sc.LCIAMethodID
 		WHERE sc.NodeCacheID = i.NodeCacheID
 		  AND sc.ImpactScore IS NULL
 
     switch i.NodeType
-    {
-      case InputOutput
-        // nothing to do-- IO flows have no impacts
-        for j in missing_L
-	  SetScoreCache( i.NodeCacheID, j, 0 );
-
+    { // InputOutput excluded
       case Background
       {
         for j in missing_L
@@ -72,7 +193,7 @@ Fragment.ComputeNodeScores( ScenarioID, ListOfLCIAMethods L )
 
 	  MyScore = SELECT Score FROM BackgroundCache
 	  	    WHERE BackgroundID = bid
-		      AND ScenarioID = @ScenarioID
+		      AND ScenarioID = scenario_id
 		      AND LCIAMethodID = j
 
 	  SetScoreCache( i.NodeCacheID, j, MyScore );
@@ -82,11 +203,11 @@ Fragment.ComputeNodeScores( ScenarioID, ListOfLCIAMethods L )
       {
         the_node = i INNER JOIN FragmentNodeProcess ON FragmentFlowID;
       	inventory = ComputeProcessLCI (	the_node.ProcessID, FragmentFlowID,
-		    		      	ScenarioID );
+		    		      	scenario_id );
 
         for j in missing_L
 	{
-	  LCIA = ComputeProcessLCIA ( inventory, ScenarioID, j );
+	  LCIA = ComputeProcessLCIA ( inventory, scenario_id, j );
 	  MyScore = sum( LCIA.Score );
 	  SetScoreCache( i.NodeCacheID, j, MyScore );
 	}
@@ -98,7 +219,7 @@ Fragment.ComputeNodeScores( ScenarioID, ListOfLCIAMethods L )
 	for j in missing_L
 	{
 	  FragmentScore = ComputeFragmentLCIA ( the_node.FragmentID, 
-	  		  		      	ScenarioID, j);
+	  		  		      	scenario_id, j);
 	  MyScore = sum ( FragmentScore.LCIA );
 	  SetScoreCache( i.NodeCacheID, j, MyScore );
 	}
@@ -107,57 +228,18 @@ Fragment.ComputeNodeScores( ScenarioID, ListOfLCIAMethods L )
   } // see?? easy!
 }
 
-inventory = ComputeProcessLCI( ProcessID, FragmentFlowID, ScenarioID )
+
+FragmentScore = ComputeFragmentLCIA ( fragment_id, scenario_id, lcia_method_id )
 {
-  // pull ProcessFlow.Result
-  p_flow = SELECT * FROM ProcessFlow where ProcessID = @ProcessID
-
-  // override with ProcessEmissionParam:
-  p_flow = applyParam( process_flow, ScenarioID, ProcessEmissionParam,
-  	   	       ProcessFlowID, Result );
-
-  // override further with NodeEmissionParam
-  p_flow = applyNodeParam( process_flow, ScenarioID, FragmentFlowID,
-  	   		   NodeEmissionParam, ProcessFlowID, Result );
-
-  if 0
-  { 
-    // hold off on this until later
-    - get dissipation flows (ProcessDissipation.EmissionFactor)
-    - override with ProcessDissipationParam.Value
-    - override further with NodeDissipationParam.Value
-    - lookup FlowFlowProperty.MeanValue
-    - override with CompositionParam.Value
-
-    - compute Result = EmissionFactor * MeanValue
-    - override ProcessFlow.Result where non-null
-  {
-
-  return p_flow;
-}
-
-lcia = ComputeProcessLCIA( inventory, ScenarioID, LCIAMethodID )
-{
- - start with inventory result
- - lookup LCIA.Factor (null geography)
- - override with LCIAParam.Value
- - compute Score = Result * Factor
- - return lcia result (array)
-}
-
-FragmentScore = ComputeFragmentLCIA ( FragmentID, ScenarioID, LCIAMethodID )
-{
-  F = new Fragment( @FragmentID );
-  // F.flows is the FragmentFlow excerpt belonging to Fragment F
-
   FragmentScore = SELECT nc.NodeCacheID AS NodeCacheID,
   	      	     nc.NodeWeight AS NodeWeight,
 		     sc.ImpactScore AS ImpactScore,
 		     NodeWeight * ImpactScore AS LCIA,
-		FROM F.Flows INNER JOIN NodeCache nc ON FragmentFlowID
+		FROM FragmentFlow INNER JOIN NodeCache nc ON FragmentFlowID
 		INNER JOIN ScoreCache sc ON NodeCacheID
-		WHERE ScenarioID = @ScenarioID
-		  AND sc.LCIAMethodID = @LCIAMethodID;
+		WHERE FragmentFlow.FragmentID = fragment_id
+		  AND ScenarioID = scenario_id
+		  AND sc.LCIAMethodID = lcia_method_id;
 
   // later-- add in grouping by stage
 }
