@@ -44,11 +44,13 @@ function FragmentFlows() {
         flowTables = [],    // d3 selection of flow tables
         flowColumns = ["Name", "Magnitude", "Unit"],    // Flow table column names
         panelSelection,     // d3 selection of panel for node information
-        nodeTip,            // tooltip for node, not currently used
-        nodeTypeSelection,  // d3 selection of element to display node type
-        nodeNameSelection,  // d3 selection of element to display fragment/process name
+        nodeTip,            // tooltip for node
+        //nodeTypeSelection,  // d3 selection of element to display node type
+        //nodeNameSelection,  // d3 selection of element to display fragment/process name
         baseValue = 1E-14,  // sankey link base value (replaces 0).
-        curFragment = null; // reference to selected fragment in LCA.indexedData
+        curFragment = null, // reference to selected fragment in LCA.indexedData
+        minNodeHeight = 3,  // Minimum height of sankey node/link
+        parentFragments = []; // Array of fragments traversed by clicking on sub-fragment
 
     /**
      * Initial preparation of svg element.
@@ -66,10 +68,18 @@ function FragmentFlows() {
         // Initialize tooltip plugin
         nodeTip = d3.tip()
           .attr('class', 'd3-tip')
-          .direction('e')
+          .offset([-10, 0])
+          .direction('n')
           .html(function (d) {
-              return "<strong>" + nodeTypes[d.nodeTypeID] + "</strong>" +
-                 "<p>" + d.nodeName + "</p>";
+              var htmlString = "<strong>" + nodeTypes[d.nodeTypeID] + "</strong>";
+              if ("nodeName" in d) {
+                  htmlString = htmlString + "<p>" + d.nodeName + "</p>";
+              }
+              if (d.nodeTypeID === 2) {
+                  htmlString = htmlString + "<p><i><small>Click to navigate</small></i></p>";
+              }
+              return  htmlString;
+
           });
         svg.call(nodeTip);
     }
@@ -78,12 +88,12 @@ function FragmentFlows() {
       * Initial preparation of svg element.
       */
     function prepareNodeView() {
-        var parSelection;
+        //var parSelection;
         panelSelection = d3.select("#chartcontainer")
               .append("div")
               .classed("vis-panel", true)
               .style("display", "none");
-        panelSelection.append("h2")
+/*        panelSelection.append("h2")
             .text("Node Details");
 
         parSelection = panelSelection.append("p");
@@ -94,7 +104,7 @@ function FragmentFlows() {
         parSelection = panelSelection.append("p");
         parSelection.append("label")
             .text("Name: ");
-        nodeNameSelection = parSelection.append("span");
+        nodeNameSelection = parSelection.append("span");*/
 
         panelSelection.append("p")
             .append("h3")
@@ -146,6 +156,84 @@ function FragmentFlows() {
     }
 
     /**
+     * Load fragment data and refresh display
+     * @param {Number}  fragmentID
+     */
+    function displayFragment(fragmentID) {
+        var webApiFilter;
+        selectedFragmentID = fragmentID;
+        panelSelection.style("display", "none");
+        nodeTip.hide();
+        webApiFilter = "fragments/" + selectedFragmentID;
+        selectedFlowPropertyID = 23;
+        apiResourceNames = ["fragments", "flowproperties", "links", "flows"];
+        LCA.loadedData = [];
+        LCA.loadData(apiResourceNames[0], false, onFragmentsLoaded);
+        LCA.loadData(apiResourceNames[1], false, onFlowPropertiesLoaded, webApiFilter);
+        LCA.loadData(apiResourceNames[2], false, onFragmentLinksLoaded, webApiFilter);
+        LCA.loadData(apiResourceNames[3], false, onFlowsLoaded, webApiFilter);
+    }
+
+    /**
+     * Respond to click on bread crumb link
+     *
+     * @param {Object}  d    Reference to d3 data element
+     * @param {Number}  i    D3 data index
+     */
+    function onCrumbClick(d, i) {
+        var breadCrumbs = d3.select("#fragmentParents");
+
+        parentFragments.splice(i);
+        breadCrumbs.selectAll("a")
+            .data(parentFragments)
+            .exit()
+            .remove();
+        breadCrumbs.selectAll("span")
+            .data(parentFragments)
+            .exit()
+            .remove();
+
+        displayFragment(d);
+
+    }
+
+    /**
+     * Add current fragment to bread crumb trail
+     */
+    function breadCrumbFragment() {
+        var breadCrumbs;
+
+        parentFragments.push(selectedFragmentID);
+
+        breadCrumbs = d3.select("#fragmentParents");
+
+        breadCrumbs.selectAll("a")
+            .data(parentFragments)
+            .enter().append("a")
+            .attr("href", "#")
+            .text( function (d) {
+                return LCA.indexedData.fragments[d].name;
+            })
+            .on("click", onCrumbClick);
+
+        breadCrumbs.selectAll("span").data(parentFragments)
+            .enter().append("span")
+            .text( " > ");
+    }
+    /**
+     * Respond to click on node
+     *
+     * @param {Object}  node    Reference to graph node data
+     */
+    function onNodeClick(node) {
+        //window.alert("Clicked on " + node);
+        if ( "subFragmentID" in node) {
+            breadCrumbFragment();
+            displayFragment(node.subFragmentID);
+        }
+    }
+
+    /**
      * Respond to mouse over Sankey node
      * Update panel with information related to node
      * Fade other nodes and unconnected links
@@ -154,31 +242,30 @@ function FragmentFlows() {
      * @param {Number}  index   D3 data index
      */
     function onMouseOverNode(node, index) {
-        var nodeTypeName = "", nodeName = "";
         svg.selectAll(".node")
            .transition()
            .style("opacity", function (d, i) {
                return i === index ? 1 : 0.1;
            });
-        if ( "nodeTypeID" in node) {
-            nodeTypeName = nodeTypes[node.nodeTypeID];
-        }
+//        if ( "nodeTypeID" in node) {
+//            nodeTypeName = nodeTypes[node.nodeTypeID];
+//        }
         svg.selectAll(".link")
             .transition()
            .style("stroke-opacity", function (l) {
                return (
-               (l.source.fragmentFlowID === node.fragmentFlowID || l.target.fragmentFlowID === node.fragmentFlowID)
-                ? 0.5 : 0.2);
+               (l.source.fragmentFlowID === node.fragmentFlowID || l.target.fragmentFlowID === node.fragmentFlowID) ?
+                   0.5 : 0.2);
            });
-        if ("nodeTypeID" in node) {
-            nodeTypeName = nodeTypes[node.nodeTypeID];
-        }
-        nodeTypeSelection.text(nodeTypeName);
-        if ("nodeName" in node) {
-            nodeName = node.nodeName;
-        }
-        nodeNameSelection.text(nodeName);
-
+//        if ("nodeTypeID" in node) {
+//            nodeTypeName = nodeTypes[node.nodeTypeID];
+//        }
+//        nodeTypeSelection.text(nodeTypeName);
+//        if ("nodeName" in node) {
+//            nodeName = node.nodeName;
+//        }
+//        nodeNameSelection.text(nodeName);
+        nodeTip.show(node, index);
         displayFlows(node);
         panelSelection.style("display", "inline-block");
     }
@@ -222,7 +309,7 @@ function FragmentFlows() {
             .attr("class", "link")
             .attr("d", path)
             .style("stroke-width", function (d) {
-                return Math.max(1, d.dy);
+                return Math.max(minNodeHeight, d.dy);
             })
             .sort(function (a, b) {
                 return b.dy - a.dy;
@@ -245,7 +332,7 @@ function FragmentFlows() {
 
         node.append("rect")
             .attr("height", function (d) {
-                return Math.max(1, d.dy);
+                return Math.max(minNodeHeight, d.dy);
             })
             .attr({
                 width: sankey.nodeWidth()
@@ -253,10 +340,10 @@ function FragmentFlows() {
             .style("fill", function (d) {
                 d.color = color(d.nodeTypeID);
                 return d.color;
-            })
-            .style("stroke", function (d) {
-                return d3.rgb(d.color).darker(2);
             });
+//            .style("stroke", function (d) {
+//                return d3.rgb(d.color).darker(2);
+//            });
         //var ntElement = d3.select(".d3-tip");
         node.on('mouseover', onMouseOverNode);
             //.on('mouseout', function (d) {
@@ -270,7 +357,7 @@ function FragmentFlows() {
         node.append("text")
             .attr("x", -6)
             .attr("y", function (d) {
-                return Math.max(1, d.dy) / 2;
+                return Math.max(minNodeHeight, d.dy) / 2;
             })
             .attr("dy", ".35em")
             .attr("text-anchor", "end")
@@ -283,6 +370,14 @@ function FragmentFlows() {
             })
             .attr("x", 6 + sankey.nodeWidth())
             .attr("text-anchor", "start");
+        //
+        // Nodes with click behavior
+        //
+        node.filter (function (d) {
+            return (d.nodeTypeID === 2);
+        })
+            .style("cursor", "pointer")
+            .on("click", onNodeClick);
         //
         //  Change links with 0 of less magnitude
         //  - display as thin dashed line.
@@ -442,9 +537,9 @@ function FragmentFlows() {
      * Invoked after links have been loaded and fragments have loaded and indexed.
      */
     function onFragmentLinksLoaded() {
-        if ("fragments" in LCA.indexedData && apiResourceNames[3] in LCA.loadedData) {
+        if ("fragments" in LCA.indexedData && "links" in LCA.loadedData) {
             if (curFragment) {
-                curFragment.links = LCA.indexData(apiResourceNames[3], "fragmentFlowID");
+                curFragment.links = LCA.indexData("links", "fragmentFlowID");
             }
             onDataLoaded();
         }

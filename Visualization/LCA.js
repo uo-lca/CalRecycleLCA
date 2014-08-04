@@ -187,9 +187,10 @@ LCA.updateTable = function (table, data, columns) {
  * @param {String} resourceName     web service resource name
  * @param {Boolean} useTestData     Load json file for testing
  * @param {Function} callback       Function to call when done
+ * @param {String} routePrefix      Web API route prefix
  */
 LCA.loadData = function (resourceName, useTestData, callback, routePrefix) {
-   
+
     if (resourceName in LCA.loadedData) {
         callback.call();
         return false;
@@ -230,15 +231,19 @@ LCA.loadSelectionList = function (objects, selectID, oidName, changeHandler, ini
     var selectOptions = d3.select(selectID)
         .on("change", changeHandler)
         .selectAll("option")
-        .data(objects)
-        .enter()
-        .append("option")
-        .attr("value", function (d) {
+        .data(objects);
+
+    selectOptions.enter()
+        .append("option");
+
+    selectOptions.attr("value", function (d) {
             return d[oidName];
         })
         .text(function (d) {
             return d.name;
         });
+
+    selectOptions.exit().remove();
     //
     // Initialize selection
     //
