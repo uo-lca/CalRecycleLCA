@@ -235,22 +235,17 @@ LCA.loadSelectionList = function (objects, selectID, oidName, changeHandler, ini
 
     selectOptions.enter()
         .append("option");
+    selectOptions.exit().remove();
 
     selectOptions.attr("value", function (d) {
             return d[oidName];
         })
         .text(function (d) {
             return d.name;
+        })
+        .attr("selected", function (d) {
+            return d[oidName] === initialValue ? true : null;
         });
-
-    selectOptions.exit().remove();
-    //
-    // Initialize selection
-    //
-    selectOptions.filter(function (d) {
-        return d[oidName] === initialValue;
-    })
-        .attr("selected", true);
 };
 
 /**

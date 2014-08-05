@@ -68,8 +68,8 @@ function FragmentFlows() {
         // Initialize tooltip plugin
         nodeTip = d3.tip()
           .attr('class', 'd3-tip')
-          .offset([-10, 0])
-          .direction('n')
+          .offset([-10, -10])
+          .direction('ne')
           .html(function (d) {
               var htmlString = "<strong>" + nodeTypes[d.nodeTypeID] + "</strong>";
               if ("nodeName" in d) {
