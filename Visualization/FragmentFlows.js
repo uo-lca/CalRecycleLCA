@@ -38,7 +38,8 @@ function FragmentFlows() {
         .nodePadding(20)
         .size([width, height]),
         graph = {};
-    var selectedFlowPropertyID = 23;
+    var defaultFlowPropertyID = 23,
+        selectedFlowPropertyID = defaultFlowPropertyID;
     var apiResourceNames = [],
         nodeTypes = [],
         flowTables = [],    // d3 selection of flow tables
@@ -165,7 +166,7 @@ function FragmentFlows() {
         panelSelection.style("display", "none");
         nodeTip.hide();
         webApiFilter = "fragments/" + selectedFragmentID;
-        selectedFlowPropertyID = 23;
+        
         apiResourceNames = ["fragments", "flowproperties", "links", "flows"];
         LCA.loadedData = [];
         LCA.loadData(apiResourceNames[0], false, onFragmentsLoaded);
@@ -509,7 +510,7 @@ function FragmentFlows() {
      * Triggers sankey link update
      */
     function onPropertyTypeChange() {
-
+        nodeTip.hide();
         selectedFlowPropertyID = parseInt(this.options[this.selectedIndex].value);
         updateUnit();
         
@@ -526,9 +527,20 @@ function FragmentFlows() {
     function onFlowPropertiesLoaded() {
         if ("flowproperties" in LCA.loadedData) {
             LCA.indexedData.flowProperties = LCA.indexData("flowproperties", "flowPropertyID");
-            updateUnit();
+            //
+            //  If the last flow property selection is not in the current list, reset to the default flow property,
+            //  if that is in the list. Otherwise, select first flow property.
+            //
+            if (!(selectedFlowPropertyID in LCA.indexedData.flowProperties)) {
+                if (selectedFlowPropertyID != defaultFlowPropertyID && (defaultFlowPropertyID in LCA.indexedData.flowProperties)) {
+                    selectedFlowPropertyID = defaultFlowPropertyID;
+                } else {
+                    selectedFlowPropertyID = LCA.indexedData.flowProperties[0].flowPropertyID;
+                }
+            }
             LCA.loadSelectionList(LCA.loadedData.flowproperties,
                 "#ptSelect", "flowPropertyID", onPropertyTypeChange, selectedFlowPropertyID);
+            updateUnit();
         }
         onDataLoaded();
     }

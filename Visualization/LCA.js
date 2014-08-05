@@ -225,17 +225,23 @@ LCA.loadData = function (resourceName, useTestData, callback, routePrefix) {
  * @param {Number} initialValue     Default value (selected object ID).
  */
 LCA.loadSelectionList = function (objects, selectID, oidName, changeHandler, initialValue) {
+    var selectOptions;
 
     objects.sort(LCA.compareNames);
+    //
+    // Internet Explorer does not display updated options correctly so remove/append only
+    //
+    d3.select(selectID)
+        .selectAll("option")
+        .remove();
 
-    var selectOptions = d3.select(selectID)
-        .on("change", changeHandler)
+    selectOptions = d3.select(selectID)
         .selectAll("option")
         .data(objects);
 
     selectOptions.enter()
         .append("option");
-    selectOptions.exit().remove();
+    // selectOptions.exit().remove();
 
     selectOptions.attr("value", function (d) {
             return d[oidName];
@@ -246,6 +252,8 @@ LCA.loadSelectionList = function (objects, selectID, oidName, changeHandler, ini
         .attr("selected", function (d) {
             return d[oidName] === initialValue ? true : null;
         });
+
+    d3.select(selectID).on("change", changeHandler);
 };
 
 /**
