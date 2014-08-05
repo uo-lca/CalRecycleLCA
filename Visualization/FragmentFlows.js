@@ -14,7 +14,7 @@ function FragmentFlows() {
     /*global d3, colorbrewer, LCA, console */
 
     // Current selections
-    var selectedFragmentID = 2,
+    var selectedFragmentID = 8,
         fragmentName = "";
 
     // SVG margins
@@ -39,8 +39,8 @@ function FragmentFlows() {
         .size([width, height]),
         graph = {};
     var defaultFlowPropertyID = 23,
-        selectedFlowPropertyID = defaultFlowPropertyID;
-    var apiResourceNames = [],
+        selectedFlowPropertyID = defaultFlowPropertyID,
+        apiResourceNames = [],
         nodeTypes = [],
         flowTables = [],    // d3 selection of flow tables
         flowColumns = ["Name", "Magnitude", "Unit"],    // Flow table column names
@@ -51,7 +51,8 @@ function FragmentFlows() {
         baseValue = 1E-14,  // sankey link base value (replaces 0).
         curFragment = null, // reference to selected fragment in LCA.indexedData
         minNodeHeight = 3,  // Minimum height of sankey node/link
-        parentFragments = []; // Array of fragments traversed by clicking on sub-fragment
+        parentFragments = [], // Array of fragments traversed by clicking on sub-fragment
+        reverseIndex = [];      // Associates fragment links with graph nodes
 
     /**
      * Initial preparation of svg element.
@@ -79,7 +80,7 @@ function FragmentFlows() {
               if (d.nodeTypeID === 2) {
                   htmlString = htmlString + "<p><i><small>Click to navigate</small></i></p>";
               }
-              return  htmlString;
+              return htmlString;
 
           });
         svg.call(nodeTip);
@@ -292,70 +293,84 @@ function FragmentFlows() {
 
     /**
      * Draw the sankey graph
+     * @param {Boolean}  rebuild    Flag to indicate if this is a full redraw or an update
      */
-    function drawSankey() {
+    function drawSankey(rebuild) {
 
         var link, node,
             path = sankey.link(),
-            linkedNodes = [];
+            transitionTime = 250;
 
-        svg.selectAll("g").remove();
+        if (rebuild) {
+            svg.selectAll("g").remove();
+            svg.append("g").attr("id", "linkGroup");
+            transitionTime = 0;
+        }
+                
         sankey.nodes(graph.nodes)
             .links(graph.links)
             .layout(10);
 
-        link = svg.append("g").selectAll(".link")
-            .data(graph.links)
-            .enter().append("path")
-            .attr("class", "link")
+        link = svg.select("#linkGroup").selectAll(".link")
+            .data(graph.links);
+        if (rebuild) {
+            link.enter().append("path")
+            .attr("class", "link");
+        }
+        link.transition().duration(transitionTime)
             .attr("d", path)
             .style("stroke-width", function (d) {
                 return Math.max(minNodeHeight, d.dy);
             })
+            .style("stroke-dasharray", function (d) {
+                return (d.value === baseValue) ? "5,5" : null;
+            })
+            .style("stroke-opacity", 0.2)
             .sort(function (a, b) {
                 return b.dy - a.dy;
             });
         // Tooltip for links <fragment flow name>
-        link.append("title")
-            .text(function (d) {
-                return getFragmentFlowName(d);
-            });
-        linkedNodes = graph.nodes.filter(function (n) {
-            return n.sourceLinks.length > 0 || n.targetLinks.length > 0;
-        });
-        node = svg.append("g").selectAll(".node")
-            .data(linkedNodes)
-            .enter().append("g")
-            .attr("class", "node")
-            .attr("transform", function (d) {
-                return "translate(" + d.x + "," + d.y + ")";
-            });
+        //link.append("title")stroke-opacity
+        //    .text(function (d) {
+        //        return getFragmentFlowName(d);
+        //    });
 
-        node.append("rect")
+        if (rebuild) {
+            svg.append("g").attr("id", "nodeGroup");
+        }
+        node = svg.select("#nodeGroup").selectAll(".node")
+            .data(graph.nodes);
+        if (rebuild) {
+            node.enter().append("g")
+                .attr("class", "node");
+            node.append("rect");
+            node.append("text");
+        }
+        node.transition().duration(transitionTime)
+            .attr("transform", function (d) {
+            return "translate(" + d.x + "," + d.y + ")";
+            })
+            .style("opacity", 1);
+        node.selectAll("rect")
+            .transition().duration(transitionTime)
             .attr("height", function (d) {
-                return Math.max(minNodeHeight, d.dy);
-            })
-            .attr({
-                width: sankey.nodeWidth()
-            })
-            .style("fill", function (d) {
-                d.color = color(d.nodeTypeID);
-                return d.color;
-            });
-//            .style("stroke", function (d) {
-//                return d3.rgb(d.color).darker(2);
-//            });
-        //var ntElement = d3.select(".d3-tip");
+                    return Math.max(minNodeHeight, d.dy);
+                })
+                .attr({
+                    width: sankey.nodeWidth()
+                })
+                .style("fill", function (d) {
+                    d.color = color(d.nodeTypeID);
+                    return d.color;
+                });
+
         node.on('mouseover', onMouseOverNode);
-            //.on('mouseout', function (d) {
-            //    ntElement.transition()
-            //    .duration(500);
-            //    nodeTip.hide(d);
-            //});
+
         //
         // Position fragment flow name to the right or left of node.
         //
-        node.append("text")
+        node.selectAll("text")
+            .transition().duration(transitionTime)
             .attr("x", -6)
             .attr("y", function (d) {
                 return Math.max(minNodeHeight, d.dy) / 2;
@@ -379,59 +394,46 @@ function FragmentFlows() {
         })
             .style("cursor", "pointer")
             .on("click", onNodeClick);
-        //
-        //  Change links with 0 of less magnitude
-        //  - display as thin dashed line.
-        //
-        link.filter(function (d) {
-            return (d.value === baseValue );
-        })
-        //.style("stroke-width", 1)
-        .style("stroke-dasharray", "5,5");
 
-        //onMouseOverNode(linkedNodes[0], 0);
     }
 
     /**
      * Build sankey graph from fragment link data
-     * @param {Array}  data          fragment link data
+     * @param {Array}    data          fragment link data
+     * @param {Boolean}  doUpdate      Optional flag to update existing graph and diagram
      */
-    function buildGraph(data) {
+    function buildGraph(data, doUpdate) {
         var nodeIndex = 0,
+            rebuild = arguments.length === 1 || !doUpdate;
+        
+        if (rebuild) {
             reverseIndex = []; // map fragmentFlowID to graph.nodes and graph.links
+            graph.nodes = [];
 
-        graph.nodes = [];
+            // Add a node for every flow
+            data.forEach(function (element) {
+                var node = {
+                    nodeTypeID: element.nodeTypeID,
+                    fragmentFlowID: element.fragmentFlowID,
+                    nodeName: "" // Name of referenced object, if any
+                };
+                if ("processID" in element) {
+                    node.processID = element.processID;
+                    if (node.processID in LCA.indexedData.processes) {
+                        node.nodeName = LCA.indexedData.processes[node.processID].name;
+                    }
+                }
+                if ("subFragmentID" in element) {
+                    node.subFragmentID = element.subFragmentID;
+                    if (node.subFragmentID in LCA.indexedData.fragments) {
+                        node.nodeName = LCA.indexedData.fragments[node.subFragmentID].name;
+                    }
+                }
+                reverseIndex[element.fragmentFlowID] = graph.nodes.push(node) - 1;
+            });
+        }
+
         graph.links = [];
-
-        // Create root node
-        //graph.nodes.push({
-        //    fragmentFlowName: "",
-        //    nodeTypeID: 0,
-        //    nodeName: ""
-        //});
-        //reverseIndex[0] = 0;
-        // Add a node for every flow
-        data.forEach(function (element) {
-            var node = {
-                nodeTypeID: element.nodeTypeID,
-                fragmentFlowID: element.fragmentFlowID,
-                nodeName: "" // Name of referenced object, if any
-            };
-            if ("processID" in element) {
-                node.processID = element.processID;
-                if (node.processID in LCA.indexedData.processes) {
-                    node.nodeName = LCA.indexedData.processes[node.processID].name;
-                }
-            }
-            if ("subFragmentID" in element) {
-                node.subFragmentID = element.subFragmentID;
-                if (node.subFragmentID in LCA.indexedData.fragments) {
-                    node.nodeName = LCA.indexedData.fragments[node.subFragmentID].name;
-                }
-            }
-            reverseIndex[element.fragmentFlowID] = graph.nodes.push(node) - 1;
-        });
-
         // Add a link for every flow. source and target are indexes into nodes array.
         data.forEach(function (element) {
             var link, parentIndex;
@@ -456,7 +458,7 @@ function FragmentFlows() {
                 graph.links.push(link);
             }
         });
-        drawSankey();
+        drawSankey(rebuild);
     }
 
     function onFragmentsLoaded() {
@@ -516,8 +518,7 @@ function FragmentFlows() {
         
         panelSelection.style("display", "none");
 
-        // IE does not display link style changes - need to recreate svg.
-        buildGraph(LCA.indexedData.fragments[selectedFragmentID].links);
+        buildGraph(LCA.indexedData.fragments[selectedFragmentID].links, true);
     }
 
     /**
@@ -532,7 +533,8 @@ function FragmentFlows() {
             //  if that is in the list. Otherwise, select first flow property.
             //
             if (!(selectedFlowPropertyID in LCA.indexedData.flowProperties)) {
-                if (selectedFlowPropertyID != defaultFlowPropertyID && (defaultFlowPropertyID in LCA.indexedData.flowProperties)) {
+                if (selectedFlowPropertyID !== defaultFlowPropertyID &&
+                    (defaultFlowPropertyID in LCA.indexedData.flowProperties)) {
                     selectedFlowPropertyID = defaultFlowPropertyID;
                 } else {
                     selectedFlowPropertyID = LCA.indexedData.flowProperties[0].flowPropertyID;

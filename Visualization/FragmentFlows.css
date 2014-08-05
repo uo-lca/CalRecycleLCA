@@ -49,7 +49,7 @@ fieldset label {
     line-height: 1;
     padding: 4px;
     background:  #BCC5D0;
-    border-radius: 2px;
+    border-radius: 3px;
 }
 
 /* Creates a small triangle extender for the tooltip */
@@ -57,7 +57,6 @@ fieldset label {
     box-sizing: border-box;
     display: inline;
     font-size: 10px;
-    width: 100%;
     line-height: 1;
     color:  #BCC5D0;
     position: absolute;
