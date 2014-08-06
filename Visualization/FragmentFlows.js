@@ -7,6 +7,7 @@
 /// <reference path="d3.min.js" />
 /// <reference path="sankey.js" />
 /// <reference path="d3-tip.js" />
+/// <reference path="FragmentFlows.html" />
 
 function FragmentFlows() {
 
@@ -212,7 +213,7 @@ function FragmentFlows() {
         breadCrumbs.selectAll("a")
             .data(parentFragments)
             .enter().append("a")
-            .attr("href", "#")
+            .attr("href", "#fragmentName")
             .text( function (d) {
                 return LCA.indexedData.fragments[d].name;
             })

@@ -260,8 +260,15 @@ LCA.loadSelectionList = function (objects, selectID, oidName, changeHandler, ini
  * Read current page's URL variables and store them as an associative array.
  */
 LCA.loadUrlVars = function() {
-    var hash, varName;
-    var hashes = window.location.href.slice(window.location.href.indexOf('?') + 1).split('&');
+    var hash,
+        varName,
+        curPageURL = window.location.href,
+        idRefIndex = curPageURL.indexOf('#'),
+        hashes = [];
+    if (idRefIndex >= 0) {
+        curPageURL = curPageURL.slice(0, idRefIndex);
+    }
+    hashes = curPageURL.slice(curPageURL.indexOf('?') + 1).split('&');
     for (var i = 0; i < hashes.length; i++) {
         hash = hashes[i].split('=');
         varName = hash[0].toLowerCase();
