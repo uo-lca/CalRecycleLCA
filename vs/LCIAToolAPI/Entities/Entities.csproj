@@ -131,12 +131,15 @@
   <ItemGroup>
     <Compile Include="Models\DependencyParamModel.cs" />
     <Compile Include="Models\FragmentModel.cs" />
+    <Compile Include="Models\NodeFlowModel.cs" />
     <Compile Include="Models\ProcessModel.cs" />
     <Compile Include="Models\FlowPropertyModel.cs" />
     <Compile Include="Models\FlowModel.cs" />
     <Compile Include="Models\FlowPropertyParamModel.cs" />
     <Compile Include="Models\FragmentFlowModel.cs" />
     <Compile Include="Models\FragmentLink.cs" />
+    <Compile Include="Models\ScenarioProductFlowModel.cs" />
+    <Compile Include="Models\TestOutFlowModel.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

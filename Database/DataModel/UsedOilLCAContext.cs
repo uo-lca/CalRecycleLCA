@@ -9,6 +9,7 @@ namespace LcaDataModel
     public partial class UsedOilLCAContext : DbContext, IDbContext
     {
 
+
         static UsedOilLCAContext()
         {
             Database.SetInitializer<UsedOilLCAContext>(null);
@@ -52,6 +53,7 @@ namespace LcaDataModel
             }
         }
 
+        public virtual DbSet<C__MigrationHistory> C__MigrationHistory { get; set; }
         public virtual DbSet<Background> Backgrounds { get; set; }
         public virtual DbSet<BackgroundCache> BackgroundCaches { get; set; }
         public virtual DbSet<Category> Categories { get; set; }

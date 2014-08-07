@@ -81,6 +81,7 @@ namespace LCAToolAPI.App_Start
             kernel.Bind<IFragmentFlowService>().To<FragmentFlowService>();
             kernel.Bind<IDependencyParamService>().To<DependencyParamService>();
             kernel.Bind<IFragmentTraversal>().To<FragmentTraversal>();
+            kernel.Bind<IFragmentTraversalV2>().To<FragmentTraversalV2>();
             kernel.Bind<IFragmentLinkService>().To<FragmentLinkService>();
             kernel.Bind<IScenarioParamService>().To<ScenarioParamService>();
             kernel.Bind<IParamService>().To<ParamService>();
@@ -91,6 +92,15 @@ namespace LCAToolAPI.App_Start
             kernel.Bind<IFlowService>().To<FlowService>();
             kernel.Bind<INodeCacheService>().To<NodeCacheService>();
             kernel.Bind<IFragmentNodeFragmentService>().To<FragmentNodeFragmentService>();
+            kernel.Bind<IFragmentNodeProcessService>().To<FragmentNodeProcessService>();
+            kernel.Bind<IProcessFlowService>().To<ProcessFlowService>();
+
+            //Trying to inject a generic service to avoid having a service for each model class
+            //kernel.Bind(typeof(IService<Flow>)).To(typeof(Service<Flow>))
+            //    .When(request => request.Service == typeof(IService<Flow>));
+
+            //kernel.Bind(typeof(IService<>)).To(typeof(Service))
+            //    .When(request => request.Service == typeof(IService<FragmentFlow>));
         }
 
         public static void RegisterNinject(HttpConfiguration configuration)

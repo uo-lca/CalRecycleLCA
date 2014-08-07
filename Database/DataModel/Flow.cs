@@ -16,13 +16,12 @@ namespace LcaDataModel
             FlowFlowProperties = new HashSet<FlowFlowProperty>();
             FlowPropertyEmissions = new HashSet<FlowPropertyEmission>();
             FragmentFlows = new HashSet<FragmentFlow>();
+            FragmentNodeFragments = new HashSet<FragmentNodeFragment>();
+            FragmentNodeProcesses = new HashSet<FragmentNodeProcess>();
             LCIAs = new HashSet<LCIA>();
             Processes = new HashSet<Process>();
             ProcessFlows = new HashSet<ProcessFlow>();
             ScenarioBackgrounds = new HashSet<ScenarioBackground>();
-            FragmentNodeProcesses = new HashSet<FragmentNodeProcess>();
-            FragmentNodeFragments = new HashSet<FragmentNodeFragment>();
-
         }
 
         public int FlowID { get; set; }
@@ -47,15 +46,17 @@ namespace LcaDataModel
 
         public virtual FlowType FlowType { get; set; }
 
+        public virtual ILCDEntity ILCDEntity { get; set; }
+
         public virtual ICollection<FlowFlowProperty> FlowFlowProperties { get; set; }
 
         public virtual ICollection<FlowPropertyEmission> FlowPropertyEmissions { get; set; }
 
         public virtual ICollection<FragmentFlow> FragmentFlows { get; set; }
 
-        public virtual ICollection<FragmentNodeProcess> FragmentNodeProcesses { get; set; }
-
         public virtual ICollection<FragmentNodeFragment> FragmentNodeFragments { get; set; }
+
+        public virtual ICollection<FragmentNodeProcess> FragmentNodeProcesses { get; set; }
 
         public virtual ICollection<LCIA> LCIAs { get; set; }
 
@@ -64,7 +65,5 @@ namespace LcaDataModel
         public virtual ICollection<ProcessFlow> ProcessFlows { get; set; }
 
         public virtual ICollection<ScenarioBackground> ScenarioBackgrounds { get; set; }
-
-        public virtual ILCDEntity ILCDEntity { get; set; }
     }
 }

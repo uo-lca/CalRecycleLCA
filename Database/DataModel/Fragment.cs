@@ -28,12 +28,12 @@ namespace LcaDataModel
 
         public virtual FragmentFlow FragmentFlow { get; set; }
 
+        public virtual ILCDEntity ILCDEntity { get; set; }
+
         public virtual ICollection<FragmentFlow> FragmentFlows { get; set; }
 
         public virtual ICollection<FragmentNodeFragment> FragmentNodeFragments { get; set; }
 
         public virtual ICollection<FragmentStage> FragmentStages { get; set; }
-
-        public virtual ILCDEntity ILCDEntity { get; set; }
     }
 }

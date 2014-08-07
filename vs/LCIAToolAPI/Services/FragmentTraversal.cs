@@ -272,8 +272,8 @@ namespace Services
                Quantity = m.p.Quantity,
                ParentFragmentFlowID = m.p.ParentFragmentFlowID,
                Value = m.p.Value,
-               //MeanValue = (m.pc.MeanValue == null ? 0 : m.pc.MeanValue)
-               MeanValue = (m.pc.MeanValue)
+               MeanValue = (m.pc.MeanValue == null ? m.pc.FlowID : m.pc.MeanValue)
+               //MeanValue = (m.pc.MeanValue)
            }).AsEnumerable();
 
             //return query;

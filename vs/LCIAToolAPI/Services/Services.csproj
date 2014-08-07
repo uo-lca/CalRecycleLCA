@@ -133,9 +133,13 @@
     <Compile Include="FlowFlowPropertyService.cs" />
     <Compile Include="FlowPropertyParamService.cs" />
     <Compile Include="FlowPropertyService.cs" />
+    <Compile Include="FragmentNodeProcessService.cs" />
     <Compile Include="FragmentTraversalV2.cs" />
+    <Compile Include="IFragmentNodeProcessService.cs" />
     <Compile Include="IFragmentTraversalV2.cs" />
+    <Compile Include="IProcessFlowService.cs" />
     <Compile Include="IProcessService.cs" />
+    <Compile Include="ProcessFlowService.cs" />
     <Compile Include="ProcessService.cs" />
     <Compile Include="FlowService.cs" />
     <Compile Include="FragmentFlowService.cs" />
