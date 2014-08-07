@@ -612,7 +612,7 @@ The following tables are required:
     * FragmentSubstitutionID
     * ScenarioID (FK to Scenario)
     * FragmentNodeFragmentID (FK)
-    * FragmentID (FK)
+    * SubFragmentID (FK)
 
     It is a scenario design constraint that the substituted FragmentID must
     have the same list of product flows as the original FragmentID.

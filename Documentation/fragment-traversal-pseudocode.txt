@@ -47,13 +47,19 @@ success = NodeRecurse( fragment_flow_id, scenario_id, flow_magnitude )
     	      WHERE FlowID = TermFlowID
     
     node_conv = SELECT ( fpp.Value == NULL 
-    	      	         ? ff.MeanValue : fpp.Value) AS Result
+    	      	         ? ff.MeanValue : fpparam.Value) AS Result
     	        FROM FlowFlowProperty ff
-    	      	INNER JOIN FlowPropertyParam fpp ON FlowFlowPropertyID
-		INNER JOIN ScenarioParam on fpp.ParamID
-                WHERE FlowID = the_flow.FlowID
-                  AND FlowPropertyID = term_fp
-		  AND ScenarioID = scenario_id
+    	      	LEFT OUTER JOIN 
+		(
+		  SELECT fpp.Value AS Value
+		  FROM FlowPropertyParam fpp 
+		  INNER JOIN ScenarioParam sp ON fpp.ParamID = sp.ParamID
+		  WHERE ScenarioID = scenario_id
+		) 
+		fpparam
+		ON FlowFlowPropertyID
+                WHERE ff.FlowID = the_flow.FlowID
+                  AND ff.FlowPropertyID = term_fp
 
   }
 
@@ -65,14 +71,22 @@ success = NodeRecurse( fragment_flow_id, scenario_id, flow_magnitude )
   // now map outgoing fragment edges to other product flows
   // NO NEED to EXCLUDE inflows because it will not show up in the join
   outflows = SELECT ff.FragmentFlowID, ff.FlowID, ff.DirectionID,
-                    ( dp.Value == NULL ? nf.Result : dp.Value ) AS Result
+                    ( dpparam.Value == NULL 
+		      ? nf.Result : dpparam.Value ) AS Result
              FROM FragmentFlow ff 
              LEFT OUTER JOIN node_flows nf ON ff.FlowID = nf.FlowID
-             LEFT OUTER JOIN DependencyParam dp -> ScenarioParam sp
-               ON ff.FragmentFlowID = dp.FragmentFlowID
+             LEFT OUTER JOIN
+	     (
+	       SELECT dp.FragmentFlowID AS FragmentFlowID,
+	       	      dp.Value AS Value 
+	       FROM DependencyParam dp
+	       INNER JOIN ScenarioParam sp ON dp.ParamID = sp.ParamID
+	       WHERE sp.ScenarioID = @ScenarioID 
+	     )
+	     dpparam
+	     ON ff.FragmentFlowID = dpparam.FragmentFlowID
              WHERE ParentFragmentFlowID = @FragmentFlowID
                AND ff.DirectionID = nf.DirectionID
-               AND sp.ScenarioID = @ScenarioID ;
 
   if isempty (outflows)
     success = true;
@@ -127,15 +141,16 @@ node_flows = GetScenarioProductFlows ( the_fragment_flow, scenario_id)
     }
     case 2 // Fragment
     {
-      fragment_id = SELECT ( fs.FragmentID == NULL 
-      		   	   ? fnf.FragmentID : fs.FragmentID ) as FragmentID
+      subfragment_id = SELECT ( fs.SubFragmentID == NULL 
+      		   	        ? fnf.SubFragmentID 
+				: fs.SubFragmentID ) as SubFragmentID
       		    FROM the_fragment_flow 
       		    INNER JOIN FragmentNodeFragment fnf
       		    LEFT OUTER JOIN  FragmentSubstitution fs
 		    WHERE fs.ScenarioID = scenario_id
 
       // recursive traversal
-      FragmentTraverse( fragment_id, scenario_id);
+      FragmentTraverse( subfragment_id, scenario_id);
 
       // pull cache values 
       // in SQL it's a bit complicated:
