@@ -8,25 +8,37 @@ The Database solution contains the following 2 projects:
 DataImport is a web app that loads individual data files. It is not currently used nor maintained.
 
 The console app is named LcaDataLoader.exe and has the following arguments:
-  * -r The full data root path Default: C:\\CalRecycleLCA-DATA_ROOT
+  * -r The full data root path
   * -s ILCD archive source name
+  * -i Create database and seed it.
   * -d Delete database and recreate.
   * -c Load CSV files
- 
-The console app creates a log file in the current directory. Logging can be configured by editing app.Config. (See log4net documentation for instructions).
 
-Data files loaded by LcaDataLoader are in the LCA_Data repository.
- 
-Examples: 
+Database connection configuration: Edit LcaDataLoader/App.Config. Change Data Source to the database server name. 
 
- Recreate database and load ILCD archive using
-  <pre><code>LcaDataLoader -r "C:\CalRecycleLCA-DATA_ROOT" -s "Full UO LCA Flat Export BK 2014_05_05" -d</pre></code>
+The console app creates log files in the current directory. The log file name and path can be configured by editing the log4net File param in LcaDataLoader/App.Config. 
 
- Update database and load ILCD archive using
-  <pre><code>LcaDataLoader -r "C:\CalRecycleLCA-DATA_ROOT" -s "Full UO LCA Flat Export Ecoinvent 2014_04_24"</pre></code>
+Examples:
 
-  Update database and load CSV files using
-  <pre><code>LcaDataLoader -r "C:\CalRecycleLCA-DATA_ROOT" -c</pre></code>
+
+Create the database using 
+<pre><code>LcaDataLoader -i</pre></code>
+
+Drop and recreate the database using 
+<pre><code>LcaDataLoader -d</pre></code>
+
+Data files loaded by LcaDataLoader are in the LCA_Data repository. 
+Suppose those files are downloaded to C:\LCA_Data. They can be loaded as follows.
+<pre><code>
+LcaDataLoader -r "C:\LCA_Data" -s "Full UO LCA Flat Export BK 2014_05_05"
+LcaDataLoader -r "C:\LCA_Data" -s "Full UO LCA Flat Export Ecoinvent 2014_04_24"
+LcaDataLoader -r "C:\LCA_Data" -s "Full UO LCA Flat Export Improper 2014_04_01"
+LcaDataLoader -r "C:\LCA_Data" -s "Full UO LCA Flat Export PE 2014_04_24"
+LcaDataLoader -r "C:\LCA_Data" -s "ELCD-LCIA"
+LcaDataLoader -r "C:\LCA_Data" -c
+</pre></code>
+
+
   
   
  

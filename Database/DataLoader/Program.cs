@@ -24,24 +24,27 @@ namespace LcaDataLoader {
         static string _IlcdSourceName = null;
         static bool _DeleteFlag;
         static bool _CsvFlag;
+        static bool _InitFlag;
 
         public static readonly ILog Logger = LogManager.GetLogger("LcaDataLoader");
 
         static void ParseArguments(string[] args) {
-            _DataRoot = "C:\\CalRecycleLCA-DATA_ROOT";
+            _DataRoot = "";
             _DeleteFlag = false;
             _CsvFlag = false;
+            _InitFlag = false;
 
             OptionSet options = new OptionSet() {
                 {"r|root=", "The full {DATA_ROOT} path.", v => _DataRoot = v },
                 {"s|source=", "ILCD archive {source name}.", v => _IlcdSourceName = v },
                 {"c|csv", "Load CSV files.", v => _CsvFlag = (v!=null)}, 
-                {"d|delete", "Delete database and recreate.", v => _DeleteFlag = (v!=null)} 
+                {"i|initialize", "Create database and seed.", v => _InitFlag = (v!=null)},
+                {"d|delete", "Delete database, then initialize.", v => _DeleteFlag = (v!=null)}
             };
             List<string> extraArgs;
             try {
                 extraArgs = options.Parse(args);
-                Logger.InfoFormat("Data root={0}, Load CSVs={1}, Delete={2}", _DataRoot, _CsvFlag.ToString(), _DeleteFlag.ToString());
+                Logger.InfoFormat("Initialize={0}, Data root={1}, Load CSVs={2}, Delete={3}", _InitFlag.ToString(), _DataRoot, _CsvFlag.ToString(), _DeleteFlag.ToString());
                 if (_IlcdSourceName != null)
                     Logger.InfoFormat("ILCD source={0}", _IlcdSourceName);
             }
@@ -76,6 +79,12 @@ namespace LcaDataLoader {
                 ParseArguments(args);
                 if (_DeleteFlag) {
                     Database.SetInitializer<EntityDataModel>(new DropCreateDatabaseInitializer());
+                }
+                else if (_InitFlag) {
+                    Database.SetInitializer<EntityDataModel>(new CreateDatabaseInitializer());
+                }
+                else {
+                    Database.SetInitializer<EntityDataModel>(null);
                 }
                 if (!String.IsNullOrEmpty(_IlcdDirName)) {
                     if (Directory.Exists(_IlcdDirName)) {
