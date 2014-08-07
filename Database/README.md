@@ -8,14 +8,16 @@ The Database solution contains the following 2 projects:
 DataImport is a web app that loads individual data files. It is not currently used nor maintained.
 
 The console app is named LcaDataLoader.exe. 
-Options
-=======
-  -r, --root=DATA_ROOT       The full DATA_ROOT path.
-  -s, --source=source name   ILCD archive source name.
-  -c, --csv                  Load CSV files.
-  -i, --initialize           Create database and seed.
-  -d, --delete               Delete database, then initialize.
-  -h, --help                 List options and exit
+
+
+Option                     | Description
+---------------------------|----------------------------------
+-r, --root=DATA_ROOT       | The full DATA_ROOT path.
+-s, --source=source name   | ILCD archive source name.
+-c, --csv                  | Load CSV files.
+-i, --initialize           | Create database and seed.
+-d, --delete               | Delete database, then initialize.
+-h, --help                 | List options and exit
 
 
 The default root path is current directory. If no options are selected, the app will list options and exit.
