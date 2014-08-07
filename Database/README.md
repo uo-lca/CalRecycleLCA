@@ -7,16 +7,22 @@ The Database solution contains the following 2 projects:
   
 DataImport is a web app that loads individual data files. It is not currently used nor maintained.
 
-The console app is named LcaDataLoader.exe and has the following arguments:
-  * -r The full data root path
-  * -s ILCD archive source name
-  * -i Create database and seed it.
-  * -d Delete database and recreate.
-  * -c Load CSV files
+The console app is named LcaDataLoader.exe. 
+Options
+=======
+  -r, --root=DATA_ROOT       The full DATA_ROOT path.
+  -s, --source=source name   ILCD archive source name.
+  -c, --csv                  Load CSV files.
+  -i, --initialize           Create database and seed.
+  -d, --delete               Delete database, then initialize.
+  -h, --help                 List options and exit
+
+
+The default root path is current directory. If no options are selected, the app will list options and exit.
 
 Database connection configuration: Edit LcaDataLoader/App.Config. Change Data Source to the database server name. 
 
-The console app creates log files in the current directory. The log file name and path can be configured by editing the log4net File param in LcaDataLoader/App.Config. 
+The console app is configured to create log files in the same directory as the executable. This can be changed by editing the log4net File param in LcaDataLoader/App.Config. 
 
 Examples:
 
