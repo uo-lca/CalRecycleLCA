@@ -370,6 +370,7 @@ namespace LcaDataLoader {
             LcaDataModel.Process process = new LcaDataModel.Process();
             SaveIlcdEntity(ilcdDb, process, DataTypeEnum.Process);
             process.Name = GetElementValue(ElementName("baseName"));
+            process.ReferenceYear = GetElementValue(_CommonNamespace + "referenceYear");
             process.Geography = GetElementAttributeValue(ElementName("locationOfOperationSupplyOrProduction"), "location");            
             lookupName = GetElementAttributeValue(ElementName("quantitativeReference"), "type");
             if (lookupName != null) {

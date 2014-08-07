@@ -292,7 +292,7 @@ namespace LcaDataModel
                 .IsUnicode(false);
 
             modelBuilder.Entity<Process>()
-                .Property(e => e.Year)
+                .Property(e => e.ReferenceYear)
                 .IsUnicode(false);
 
             modelBuilder.Entity<Process>()

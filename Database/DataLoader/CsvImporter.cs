@@ -18,12 +18,11 @@ namespace LcaDataLoader {
         /// Load all csv directories under a given root directory.
         /// </summary>
         /// <param name="dirName">Full path name of the root directory</param>
-        public static void LoadAll(string dirName) {
-            using (DbContextWrapper dbContext = new DbContextWrapper()) {
-                LoadAppend(Path.Combine(dirName, "append"), dbContext);
-                LoadFragments(Path.Combine(dirName, "fragments"), dbContext);
-                LoadScenarios(Path.Combine(dirName, "scenarios"), dbContext);
-            }
+        /// <param name="dbContext">Shared instance of DbContextWrapper</param>
+        public static void LoadAll(string dirName, DbContextWrapper dbContext) {
+            LoadAppend(Path.Combine(dirName, "append"), dbContext);
+            LoadFragments(Path.Combine(dirName, "fragments"), dbContext);
+            LoadScenarios(Path.Combine(dirName, "scenarios"), dbContext);
         }
 
         private static bool ImportCategorySystem(Row row, DbContextWrapper dbContext) {

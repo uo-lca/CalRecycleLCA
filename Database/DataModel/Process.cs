@@ -21,7 +21,7 @@ namespace LcaDataModel
         public string Name { get; set; }
 
         [StringLength(60)]
-        public string Year { get; set; }
+        public string ReferenceYear { get; set; }
 
         [StringLength(15)]
         public string Geography { get; set; }

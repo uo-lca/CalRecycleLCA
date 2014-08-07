@@ -106,6 +106,10 @@
     <Compile Include="Migrations\201407282022157_InitialCreate1.Designer.cs">
       <DependentUpon>201407282022157_InitialCreate1.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\201408072132215_ProcessReferenceYear.cs" />
+    <Compile Include="Migrations\201408072132215_ProcessReferenceYear.Designer.cs">
+      <DependentUpon>201408072132215_ProcessReferenceYear.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="NodeCache.cs" />
     <Compile Include="NodeDissipation.cs" />
@@ -154,6 +158,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\201407282022157_InitialCreate1.resx">
       <DependentUpon>201407282022157_InitialCreate1.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201408072132215_ProcessReferenceYear.resx">
+      <DependentUpon>201408072132215_ProcessReferenceYear.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
