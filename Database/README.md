@@ -26,10 +26,10 @@ Deployment Instructions
 -----------------------
 1. Build Solution, Release configuration
 2. Copy contents of DataLoader\bin\Release to the server where database initialization is to be executed.
-3. Edit LcaDataLoader.exe.config
+3. In the server folder containing the release build, edit LcaDataLoader.exe.config
   1. In connectionStrings, change Data Source to the name of the SQL Server instance where the database is to be created.
   2. log4net is configured to create log files in the same directory as the executable. If you want to change the location of the log files, edit the value of the File param (prepend a path).
-4. As a user who has database creation priviledge, create the database by executing
+4. As a user who has access to create a database, open a command prompt on the server and cd to the directory containing the release build. Create the database by executing
 <pre><code>LcaDataLoader -i</pre></code>
 5. If other users will be loading data, grant them write access to the new database, UsedOilLCA. 
 
