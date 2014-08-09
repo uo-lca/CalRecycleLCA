@@ -39,7 +39,7 @@ success = NodeRecurse( fragment_flow_id, scenario_id, flow_magnitude )
 	   AND DirectionID = comp( the_flow.DirectionID );
   // comp is complement (swap 1/Input and 2/Output)
 
-  if the_flow.FlowID == term_flow_id
+  if the_flow.FlowID == NULL || the_flow.FlowID == term_flow_id
      node_conv = 1;
   else
   { // convert the inflow to the reference property of the term flow
@@ -81,11 +81,11 @@ success = NodeRecurse( fragment_flow_id, scenario_id, flow_magnitude )
 	       	      dp.Value AS Value 
 	       FROM DependencyParam dp
 	       INNER JOIN ScenarioParam sp ON dp.ParamID = sp.ParamID
-	       WHERE sp.ScenarioID = @ScenarioID 
+	       WHERE sp.ScenarioID = scenario_id
 	     )
 	     dpparam
 	     ON ff.FragmentFlowID = dpparam.FragmentFlowID
-             WHERE ParentFragmentFlowID = @FragmentFlowID
+             WHERE ParentFragmentFlowID = fragment_flow_id
                AND ff.DirectionID = nf.DirectionID
 
   if isempty (outflows)
