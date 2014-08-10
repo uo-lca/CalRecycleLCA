@@ -43,6 +43,7 @@ namespace LcaDataLoader {
         /// </summary>
         public DbContextWrapper() {
             _DbContext = new EntityDataModel();
+            _DbContext.Database.Initialize(false);
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]

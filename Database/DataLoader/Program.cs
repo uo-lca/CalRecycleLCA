@@ -97,6 +97,7 @@ namespace LcaDataLoader {
         /// </summary>
         static int Main(string[] args) {
             int exitCode = 0;
+            bool loadedFiles = false;
             try {
                 StartLogging();
                 if (ParseArguments(args)) {
@@ -109,11 +110,14 @@ namespace LcaDataLoader {
                     else {
                         Database.SetInitializer<EntityDataModel>(null);
                     }
+                    DbContextWrapper dbContext = new DbContextWrapper();
+
                     if (!String.IsNullOrEmpty(_IlcdDirName)) {
                         if (Directory.Exists(_IlcdDirName)) {
                             IlcdImporter ilcdImporter = new IlcdImporter();
-                            ilcdImporter.LoadAll(_IlcdDirName, _IlcdSourceName);
+                            ilcdImporter.LoadAll(_IlcdDirName, _IlcdSourceName, dbContext);
                             Logger.InfoFormat("Loaded ILCD archive from {0}.", _IlcdDirName);
+                            loadedFiles = true;
                         }
                         else {
                             Logger.ErrorFormat("ILCD folder, {0}, does not exist.", _IlcdDirName);
@@ -122,18 +126,19 @@ namespace LcaDataLoader {
                     }
                     if (_CsvFlag) {
                         if (Directory.Exists(_DataRoot)) {
-                            CsvImporter.LoadAll(_DataRoot);
+                            CsvImporter.LoadAll(_DataRoot, dbContext);
                             Logger.InfoFormat("Loaded CSV folders under {0}.", _DataRoot);
+                            loadedFiles = true;
                         }
                         else {
                             Logger.ErrorFormat("Data Root folder, {0}, does not exist.", _DataRoot);
                             exitCode = 1;
                         }
                     }
-                    using (DbContextWrapper dbContext = new DbContextWrapper()) {
+                    if (loadedFiles) { 
                         Program.Logger.InfoFormat("Update LCIA Flow reference...");
                         dbContext.UpdateLciaFlowID();
-                    }
+                    }                    
                 }
             }
             catch (Exception e) {

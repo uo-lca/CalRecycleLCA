@@ -329,8 +329,6 @@ The following tables are required:
     importer must find the ProcessFlowID that matches the identified
     Process AND Flow.
 
-   Source - REMOVE TABLE
-
 ### Indices, constraints
 
     * Every table needs a primary key
@@ -508,12 +506,15 @@ The following tables are required:
     * ParamID
     * ParamTypeID
     * Name
-    * Min -- determined at invocation (in frontend) except for types 5, 6, 
+
+    these fields are derived from TypMin and TypMax fields in data tables--
+    not yet implemented
+    * Min -- determined at invocation (in frontend) except for types 4, 6, 
       	     7, where it is always 0.
     * Typ -- default value of the parameter in scenario- always 0 except
-      	     for types 5, 6, 7, where it is set to the baseline 
+      	     for types 4, 6, 7, where it is set to the baseline 
 	     EmissionFactor or FlowFlowProperty value.
-    * Max -- determined at invocation (in frontend) except for types 5, 6,
+    * Max -- determined at invocation (in frontend) except for types 4, 6,
       	     7, where it is always 1.
 
    ScenarioParam
@@ -533,8 +534,8 @@ The following tables are required:
 
    DistributionParam
     * DistributionParamID
-    * DependencyParamID (FK to DependencyParam, ParamTypeID must be 2)
-    * ConservationParamID (FK to DependencyParam, ParamTypeID must be 3)
+    * DependencyParamID (FK to DependencyParam, ParamTypeID must be 3)
+    * ConservationParamID (FK to DependencyParam, ParamTypeID must be 2)
 
     * DocID
 
