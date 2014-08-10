@@ -17,4 +17,13 @@ namespace LcaDataLoader {
             DbContextWrapper.Seed(context);
         }
     }
+    /// <summary>
+    /// Database initializer - creates database if it does not exist.
+    /// Uses DbContextWrapper to seed database.
+    /// </summary>
+    public class CreateDatabaseInitializer : CreateDatabaseIfNotExists<EntityDataModel> {
+        protected override void Seed(EntityDataModel context) {
+            DbContextWrapper.Seed(context);
+        }
+    }
 }

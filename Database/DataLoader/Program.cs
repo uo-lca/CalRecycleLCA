@@ -19,38 +19,64 @@ namespace LcaDataLoader {
         /// <summary>
         /// Directory holding ILCD data files. Default setting can be overwritten by argument.
         /// </summary>
-        static string _DataRoot;
+        static string _DataRoot = null;
         static string _IlcdDirName = null;
         static string _IlcdSourceName = null;
         static bool _DeleteFlag;
         static bool _CsvFlag;
+        static bool _InitFlag;
 
         public static readonly ILog Logger = LogManager.GetLogger("LcaDataLoader");
 
-        static void ParseArguments(string[] args) {
-            _DataRoot = "C:\\CalRecycleLCA-DATA_ROOT";
+        /// <summary>
+        /// Process commandline arguments.
+        /// </summary>
+        /// <param name="args">the arguments</param>
+        /// <returns>true iff any command mode was selected</returns>
+        static bool ParseArguments(string[] args) {
+            bool helpFlag = false;
+            bool commandMode = false;
+
+            _DataRoot = ".";
             _DeleteFlag = false;
             _CsvFlag = false;
+            _InitFlag = false;
 
             OptionSet options = new OptionSet() {
                 {"r|root=", "The full {DATA_ROOT} path.", v => _DataRoot = v },
                 {"s|source=", "ILCD archive {source name}.", v => _IlcdSourceName = v },
                 {"c|csv", "Load CSV files.", v => _CsvFlag = (v!=null)}, 
-                {"d|delete", "Delete database and recreate.", v => _DeleteFlag = (v!=null)} 
+                {"i|initialize", "Create database and seed.", v => _InitFlag = (v!=null)},
+                {"d|delete", "Delete database, then initialize.", v => _DeleteFlag = (v!=null)},
+                {"h|help",  "List options and exit", v => helpFlag = v != null },
             };
             List<string> extraArgs;
             try {
                 extraArgs = options.Parse(args);
-                Logger.InfoFormat("Data root={0}, Load CSVs={1}, Delete={2}", _DataRoot, _CsvFlag.ToString(), _DeleteFlag.ToString());
-                if (_IlcdSourceName != null)
+                Logger.InfoFormat("Initialize={0}, Data root={1}, Load CSVs={2}, Delete={3}", _InitFlag.ToString(), _DataRoot, _CsvFlag.ToString(), _DeleteFlag.ToString());
+                if (!String.IsNullOrEmpty(_IlcdSourceName)) {
                     Logger.InfoFormat("ILCD source={0}", _IlcdSourceName);
+                    if (String.IsNullOrEmpty(_DataRoot)) {
+                        throw new OptionException ("Missing root path.", "-r");
+                    }
+                    _IlcdDirName = Path.Combine(_DataRoot, _IlcdSourceName, "ILCD");
+                }
+                if (_CsvFlag) {
+                    if (String.IsNullOrEmpty(_DataRoot)) {
+                        throw new OptionException ("Missing root path.", "-r");
+                    }
+                }
+                if (helpFlag || (!_DeleteFlag && !_InitFlag && String.IsNullOrEmpty(_IlcdSourceName) && !_CsvFlag)) {
+                    options.WriteOptionDescriptions(Console.Out);
+                } else {
+                    commandMode = true;
+                }
             }
             catch (OptionException e) {
                 Logger.ErrorFormat("Usage Error: {0}", e.Message);
             }
-            if (!String.IsNullOrEmpty(_IlcdSourceName)) {
-                _IlcdDirName = Path.Combine(_DataRoot, _IlcdSourceName, "ILCD");
-            }
+            
+            return commandMode;
         }
 
         /// <summary>
@@ -73,34 +99,41 @@ namespace LcaDataLoader {
             int exitCode = 0;
             try {
                 StartLogging();
-                ParseArguments(args);
-                if (_DeleteFlag) {
-                    Database.SetInitializer<EntityDataModel>(new DropCreateDatabaseInitializer());
-                }
-                if (!String.IsNullOrEmpty(_IlcdDirName)) {
-                    if (Directory.Exists(_IlcdDirName)) {
-                        IlcdImporter ilcdImporter = new IlcdImporter();
-                        ilcdImporter.LoadAll(_IlcdDirName, _IlcdSourceName);
-                        Logger.InfoFormat("Loaded ILCD archive from {0}.", _IlcdDirName);
+                if (ParseArguments(args)) {
+                    if (_DeleteFlag) {
+                        Database.SetInitializer<EntityDataModel>(new DropCreateDatabaseInitializer());
+                    }
+                    else if (_InitFlag) {
+                        Database.SetInitializer<EntityDataModel>(new CreateDatabaseInitializer());
                     }
                     else {
-                        Logger.ErrorFormat("ILCD folder, {0}, does not exist.", _IlcdDirName);
-                        exitCode = 1;
+                        Database.SetInitializer<EntityDataModel>(null);
                     }
-                }
-                if (_CsvFlag) {
-                    if (Directory.Exists(_DataRoot)) {
-                        CsvImporter.LoadAll(_DataRoot);
-                        Logger.InfoFormat("Loaded CSV folders under {0}.", _DataRoot);
+                    if (!String.IsNullOrEmpty(_IlcdDirName)) {
+                        if (Directory.Exists(_IlcdDirName)) {
+                            IlcdImporter ilcdImporter = new IlcdImporter();
+                            ilcdImporter.LoadAll(_IlcdDirName, _IlcdSourceName);
+                            Logger.InfoFormat("Loaded ILCD archive from {0}.", _IlcdDirName);
+                        }
+                        else {
+                            Logger.ErrorFormat("ILCD folder, {0}, does not exist.", _IlcdDirName);
+                            exitCode = 1;
+                        }
                     }
-                    else {
-                        Logger.ErrorFormat("Data Root folder, {0}, does not exist.", _DataRoot);
-                        exitCode = 1;
+                    if (_CsvFlag) {
+                        if (Directory.Exists(_DataRoot)) {
+                            CsvImporter.LoadAll(_DataRoot);
+                            Logger.InfoFormat("Loaded CSV folders under {0}.", _DataRoot);
+                        }
+                        else {
+                            Logger.ErrorFormat("Data Root folder, {0}, does not exist.", _DataRoot);
+                            exitCode = 1;
+                        }
                     }
-                }
-                using (DbContextWrapper dbContext = new DbContextWrapper()) {
-                    Program.Logger.InfoFormat("Update LCIA Flow reference...");
-                    dbContext.UpdateLciaFlowID();
+                    using (DbContextWrapper dbContext = new DbContextWrapper()) {
+                        Program.Logger.InfoFormat("Update LCIA Flow reference...");
+                        dbContext.UpdateLciaFlowID();
+                    }
                 }
             }
             catch (Exception e) {

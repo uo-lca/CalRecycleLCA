@@ -3,9 +3,10 @@
   * Override sankey style appropriate for movable nodes.
   */
 .node rect {
-    cursor: pointer;
-  fill-opacity: .9;
-  shape-rendering: crispEdges;
+/*    cursor: pointer;*/
+    shape-rendering: crispEdges;
+    opacity: 1;
+    stroke-width:0;
 }
 
 .node text {
@@ -13,10 +14,63 @@
 }
 
 .vis-panel {
-    display: inline-block;
+    /*display: inline-block;*/
     vertical-align: top;
-    width: 500px;
+    width: 310px;
     font-size: 0.8em;
 }
+
+.vis-panel table {
+    width: 300px;
+}
+
+.vis-panel th {
+    background-color: #eee;
+    border-style:none;
+}
+
+.vis-panel label {
+    font-weight: bold;
+}
+
+fieldset label {
+	font-weight: bold;
+    vertical-align: middle;
+    padding-left: 1.5em;
+}
+
+#refUnitName {
+    display: table-cell;
+    padding: 5px;
+    vertical-align: middle;
+}
+
+.d3-tip {
+    line-height: 1;
+    padding: 4px;
+    background:  #BCC5D0;
+    border-radius: 3px;
+}
+
+/* Creates a small triangle extender for the tooltip */
+.d3-tip:after {
+    box-sizing: border-box;
+    display: inline;
+    font-size: 10px;
+    line-height: 1;
+    color:  #BCC5D0;
+    position: absolute;
+    pointer-events: none;
+}
+
+/* Northward tooltips */
+.d3-tip.ne:after {
+    content: "\25BC";
+    margin: -1px 0 0 0;
+    top: 100%;
+    left: 0;
+    text-align: left;
+}
+
 
 

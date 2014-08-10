@@ -210,6 +210,7 @@ function processFlow() {
      */
     function init() {
         var processesURL;
+        LCA.baseURI = "http://publictest.calrecycle.ca.gov/LCIATool/api/";
 
         processesURL = LCA.baseURI + "process";
 

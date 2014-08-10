@@ -118,8 +118,8 @@ namespace Services
 
             int? termFlowId = GetTermFlow(theFlow);
 
-            int? theFlowDirection;
-            theFlowDirection = theFlow.Select(x => x.DirectionID).FirstOrDefault();
+            int? theFlowDirection = Convert.ToInt32(theFlow.Select(x => x.DirectionID).FirstOrDefault());
+
 
             switch (theFlowDirection)
             {
@@ -132,15 +132,16 @@ namespace Services
             }
 
             var inFlow = nodeFlows
+                    .Where(x => x.FlowID == termFlowId)
+                    .Where(x => x.DirectionID == theFlowDirection)
                          .Select(b => new NodeFlowModel
                     {
                         FlowID = b.FlowID,
                         DirectionID = b.DirectionID,
                         FlowMagnitude = b.FlowMagnitude,
                         Result = b.Result
-                    })
-                    .Where(x => x.FlowID == termFlowId)
-                    .Where(x => x.DirectionID == theFlowDirection);
+                    }).ToList();
+                    
 
 
             int? theFlowId = theFlow.Select(x => x.FlowID).FirstOrDefault();
@@ -159,18 +160,48 @@ namespace Services
             else
             {
                 var termFlow = _flowService.Query().Filter(x => x.FlowID == termFlowId).Get().FirstOrDefault();
+                //var conv = _flowFlowPropertyService.Query().Get()
+                //    .Join(_flowPropertyParamService.Query().Get(), p => p.FlowFlowPropertyID, pc => pc.FlowFlowPropertyID, (p, pc) => new { p, pc })
+                //    .Join(_scenarioParamService.Query().Get(), p => p.pc.ParamID, pc => pc.ParamID, (p, pc) => new { p, pc })
+                //    .Where(x => x.p.p.FlowID == theFlowId)
+                //    .Where(x => x.p.p.FlowPropertyID == termFlow.ReferenceFlowProperty)
+                //    .Where(x => x.pc.ScenarioID == scenarioId)
+                //    .Select(b => new
+                //    {
+                //        Default = b.p.p.MeanValue,
+                //        Subs = b.p.pc.Value == null ? 0 : b.p.pc.Value, 
+                //        //Result = b.p.pc.Value == null ? b.p.p.MeanValue : b.p.pc.Value
+                //    });
+
                 var conv = _flowFlowPropertyService.Query().Get()
-                    .Join(_flowPropertyParamService.Query().Get(), p => p.FlowFlowPropertyID, pc => pc.FlowFlowPropertyID, (p, pc) => new { p, pc })
-                    .Join(_scenarioParamService.Query().Get(), p => p.pc.ParamID, pc => pc.ParamID, (p, pc) => new { p, pc })
-                    .Where(x => x.p.p.FlowID == theFlowId)
-                    .Where(x => x.p.p.FlowPropertyID == termFlow.ReferenceFlowProperty)
-                    .Where(x => x.pc.ScenarioID == scenarioId)
+                    .GroupJoin(_flowPropertyParamService.Query().Get() // Target table
+                , dp => dp.FlowFlowPropertyID
+                , sp => sp.FlowFlowPropertyID
+                , (dp, sp) => new { dependencyParams = dp, scenarioParams = sp })
+                .SelectMany(s => s.scenarioParams.DefaultIfEmpty()
+                , (s, scenarioparams) => new
+                {
+
+                    ParamID = scenarioparams == null ? 0 : scenarioparams.ParamID,
+                    FlowPropertyID = s.dependencyParams.FlowPropertyID,
+                    FlowID = s.dependencyParams.FlowID,
+                    MeanValue = s.dependencyParams.MeanValue,
+                    Value = scenarioparams == null ? 0 : scenarioparams.Value,
+                })
+                //we will join with scenario later - no point doing an expensive left outer join just to make it work
+                    //.Join(_scenarioParamService.Query().Get(), p => p.ParamID, pc => pc.ParamID, (p, pc) => new { p, pc })
+                    .Where(x => x.FlowID == theFlowId)
+                    .Where(x => x.FlowPropertyID == termFlow.ReferenceFlowProperty)
+                    //.Where(x => x.pc.ScenarioID == scenarioId)
                     .Select(b => new
                     {
-                        Default = b.p.p.MeanValue,
-                        Subs = b.p.pc.Value, 
+                        Default = b.MeanValue,
+                        Subs = b.Value == null ? 0 : b.Value,
                         //Result = b.p.pc.Value == null ? b.p.p.MeanValue : b.p.pc.Value
                     });
+
+
+
 
                 double? convDefault = conv.Select(x => x.Default).FirstOrDefault();
                 double? convSubs = conv.Select(x => x.Subs).FirstOrDefault();
@@ -187,19 +218,23 @@ namespace Services
                 }
             }
 
+
             double? nodeScale = 1 / inFlow.Select(x => x.Result).FirstOrDefault();
             double? nodeWeight = flowMagnitude * nodeConv * nodeScale;
 
-            var nodeCache = new NodeCache
+            if (inFlow.Count != 0)
             {
-                FragmentFlowID = fragmentFlowId,
-                ScenarioID = scenarioId,
-                FlowMagnitude = flowMagnitude,
-                NodeWeight = nodeWeight
-            };
-            _nodeCacheService.InsertGraph(nodeCache);
-            _unitOfWork.Save();
-
+                var nodeCache = new NodeCache
+                {
+                    FragmentFlowID = fragmentFlowId,
+                    ScenarioID = scenarioId,
+                    FlowMagnitude = flowMagnitude,
+                    NodeWeight = nodeWeight
+                };
+                _nodeCacheService.InsertGraph(nodeCache);
+                _unitOfWork.Save();
+            }
+          
             var outFlows = _fragmentFlowService.Query().Get()
                 .Where(x => x.ParentFragmentFlowID == fragmentFlowId)
                 .GroupJoin(nodeFlows // Target table

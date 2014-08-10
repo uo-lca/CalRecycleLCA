@@ -7,7 +7,7 @@
 /// <reference path="d3.min.js" />
 /// <reference path="spin.min.js" />
 var LCA = {
-    baseURI: "http://localhost:60393/api/",
+    baseURI: "http://kbcalr.isber.ucsb.edu/api/",
     testDataFolder: "TestData/",
     loadedData: [],  // Data loaded via web API (or from TestData)
     spinner: null,
@@ -56,7 +56,7 @@ LCA.init = function (callback) {
  * Compare function used to sort array of objects by Name.
  */
 LCA.compareNames = function (a, b) {
-    return d3.ascending(a.Name, b.Name);
+    return d3.ascending(a.name, b.name);
 };
 
 LCA.startSpinner = function startSpinner(tgtElementId) {
@@ -102,7 +102,7 @@ LCA.indexData = function (resourceName, indexProperty) {
 
 /**
  * Shorten a name so that it does not exceed maximum length.
- * Cut-off postion decided in the following order of preference
+ * Cut-off position decided in the following order of preference
  *  1. last position of character in shortNameBreakChars
  *  2. last position of space char
  *  3. max length
@@ -115,10 +115,10 @@ LCA.shortName = function (name, maxLen) {
     if (name.length > maxLen) {
         var endIndex = - 1;
         for (var i = maxLen - 1; i > 0 && endIndex === -1; --i) {
-            if (LCA.shortNameBreakChars.has(name.charAt(i))) endIndex = i;
+            if (LCA.shortNameBreakChars.has(name.charAt(i))) { endIndex = i; }
         }
-        if (endIndex === -1) endIndex = name.lastIndexOf(" ", maxLen -1);
-        if (endIndex === -1) endIndex = maxLen;
+        if (endIndex === -1) { endIndex = name.lastIndexOf(" ", maxLen - 1); }
+        if (endIndex === -1) { endIndex = maxLen; }
         return name.slice(0, endIndex);
     } else {
         return name;
@@ -133,8 +133,8 @@ LCA.shortName = function (name, maxLen) {
  */
 LCA.createTable = function (parSelection, columns) {
     var table = parSelection.append("table"),
-        thead = table.append("thead"),
-        tbody = table.append("tbody");
+        thead = table.append("thead");
+        table.append("tbody");
     // append the header row
         thead.append("tr")
             .selectAll("th")
@@ -142,33 +142,41 @@ LCA.createTable = function (parSelection, columns) {
             .enter()
             .append("th")
             .text(function (column) { return column; });
-        return tbody;
+        return table;
 };
 
 /**
  * Display data in table body
- * @param {Object} tbody    d3 selection containing table body
+ * Hide table header when data empty.
+ * @param {Object} table    d3 selection containing table
  * @param {Array} data      data indexed by column header names
  * @param {Array} columns   column header names
  */
-LCA.updateTable = function (tbody, data, columns) {
+LCA.updateTable = function (table, data, columns) {
+
+    if (data.length > 0) {
+        table.select("thead").style("display", "table-header-group");
+    } else {
+        table.select("thead").style("display", "none");
+    }
     // create a row for each object in the data
-    var rows = tbody.selectAll("tr")
+    var rows = table.select("tbody").selectAll("tr")
         .data(data);
 
-     rows.enter()
+    rows.enter()
         .append("tr");
 
     // create a cell in each row for each column
-    var cells = rows.selectAll("td")
+    rows.selectAll("td")
         .data(function (row) {
             return columns.map(function (column) {
                 return { column: column, value: row[column] };
             });
         })
         .enter()
-        .append("td")
-        .html(function (d) { return d.value; });
+        .append("td");
+
+    rows.selectAll("td").html(function (d) { return d.value; });
 
     // remove rows that have no data
     rows.exit().remove();
@@ -179,16 +187,17 @@ LCA.updateTable = function (tbody, data, columns) {
  * @param {String} resourceName     web service resource name
  * @param {Boolean} useTestData     Load json file for testing
  * @param {Function} callback       Function to call when done
+ * @param {String} routePrefix      Web API route prefix
  */
 LCA.loadData = function (resourceName, useTestData, callback, routePrefix) {
-   
+
     if (resourceName in LCA.loadedData) {
         callback.call();
         return false;
     }
     var jsonURL = (useTestData ? LCA.testDataFolder : LCA.baseURI);
     if (arguments.length === 4) {
-        jsonURL = jsonURL + routePrefix + "/"
+        jsonURL = jsonURL + routePrefix + "/";
     }   
     jsonURL += resourceName;
     if (useTestData) {
@@ -216,40 +225,55 @@ LCA.loadData = function (resourceName, useTestData, callback, routePrefix) {
  * @param {Number} initialValue     Default value (selected object ID).
  */
 LCA.loadSelectionList = function (objects, selectID, oidName, changeHandler, initialValue) {
+    var selectOptions;
 
     objects.sort(LCA.compareNames);
-
-    var selectOptions = d3.select(selectID)
-        .on("change", changeHandler)
+    //
+    // Internet Explorer does not display updated options correctly so remove/append only
+    //
+    d3.select(selectID)
         .selectAll("option")
-        .data(objects)
-        .enter()
-        .append("option")
-        .attr("value", function (d) {
+        .remove();
+
+    selectOptions = d3.select(selectID)
+        .selectAll("option")
+        .data(objects);
+
+    selectOptions.enter()
+        .append("option");
+    // selectOptions.exit().remove();
+
+    selectOptions.attr("value", function (d) {
             return d[oidName];
         })
         .text(function (d) {
-            return d.Name;
+            return d.name;
+        })
+        .attr("selected", function (d) {
+            return d[oidName] === initialValue ? true : null;
         });
-    //
-    // Initialize selection
-    //
-    selectOptions.filter(function (d) {
-        return d[oidName] === initialValue;
-    })
-        .attr("selected", true);
+
+    d3.select(selectID).on("change", changeHandler);
 };
 
 /**
  * Read current page's URL variables and store them as an associative array.
  */
 LCA.loadUrlVars = function() {
-    var hash;
-    var hashes = window.location.href.slice(window.location.href.indexOf('?') + 1).split('&');
+    var hash,
+        varName,
+        curPageURL = window.location.href,
+        idRefIndex = curPageURL.indexOf('#'),
+        hashes = [];
+    if (idRefIndex >= 0) {
+        curPageURL = curPageURL.slice(0, idRefIndex);
+    }
+    hashes = curPageURL.slice(curPageURL.indexOf('?') + 1).split('&');
     for (var i = 0; i < hashes.length; i++) {
         hash = hashes[i].split('=');
-        LCA.urlVars.push(hash[0]);
-        LCA.urlVars[hash[0]] = hash[1];
+        varName = hash[0].toLowerCase();
+        LCA.urlVars.push(varName);
+        LCA.urlVars[varName] = hash[1];
     }
 };
 

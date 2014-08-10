@@ -19,8 +19,8 @@
     <link rel="stylesheet" type="text/css" href="FragmentFlows.css">
     <!-- JavaScript -->
     <script src="http://ajax.aspnetcdn.com/ajax/jQuery/jquery-2.1.1.min.js"></script>
-    <script type="text/javascript" src="http://d3js.org/d3.v3.js"></script>
-    <!--<script type="text/javascript" src="d3.min.js"></script>-->
+    <!--<script type="text/javascript" src="http://d3js.org/d3.v3.js"></script>-->
+    <script type="text/javascript" src="d3.min.js"></script>
     <script type="text/javascript" src="d3-tip.js"></script>
     <script type="text/javascript" src="colorbrewer.js"></script>
     <script type="text/javascript" src="sankey.js"></script>
@@ -53,6 +53,8 @@
                 <label for="ptSelect">Flow Property Type</label>
                 <select name="ptSelect" id="ptSelect">
                 </select>
+                <label id="unitLabel">Reference Unit:</label>
+                <span id="refUnitName"></span>
             </p>
         </fieldset>
         <div id="chartcontainer"></div>

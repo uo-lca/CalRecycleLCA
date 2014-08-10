@@ -355,6 +355,7 @@ function lciaComputation() {
      */
     function init() {
         var filteredMethodsURL;
+        LCA.baseURI = "http://publictest.calrecycle.ca.gov/LCIATool/api/";
 
         processesURL = LCA.baseURI + "process?flows=1";
         impactCategoriesURL = LCA.baseURI + "impactcategory";
