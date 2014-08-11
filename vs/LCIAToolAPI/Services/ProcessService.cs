@@ -23,7 +23,6 @@ namespace Services
         /// <returns>List of ProcessModel objects</returns>
         public IEnumerable<ProcessModel> GetProcesses() {
             IEnumerable<Process> pData = _repository.GetProcesses();
-            //IEnumerable<Process> pData = _repository.Query().Get();
             return pData.Select(p => new ProcessModel {
                 ProcessID = p.ProcessID,
                 Name = p.Name,
