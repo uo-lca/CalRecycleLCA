@@ -5,8 +5,8 @@ namespace LcaDataModel {
     using System.Linq;
 
     public partial class EntityDataModel : DbContext {
-        public EntityDataModel()
-            : base("name=EntityDataModel") {
+        public EntityDataModel(String connName)
+            : base(connName) {
         }
 
         public virtual DbSet<Background> Backgrounds { get; set; }

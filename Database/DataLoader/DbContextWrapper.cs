@@ -42,7 +42,7 @@ namespace LcaDataLoader {
         /// Constructor creates model's DbContext
         /// </summary>
         public DbContextWrapper() {
-            _DbContext = new EntityDataModel();
+            _DbContext = new EntityDataModel("name=EntityDataModel");
             _DbContext.Database.Initialize(false);
         }
 
