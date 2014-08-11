@@ -107,6 +107,10 @@
     <Compile Include="Migrations\201408111906531_AddShortNameDropCompositionParam.Designer.cs">
       <DependentUpon>201408111906531_AddShortNameDropCompositionParam.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\201408112352481_CompositionModel_Fix.cs" />
+    <Compile Include="Migrations\201408112352481_CompositionModel_Fix.Designer.cs">
+      <DependentUpon>201408112352481_CompositionModel_Fix.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="NodeCache.cs" />
     <Compile Include="NodeDissipationParam.cs" />
@@ -157,6 +161,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\201408111906531_AddShortNameDropCompositionParam.resx">
       <DependentUpon>201408111906531_AddShortNameDropCompositionParam.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201408112352481_CompositionModel_Fix.resx">
+      <DependentUpon>201408112352481_CompositionModel_Fix.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

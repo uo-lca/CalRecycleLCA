@@ -20,7 +20,7 @@ namespace LcaDataModel {
         public virtual DbSet<CharacterizationParam> CharacterizationParams { get; set; }
         public virtual DbSet<Classification> Classifications { get; set; }
         public virtual DbSet<CompositionData> CompositionDatas { get; set; }
-        public virtual DbSet<CompostionModel> CompostionModels { get; set; }
+        public virtual DbSet<CompositionModel> CompostionModels { get; set; }
         public virtual DbSet<DataProvider> DataProviders { get; set; }
         public virtual DbSet<DataType> DataTypes { get; set; }
         public virtual DbSet<DependencyParam> DependencyParams { get; set; }
@@ -87,7 +87,7 @@ namespace LcaDataModel {
                 .Property(e => e.Delimiter)
                 .IsUnicode(false);
 
-            modelBuilder.Entity<CompostionModel>()
+            modelBuilder.Entity<CompositionModel>()
                 .Property(e => e.Name)
                 .IsUnicode(false);
 

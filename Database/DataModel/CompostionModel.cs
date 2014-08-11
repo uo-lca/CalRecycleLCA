@@ -6,10 +6,10 @@ namespace LcaDataModel
     using System.ComponentModel.DataAnnotations.Schema;
     using System.Data.Entity.Spatial;
 
-    [Table("CompostionModel")]
-    public partial class CompostionModel
+    [Table("CompositionModel")]
+    public partial class CompositionModel
     {
-        public CompostionModel()
+        public CompositionModel()
         {
             CompositionDatas = new HashSet<CompositionData>();
         }
