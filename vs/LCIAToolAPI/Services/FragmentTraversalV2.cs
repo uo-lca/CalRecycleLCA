@@ -120,6 +120,7 @@ namespace Services
 
             int? theFlowDirection = Convert.ToInt32(theFlow.Select(x => x.DirectionID).FirstOrDefault());
 
+            double? nodeConv = null;
 
             switch (theFlowDirection)
             {
@@ -145,15 +146,12 @@ namespace Services
 
 
             int? theFlowId = theFlow.Select(x => x.FlowID).FirstOrDefault();
-            double? nodeConv;
+            
 
             //set theFlowId to termFlowId in cases where FlowID is null (eg records with a null for ParentFragmentFlowID)
-            if (theFlowId == null)
-            {
-                theFlowId = termFlowId;
-            }
 
-            if (theFlowId == termFlowId)
+
+            if (theFlowId == termFlowId || theFlowId == null)
             {
                 nodeConv = 1;
             }
@@ -208,7 +206,7 @@ namespace Services
 
                 //nodeConv = conv.Select(x => x.Result).FirstOrDefault();
 
-                if (convSubs != null)
+                if (convSubs != 0)
                 {
                     nodeConv = convSubs;
                 }
@@ -222,8 +220,7 @@ namespace Services
             double? nodeScale = 1 / inFlow.Select(x => x.Result).FirstOrDefault();
             double? nodeWeight = flowMagnitude * nodeConv * nodeScale;
 
-            if (inFlow.Count != 0)
-            {
+                
                 var nodeCache = new NodeCache
                 {
                     FragmentFlowID = fragmentFlowId,
@@ -233,7 +230,6 @@ namespace Services
                 };
                 _nodeCacheService.InsertGraph(nodeCache);
                 _unitOfWork.Save();
-            }
           
             var outFlows = _fragmentFlowService.Query().Get()
                 .Where(x => x.ParentFragmentFlowID == fragmentFlowId)
@@ -265,7 +261,7 @@ namespace Services
                     NFDirectionID = s.fragmentflows.NFDirectionID,
                     Result = s.fragmentflows.Result,
                     ParamID = dependencyparams == null ? -1 : dependencyparams.ParamID,
-                    ParamValue = dependencyparams == null ? -1 : dependencyparams.Value,
+                    ParamValue = dependencyparams == null ? 0 : dependencyparams.Value,
                     ParentFragmentFlowID = s.fragmentflows.ParentFragmentFlowID
                 })
 
