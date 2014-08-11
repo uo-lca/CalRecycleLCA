@@ -12,7 +12,6 @@ namespace LcaDataModel
         public FlowFlowProperty()
         {
             CompositionDatas = new HashSet<CompositionData>();
-            CompositionParams = new HashSet<CompositionParam>();
             FlowPropertyParams = new HashSet<FlowPropertyParam>();
         }
 
@@ -27,8 +26,6 @@ namespace LcaDataModel
         public double? StDev { get; set; }
 
         public virtual ICollection<CompositionData> CompositionDatas { get; set; }
-
-        public virtual ICollection<CompositionParam> CompositionParams { get; set; }
 
         public virtual Flow Flow { get; set; }
 

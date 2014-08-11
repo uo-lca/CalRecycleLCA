@@ -5,6 +5,10 @@ namespace LcaDataModel {
     using System.Linq;
 
     public partial class EntityDataModel : DbContext {
+        public EntityDataModel()
+            : base() {
+        }
+
         public EntityDataModel(String connName)
             : base(connName) {
         }
@@ -16,7 +20,6 @@ namespace LcaDataModel {
         public virtual DbSet<CharacterizationParam> CharacterizationParams { get; set; }
         public virtual DbSet<Classification> Classifications { get; set; }
         public virtual DbSet<CompositionData> CompositionDatas { get; set; }
-        public virtual DbSet<CompositionParam> CompositionParams { get; set; }
         public virtual DbSet<CompostionModel> CompostionModels { get; set; }
         public virtual DbSet<DataProvider> DataProviders { get; set; }
         public virtual DbSet<DataType> DataTypes { get; set; }

@@ -28,6 +28,10 @@ namespace LcaDataModel
 
         public string Name { get; set; }
 
+        // Short name for visualization
+        [StringLength(30)]
+        public string ShortName { get; set; }
+
         public int? FragmentStageID { get; set; }
 
         public int? NodeTypeID { get; set; }
