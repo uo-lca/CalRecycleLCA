@@ -13,6 +13,7 @@ namespace LcaDataModel
     public partial class UsedOilLCAContext : EntityDataModel, IDbContext
     {
 
+
         static UsedOilLCAContext()
         {
             Database.SetInitializer<UsedOilLCAContext>(null);

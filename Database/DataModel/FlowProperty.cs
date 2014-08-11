@@ -28,14 +28,14 @@ namespace LcaDataModel
 
         public virtual ICollection<Flow> Flows { get; set; }
 
-        public virtual UnitGroup UnitGroup { get; set; }
-
         public virtual ICollection<FlowFlowProperty> FlowFlowProperties { get; set; }
+
+        public virtual ILCDEntity ILCDEntity { get; set; }
+
+        public virtual UnitGroup UnitGroup { get; set; }
 
         public virtual ICollection<FlowPropertyEmission> FlowPropertyEmissions { get; set; }
 
         public virtual ICollection<LCIAMethod> LCIAMethods { get; set; }
-
-        public virtual ILCDEntity ILCDEntity { get; set; }
     }
 }

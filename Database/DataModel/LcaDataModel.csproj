@@ -53,7 +53,6 @@
     <Compile Include="Category.cs" />
     <Compile Include="CategorySystem.cs" />
     <Compile Include="CharacterizationParam.cs" />
-    <Compile Include="Class.cs" />
     <Compile Include="Classification.cs" />
     <Compile Include="CompositionData.cs" />
     <Compile Include="CompostionModel.cs" />
@@ -72,15 +71,10 @@
     <Compile Include="FlowPropertyParam.cs" />
     <Compile Include="FlowType.cs" />
     <Compile Include="Fragment.cs" />
-    <Compile Include="FragmentEdge.cs" />
-    <Compile Include="FragmentEmission.cs" />
     <Compile Include="FragmentFlow.cs" />
-    <Compile Include="FragmentNode.cs" />
     <Compile Include="FragmentNodeFragment.cs" />
     <Compile Include="FragmentNodeProcess.cs" />
-    <Compile Include="FragmentScore.cs" />
     <Compile Include="FragmentStage.cs" />
-    <Compile Include="GlobalSuppressions.cs" />
     <Compile Include="IDbContext.cs" />
     <Compile Include="ILCDEntity.cs" />
     <Compile Include="ImpactCategory.cs" />
@@ -115,9 +109,7 @@
     </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="NodeCache.cs" />
-    <Compile Include="NodeDissipation.cs" />
     <Compile Include="NodeDissipationParam.cs" />
-    <Compile Include="NodeEmission.cs" />
     <Compile Include="NodeEmissionParam.cs" />
     <Compile Include="NodeType.cs" />
     <Compile Include="ObjectState.cs" />
@@ -136,9 +128,7 @@
     <Compile Include="ScenarioBackground.cs" />
     <Compile Include="ScenarioGroup.cs" />
     <Compile Include="ScenarioParam.cs" />
-    <Compile Include="ScenarioSet.cs" />
     <Compile Include="ScoreCache.cs" />
-    <Compile Include="Source.cs" />
     <Compile Include="UnitConversion.cs" />
     <Compile Include="UnitGroup.cs" />
     <Compile Include="UsedOilLCAContext.cs" />
