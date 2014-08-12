@@ -295,6 +295,7 @@ namespace LcaDataLoader {
                 ent.FragmentID = Convert.ToInt32(row["FragmentID"]);
                 ent.FragmentStageID = TransformOptionalID(row["FragmentStageID"]);
                 ent.Name = row["Name"];
+                ent.ShortName = dbContext.ShortenName(ent.Name, 30);
                 ent.NodeTypeID = Convert.ToInt32(row["NodeTypeID"]);
                 ent.FlowID = dbContext.GetIlcdEntityID<Flow>(row["FlowUUID"]);
                 ent.DirectionID = Convert.ToInt32(row["DirectionID"]);

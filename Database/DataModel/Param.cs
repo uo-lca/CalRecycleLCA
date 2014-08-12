@@ -12,7 +12,6 @@ namespace LcaDataModel
         public Param()
         {
             CharacterizationParams = new HashSet<CharacterizationParam>();
-            CompositionParams = new HashSet<CompositionParam>();
             DependencyParams = new HashSet<DependencyParam>();
             FlowPropertyParams = new HashSet<FlowPropertyParam>();
             NodeDissipationParams = new HashSet<NodeDissipationParam>();
@@ -36,8 +35,6 @@ namespace LcaDataModel
         public double? Max { get; set; }
 
         public virtual ICollection<CharacterizationParam> CharacterizationParams { get; set; }
-
-        public virtual ICollection<CompositionParam> CompositionParams { get; set; }
 
         public virtual ICollection<DependencyParam> DependencyParams { get; set; }
 

@@ -12,7 +12,7 @@ namespace LcaDataModel
         public Flow()
         {
             Backgrounds = new HashSet<Background>();
-            CompostionModels = new HashSet<CompostionModel>();
+            CompostionModels = new HashSet<CompositionModel>();
             FlowFlowProperties = new HashSet<FlowFlowProperty>();
             FlowPropertyEmissions = new HashSet<FlowPropertyEmission>();
             FragmentFlows = new HashSet<FragmentFlow>();
@@ -40,7 +40,7 @@ namespace LcaDataModel
 
         public virtual ICollection<Background> Backgrounds { get; set; }
 
-        public virtual ICollection<CompostionModel> CompostionModels { get; set; }
+        public virtual ICollection<CompositionModel> CompostionModels { get; set; }
 
         public virtual FlowProperty FlowProperty { get; set; }
 

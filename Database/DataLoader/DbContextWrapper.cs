@@ -18,6 +18,9 @@ namespace LcaDataLoader {
         EntityDataModel _DbContext;
         int _CurrentIlcdDataProviderID;
 
+        // Punctuation characters used to determine where to truncate name
+        static char[] nameDelimiters = new char[] { '(', '.', ',', ':', ';' };
+
         // Flag: Has Dispose already been called? 
         bool disposed = false;
 
@@ -38,11 +41,35 @@ namespace LcaDataLoader {
 
             disposed = true;
         }
+
+        /// <summary>
+        /// Shorten a name
+        /// </summary>
+        /// <param name="name">The name to shorten</param>
+        /// <param name="length">Maximum length of short name</param>
+        /// <returns>The short name</returns>
+        public string ShortenName(string name, int length) {
+            // If text in shorter or equal to length, just return it
+            if (name.Length <= length) {
+                return name;
+            }
+
+            // name is longer, so try to find out where to cut
+            int index = name.LastIndexOfAny(nameDelimiters, length);
+            if (index < length * 2 / 3) {
+                index = name.LastIndexOf(' ', length);
+            }
+            if (index == -1) {
+                index = length;
+            }
+            return name.Substring(0, index);
+        }
+
         /// <summary>
         /// Constructor creates model's DbContext
         /// </summary>
         public DbContextWrapper() {
-            _DbContext = new EntityDataModel();
+            _DbContext = new EntityDataModel("name=EntityDataModel");
             _DbContext.Database.Initialize(false);
         }
 
@@ -353,5 +380,7 @@ namespace LcaDataLoader {
             _DbContext.Database.ExecuteSqlCommand(updateCmd);
             return _DbContext.SaveChanges();
         }
+
+
     }
 }

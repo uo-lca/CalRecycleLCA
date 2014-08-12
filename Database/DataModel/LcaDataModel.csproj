@@ -55,9 +55,7 @@
     <Compile Include="CharacterizationParam.cs" />
     <Compile Include="Classification.cs" />
     <Compile Include="CompositionData.cs" />
-    <Compile Include="CompositionParam.cs" />
     <Compile Include="CompostionModel.cs" />
-    <Compile Include="C__MigrationHistory.cs" />
     <Compile Include="DataProvider.cs" />
     <Compile Include="DataType.cs" />
     <Compile Include="DbContextExtension.cs" />
@@ -104,6 +102,14 @@
     <Compile Include="Migrations\201408072132215_ProcessReferenceYear.cs" />
     <Compile Include="Migrations\201408072132215_ProcessReferenceYear.Designer.cs">
       <DependentUpon>201408072132215_ProcessReferenceYear.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201408111906531_AddShortNameDropCompositionParam.cs" />
+    <Compile Include="Migrations\201408111906531_AddShortNameDropCompositionParam.Designer.cs">
+      <DependentUpon>201408111906531_AddShortNameDropCompositionParam.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201408112352481_CompositionModel_Fix.cs" />
+    <Compile Include="Migrations\201408112352481_CompositionModel_Fix.Designer.cs">
+      <DependentUpon>201408112352481_CompositionModel_Fix.cs</DependentUpon>
     </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="NodeCache.cs" />
@@ -152,6 +158,12 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\201408072132215_ProcessReferenceYear.resx">
       <DependentUpon>201408072132215_ProcessReferenceYear.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201408111906531_AddShortNameDropCompositionParam.resx">
+      <DependentUpon>201408111906531_AddShortNameDropCompositionParam.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201408112352481_CompositionModel_Fix.resx">
+      <DependentUpon>201408112352481_CompositionModel_Fix.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

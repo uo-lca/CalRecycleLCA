@@ -17,7 +17,7 @@ namespace LcaDataModel
 
         public double? Value { get; set; }
 
-        public virtual CompostionModel CompostionModel { get; set; }
+        public virtual CompositionModel CompostionModel { get; set; }
 
         public virtual FlowFlowProperty FlowFlowProperty { get; set; }
     }

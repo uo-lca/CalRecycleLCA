@@ -341,17 +341,16 @@ namespace Services
             {
                 case 1: //process
 
-                    var theProcessFragmentFlow = theFragmentFlow
-                        .Join(_fragmentNodeProcessService.Query().Get(), p => p.FragmentFlowID, pc => pc.FragmentFlowID, (p, pc) => new { p, pc });
+                    int? processId = theFragmentFlow
+                        .Join(_fragmentNodeProcessService.Query().Get(), p => p.FragmentFlowID, pc => pc.FragmentFlowID, (p, pc) => new { p, pc })
+                        .FirstOrDefault()
+                        .pc.ProcessID;
                     //also needs left outer join on substitution but we don't have those tables yet.
-
                     //add this later when the substitution tables have been added
                     //if Subs is not null
                     //    process_id = Subs;
                     //else
                     //    process_id = Default;
-
-                    int? processId = theProcessFragmentFlow.Select(x => x.pc.ProcessID).FirstOrDefault();
 
                     nodeFlowModel = _processFlowService.Query().Get()
                         .Join(_flowService.Query().Get(), p => p.FlowID, pc => pc.FlowID, (p, pc) => new { p, pc })
@@ -361,7 +360,7 @@ namespace Services
                           {
                               FlowID = nfm.p.FlowID,
                               DirectionID = nfm.p.DirectionID,
-                              Result = nfm.p.Magnitude
+                              Result = nfm.p.Result
                           });
 
 
@@ -369,51 +368,63 @@ namespace Services
                     break;
                 case 2: //fragment
 
-                    var theFragmentFragmentFlow = theFragmentFlow
-                        .Join(_fragmentNodeFragmentService.Query().Get(), p => p.FragmentFlowID, pc => pc.FragmentFlowID, (p, pc) => new { p, pc });
+                    //get the sub fragment
+                    int? subFragmentId = theFragmentFlow
+                        .Join(_fragmentNodeFragmentService.Query().Get(), p => p.FragmentFlowID, pc => pc.FragmentFlowID, (p, pc) => new { p, pc })
+                        .FirstOrDefault()
+                        .pc.SubFragmentID;
                     //also needs left outer join on substitution but we don't have those tables yet.
-
                     //add this later when the substitution tables have been added
                     //if Subs is not null
                     //fragment_id = Subs;
                     //else
                     //fragment_id = Default;
 
-                    //get the parent fragmentID
-                    int? fragmentId = theFragmentFragmentFlow.Select(x => x.p.FragmentID).FirstOrDefault();
-
-                    //get the sub fragment
-                    int? subFragmentId = theFragmentFragmentFlow.Select(x => x.pc.SubFragmentID).FirstOrDefault();
-
                     Traverse(subFragmentId, scenarioId);
 
                     // pull cache values 
                     // first we make a table of flows with cache values
                     var fragmentNodeFlows = _fragmentFlowService.Query().Get()
+                        .Where(x => x.FragmentID == subFragmentId)
+                        .Where(x => x.NodeTypeID == 3 || x.FlowID == null)
                         .Join(_nodeCacheService.Query().Get(), p => p.FragmentFlowID, pc => pc.FragmentFlowID, (p, pc) => new { p, pc })
-                        .GroupJoin(_fragmentNodeFragmentService.Query().Get(),
-            ff => ff.p.FragmentFlowID,
-            dp => dp.FragmentFlowID,
-            (ff, dp) =>
-                new { NodeFlowModel = ff, FragmentNodeFragment = dp.DefaultIfEmpty() })
+                        .Where(x => x.pc.ScenarioID == scenarioId)
+                        .GroupJoin(_fragmentNodeFragmentService.Query().Get() // Target table
+                , dp => dp.p.FragmentFlowID
+                , sp => sp.FragmentFlowID
+                , (dp, sp) => new { dependencyParams = dp, scenarioParams = sp })
+                .SelectMany(s => s.scenarioParams.DefaultIfEmpty()
+                , (s, scenarioparams) => new NodeFlowModel
+                {
+                    FlowID = s.dependencyParams.p.FlowID == null ? 0 : s.dependencyParams.p.FlowID,
+                    DirectionID = s.dependencyParams.p.DirectionID,
+                    FlowMagnitude = s.dependencyParams.pc.FlowMagnitude
+                    //RefFlowID = scenarioparams.FlowID
+                }).ToList();
+            //            .GroupJoin(_fragmentNodeFragmentService.Query().Get(),
+            //ff => ff.p.FragmentFlowID,
+            //dp => dp.FragmentFlowID,
+            //(ff, dp) =>
+            //    new { NodeFlowModel = ff, FragmentNodeFragment = dp.DefaultIfEmpty() })
 
-                    .SelectMany(a => a.FragmentNodeFragment.
-                    Select(b => new NodeFlowModel
-                    {
-                        FlowID = a.NodeFlowModel.p.FlowID,
-                        DirectionID = a.NodeFlowModel.p.DirectionID,
-                        FlowMagnitude = a.NodeFlowModel.pc.FlowMagnitude,
-                        //RefFlowID = b.FlowID,
-                        FragmentID = a.NodeFlowModel.p.FragmentID,
-                        ScenarioID = a.NodeFlowModel.pc.ScenarioID
-                    }))
-                    .Where(x => x.FragmentID == subFragmentId)
-                    .Where(x => x.ScenarioID == scenarioId);
+            //        .SelectMany(a => a.FragmentNodeFragment.
+            //        Select(b => new NodeFlowModel
+            //        {
+            //            FlowID = a.NodeFlowModel.p.FlowID == null ? 0 : a.NodeFlowModel.p.FlowID,
+            //            DirectionID = a.NodeFlowModel.p.DirectionID,
+            //            FlowMagnitude = a.NodeFlowModel.pc.FlowMagnitude,
+            //            RefFlowID = b.FlowID
+            //            //FragmentID = a.NodeFlowModel.p.FragmentID,
+            //            //ScenarioID = a.NodeFlowModel.pc.ScenarioID,
+            //            //NodeTypeID = a.NodeFlowModel.p.NodeTypeID
+            //        }));
+                   
+                    
 
                     // next we need to modify the table to fix the reference flow (FlowID = null) and
                     // make it appear like an InputOutput flow
 
-                    var updateNodeFlows = fragmentNodeFlows.Where(x => x.FlowID == null).AsEnumerable();
+                    var updateNodeFlows = fragmentNodeFlows.Where(x => x.FlowID == 0).AsEnumerable();
                     foreach (var item in updateNodeFlows)
                     {
                         switch (item.DirectionID)
