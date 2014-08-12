@@ -373,6 +373,10 @@ namespace Services
                     //else
                     //fragment_id = Default;
 
+                    int? fragmentId = theFragmentFlow
+                       .FirstOrDefault()
+                       .FragmentID;
+
 
 
                     Traverse(subFragmentId, scenarioId);
@@ -380,16 +384,16 @@ namespace Services
 
                     var fragmentNodeFlows = _fragmentFlowService.Query().Get()
                          .Where(x => x.FragmentFlowID == theFragmentFlow.Select(y => y.FragmentFlowID).FirstOrDefault())
+                         //.Where(x => x.FragmentID == fragmentId)
                         .Join(_fragmentNodeFragmentService.Query().Get(), p => p.FragmentFlowID, pc => pc.FragmentFlowID, (p, pc) => new { p, pc })
                        
                         .Join(_fragmentService.Query().Get(), p => p.pc.SubFragmentID, pc => pc.FragmentID, (p, pc) => new { p, pc })
-                        //.Where(x => x.pc.FragmentID == subFragmentId && x.p.p.NodeTypeID ==3)
                          .Select(a => new NodeFlowModel
                     {
-                        FragmentFlowID = a.p.p.FragmentFlowID,
+                        FragmentFlowID = a.pc.ReferenceFragmentFlowID,
                         FlowID = a.p.pc.FlowID,
                         DirectionID = a.p.p.DirectionID,
-                        FragmentID = a.pc.FragmentID,
+                        FragmentID = a.p.p.FragmentID,
                         NodeTypeID = a.p.p.NodeTypeID
                     })
                     
