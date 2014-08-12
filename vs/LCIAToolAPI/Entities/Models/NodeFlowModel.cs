@@ -20,5 +20,12 @@ namespace Entities.Models
         public int? ScenarioID { get; set; }
         [JsonIgnore]
         public int? NodeTypeID { get; set; }
+        [JsonIgnore]
+        public int? FragmentFlowID { get; set; }
+         [JsonIgnore]
+        public int? RefFragmentFlowID { get; set; }
+         [JsonIgnore]
+        public int? SubFragmentID { get; set; }
+        
     }
 }
