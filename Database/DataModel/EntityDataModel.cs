@@ -37,6 +37,7 @@ namespace LcaDataModel {
         public virtual DbSet<FragmentNodeFragment> FragmentNodeFragments { get; set; }
         public virtual DbSet<FragmentNodeProcess> FragmentNodeProcesses { get; set; }
         public virtual DbSet<FragmentStage> FragmentStages { get; set; }
+        public virtual DbSet<FragmentSubstitution> FragmentSubstitutions { get; set; }
         public virtual DbSet<ILCDEntity> ILCDEntities { get; set; }
         public virtual DbSet<ImpactCategory> ImpactCategories { get; set; }
         public virtual DbSet<IndicatorType> IndicatorTypes { get; set; }
@@ -53,6 +54,7 @@ namespace LcaDataModel {
         public virtual DbSet<ProcessDissipationParam> ProcessDissipationParams { get; set; }
         public virtual DbSet<ProcessEmissionParam> ProcessEmissionParams { get; set; }
         public virtual DbSet<ProcessFlow> ProcessFlows { get; set; }
+        public virtual DbSet<ProcessSubstitution> ProcessSubstitutions { get; set; }
         public virtual DbSet<ProcessType> ProcessTypes { get; set; }
         public virtual DbSet<ReferenceType> ReferenceTypes { get; set; }
         public virtual DbSet<Scenario> Scenarios { get; set; }
@@ -160,8 +162,13 @@ namespace LcaDataModel {
 
             modelBuilder.Entity<Fragment>()
                 .HasMany(e => e.FragmentNodeFragments)
-                .WithOptional(e => e.Fragment)
+                .WithOptional(e => e.SubFragment)
                 .HasForeignKey(e => e.SubFragmentID);
+
+            modelBuilder.Entity<Fragment>()
+               .HasMany(e => e.FragmentSubstitutions)
+               .WithRequired(e => e.SubFragment)
+               .HasForeignKey(e => e.SubFragmentID);
 
             modelBuilder.Entity<FragmentFlow>()
                 .Property(e => e.Name)
