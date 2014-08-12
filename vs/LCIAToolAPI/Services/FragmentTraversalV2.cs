@@ -453,8 +453,7 @@ namespace Services
                     {
                         FlowID = t.FlowID,
                         DirectionID = t.DirectionID,
-                        Result = 1,
-                        FragmentFlowID = t.FragmentFlowID
+                        Result = 1
                     });
                     break;
             }
