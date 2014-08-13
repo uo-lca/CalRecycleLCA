@@ -25,6 +25,7 @@ namespace Entities.Models {
         //
         public int FragmentFlowID { get; set; }
         public string Name { get; set; }
+        public string ShortName { get; set; }        
         public int NodeTypeID { get; set; }
         public int? FlowID { get; set; }
         public int DirectionID { get; set; }
