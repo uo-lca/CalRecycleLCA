@@ -1,7 +1,7 @@
 Database Initialization Tool
 ============================
 
-The Database solution contains the following 2 projects:
+The Database folder contains the following 2 projects:
   * LcaDataLoader - Console app creates and populates a database with data from ILCD archives and CSVs exported from MatLab.
   * LcaDataModel - Class library containing code first Entity Framework data model used by LcaDataLoader and the back end solution (../vs/LCIAToolAPI).
 
@@ -23,7 +23,7 @@ The default root path is current directory. If no options are selected, the app 
 
 Deployment Instructions
 -----------------------
-1. Build Solution, Release configuration
+1. Build solution (..\CalRecycleLCA.sln), Release configuration
 2. Copy contents of DataLoader\bin\Release to the server where database initialization is to be executed.
 3. In the server folder containing the release build, edit LcaDataLoader.exe.config
   1. In connectionStrings, change Data Source to the name of the SQL Server instance where the database is to be created.
