@@ -330,11 +330,6 @@ function FragmentFlows() {
             .sort(function (a, b) {
                 return b.dy - a.dy;
             });
-        // Tooltip for links <fragment flow name>
-        //link.append("title")stroke-opacity
-        //    .text(function (d) {
-        //        return getFragmentFlowName(d);
-        //    });
 
         if (rebuild) {
             svg.append("g").attr("id", "nodeGroup");
@@ -380,7 +375,7 @@ function FragmentFlows() {
             .attr("text-anchor", "end")
             .attr("transform", null)
             .text(function (d) {
-                return LCA.shortName(getFragmentFlowName(d), 30);
+                return getFragmentFlowName(d);
             })
             .filter(function (d) {
                 return d.x < width / 2;
@@ -566,15 +561,15 @@ function FragmentFlows() {
     }
 
     /**
-     * Get name of fragment flow associated with current Sankey node or link
+     * Get short name of fragment flow associated with current Sankey node or link
      * @param {Object} data     d3 data at current node or link
      * @return the name
      */
     function getFragmentFlowName(data) {
         var name = "";
         if ("fragmentFlowID" in data) {
-            if ("name" in curFragment.links[data.fragmentFlowID]) {
-                name = curFragment.links[data.fragmentFlowID].name;
+            if ("shortName" in curFragment.links[data.fragmentFlowID]) {
+                name = curFragment.links[data.fragmentFlowID].shortName;
             }
         }
         return name;
