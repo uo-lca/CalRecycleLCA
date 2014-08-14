@@ -263,7 +263,7 @@ namespace Services
                 , sp => sp.ParamID
                 , (dp, sp) => new { dependencyParams = dp, scenarioParams = sp })
                 .SelectMany(s => s.scenarioParams.DefaultIfEmpty()
-                , (s, scenarioparams) => new TestOutFlowModel
+                , (s, scenarioparams) => new OutFlowModel
                 {
                     ScenarioID = scenarioparams == null ? 1 : scenarioparams.ScenarioID,
                     FragmentFlowID = s.dependencyParams.FragmentFlowID,
@@ -431,7 +431,7 @@ namespace Services
                     .Where(x => x.FragmentID == subFragmentId && x.NodeTypeID == 3));
                     
 
-                    // next we need to modify the table to fix the reference flow (FlowID = null) and
+                    // next we need to modify the table to fix the parent fragmentflow and
                     // make it appear like an InputOutput flow
                     fragmentNodeFlows = fragmentNodeFlows.ToList();
                     foreach (var item in fragmentNodeFlows)

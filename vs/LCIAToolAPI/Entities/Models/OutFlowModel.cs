@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Entities.Models
 {
-    public class TestOutFlowModel
+    public class OutFlowModel
     {
         public int? FlowID { get; set; }
         public int? FFDirectionID { get; set; }
