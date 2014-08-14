@@ -433,20 +433,21 @@ namespace Services
 
                     // next we need to modify the table to fix the reference flow (FlowID = null) and
                     // make it appear like an InputOutput flow
-                    var updateNodeFlows = fragmentNodeFlows.Where(x => x.FlowID == 0).AsEnumerable();
-                    foreach (var item in updateNodeFlows)
+                    fragmentNodeFlows = fragmentNodeFlows.ToList();
+                    foreach (var item in fragmentNodeFlows)
                     {
-                        switch (item.DirectionID)
+                        if (item.FragmentID == fragmentId)
                         {
-                            case 1:
-                                item.DirectionID = 2;
-                                break;
-                            case 2:
-                                item.DirectionID = 1;
-                                break;
+                            switch (item.DirectionID)
+                            {
+                                case 1:
+                                    item.DirectionID = 2;
+                                    break;
+                                case 2:
+                                    item.DirectionID = 1;
+                                    break;
+                            }
                         }
-
-                        item.FlowID = item.RefFlowID;
                     }
 
                     nodeFlowModel = fragmentNodeFlows
