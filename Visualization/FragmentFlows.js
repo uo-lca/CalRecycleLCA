@@ -26,7 +26,8 @@ function FragmentFlows() {
         left: 20
     },
         width = 700 - margin.left - margin.right,   // diagram width
-        height = 600 - margin.top - margin.bottom;  // diagram height
+        height = 600 - margin.top - margin.bottom,  // diagram height
+        sankeyWidth = width - 100; // leave room for labels on right
 
     var formatNumber = d3.format("^.2g"),
         svg,
@@ -37,7 +38,7 @@ function FragmentFlows() {
     var sankey = d3.sankey()
         .nodeWidth(20)
         .nodePadding(20)
-        .size([width, height]),
+        .size([sankeyWidth, height]),
         graph = {};
     var defaultFlowPropertyID = 23,
         selectedFlowPropertyID = defaultFlowPropertyID,
@@ -330,11 +331,6 @@ function FragmentFlows() {
             .sort(function (a, b) {
                 return b.dy - a.dy;
             });
-        // Tooltip for links <fragment flow name>
-        //link.append("title")stroke-opacity
-        //    .text(function (d) {
-        //        return getFragmentFlowName(d);
-        //    });
 
         if (rebuild) {
             svg.append("g").attr("id", "nodeGroup");
@@ -372,7 +368,6 @@ function FragmentFlows() {
         //
         node.selectAll("text")
             .transition().duration(transitionTime)
-            .attr("x", -6)
             .attr("y", function (d) {
                 return Math.max(minNodeHeight, d.dy) / 2;
             })
@@ -380,10 +375,7 @@ function FragmentFlows() {
             .attr("text-anchor", "end")
             .attr("transform", null)
             .text(function (d) {
-                return LCA.shortName(getFragmentFlowName(d), 30);
-            })
-            .filter(function (d) {
-                return d.x < width / 2;
+                return getFragmentFlowName(d);
             })
             .attr("x", 6 + sankey.nodeWidth())
             .attr("text-anchor", "start");
@@ -566,15 +558,15 @@ function FragmentFlows() {
     }
 
     /**
-     * Get name of fragment flow associated with current Sankey node or link
+     * Get short name of fragment flow associated with current Sankey node or link
      * @param {Object} data     d3 data at current node or link
      * @return the name
      */
     function getFragmentFlowName(data) {
         var name = "";
         if ("fragmentFlowID" in data) {
-            if ("name" in curFragment.links[data.fragmentFlowID]) {
-                name = curFragment.links[data.fragmentFlowID].name;
+            if ("shortName" in curFragment.links[data.fragmentFlowID]) {
+                name = curFragment.links[data.fragmentFlowID].shortName;
             }
         }
         return name;

@@ -16,7 +16,7 @@ LCA.js and LCA.css contain shared code.
 Copy Visualization folder to a web server host. 
 In IIS, create a web app that points to the Visualization folder.
 
-The base URI for the LCA Tool web API is set at the top of LCA.js. 
+Edit LCA.js - at the top of the file change baseURI setting to the base URI of the web API.
 
 ### Current Status
 
@@ -32,3 +32,5 @@ User selects LCIA Method, Impact Category and Process from drop down selection l
 
 User selects Process from drop down selection list. Front end queries IntermediateFlows web API method with selected processid parameter. A sankey diagram is displayed. The center node represents the selected process. Each intermediate flow is represented by a node and a link to/from the process. Input flows are displayed to the left of the process, while output flows are displayed on the right.
 
+An old prototype of waterfall charts displaying **Contribution Analysis** is also included. It reads data from a json file. 
+A new version will be developed to display LCIA Computation results when that has been implemented server side. The dependency on bootstrap will also be eliminated.

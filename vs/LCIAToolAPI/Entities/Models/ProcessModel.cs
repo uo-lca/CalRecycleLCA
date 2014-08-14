@@ -18,7 +18,7 @@ namespace Entities.Models {
 
         public string Name { get; set; }
 
-        public string Year { get; set; }
+        public string ReferenceYear { get; set; }
 
         public string Geography { get; set; }
 

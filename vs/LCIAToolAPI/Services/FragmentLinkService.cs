@@ -28,14 +28,20 @@ namespace Services {
         private ICollection<LinkMagnitude> GetLinkMagnitudes(FragmentFlow ff, int scenarioID) {
             IEnumerable<FlowFlowProperty> ffpData = ff.Flow.FlowFlowProperties;
             IEnumerable<NodeCache> ncData = ff.NodeCaches;
-            // TODO : error handling in case node cache is not built
+            
             NodeCache nodeCache = ncData.Where(nc => nc.ScenarioID == scenarioID).FirstOrDefault();
-            double flowMagnitude = Convert.ToDouble(nodeCache.FlowMagnitude); 
-            return ffpData.Select(ffp => 
-                    new LinkMagnitude {
-                        FlowPropertyID = Convert.ToInt32(ffp.FlowPropertyID),
-                        Magnitude = flowMagnitude * Convert.ToDouble(ffp.MeanValue)
-                }).ToList();
+            if (nodeCache == null) {
+                return null;
+            }
+            else {
+                double flowMagnitude = Convert.ToDouble(nodeCache.FlowMagnitude);
+                return ffpData.Select(ffp =>
+                        new LinkMagnitude {
+                            FlowPropertyID = Convert.ToInt32(ffp.FlowPropertyID),
+                            Magnitude = flowMagnitude * Convert.ToDouble(ffp.MeanValue)
+                        }).ToList();
+            }
+            
         }
 
         private FragmentLink CreateFragmentLink(FragmentFlow ff, int scenarioID) {
@@ -45,6 +51,7 @@ namespace Services {
             return new FragmentLink {
                 FragmentFlowID = ff.FragmentFlowID,
                 Name = ff.Name,
+                ShortName = ff.ShortName,
                 NodeTypeID = Convert.ToInt32(ff.NodeTypeID),
                 DirectionID = Convert.ToInt32(ff.DirectionID),
                 FlowID = ff.FlowID,

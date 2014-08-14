@@ -1,0 +1,290 @@
+[{
+    "IndicatorType": "Global Warming Air",
+    "Methodology": "TRACI 2.1",
+    "ReferenceQuantity": "kg CO2-Equiv.",
+    "Scenarios": [{
+        "Scenario": "2010 Base Year",
+        "Collection + Waste": 35945437.59,
+        "Reprocessing": 56887872.41,
+        "Use": 512813574.5,
+        "Displaced Use": -507765022.9,
+        "Displaced Prod.": -185352612.7
+    }, {
+        "Scenario": "ReRe",
+        "Collection + Waste": 33164483.71,
+        "Reprocessing": 105282168.8,
+        "Use": 75957482.38,
+        "Displaced Use": -76401504.77,
+        "Displaced Prod.": -308726203.9
+    }, {
+        "Scenario": "MDO",
+        "Collection + Waste": 33164483.71,
+        "Reprocessing": 49654623.73,
+        "Use": 580662627.9,
+        "Displaced Use": -580795905.1,
+        "Displaced Prod.": -143718257.3
+    }, {
+        "Scenario": "RFO",
+        "Collection + Waste": 33164483.71,
+        "Reprocessing": 1387904.628,
+        "Use": 971982747.9,
+        "Displaced Use": -929293149.7,
+        "Displaced Prod.": -204159991.3
+    }]
+}, {
+    "IndicatorType": "Acidification Air",
+    "Methodology": "TRACI 2.0",
+    "ReferenceQuantity": "H+ moles-Equiv.",
+    "Scenarios": [{
+        "Scenario": "2010 Base Year",
+        "Collection + Waste": 12016945.28,
+        "Reprocessing": 22309123.99,
+        "Use": 219298381.3,
+        "Displaced Use": -222069386.1,
+        "Displaced Prod.": -56029233.53
+    }, {
+        "Scenario": "ReRe",
+        "Collection + Waste": 10647054.28,
+        "Reprocessing": 37359215.24,
+        "Use": 4923570.828,
+        "Displaced Use": -5080033.637,
+        "Displaced Prod.": -87737630.49
+    }, {
+        "Scenario": "MDO",
+        "Collection + Waste": 10647054.28,
+        "Reprocessing": 20088681.41,
+        "Use": 318546795.6,
+        "Displaced Use": -318748807.2,
+        "Displaced Prod.": -48218807.98
+    }, {
+        "Scenario": "RFO",
+        "Collection + Waste": 10647054.28,
+        "Reprocessing": 635112.1459,
+        "Use": 108981361.8,
+        "Displaced Use": -129582961.5,
+        "Displaced Prod.": -45985041.16
+    }]
+}, {
+    "IndicatorType": "Eutrophication",
+    "Methodology": "TRACI 2.0",
+    "ReferenceQuantity": "kg N-Equiv.",
+    "Scenarios": [{
+        "Scenario": "2010 Base Year",
+        "Collection + Waste": 14766.8734,
+        "Reprocessing": 9551.785065,
+        "Use": 227501.1605,
+        "Displaced Use": -208556.6274,
+        "Displaced Prod.": -28235.63524
+    }, {
+        "Scenario": "ReRe",
+        "Collection + Waste": 13244.93703,
+        "Reprocessing": 16446.96257,
+        "Use": 2107.252105,
+        "Displaced Use": -1763.42865,
+        "Displaced Prod.": -44057.40484
+    }, {
+        "Scenario": "MDO",
+        "Collection + Waste": 13244.93703,
+        "Reprocessing": 9273.163454,
+        "Use": 315024.1663,
+        "Displaced Use": -314920.9647,
+        "Displaced Prod.": -23885.44266
+    }, {
+        "Scenario": "RFO",
+        "Collection + Waste": 13244.93703,
+        "Reprocessing": 591.3864338,
+        "Use": 196654.7728,
+        "Displaced Use": -46668.61435,
+        "Displaced Prod.": -26538.25599
+    }]
+}, {
+    "IndicatorType": "Ecotoxicity",
+    "Methodology": "TRACI 2.0",
+    "ReferenceQuantity": "CTUeco",
+    "Scenarios": [
+        {
+            "Scenario": "2010 Base Year",
+            "Collection + Waste": 20440217.06,
+            "Reprocessing": 63042149.11,
+            "Use": 58848786.72,
+            "Displaced Use": -17674867.41,
+            "Displaced Prod.": -77337562.26
+  },
+        {
+            "Scenario": "ReRe",
+            "Collection + Waste": 20343920.22,
+            "Reprocessing": 107887217.1,
+            "Use": 499837.6956,
+            "Displaced Use": -510794.8417,
+            "Displaced Prod.": -147591766.1
+  },
+        {
+            "Scenario": "MDO",
+            "Collection + Waste": 20343920.22,
+            "Reprocessing": 58323551.46,
+            "Use": 15740615.34,
+            "Displaced Use": -21306788.32,
+            "Displaced Prod.": -57562642.82
+  },
+        {
+            "Scenario": "RFO",
+            "Collection + Waste": 20343920.22,
+            "Reprocessing": 934384.5223,
+            "Use": 389640109.2,
+            "Displaced Use": -31190485.69,
+            "Displaced Prod.": -63263677.51
+  }
+]
+}, {
+    "IndicatorType": "Human Health Cancer Potential",
+    "Methodology": "TRACI 2.0",
+    "ReferenceQuantity": "cases",
+    "Scenarios": [
+        {
+            "Scenario": "2010 Base Year",
+            "Collection + Waste": 0.254054751,
+            "Reprocessing": 0.04346006,
+            "Use": 0.342029104,
+            "Displaced Use": -0.361869846,
+            "Displaced Prod.": -0.069611159
+  },
+        {
+            "Scenario": "ReRe",
+            "Collection + Waste": 0.253881048,
+            "Reprocessing": 0.113856865,
+            "Use": 0.007200857,
+            "Displaced Use": -0.007199745,
+            "Displaced Prod.": -0.09255871
+  },
+        {
+            "Scenario": "MDO",
+            "Collection + Waste": 0.253881048,
+            "Reprocessing": 0.039577572,
+            "Use": 0.510446431,
+            "Displaced Use": -0.543953103,
+            "Displaced Prod.": -0.06624462
+  },
+        {
+            "Scenario": "RFO",
+            "Collection + Waste": 0.253881048,
+            "Reprocessing": 0.002363425,
+            "Use": 0.101828038,
+            "Displaced Use": -0.088349734,
+            "Displaced Prod.": -0.057303921
+  }
+]
+}, {
+    "IndicatorType": "Human Health Non Cancer Potential",
+    "Methodology": "TRACI 2.0",
+    "ReferenceQuantity": "cases",
+    "Scenarios": [
+        {
+            "Scenario": "2010 Base Year",
+            "Collection + Waste": 0.907677549,
+            "Reprocessing": 3.054740308,
+            "Use": 59.10972494,
+            "Displaced Use": -12.5345783,
+            "Displaced Prod.": -8.894317459
+  },
+        {
+            "Scenario": "ReRe",
+            "Collection + Waste": 0.899324001,
+            "Reprocessing": 5.410182012,
+            "Use": 0.465574564,
+            "Displaced Use": -0.476227616,
+            "Displaced Prod.": -14.36759443
+  },
+        {
+            "Scenario": "MDO",
+            "Collection + Waste": 0.899324001,
+            "Reprocessing": 2.754267734,
+            "Use": 22.94493856,
+            "Displaced Use": -18.53899058,
+            "Displaced Prod.": -7.464600668
+  },
+        {
+            "Scenario": "RFO",
+            "Collection + Waste": 0.899324001,
+            "Reprocessing": 0.055192812,
+            "Use": 354.7160988,
+            "Displaced Use": -4.314301943,
+            "Displaced Prod.": -7.55918282
+  }
+]
+}, {
+    "IndicatorType": "Human Health Criteria Air",
+    "Methodology": "TRACI 2.0",
+    "ReferenceQuantity": "kg PM10-Equiv.",
+    "Scenarios": [
+        {
+            "Scenario": "2010 Base Year",
+            "Collection + Waste": 39015.68733,
+            "Reprocessing": 70668.94384,
+            "Use": 713042.2002,
+            "Displaced Use": -668510.7111,
+            "Displaced Prod.": -220110.1006
+  },
+        {
+            "Scenario": "ReRe",
+            "Collection + Waste": 36180.42549,
+            "Reprocessing": 117814.7617,
+            "Use": 12604.68231,
+            "Displaced Use": -13982.58306,
+            "Displaced Prod.": -389771.7388
+  },
+        {
+            "Scenario": "MDO",
+            "Collection + Waste": 36180.42549,
+            "Reprocessing": 63904.00497,
+            "Use": 961905.5631,
+            "Displaced Use": -962319.1521,
+            "Displaced Prod.": -176775.7095
+  },
+        {
+            "Scenario": "RFO",
+            "Collection + Waste": 36180.42549,
+            "Reprocessing": 1775.449861,
+            "Use": 743102.3242,
+            "Displaced Use": -379441.8262,
+            "Displaced Prod.": -166982.1879
+  }
+]
+}, {
+    "IndicatorType": "Smog Creation",
+    "Methodology": "TRACI 2.0",
+    "ReferenceQuantity": "kg O3-Equiv.",
+    "Scenarios": [
+        {
+            "Scenario": "2010 Base Year",
+            "Collection + Waste": 4355247.931,
+            "Reprocessing": 1022603.854,
+            "Use": 117151961.8,
+            "Displaced Use": -117155289.1,
+            "Displaced Prod.": -10161896.39
+  },
+        {
+            "Scenario": "ReRe",
+            "Collection + Waste": 3558181.672,
+            "Reprocessing": 2051504.153,
+            "Use": 1158910.578,
+            "Displaced Use": -956301.0094,
+            "Displaced Prod.": -12561216.97
+  },
+        {
+            "Scenario": "MDO",
+            "Collection + Waste": 3558181.672,
+            "Reprocessing": 800766.9531,
+            "Use": 177128585.6,
+            "Displaced Use": -177067770.6,
+            "Displaced Prod.": -9549016.097
+  },
+        {
+            "Scenario": "RFO",
+            "Collection + Waste": 3558181.672,
+            "Reprocessing": 74622.60538,
+            "Use": 24388692.22,
+            "Displaced Use": -25444035.59,
+            "Displaced Prod.": -10093577.94
+  }
+]
+}]

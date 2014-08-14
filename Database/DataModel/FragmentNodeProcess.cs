@@ -9,6 +9,10 @@ namespace LcaDataModel
     [Table("FragmentNodeProcess")]
     public partial class FragmentNodeProcess
     {
+        public FragmentNodeProcess() {
+            ProcessSubstitutions = new HashSet<ProcessSubstitution>();
+        } 
+        
         [DatabaseGenerated(DatabaseGeneratedOption.None)]
         public int FragmentNodeProcessID { get; set; }
 
@@ -23,5 +27,8 @@ namespace LcaDataModel
         public virtual FragmentFlow FragmentFlow { get; set; }
 
         public virtual Process Process { get; set; }
+        
+        public virtual ICollection<ProcessSubstitution> ProcessSubstitutions { get; set; }
+
     }
 }
