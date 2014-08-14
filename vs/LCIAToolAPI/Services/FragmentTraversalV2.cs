@@ -359,6 +359,28 @@ namespace Services
 
 
                     break;
+                case 3:
+                case 4: //InputOutput and Background
+
+                    var updatedirection = theFragmentFlow.Select(x => x.DirectionID).FirstOrDefault();
+                   
+                        switch (updatedirection)
+                        {
+                            case 1:
+                                updatedirection= 2;
+                                break;
+                            case 2:
+                                updatedirection = 1;
+                                break;
+                        }
+
+                    nodeFlowModel = theFragmentFlow.Select(t => new NodeFlowModel
+                    {
+                        FlowID = t.FlowID,
+                        DirectionID = updatedirection,
+                        Result = 1
+                    });
+                    break;
                 case 2: //fragment
 
                     //get the sub fragment
@@ -446,16 +468,7 @@ namespace Services
              });
 
                     break;
-                case 3:
-                case 4: //InputOutput and Background
-
-                    nodeFlowModel = theFragmentFlow.Select(t => new NodeFlowModel
-                    {
-                        FlowID = t.FlowID,
-                        DirectionID = t.DirectionID,
-                        Result = 1
-                    });
-                    break;
+               
             }
 
             return nodeFlowModel;
