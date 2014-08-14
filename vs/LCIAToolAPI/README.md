@@ -6,7 +6,9 @@ Domain logic and web API are implemented here.
 Deployment Instructions
 -----------------------
 1. Build solution (..\CalRecycleLCA.sln), Release configuration
-2. Publish project, LCIAToolAPI. A publishing profile must first be configured. FTP is used at UCSB to publish to a test server. The profile is saved as LCIAToolAPI\Properties\PublishProfiles\kbcalr.pubxml
+2. Publish project, LCIAToolAPI. A publishing profile must first be configured. FTP is used at UCSB to publish to a test server. The profile is saved as LCIAToolAPI\Properties\PublishProfiles\kbcalr.pubxml.
+4. Edit web.config in the publish destination. In the connection string with name=UsedOilLCAContext, change the Data Source to the name of the server hosting a deployed database (see database deployment instructions in ..\..\Database\README).
+4. In the deployed database, add user IIS APPPOOL\DefaultAppPool and grant it connect, read, and write privileges to the database.
 
 Usage Instructions
 ------------------
