@@ -405,7 +405,7 @@ function contributionAnalysis() {
         jqSelect.selectpicker("refresh");
         jqSelect.selectpicker("val", "Global Warming Air");
         jqSelect.selectpicker("refresh");
-
+        onSelectChange();
     }
 
     function init() {
