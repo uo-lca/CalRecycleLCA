@@ -600,8 +600,8 @@ The following tables are required:
 
     * DocID
 
-   ProcessSubstitution - NEW TABLE - PROVISIONAL
-    * ProcessSubstitutionID
+   ProcessSubstitution 
+    X ProcessSubstitutionID - Not Needed - primary key is composite (FragmentNodeProcessID, ScenarioID)
     * ScenarioID (FK to Scenario)
     * FragmentNodeProcessID (FK)
     * ProcessID (FK)
@@ -609,8 +609,8 @@ The following tables are required:
     It is a scenario design constraint that the substituted ProcessID must
     have the same list of product flows as the original ProcessID.
 
-   FragmentSubstitution - NEW TABLE - PROVISIONAL
-    * FragmentSubstitutionID
+   FragmentSubstitution 
+    X FragmentSubstitutionID   - Not Needed - primary key is composite (FragmentNodeFragmentID, ScenarioID)
     * ScenarioID (FK to Scenario)
     * FragmentNodeFragmentID (FK)
     * SubFragmentID (FK)

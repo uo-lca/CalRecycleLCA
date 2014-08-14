@@ -29,7 +29,8 @@ namespace Services
                 Name = p.Name,
                 ProcessTypeID = Convert.ToInt32(p.ProcessTypeID),
                 ReferenceTypeID = p.ReferenceTypeID,
-                ReferenceFlowID = p.ReferenceFlowID
+                ReferenceFlowID = p.ReferenceFlowID,
+                ReferenceYear = p.ReferenceYear
             }).ToList();
         }
     }
