@@ -60,17 +60,21 @@ namespace LcaDataLoader {
         private static bool ImportClassification(Row row, DbContextWrapper dbContext) {
             bool isImported = false;
             string uuid = row["UUID"];
+            int id = Convert.ToInt32(row["ClassificationID"]);
             ILCDEntity ilcdEntity = dbContext.GetIlcdEntity(uuid);
-            if (dbContext.IlcdUuidExists(uuid)) {
-                Classification obj = dbContext.CreateEntityWithID<Classification>(Convert.ToInt32(row["ClassificationID"])); 
-                if (obj != null) {
-                    obj.ILCDEntity = ilcdEntity;
-                    obj.CategoryID = Convert.ToInt32(row["CategoryID"]);
-                }
-                isImported = (dbContext.SaveChanges() > 0);
-            }
-            else {
+            if (ilcdEntity == null) {
                 Program.Logger.ErrorFormat("Classification UUID {0} not found. Skipping record.", uuid);
+            } else {
+                if (dbContext.EntityIdExists<Classification>(id)) {
+                    Program.Logger.WarnFormat("Classification ID {0} exists. Skipping record.", id);
+                } else {
+                    Classification obj = new Classification {
+                        ClassificationID = id,
+                        ILCDEntityID = ilcdEntity.ILCDEntityID,
+                        CategoryID = Convert.ToInt32(row["CategoryID"])
+                    };
+                    isImported = dbContext.AddEntity(obj);
+                }
             }
             return isImported;
         }
@@ -428,7 +432,10 @@ namespace LcaDataLoader {
                 ImportAppendCSV(dirName, "FlowPropertyEmission", ImportFlowPropertyEmission, dbContext);
                 ImportAppendCSV(dirName, "ProcessDissipation", ImportProcessDissipation, dbContext);
                 // Import Classification last because it references UUIDs in other files
+                // Improve performance by disabling AutoDetectChanges and only executing Adds (no updates).
+                dbContext.SetAutoDetectChanges(false);
                 ImportAppendCSV(dirName, "Classification", ImportClassification, dbContext);
+                dbContext.SetAutoDetectChanges(true);
             }
             else {
                 Program.Logger.WarnFormat("Append folder, {0}, does not exist.", dirName);
