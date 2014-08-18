@@ -209,8 +209,17 @@ namespace Services
                 }
             }
 
+            double? nodeScale;
+            if (inFlow.Select(x => x.Result).FirstOrDefault() == 0)
+            {
+                throw new ArgumentException("The inflow result cannot be 0");
+            }
+            else
+            {
+                nodeScale = 1 / inFlow.Select(x => x.Result).FirstOrDefault();
+            }
 
-            double? nodeScale = 1 / inFlow.Select(x => x.Result).FirstOrDefault();
+            
             double? nodeWeight = flowMagnitude * nodeConv * nodeScale;
 
             //do not save to NodeCache and abandon recursion if nodeweight == 0
@@ -287,41 +296,21 @@ namespace Services
                 {
                     foreach (var item in outFlows)
                     {
-
-                        try
+                        double outflowMagnitude = Convert.ToDouble(nodeWeight * item.Result);
+                        int outflowScenarioId = Convert.ToInt32(item.ScenarioID);
+                        int outflowFragmentFlowID = Convert.ToInt32(item.FragmentFlowID);
+                        if (item.ParamValue == null)
                         {
-                            double outflowMagnitude = Convert.ToDouble(nodeWeight * item.Result);
-                            int outflowScenarioId = Convert.ToInt32(item.ScenarioID);
-                            int outflowFragmentFlowID = Convert.ToInt32(item.FragmentFlowID);
-
-                            if (item.ParamValue != null)
-                            {
-                                item.Result = item.ParamValue;
-                            }
-
+                            throw new ArgumentNullException("This value cannot be null.");
+                        }
+                        else
+                        {
+                            item.Result = item.ParamValue;
                             NodeRecurse(outflowFragmentFlowID, outflowScenarioId, outflowMagnitude);
                         }
-                        catch (ArgumentNullException e)
-                        {
-                            throw new ArgumentNullException("This value cannot be null.", e);
-                        }
-
-
-
                     }
                 }
             }
-
-
-
-
-
-
-
-
-
-
-
 
         }
 
