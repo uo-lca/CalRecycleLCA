@@ -139,7 +139,7 @@
     <Compile Include="Models\FragmentFlowModel.cs" />
     <Compile Include="Models\FragmentLink.cs" />
     <Compile Include="Models\ScenarioProductFlowModel.cs" />
-    <Compile Include="Models\OutFlowModel.cs" />
+    <Compile Include="Models\TestOutFlowModel.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
