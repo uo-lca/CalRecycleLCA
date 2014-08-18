@@ -7,11 +7,13 @@ Deployment Instructions
 -----------------------
 1. Build solution (..\CalRecycleLCA.sln), Release configuration
 2. Publish project, LCIAToolAPI. A publishing profile must first be configured. FTP is used at UCSB to publish to a test server. The profile is saved as LCIAToolAPI\Properties\PublishProfiles\kbcalr.pubxml.
-4. Edit web.config in the publish destination. In the connection string with name=UsedOilLCAContext, change the Data Source to the name of the server hosting a deployed database (see database deployment instructions in ..\..\Database\README).
+3. Edit web.config in the publish destination. In the connection string with name=UsedOilLCAContext, change the Data Source to the name of the server hosting a deployed database (see database deployment instructions in ..\..\Database\README).
 4. In the deployed database, add user IIS APPPOOL\DefaultAppPool and grant it connect, read, and write privileges to the database.
+5. Restart the published web app in IIS.
 
 Usage Instructions
 ------------------
+
 The URL for the web API is the publish URL + /api/ + resource
 
 
@@ -23,6 +25,24 @@ GET         | api/fragments/{id}/links    | List links for sankey diagram of fra
 GET         | api/fragments/{id}/flows    | List flows used in fragment with FragmentID = {id}
 GET         | api/fragments/{id}/flowproperties    | List flow properties associated with fragment having FragmentID = {id}
 GET         | api/processes    | List all processes
+
+Prime fragment node cache by listing all fragment links.
+
+Example:
+<pre><code>
+http://kbcalr.isber.ucsb.edu/api/fragments/1/links
+http://kbcalr.isber.ucsb.edu/api/fragments/2/links
+http://kbcalr.isber.ucsb.edu/api/fragments/3/links
+http://kbcalr.isber.ucsb.edu/api/fragments/4/links
+http://kbcalr.isber.ucsb.edu/api/fragments/5/links
+http://kbcalr.isber.ucsb.edu/api/fragments/6/links
+http://kbcalr.isber.ucsb.edu/api/fragments/7/links
+http://kbcalr.isber.ucsb.edu/api/fragments/8/links
+http://kbcalr.isber.ucsb.edu/api/fragments/9/links
+http://kbcalr.isber.ucsb.edu/api/fragments/10/links
+http://kbcalr.isber.ucsb.edu/api/fragments/11/links
+http://kbcalr.isber.ucsb.edu/api/fragments/12/links
+</pre></code>
 
 ### Output
 
