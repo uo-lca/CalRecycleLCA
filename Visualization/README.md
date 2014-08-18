@@ -20,8 +20,8 @@ Edit LCA.js - at the top of the file change baseURI setting to the base URI of t
 
 ### Current Status
 
-A new web page, **FragmentFlows**, is being developed. 
-It will use a new version of the web API, also in development.
+A new web page, **FragmentFlows**, has been developed. 
+It uses a new version of the web API. See description in ../vs/LCIAToolAPI/README
 The following pages currently depend on the old version of web API (published at CalRecycle).
 
 #### LciaComputation
