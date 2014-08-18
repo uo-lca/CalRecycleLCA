@@ -213,99 +213,102 @@ namespace Services
             double? nodeScale = 1 / inFlow.Select(x => x.Result).FirstOrDefault();
             double? nodeWeight = flowMagnitude * nodeConv * nodeScale;
 
-
-            var nodeCache = new NodeCache
+            //do not save to NodeCache and abandon recursion if nodeweight == 0
+            if (nodeWeight != 0)
             {
-                FragmentFlowID = fragmentFlowId,
-                ScenarioID = scenarioId,
-                FlowMagnitude = flowMagnitude,
-                NodeWeight = nodeWeight
-            };
-            _nodeCacheService.InsertGraph(nodeCache);
-            _unitOfWork.Save();
-
-            var outFlows = _fragmentFlowService.Query().Get()
-                .Where(x => x.ParentFragmentFlowID == fragmentFlowId)
-                .GroupJoin(nodeFlows // Target table
-, ff => ff.FlowID
-, nf => nf.FlowID
-, (ff, nf) => new { fragmentflows = ff, nodeFlows = nf })
-.SelectMany(s => s.nodeFlows.DefaultIfEmpty()
-, (s, nodeflows) => new
-{
-    FragmentFlowID = s.fragmentflows.FragmentFlowID,
-    FlowID = s.fragmentflows.FlowID,
-    FFDirectionID = s.fragmentflows.DirectionID,
-    NFDirectionID = nodeflows.DirectionID,
-    Result = nodeflows.Result,
-    ParentFragmentFlowID = s.fragmentflows.ParentFragmentFlowID
-})
-
-.GroupJoin(_dependencyParamService.Query().Get() // Target table
-                , ff => ff.FragmentFlowID
-                , dp => dp.FragmentFlowID
-                , (ff, dp) => new { fragmentflows = ff, dependencyparams = dp })
-                .SelectMany(s => s.dependencyparams.DefaultIfEmpty()
-                , (s, dependencyparams) => new
+                var nodeCache = new NodeCache
                 {
-                    FragmentFlowID = s.fragmentflows.FragmentFlowID,
-                    FlowID = s.fragmentflows.FlowID,
-                    FFDirectionID = s.fragmentflows.FFDirectionID,
-                    NFDirectionID = s.fragmentflows.NFDirectionID,
-                    Result = s.fragmentflows.Result,
-                    ParamID = dependencyparams == null ? -1 : dependencyparams.ParamID,
-                    ParamValue = dependencyparams == null ? 0 : dependencyparams.Value,
-                    ParentFragmentFlowID = s.fragmentflows.ParentFragmentFlowID
-                })
+                    FragmentFlowID = fragmentFlowId,
+                    ScenarioID = scenarioId,
+                    FlowMagnitude = flowMagnitude,
+                    NodeWeight = nodeWeight
+                };
+                _nodeCacheService.InsertGraph(nodeCache);
+                _unitOfWork.Save();
 
-.GroupJoin(_scenarioParamService.Query().Get() // Target table
-                , dp => dp.ParamID
-                , sp => sp.ParamID
-                , (dp, sp) => new { dependencyParams = dp, scenarioParams = sp })
-                .SelectMany(s => s.scenarioParams.DefaultIfEmpty()
-                , (s, scenarioparams) => new TestOutFlowModel
-                {
-                    ScenarioID = scenarioparams == null ? 1 : scenarioparams.ScenarioID,
-                    FragmentFlowID = s.dependencyParams.FragmentFlowID,
-                    FlowID = s.dependencyParams.FlowID,
-                    FFDirectionID = s.dependencyParams.FFDirectionID,
-                    NFDirectionID = s.dependencyParams.NFDirectionID,
-                    Result = s.dependencyParams.Result,
-                    ParamID = s.dependencyParams.ParamID,
-                    ParamValue = s.dependencyParams.ParamValue,
-                    ParentFragmentFlowID = s.dependencyParams.ParentFragmentFlowID
-                }).ToList()
+                var outFlows = _fragmentFlowService.Query().Get()
+                    .Where(x => x.ParentFragmentFlowID == fragmentFlowId)
+                    .GroupJoin(nodeFlows // Target table
+    , ff => ff.FlowID
+    , nf => nf.FlowID
+    , (ff, nf) => new { fragmentflows = ff, nodeFlows = nf })
+    .SelectMany(s => s.nodeFlows.DefaultIfEmpty()
+    , (s, nodeflows) => new
+    {
+        FragmentFlowID = s.fragmentflows.FragmentFlowID,
+        FlowID = s.fragmentflows.FlowID,
+        FFDirectionID = s.fragmentflows.DirectionID,
+        NFDirectionID = nodeflows.DirectionID,
+        Result = nodeflows.Result,
+        ParentFragmentFlowID = s.fragmentflows.ParentFragmentFlowID
+    })
 
-
-.Where(x => x.FFDirectionID == x.NFDirectionID);
-            //.Where(x => x.ScenarioID == scenarioId)
-
-
-            if (outFlows != null)
-            {
-                foreach (var item in outFlows)
-                {
-
-                    try
+    .GroupJoin(_dependencyParamService.Query().Get() // Target table
+                    , ff => ff.FragmentFlowID
+                    , dp => dp.FragmentFlowID
+                    , (ff, dp) => new { fragmentflows = ff, dependencyparams = dp })
+                    .SelectMany(s => s.dependencyparams.DefaultIfEmpty()
+                    , (s, dependencyparams) => new
                     {
-                        double outflowMagnitude = Convert.ToDouble(nodeWeight * item.Result);
-                        int outflowScenarioId = Convert.ToInt32(item.ScenarioID);
-                        int outflowFragmentFlowID = Convert.ToInt32(item.FragmentFlowID);
+                        FragmentFlowID = s.fragmentflows.FragmentFlowID,
+                        FlowID = s.fragmentflows.FlowID,
+                        FFDirectionID = s.fragmentflows.FFDirectionID,
+                        NFDirectionID = s.fragmentflows.NFDirectionID,
+                        Result = s.fragmentflows.Result,
+                        ParamID = dependencyparams == null ? -1 : dependencyparams.ParamID,
+                        ParamValue = dependencyparams == null ? 0 : dependencyparams.Value,
+                        ParentFragmentFlowID = s.fragmentflows.ParentFragmentFlowID
+                    })
 
-                        if (item.ParamValue != null)
+    .GroupJoin(_scenarioParamService.Query().Get() // Target table
+                    , dp => dp.ParamID
+                    , sp => sp.ParamID
+                    , (dp, sp) => new { dependencyParams = dp, scenarioParams = sp })
+                    .SelectMany(s => s.scenarioParams.DefaultIfEmpty()
+                    , (s, scenarioparams) => new TestOutFlowModel
+                    {
+                        ScenarioID = scenarioparams == null ? 1 : scenarioparams.ScenarioID,
+                        FragmentFlowID = s.dependencyParams.FragmentFlowID,
+                        FlowID = s.dependencyParams.FlowID,
+                        FFDirectionID = s.dependencyParams.FFDirectionID,
+                        NFDirectionID = s.dependencyParams.NFDirectionID,
+                        Result = s.dependencyParams.Result,
+                        ParamID = s.dependencyParams.ParamID,
+                        ParamValue = s.dependencyParams.ParamValue,
+                        ParentFragmentFlowID = s.dependencyParams.ParentFragmentFlowID
+                    }).ToList()
+
+
+    .Where(x => x.FFDirectionID == x.NFDirectionID);
+                //.Where(x => x.ScenarioID == scenarioId)
+
+
+                if (outFlows != null)
+                {
+                    foreach (var item in outFlows)
+                    {
+
+                        try
                         {
-                            item.Result = item.ParamValue;
+                            double outflowMagnitude = Convert.ToDouble(nodeWeight * item.Result);
+                            int outflowScenarioId = Convert.ToInt32(item.ScenarioID);
+                            int outflowFragmentFlowID = Convert.ToInt32(item.FragmentFlowID);
+
+                            if (item.ParamValue != null)
+                            {
+                                item.Result = item.ParamValue;
+                            }
+
+                            NodeRecurse(outflowFragmentFlowID, outflowScenarioId, outflowMagnitude);
+                        }
+                        catch (ArgumentNullException e)
+                        {
+                            throw new ArgumentNullException("This value cannot be null.", e);
                         }
 
-                        NodeRecurse(outflowFragmentFlowID, outflowScenarioId, outflowMagnitude);
+
+
                     }
-                    catch (ArgumentNullException e)
-                    {
-                        throw new ArgumentNullException("This value cannot be null.", e);
-                    }
-
-
-
                 }
             }
 
@@ -363,16 +366,16 @@ namespace Services
                 case 4: //InputOutput and Background
 
                     var updatedirection = theFragmentFlow.Select(x => x.DirectionID).FirstOrDefault();
-                   
-                        switch (updatedirection)
-                        {
-                            case 1:
-                                updatedirection= 2;
-                                break;
-                            case 2:
-                                updatedirection = 1;
-                                break;
-                        }
+
+                    switch (updatedirection)
+                    {
+                        case 1:
+                            updatedirection = 2;
+                            break;
+                        case 2:
+                            updatedirection = 1;
+                            break;
+                    }
 
                     nodeFlowModel = theFragmentFlow.Select(t => new NodeFlowModel
                     {
@@ -406,9 +409,9 @@ namespace Services
 
                     var fragmentNodeFlows = _fragmentFlowService.Query().Get()
                          .Where(x => x.FragmentFlowID == theFragmentFlow.Select(y => y.FragmentFlowID).FirstOrDefault())
-                         //.Where(x => x.FragmentID == fragmentId)
+                        //.Where(x => x.FragmentID == fragmentId)
                         .Join(_fragmentNodeFragmentService.Query().Get(), p => p.FragmentFlowID, pc => pc.FragmentFlowID, (p, pc) => new { p, pc })
-                       
+
                         .Join(_fragmentService.Query().Get(), p => p.pc.SubFragmentID, pc => pc.FragmentID, (p, pc) => new { p, pc })
                          .Select(a => new NodeFlowModel
                     {
@@ -418,18 +421,18 @@ namespace Services
                         FragmentID = a.p.p.FragmentID,
                         NodeTypeID = a.p.p.NodeTypeID
                     })
-                    
+
                     .Union(_fragmentFlowService.Query().Get().Select(
                     b => new NodeFlowModel
                     {
                         FragmentFlowID = b.FragmentFlowID,
                         FlowID = b.FlowID,
-                        DirectionID = b.DirectionID, 
+                        DirectionID = b.DirectionID,
                         FragmentID = b.FragmentID,
                         NodeTypeID = b.NodeTypeID
                     })
                     .Where(x => x.FragmentID == subFragmentId && x.NodeTypeID == 3));
-                    
+
 
                     // next we need to modify the table to fix the reference flow (FlowID = null) and
                     // make it appear like an InputOutput flow
@@ -469,7 +472,7 @@ namespace Services
              });
 
                     break;
-               
+
             }
 
             return nodeFlowModel;
