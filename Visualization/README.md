@@ -24,6 +24,16 @@ A new web page, **FragmentFlows**, has been developed.
 It uses a new version of the web API. See description in ../vs/LCIAToolAPI/README
 The following pages currently depend on the old version of web API (published at CalRecycle).
 
+#### FragmentFlows
+Sankey diagram of fragment flows.
+12 fragments have been defined. The web page defaults to fragmentID=6. 
+
+Start with a different fragment by adding a fragmentid URL variable. Example:
+`http://publictest.calrecycle.ca.gov/LCIAToolVisualization/FragmentFlows.html?fragmentid=2`
+
+Navigate to another fragment by clicking on a node with fragment type (node type is shown on hover). 
+
+
 #### LciaComputation
 
 User selects LCIA Method, Impact Category and Process from drop down selection lists. LCIA computation is performed and the total impact score is displayed. A stacked bar chart displays the associated elementary flows, where the size of each flow is proportional to the flow's positive contribution to the total score.
