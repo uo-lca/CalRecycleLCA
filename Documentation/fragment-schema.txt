@@ -533,9 +533,12 @@ The following tables are required:
     * DocID
 
    DistributionParam
-    * DistributionParamID
-    * DependencyParamID (FK to DependencyParam, ParamTypeID must be 3)
-    * ConservationParamID (FK to DependencyParam, ParamTypeID must be 2)
+    X DistributionParamID - not needed
+    * DependencyParamID (FK to DependencyParamID)
+    * ConservationDependencyParamID (FK to DependencyParamID)
+
+      note: both DependencyParamID and ConservationDependencyParamID must
+      have the same ParamID [with ParamTypeID=2]
 
     * DocID
 
