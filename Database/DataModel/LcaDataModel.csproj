@@ -115,6 +115,10 @@
     <Compile Include="Migrations\201408122338021_SubstitutionTables.Designer.cs">
       <DependentUpon>201408122338021_SubstitutionTables.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\201408192235574_IX_ILCDEntity_UUID_Version.cs" />
+    <Compile Include="Migrations\201408192235574_IX_ILCDEntity_UUID_Version.Designer.cs">
+      <DependentUpon>201408192235574_IX_ILCDEntity_UUID_Version.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="NodeCache.cs" />
     <Compile Include="NodeDissipationParam.cs" />
@@ -177,6 +181,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\201408122338021_SubstitutionTables.resx">
       <DependentUpon>201408122338021_SubstitutionTables.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201408192235574_IX_ILCDEntity_UUID_Version.resx">
+      <DependentUpon>201408192235574_IX_ILCDEntity_UUID_Version.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
