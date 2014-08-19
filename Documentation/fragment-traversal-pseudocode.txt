@@ -63,8 +63,17 @@ success = NodeRecurse( fragment_flow_id, scenario_id, flow_magnitude )
 
   }
 
+  if inflow.Result == 0
+    catch exception!
   node_scale = 1 / inflow.Result;
   node_weight = flow_magnitude * node_conv * node_scale;
+
+  if node_weight == 0
+  {
+    // no need to go further
+    success = true;
+    return;
+  }
 
   SetNodeCache( fragment_flow_id, scenario_id, flow_magnitude, node_weight );
   
