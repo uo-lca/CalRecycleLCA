@@ -17,12 +17,23 @@ namespace Services {
     public class FragmentLinkService : IFragmentLinkService {
         [Inject]
         private readonly IFragmentFlowService _fragmentFlowService;
+        [Inject]
+        private readonly IFragmentTraversalV2 _fragmentTraversalV2;
 
-        public FragmentLinkService(IFragmentFlowService fragmentFlowService) {
+        public FragmentLinkService(IFragmentFlowService fragmentFlowService,
+            IFragmentTraversalV2 fragmentTraversalV2) {
             if (fragmentFlowService == null) {
                 throw new ArgumentNullException("fragmentFlowService is null");
             }
             _fragmentFlowService = fragmentFlowService;
+
+            if (fragmentTraversalV2 == null)
+            {
+                throw new ArgumentNullException("fragmentTraversalV2 is null");
+            }
+            _fragmentTraversalV2 = fragmentTraversalV2;
+
+
         }
 
         private ICollection<LinkMagnitude> GetLinkMagnitudes(FragmentFlow ff, int scenarioID) {
@@ -57,7 +68,7 @@ namespace Services {
                 FlowID = ff.FlowID,
                 ParentFragmentFlowID = ff.ParentFragmentFlowID,
                 ProcessID = (ff.NodeTypeID == 1) ? ff.FragmentNodeProcesses.FirstOrDefault().FragmentNodeProcessID : nullID,
-                SubFragmentID = (ff.NodeTypeID == 2) ? ff.FragmentNodeFragments.FirstOrDefault().FragmentNodeFragmentID : nullID,
+                SubFragmentID = (ff.NodeTypeID == 2) ? ff.FragmentNodeFragments.FirstOrDefault().SubFragmentID : nullID,
                 LinkMagnitudes = (ff.FlowID == null) ? null : GetLinkMagnitudes(ff, scenarioID)
             };
         }
@@ -69,6 +80,7 @@ namespace Services {
         /// <param name="scenarioID">ScenarioID filter for NodeCache</param>
         /// <returns>List of FragmentLink objects</returns>
         public IEnumerable<FragmentLink> GetFragmentLinks(int fragmentID, int scenarioID) {
+            _fragmentTraversalV2.Traverse(fragmentID, scenarioID);
             IEnumerable<FragmentFlow> ffData = _fragmentFlowService.GetFragmentFlows(fragmentID);
             return ffData.Select(ff => CreateFragmentLink(ff, scenarioID)).ToList();
         }

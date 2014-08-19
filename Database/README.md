@@ -21,6 +21,16 @@ Option                     | Description
 
 The default root path is current directory. If no options are selected, the app will list options and exit.
 
+Package Dependencies
+--------------------
+The projects in this folder depend on the following NuGet Packages. 
+* CSV Reader
+* EntityFramework
+* log4net
+* NDesk.Options
+
+They are included in packages.config files and should be installed automatically at the start of the first build.
+
 Deployment Instructions
 -----------------------
 1. Build solution (..\CalRecycleLCA.sln), Release configuration

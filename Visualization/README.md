@@ -20,9 +20,19 @@ Edit LCA.js - at the top of the file change baseURI setting to the base URI of t
 
 ### Current Status
 
-A new web page, **FragmentFlows**, is being developed. 
-It will use a new version of the web API, also in development.
+A new web page, **FragmentFlows**, has been developed. 
+It uses a new version of the web API. See description in ../vs/LCIAToolAPI/README
 The following pages currently depend on the old version of web API (published at CalRecycle).
+
+#### FragmentFlows
+Sankey diagram of fragment flows.
+12 fragments have been defined. The web page defaults to fragmentID=6. 
+
+Start with a different fragment by adding a fragmentid URL variable. Example:
+`http://publictest.calrecycle.ca.gov/LCIAToolVisualization/FragmentFlows.html?fragmentid=2`
+
+Navigate to another fragment by clicking on a node with fragment type (node type is shown on hover). 
+
 
 #### LciaComputation
 

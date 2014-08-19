@@ -73,6 +73,16 @@ namespace LcaDataLoader {
             _DbContext.Database.Initialize(false);
         }
 
+        /// <summary>
+        /// Enable/disable automatic detection of changes by Entity Framework.
+        /// Disable to improve performance of Adds. 
+        /// Enable whenever objects are updated.
+        /// </summary>
+        /// <param name="enabled">set to true to enable, false to disable</param>
+        public void SetAutoDetectChanges(bool enabled) {
+            _DbContext.Configuration.AutoDetectChangesEnabled = enabled;
+        }
+
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public int GetCurrentIlcdDataProviderID() {
             return _CurrentIlcdDataProviderID;
@@ -354,7 +364,7 @@ namespace LcaDataLoader {
         /// Use this method to check if an ILCDEntity with given UUID already exists in the database
         /// </summary>
         /// <param name="uuid">The UUID value</param>
-        /// <returns>true iff found</returns>
+        /// <returns>Instance of ILCDEntity if found, otherwise null</returns>
         public ILCDEntity GetIlcdEntity(string uuid) {
             ILCDEntity entity = (from il in _DbContext.ILCDEntities where il.UUID == uuid select il).FirstOrDefault();
             return entity;
