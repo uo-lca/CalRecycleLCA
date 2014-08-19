@@ -25,12 +25,15 @@ namespace LcaDataLoader {
         /// <param name="ilcdSourceName">Name of ILCD data source</param>
         /// <param name="dbContext">Shared instance of DbContextWrapper</param>
         public void LoadAll(string dirName, string ilcdSourceName, DbContextWrapper dbContext) {
-            if (dbContext.CreateDataProvider(dirName, ilcdSourceName) != null) { 
+            if (dbContext.CreateDataProvider(dirName, ilcdSourceName) != null) {
+                // Improve load performance by disabling AutoDetectChanges.
+                dbContext.SetAutoDetectChanges(false);
                 LoadDataType(Path.Combine(dirName, "unitgroups"), dbContext);
                 LoadDataType(Path.Combine(dirName, "flowproperties"), dbContext);
                 LoadDataType(Path.Combine(dirName, "flows"), dbContext);
                 LoadDataType(Path.Combine(dirName, "LCIAmethods"), dbContext);
                 LoadDataType(Path.Combine(dirName, "processes"), dbContext);
+                dbContext.SetAutoDetectChanges(true);
             }
         }
 
