@@ -63,8 +63,17 @@ success = NodeRecurse( fragment_flow_id, scenario_id, flow_magnitude )
 
   }
 
+  if inflow.Result == 0
+    catch exception!
   node_scale = 1 / inflow.Result;
   node_weight = flow_magnitude * node_conv * node_scale;
+
+  if node_weight == 0
+  {
+    // no need to go further
+    success = true;
+    return;
+  }
 
   SetNodeCache( fragment_flow_id, scenario_id, flow_magnitude, node_weight );
   
@@ -155,31 +164,34 @@ node_flows = GetScenarioProductFlows ( the_fragment_flow, scenario_id)
       // pull cache values 
       // in SQL it's a bit complicated:
       // first we make a table of flows with cache values:
-      node_flows = SELECT ff.FlowID AS FlowID,
-                          ff.DirectionID AS DirectionID,
-                          nc.FlowMagnitude AS FlowMagnitude,
-                          fnf.FlowID AS RefFlowID
-                   FROM FragmentFlow ff
-                   INNER JOIN NodeCache nc ON ff.FragmentFlowID = nc.FragmentFlowID 
-                   LEFT OUTER JOIN FragmentNodeFragment fnf ON ff.FragmentFlowID = fnf.FragmentFlowID
-                   WHERE ff.FragmentID = FID 
-                     AND ( ff.NodeTypeID = 3 OR ff.FlowID IS NULL )
-                     AND nc.ScenarioID = scenario_id
-      
-      // next we need to modify the table to fix the reference flow (FlowID = null) and
-      // make it appear like an InputOutput flow
-    
-      update node_flows.FlowID = node_flows.RefFlowID 
-             AND node_flows.DirectionID = comp(node_flows.DirectionID) 
-             WHERE node_flows.FlowID IS NULL
-     
-      // Finally we need to group flows by distinct FlowID + DirectionID
-    
-      node_flows = select FlowID, DirectionID,
-                           sum(FlowMagnitude) AS Result
-                           FROM node_flows
-                           GROUP BY FlowID, DirectionID
-     
+
+      node_flows = SELECT f.ReferenceFragmentFlowID AS FragmentFlowID, 
+      		   	  fnf.FlowID AS FlowID,
+      		   	  comp( ff.DirectionID) AS DirectionID
+			  FROM FragmentFlow ff
+			  INNER JOIN FragmentNodeFragment fnf 
+			  ON ff.FragmentFlowID = fnf.FragmentFlowID
+			  INNER JOIN Fragment f ON fnf.SubFragmentID = f.FragmentID
+			  WHERE ff.FragmentFlowID =
+      		   	    the_fragment_flow.FragmentFlowID
+		   UNION
+		   SELECT ff.FragmentFlowID AS FragmentFlowID,
+		   	  ff.FlowID AS FlowID, 
+		   	  ff.DirectionID AS DirectionID
+			  FROM FragmentFlow ff
+			  WHERE ff.FragmentID = subfragment_id
+			  AND ff.NodeTypeID = 3
+			  
+      // next we lookup cache values and group by flow+direction
+
+      node_flows = SELECT FlowID, DirectionID,
+      		   	  sum ( nc.FlowMagnitude ) AS Result
+			  FROM node_flows
+			  INNER JOIN NodeCache nc
+			  ON ff.FragmentFlowID = nc.FragmentFlowID
+			  WHERE nc.ScenarioID = scenario_id
+			  GROUP BY FlowID, DirectionID
+			  
       // and that's it.
     }
   }
