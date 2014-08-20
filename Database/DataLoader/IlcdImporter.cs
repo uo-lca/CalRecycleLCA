@@ -45,6 +45,7 @@ namespace LcaDataLoader {
         public void LoadDataType(string dirName, DbContextWrapper dbContext) {
             int importCounter = 0;
             if (Directory.Exists(dirName)) {
+                Program.Logger.InfoFormat("Load {0}...", dirName);
                 string[] files = Directory.GetFiles(dirName, "*.xml");
                 foreach (string s in files) {
                     Program.Logger.DebugFormat("Load {0}", s);
