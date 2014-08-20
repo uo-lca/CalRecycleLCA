@@ -68,7 +68,7 @@ namespace Services {
                 FlowID = ff.FlowID,
                 ParentFragmentFlowID = ff.ParentFragmentFlowID,
                 ProcessID = (ff.NodeTypeID == 1) ? ff.FragmentNodeProcesses.FirstOrDefault().FragmentNodeProcessID : nullID,
-                SubFragmentID = (ff.NodeTypeID == 2) ? ff.FragmentNodeFragments.FirstOrDefault().FragmentNodeFragmentID : nullID,
+                SubFragmentID = (ff.NodeTypeID == 2) ? ff.FragmentNodeFragments.FirstOrDefault().SubFragmentID : nullID,
                 LinkMagnitudes = (ff.FlowID == null) ? null : GetLinkMagnitudes(ff, scenarioID)
             };
         }

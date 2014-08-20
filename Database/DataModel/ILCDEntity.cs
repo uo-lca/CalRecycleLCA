@@ -24,9 +24,11 @@ namespace LcaDataModel
 
         [Required]
         [StringLength(36)]
+        [Index("IX_UUID_Version", 1)]
         public string UUID { get; set; }
 
         [StringLength(15)]
+        [Index("IX_UUID_Version", 2, IsUnique = true)]
         public string Version { get; set; }
 
         public int? DataProviderID { get; set; }
