@@ -232,6 +232,7 @@ namespace Services
                     FlowMagnitude = flowMagnitude,
                     NodeWeight = nodeWeight
                 };
+
                 _nodeCacheService.InsertGraph(nodeCache);
                 _unitOfWork.Save();
 
@@ -247,8 +248,8 @@ namespace Services
         FragmentFlowID = s.fragmentflows.FragmentFlowID,
         FlowID = s.fragmentflows.FlowID,
         FFDirectionID = s.fragmentflows.DirectionID,
-        NFDirectionID = nodeflows.DirectionID,
-        Result = nodeflows.Result,
+        NFDirectionID = nodeflows == null ? 0 : nodeflows.DirectionID,
+        Result = nodeflows == null ? 0 : nodeflows.Result,
         ParentFragmentFlowID = s.fragmentflows.ParentFragmentFlowID
     })
 
@@ -274,7 +275,7 @@ namespace Services
                     , sp => sp.ParamID
                     , (dp, sp) => new { dependencyParams = dp, scenarioParams = sp })
                     .SelectMany(s => s.scenarioParams.DefaultIfEmpty()
-                    , (s, scenarioparams) => new TestOutFlowModel
+                    , (s, scenarioparams) => new OutFlowModel
                     {
                         ScenarioID = scenarioparams == null ? 1 : scenarioparams.ScenarioID,
                         FragmentFlowID = s.dependencyParams.FragmentFlowID,
