@@ -544,7 +544,7 @@ namespace LcaDataLoader {
                 ImportCSV(Path.Combine(dirName, "ScenarioGroup.csv"), ImportScenarioGroup, dbContext);
                 ImportCSV(Path.Combine(dirName, "Scenario.csv"), ImportScenario, dbContext);
                 ImportCSV(Path.Combine(dirName, "Param.csv"), ImportParam, dbContext);
-                ImportCSV(Path.Combine(dirName, "ScenarioParam.csv"), ImportScenarioParam, dbContext);
+                //ImportCSV(Path.Combine(dirName, "ScenarioParam.csv"), ImportScenarioParam, dbContext);
                 ImportCSV(Path.Combine(dirName, "DependencyParam.csv"), ImportDependencyParam, dbContext);
                 ImportCSV(Path.Combine(dirName, "DistributionParam.csv"), ImportDistributionParam, dbContext);
             }
