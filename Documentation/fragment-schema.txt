@@ -534,7 +534,7 @@ The following tables are required:
 
    DistributionParam
     X DistributionParamID - not needed
-    * DependencyParamID (FK to DependencyParamID)
+    * DependencyParamID (FK to DependencyParamID, PK for this table)
     * ConservationDependencyParamID (FK to DependencyParamID)
 
       note: both DependencyParamID and ConservationDependencyParamID must

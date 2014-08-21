@@ -25,7 +25,7 @@ namespace LcaDataModel
 
         public int? ParamTypeID { get; set; }
 
-        [StringLength(30)]
+        [StringLength(255)]
         public string Name { get; set; }
 
         public double? Min { get; set; }

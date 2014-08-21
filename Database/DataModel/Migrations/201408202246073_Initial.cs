@@ -3,7 +3,7 @@ namespace LcaDataModel.Migrations
     using System;
     using System.Data.Entity.Migrations;
     
-    public partial class InitialCreate : DbMigration
+    public partial class Initial : DbMigration
     {
         public override void Up()
         {
@@ -19,8 +19,8 @@ namespace LcaDataModel.Migrations
                     })
                 .PrimaryKey(t => t.BackgroundCacheID)
                 .ForeignKey("dbo.Background", t => t.BackgroundID)
-                .ForeignKey("dbo.LCIAMethod", t => t.LCIAMethodID)
                 .ForeignKey("dbo.Scenario", t => t.ScenarioID)
+                .ForeignKey("dbo.LCIAMethod", t => t.LCIAMethodID)
                 .Index(t => t.BackgroundID)
                 .Index(t => t.ScenarioID)
                 .Index(t => t.LCIAMethodID);
@@ -59,25 +59,22 @@ namespace LcaDataModel.Migrations
                         FragmentFlowID = c.Int(nullable: false),
                         FragmentID = c.Int(),
                         Name = c.String(unicode: false),
+                        ShortName = c.String(maxLength: 30),
                         FragmentStageID = c.Int(),
-                        ReferenceFlowPropertyID = c.Int(),
                         NodeTypeID = c.Int(),
                         FlowID = c.Int(),
                         DirectionID = c.Int(),
-                        Quantity = c.Double(),
                         ParentFragmentFlowID = c.Int(),
                     })
                 .PrimaryKey(t => t.FragmentFlowID)
-                .ForeignKey("dbo.FlowProperty", t => t.ReferenceFlowPropertyID)
                 .ForeignKey("dbo.Fragment", t => t.FragmentID)
-                .ForeignKey("dbo.FragmentStage", t => t.FragmentStageID)
                 .ForeignKey("dbo.NodeType", t => t.NodeTypeID)
+                .ForeignKey("dbo.FragmentStage", t => t.FragmentStageID)
                 .ForeignKey("dbo.Flow", t => t.FlowID)
                 .ForeignKey("dbo.Direction", t => t.DirectionID)
                 .ForeignKey("dbo.FragmentFlow", t => t.ParentFragmentFlowID)
                 .Index(t => t.FragmentID)
                 .Index(t => t.FragmentStageID)
-                .Index(t => t.ReferenceFlowPropertyID)
                 .Index(t => t.NodeTypeID)
                 .Index(t => t.FlowID)
                 .Index(t => t.DirectionID)
@@ -102,15 +99,14 @@ namespace LcaDataModel.Migrations
                 "dbo.DistributionParam",
                 c => new
                     {
-                        DistributionParamID = c.Int(nullable: false, identity: true),
-                        DependencyParamID = c.Int(),
-                        ConservationParamID = c.Int(),
+                        DependencyParamID = c.Int(nullable: false),
+                        ConservationDependencyParamID = c.Int(nullable: false),
                     })
-                .PrimaryKey(t => t.DistributionParamID)
-                .ForeignKey("dbo.DependencyParam", t => t.ConservationParamID)
+                .PrimaryKey(t => t.DependencyParamID)
+                .ForeignKey("dbo.DependencyParam", t => t.ConservationDependencyParamID, cascadeDelete: true)
                 .ForeignKey("dbo.DependencyParam", t => t.DependencyParamID)
                 .Index(t => t.DependencyParamID)
-                .Index(t => t.ConservationParamID);
+                .Index(t => t.ConservationDependencyParamID);
             
             CreateTable(
                 "dbo.Param",
@@ -183,7 +179,7 @@ namespace LcaDataModel.Migrations
                 .Index(t => t.ILCDEntityID);
             
             CreateTable(
-                "dbo.CompostionModel",
+                "dbo.CompositionModel",
                 c => new
                     {
                         CompositionModelID = c.Int(nullable: false, identity: true),
@@ -204,7 +200,7 @@ namespace LcaDataModel.Migrations
                         Value = c.Double(),
                     })
                 .PrimaryKey(t => t.CompositionDataID)
-                .ForeignKey("dbo.CompostionModel", t => t.CompositionModelID)
+                .ForeignKey("dbo.CompositionModel", t => t.CompositionModelID)
                 .ForeignKey("dbo.FlowFlowProperty", t => t.FlowFlowPropertyID)
                 .Index(t => t.CompositionModelID)
                 .Index(t => t.FlowFlowPropertyID);
@@ -221,37 +217,9 @@ namespace LcaDataModel.Migrations
                     })
                 .PrimaryKey(t => t.FlowFlowPropertyID)
                 .ForeignKey("dbo.Flow", t => t.FlowID)
-                .Index(t => t.FlowID);
-            
-            CreateTable(
-                "dbo.CompositionParam",
-                c => new
-                    {
-                        CompositionParamID = c.Int(nullable: false, identity: true),
-                        ParamID = c.Int(),
-                        FlowFlowPropertyID = c.Int(),
-                        Value = c.Double(),
-                    })
-                .PrimaryKey(t => t.CompositionParamID)
-                .ForeignKey("dbo.FlowFlowProperty", t => t.FlowFlowPropertyID)
-                .ForeignKey("dbo.Param", t => t.ParamID)
-                .Index(t => t.ParamID)
-                .Index(t => t.FlowFlowPropertyID);
-            
-            CreateTable(
-                "dbo.FlowPropertyParam",
-                c => new
-                    {
-                        FlowPropertyParamID = c.Int(nullable: false, identity: true),
-                        ParamID = c.Int(),
-                        FlowFlowPropertyID = c.Int(),
-                        Value = c.Double(),
-                    })
-                .PrimaryKey(t => t.FlowPropertyParamID)
-                .ForeignKey("dbo.FlowFlowProperty", t => t.FlowFlowPropertyID)
-                .ForeignKey("dbo.Param", t => t.ParamID)
-                .Index(t => t.ParamID)
-                .Index(t => t.FlowFlowPropertyID);
+                .ForeignKey("dbo.FlowProperty", t => t.FlowPropertyID)
+                .Index(t => t.FlowID)
+                .Index(t => t.FlowPropertyID);
             
             CreateTable(
                 "dbo.FlowProperty",
@@ -296,6 +264,7 @@ namespace LcaDataModel.Migrations
                 .PrimaryKey(t => t.ILCDEntityID)
                 .ForeignKey("dbo.DataType", t => t.DataTypeID)
                 .ForeignKey("dbo.DataProvider", t => t.DataProviderID)
+                .Index(t => new { t.UUID, t.Version }, unique: true)
                 .Index(t => t.DataProviderID)
                 .Index(t => t.DataTypeID);
             
@@ -384,24 +353,74 @@ namespace LcaDataModel.Migrations
                         FragmentNodeFragmentID = c.Int(nullable: false),
                         FragmentFlowID = c.Int(),
                         SubFragmentID = c.Int(),
+                        FlowID = c.Int(),
                     })
                 .PrimaryKey(t => t.FragmentNodeFragmentID)
+                .ForeignKey("dbo.Flow", t => t.FlowID)
                 .ForeignKey("dbo.FragmentFlow", t => t.FragmentFlowID)
                 .ForeignKey("dbo.Fragment", t => t.SubFragmentID)
                 .Index(t => t.FragmentFlowID)
+                .Index(t => t.SubFragmentID)
+                .Index(t => t.FlowID);
+            
+            CreateTable(
+                "dbo.FragmentSubstitution",
+                c => new
+                    {
+                        FragmentNodeFragmentID = c.Int(nullable: false),
+                        ScenarioID = c.Int(nullable: false),
+                        SubFragmentID = c.Int(nullable: false),
+                    })
+                .PrimaryKey(t => new { t.FragmentNodeFragmentID, t.ScenarioID })
+                .ForeignKey("dbo.FragmentNodeFragment", t => t.FragmentNodeFragmentID, cascadeDelete: true)
+                .ForeignKey("dbo.Scenario", t => t.ScenarioID, cascadeDelete: true)
+                .ForeignKey("dbo.Fragment", t => t.SubFragmentID, cascadeDelete: true)
+                .Index(t => t.FragmentNodeFragmentID)
+                .Index(t => t.ScenarioID)
                 .Index(t => t.SubFragmentID);
             
             CreateTable(
-                "dbo.FragmentStage",
+                "dbo.Scenario",
                 c => new
                     {
-                        FragmentStageID = c.Int(nullable: false, identity: true),
-                        FragmentID = c.Int(),
-                        StageName = c.String(maxLength: 255, unicode: false),
+                        ScenarioID = c.Int(nullable: false),
+                        ScenarioGroupID = c.Int(),
+                        Name = c.String(maxLength: 50, unicode: false),
                     })
-                .PrimaryKey(t => t.FragmentStageID)
-                .ForeignKey("dbo.Fragment", t => t.FragmentID)
-                .Index(t => t.FragmentID);
+                .PrimaryKey(t => t.ScenarioID)
+                .ForeignKey("dbo.ScenarioGroup", t => t.ScenarioGroupID)
+                .Index(t => t.ScenarioGroupID);
+            
+            CreateTable(
+                "dbo.NodeCache",
+                c => new
+                    {
+                        NodeCacheID = c.Int(nullable: false, identity: true),
+                        FragmentFlowID = c.Int(),
+                        ScenarioID = c.Int(),
+                        NodeWeight = c.Double(),
+                        FlowMagnitude = c.Double(),
+                    })
+                .PrimaryKey(t => t.NodeCacheID)
+                .ForeignKey("dbo.FragmentFlow", t => t.FragmentFlowID)
+                .ForeignKey("dbo.Scenario", t => t.ScenarioID)
+                .Index(t => t.FragmentFlowID)
+                .Index(t => t.ScenarioID);
+            
+            CreateTable(
+                "dbo.ScoreCache",
+                c => new
+                    {
+                        ScoreCacheID = c.Int(nullable: false),
+                        NodeCacheID = c.Int(),
+                        LCIAMethodID = c.Int(),
+                        ImpactScore = c.Double(),
+                    })
+                .PrimaryKey(t => t.ScoreCacheID)
+                .ForeignKey("dbo.LCIAMethod", t => t.LCIAMethodID)
+                .ForeignKey("dbo.NodeCache", t => t.NodeCacheID)
+                .Index(t => t.NodeCacheID)
+                .Index(t => t.LCIAMethodID);
             
             CreateTable(
                 "dbo.LCIAMethod",
@@ -451,125 +470,37 @@ namespace LcaDataModel.Migrations
                 .PrimaryKey(t => t.IndicatorTypeID);
             
             CreateTable(
-                "dbo.ScoreCache",
+                "dbo.ProcessSubstitution",
                 c => new
                     {
-                        ScoreCacheID = c.Int(nullable: false),
-                        NodeCacheID = c.Int(),
-                        LCIAMethodID = c.Int(),
-                        ImpactScore = c.Double(),
-                    })
-                .PrimaryKey(t => t.ScoreCacheID)
-                .ForeignKey("dbo.LCIAMethod", t => t.LCIAMethodID)
-                .ForeignKey("dbo.NodeCache", t => t.NodeCacheID)
-                .Index(t => t.NodeCacheID)
-                .Index(t => t.LCIAMethodID);
-            
-            CreateTable(
-                "dbo.NodeCache",
-                c => new
-                    {
-                        NodeCacheID = c.Int(nullable: false, identity: true),
-                        FragmentFlowID = c.Int(),
-                        ScenarioID = c.Int(),
-                        NodeWeight = c.Double(),
-                    })
-                .PrimaryKey(t => t.NodeCacheID)
-                .ForeignKey("dbo.FragmentFlow", t => t.FragmentFlowID)
-                .ForeignKey("dbo.Scenario", t => t.ScenarioID)
-                .Index(t => t.FragmentFlowID)
-                .Index(t => t.ScenarioID);
-            
-            CreateTable(
-                "dbo.Scenario",
-                c => new
-                    {
+                        FragmentNodeProcessID = c.Int(nullable: false),
                         ScenarioID = c.Int(nullable: false),
-                        ScenarioGroupID = c.Int(),
-                        Name = c.String(maxLength: 50, unicode: false),
+                        ProcessID = c.Int(nullable: false),
                     })
-                .PrimaryKey(t => t.ScenarioID)
-                .ForeignKey("dbo.ScenarioGroup", t => t.ScenarioGroupID)
-                .Index(t => t.ScenarioGroupID);
+                .PrimaryKey(t => new { t.FragmentNodeProcessID, t.ScenarioID })
+                .ForeignKey("dbo.Process", t => t.ProcessID, cascadeDelete: true)
+                .ForeignKey("dbo.FragmentNodeProcess", t => t.FragmentNodeProcessID, cascadeDelete: true)
+                .ForeignKey("dbo.Scenario", t => t.ScenarioID, cascadeDelete: true)
+                .Index(t => t.FragmentNodeProcessID)
+                .Index(t => t.ScenarioID)
+                .Index(t => t.ProcessID);
             
             CreateTable(
-                "dbo.ScenarioBackground",
+                "dbo.FragmentNodeProcess",
                 c => new
                     {
-                        ScenarioBackgroundID = c.Int(nullable: false),
-                        ScenarioID = c.Int(),
+                        FragmentNodeProcessID = c.Int(nullable: false),
+                        FragmentFlowID = c.Int(),
+                        ProcessID = c.Int(),
                         FlowID = c.Int(),
-                        NodeTypeID = c.Int(),
-                        TargetID = c.Int(),
                     })
-                .PrimaryKey(t => t.ScenarioBackgroundID)
+                .PrimaryKey(t => t.FragmentNodeProcessID)
                 .ForeignKey("dbo.Flow", t => t.FlowID)
-                .ForeignKey("dbo.NodeType", t => t.NodeTypeID)
-                .ForeignKey("dbo.Scenario", t => t.ScenarioID)
-                .Index(t => t.ScenarioID)
-                .Index(t => t.FlowID)
-                .Index(t => t.NodeTypeID);
-            
-            CreateTable(
-                "dbo.NodeType",
-                c => new
-                    {
-                        NodeTypeID = c.Int(nullable: false, identity: true),
-                        Name = c.String(maxLength: 250, unicode: false),
-                    })
-                .PrimaryKey(t => t.NodeTypeID);
-            
-            CreateTable(
-                "dbo.ScenarioGroup",
-                c => new
-                    {
-                        ScenarioGroupID = c.Int(nullable: false),
-                        OwnedBy = c.Int(),
-                        Name = c.String(maxLength: 50, unicode: false),
-                        VisibilityID = c.Int(),
-                    })
-                .PrimaryKey(t => t.ScenarioGroupID)
-                .ForeignKey("dbo.User", t => t.OwnedBy)
-                .ForeignKey("dbo.Visibility", t => t.VisibilityID)
-                .Index(t => t.OwnedBy)
-                .Index(t => t.VisibilityID);
-            
-            CreateTable(
-                "dbo.User",
-                c => new
-                    {
-                        UserID = c.Int(nullable: false, identity: true),
-                        Name = c.String(maxLength: 250, unicode: false),
-                        CanLogin = c.Boolean(),
-                        CanEditScenarios = c.Boolean(),
-                        CanEditFragments = c.Boolean(),
-                        CanEditBackground = c.Boolean(),
-                        CanAppend = c.Boolean(),
-                    })
-                .PrimaryKey(t => t.UserID);
-            
-            CreateTable(
-                "dbo.Visibility",
-                c => new
-                    {
-                        VisibilityID = c.Int(nullable: false, identity: true),
-                        Name = c.String(maxLength: 50, unicode: false),
-                    })
-                .PrimaryKey(t => t.VisibilityID);
-            
-            CreateTable(
-                "dbo.ScenarioParam",
-                c => new
-                    {
-                        ScenarioParamID = c.Int(nullable: false),
-                        ScenarioID = c.Int(),
-                        ParamID = c.Int(),
-                    })
-                .PrimaryKey(t => t.ScenarioParamID)
-                .ForeignKey("dbo.Param", t => t.ParamID)
-                .ForeignKey("dbo.Scenario", t => t.ScenarioID)
-                .Index(t => t.ScenarioID)
-                .Index(t => t.ParamID);
+                .ForeignKey("dbo.FragmentFlow", t => t.FragmentFlowID)
+                .ForeignKey("dbo.Process", t => t.ProcessID)
+                .Index(t => t.FragmentFlowID)
+                .Index(t => t.ProcessID)
+                .Index(t => t.FlowID);
             
             CreateTable(
                 "dbo.Process",
@@ -577,7 +508,7 @@ namespace LcaDataModel.Migrations
                     {
                         ProcessID = c.Int(nullable: false, identity: true),
                         Name = c.String(maxLength: 255, unicode: false),
-                        Year = c.String(maxLength: 60, unicode: false),
+                        ReferenceYear = c.String(maxLength: 60, unicode: false),
                         Geography = c.String(maxLength: 15, unicode: false),
                         ReferenceTypeID = c.Int(),
                         ProcessTypeID = c.Int(),
@@ -593,20 +524,6 @@ namespace LcaDataModel.Migrations
                 .Index(t => t.ProcessTypeID)
                 .Index(t => t.ReferenceFlowID)
                 .Index(t => t.ILCDEntityID);
-            
-            CreateTable(
-                "dbo.FragmentNodeProcess",
-                c => new
-                    {
-                        FragmentNodeProcessID = c.Int(nullable: false),
-                        FragmentFlowID = c.Int(),
-                        ProcessID = c.Int(),
-                    })
-                .PrimaryKey(t => t.FragmentNodeProcessID)
-                .ForeignKey("dbo.FragmentFlow", t => t.FragmentFlowID)
-                .ForeignKey("dbo.Process", t => t.ProcessID)
-                .Index(t => t.FragmentFlowID)
-                .Index(t => t.ProcessID);
             
             CreateTable(
                 "dbo.ProcessFlow",
@@ -728,6 +645,97 @@ namespace LcaDataModel.Migrations
                 .PrimaryKey(t => t.ReferenceTypeID);
             
             CreateTable(
+                "dbo.ScenarioBackground",
+                c => new
+                    {
+                        ScenarioBackgroundID = c.Int(nullable: false),
+                        ScenarioID = c.Int(),
+                        FlowID = c.Int(),
+                        NodeTypeID = c.Int(),
+                        TargetID = c.Int(),
+                    })
+                .PrimaryKey(t => t.ScenarioBackgroundID)
+                .ForeignKey("dbo.Flow", t => t.FlowID)
+                .ForeignKey("dbo.NodeType", t => t.NodeTypeID)
+                .ForeignKey("dbo.Scenario", t => t.ScenarioID)
+                .Index(t => t.ScenarioID)
+                .Index(t => t.FlowID)
+                .Index(t => t.NodeTypeID);
+            
+            CreateTable(
+                "dbo.NodeType",
+                c => new
+                    {
+                        NodeTypeID = c.Int(nullable: false, identity: true),
+                        Name = c.String(maxLength: 250, unicode: false),
+                    })
+                .PrimaryKey(t => t.NodeTypeID);
+            
+            CreateTable(
+                "dbo.ScenarioGroup",
+                c => new
+                    {
+                        ScenarioGroupID = c.Int(nullable: false),
+                        OwnedBy = c.Int(),
+                        Name = c.String(maxLength: 50, unicode: false),
+                        VisibilityID = c.Int(),
+                    })
+                .PrimaryKey(t => t.ScenarioGroupID)
+                .ForeignKey("dbo.User", t => t.OwnedBy)
+                .ForeignKey("dbo.Visibility", t => t.VisibilityID)
+                .Index(t => t.OwnedBy)
+                .Index(t => t.VisibilityID);
+            
+            CreateTable(
+                "dbo.User",
+                c => new
+                    {
+                        UserID = c.Int(nullable: false, identity: true),
+                        Name = c.String(maxLength: 250, unicode: false),
+                        CanLogin = c.Boolean(),
+                        CanEditScenarios = c.Boolean(),
+                        CanEditFragments = c.Boolean(),
+                        CanEditBackground = c.Boolean(),
+                        CanAppend = c.Boolean(),
+                    })
+                .PrimaryKey(t => t.UserID);
+            
+            CreateTable(
+                "dbo.Visibility",
+                c => new
+                    {
+                        VisibilityID = c.Int(nullable: false, identity: true),
+                        Name = c.String(maxLength: 50, unicode: false),
+                    })
+                .PrimaryKey(t => t.VisibilityID);
+            
+            CreateTable(
+                "dbo.ScenarioParam",
+                c => new
+                    {
+                        ScenarioParamID = c.Int(nullable: false),
+                        ScenarioID = c.Int(),
+                        ParamID = c.Int(),
+                    })
+                .PrimaryKey(t => t.ScenarioParamID)
+                .ForeignKey("dbo.Param", t => t.ParamID)
+                .ForeignKey("dbo.Scenario", t => t.ScenarioID)
+                .Index(t => t.ScenarioID)
+                .Index(t => t.ParamID);
+            
+            CreateTable(
+                "dbo.FragmentStage",
+                c => new
+                    {
+                        FragmentStageID = c.Int(nullable: false, identity: true),
+                        FragmentID = c.Int(),
+                        StageName = c.String(maxLength: 255, unicode: false),
+                    })
+                .PrimaryKey(t => t.FragmentStageID)
+                .ForeignKey("dbo.Fragment", t => t.FragmentID)
+                .Index(t => t.FragmentID);
+            
+            CreateTable(
                 "dbo.UnitGroup",
                 c => new
                     {
@@ -755,6 +763,21 @@ namespace LcaDataModel.Migrations
                 .PrimaryKey(t => t.UnitConversionID)
                 .ForeignKey("dbo.UnitGroup", t => t.UnitGroupID)
                 .Index(t => t.UnitGroupID);
+            
+            CreateTable(
+                "dbo.FlowPropertyParam",
+                c => new
+                    {
+                        FlowPropertyParamID = c.Int(nullable: false, identity: true),
+                        ParamID = c.Int(),
+                        FlowFlowPropertyID = c.Int(),
+                        Value = c.Double(),
+                    })
+                .PrimaryKey(t => t.FlowPropertyParamID)
+                .ForeignKey("dbo.FlowFlowProperty", t => t.FlowFlowPropertyID)
+                .ForeignKey("dbo.Param", t => t.ParamID)
+                .Index(t => t.ParamID)
+                .Index(t => t.FlowFlowPropertyID);
             
             CreateTable(
                 "dbo.FlowType",
@@ -788,13 +811,34 @@ namespace LcaDataModel.Migrations
             DropForeignKey("dbo.LCIA", "FlowID", "dbo.Flow");
             DropForeignKey("dbo.FragmentFlow", "FlowID", "dbo.Flow");
             DropForeignKey("dbo.Flow", "FlowTypeID", "dbo.FlowType");
+            DropForeignKey("dbo.CompositionModel", "FlowID", "dbo.Flow");
+            DropForeignKey("dbo.FlowPropertyParam", "ParamID", "dbo.Param");
+            DropForeignKey("dbo.FlowPropertyParam", "FlowFlowPropertyID", "dbo.FlowFlowProperty");
             DropForeignKey("dbo.LCIAMethod", "ReferenceQuantity", "dbo.FlowProperty");
             DropForeignKey("dbo.UnitConversion", "UnitGroupID", "dbo.UnitGroup");
             DropForeignKey("dbo.UnitGroup", "ReferenceUnitConversionID", "dbo.UnitConversion");
             DropForeignKey("dbo.UnitGroup", "ILCDEntityID", "dbo.ILCDEntity");
             DropForeignKey("dbo.FlowProperty", "UnitGroupID", "dbo.UnitGroup");
+            DropForeignKey("dbo.Fragment", "ILCDEntityID", "dbo.ILCDEntity");
+            DropForeignKey("dbo.FragmentSubstitution", "SubFragmentID", "dbo.Fragment");
+            DropForeignKey("dbo.FragmentFlow", "FragmentStageID", "dbo.FragmentStage");
+            DropForeignKey("dbo.FragmentStage", "FragmentID", "dbo.Fragment");
+            DropForeignKey("dbo.FragmentNodeFragment", "SubFragmentID", "dbo.Fragment");
+            DropForeignKey("dbo.ScenarioParam", "ScenarioID", "dbo.Scenario");
+            DropForeignKey("dbo.ScenarioParam", "ParamID", "dbo.Param");
+            DropForeignKey("dbo.ScenarioGroup", "VisibilityID", "dbo.Visibility");
+            DropForeignKey("dbo.ScenarioGroup", "OwnedBy", "dbo.User");
+            DropForeignKey("dbo.Scenario", "ScenarioGroupID", "dbo.ScenarioGroup");
+            DropForeignKey("dbo.ScenarioBackground", "ScenarioID", "dbo.Scenario");
+            DropForeignKey("dbo.ScenarioBackground", "NodeTypeID", "dbo.NodeType");
+            DropForeignKey("dbo.FragmentFlow", "NodeTypeID", "dbo.NodeType");
+            DropForeignKey("dbo.Background", "NodeTypeID", "dbo.NodeType");
+            DropForeignKey("dbo.ScenarioBackground", "FlowID", "dbo.Flow");
+            DropForeignKey("dbo.ProcessSubstitution", "ScenarioID", "dbo.Scenario");
+            DropForeignKey("dbo.ProcessSubstitution", "FragmentNodeProcessID", "dbo.FragmentNodeProcess");
             DropForeignKey("dbo.Process", "ReferenceTypeID", "dbo.ReferenceType");
             DropForeignKey("dbo.Process", "ProcessTypeID", "dbo.ProcessType");
+            DropForeignKey("dbo.ProcessSubstitution", "ProcessID", "dbo.Process");
             DropForeignKey("dbo.ProcessEmissionParam", "ProcessFlowID", "dbo.ProcessFlow");
             DropForeignKey("dbo.ProcessEmissionParam", "ParamID", "dbo.Param");
             DropForeignKey("dbo.ProcessDissipation", "ProcessFlowID", "dbo.ProcessFlow");
@@ -812,31 +856,21 @@ namespace LcaDataModel.Migrations
             DropForeignKey("dbo.Process", "ILCDEntityID", "dbo.ILCDEntity");
             DropForeignKey("dbo.FragmentNodeProcess", "ProcessID", "dbo.Process");
             DropForeignKey("dbo.FragmentNodeProcess", "FragmentFlowID", "dbo.FragmentFlow");
+            DropForeignKey("dbo.FragmentNodeProcess", "FlowID", "dbo.Flow");
             DropForeignKey("dbo.ScoreCache", "NodeCacheID", "dbo.NodeCache");
-            DropForeignKey("dbo.ScenarioParam", "ScenarioID", "dbo.Scenario");
-            DropForeignKey("dbo.ScenarioParam", "ParamID", "dbo.Param");
-            DropForeignKey("dbo.ScenarioGroup", "VisibilityID", "dbo.Visibility");
-            DropForeignKey("dbo.ScenarioGroup", "OwnedBy", "dbo.User");
-            DropForeignKey("dbo.Scenario", "ScenarioGroupID", "dbo.ScenarioGroup");
-            DropForeignKey("dbo.ScenarioBackground", "ScenarioID", "dbo.Scenario");
-            DropForeignKey("dbo.ScenarioBackground", "NodeTypeID", "dbo.NodeType");
-            DropForeignKey("dbo.FragmentFlow", "NodeTypeID", "dbo.NodeType");
-            DropForeignKey("dbo.Background", "NodeTypeID", "dbo.NodeType");
-            DropForeignKey("dbo.ScenarioBackground", "FlowID", "dbo.Flow");
-            DropForeignKey("dbo.NodeCache", "ScenarioID", "dbo.Scenario");
-            DropForeignKey("dbo.BackgroundCache", "ScenarioID", "dbo.Scenario");
-            DropForeignKey("dbo.NodeCache", "FragmentFlowID", "dbo.FragmentFlow");
             DropForeignKey("dbo.ScoreCache", "LCIAMethodID", "dbo.LCIAMethod");
             DropForeignKey("dbo.LCIA", "LCIAMethodID", "dbo.LCIAMethod");
             DropForeignKey("dbo.LCIAMethod", "IndicatorTypeID", "dbo.IndicatorType");
             DropForeignKey("dbo.LCIAMethod", "ImpactCategoryID", "dbo.ImpactCategory");
             DropForeignKey("dbo.LCIAMethod", "ILCDEntityID", "dbo.ILCDEntity");
             DropForeignKey("dbo.BackgroundCache", "LCIAMethodID", "dbo.LCIAMethod");
-            DropForeignKey("dbo.Fragment", "ILCDEntityID", "dbo.ILCDEntity");
-            DropForeignKey("dbo.FragmentFlow", "FragmentStageID", "dbo.FragmentStage");
-            DropForeignKey("dbo.FragmentStage", "FragmentID", "dbo.Fragment");
-            DropForeignKey("dbo.FragmentNodeFragment", "SubFragmentID", "dbo.Fragment");
+            DropForeignKey("dbo.NodeCache", "ScenarioID", "dbo.Scenario");
+            DropForeignKey("dbo.NodeCache", "FragmentFlowID", "dbo.FragmentFlow");
+            DropForeignKey("dbo.FragmentSubstitution", "ScenarioID", "dbo.Scenario");
+            DropForeignKey("dbo.BackgroundCache", "ScenarioID", "dbo.Scenario");
+            DropForeignKey("dbo.FragmentSubstitution", "FragmentNodeFragmentID", "dbo.FragmentNodeFragment");
             DropForeignKey("dbo.FragmentNodeFragment", "FragmentFlowID", "dbo.FragmentFlow");
+            DropForeignKey("dbo.FragmentNodeFragment", "FlowID", "dbo.Flow");
             DropForeignKey("dbo.FragmentFlow", "FragmentID", "dbo.Fragment");
             DropForeignKey("dbo.Flow", "ILCDEntityID", "dbo.ILCDEntity");
             DropForeignKey("dbo.FlowProperty", "ILCDEntityID", "dbo.ILCDEntity");
@@ -847,29 +881,34 @@ namespace LcaDataModel.Migrations
             DropForeignKey("dbo.CategorySystem", "DataTypeID", "dbo.DataType");
             DropForeignKey("dbo.Category", "CategorySystemID", "dbo.CategorySystem");
             DropForeignKey("dbo.Category", "ParentCategoryID", "dbo.Category");
-            DropForeignKey("dbo.FragmentFlow", "ReferenceFlowPropertyID", "dbo.FlowProperty");
             DropForeignKey("dbo.Flow", "ReferenceFlowProperty", "dbo.FlowProperty");
             DropForeignKey("dbo.FlowPropertyEmission", "FlowPropertyID", "dbo.FlowProperty");
             DropForeignKey("dbo.FlowPropertyEmission", "FlowID", "dbo.Flow");
-            DropForeignKey("dbo.CompostionModel", "FlowID", "dbo.Flow");
-            DropForeignKey("dbo.FlowPropertyParam", "ParamID", "dbo.Param");
-            DropForeignKey("dbo.FlowPropertyParam", "FlowFlowPropertyID", "dbo.FlowFlowProperty");
+            DropForeignKey("dbo.FlowFlowProperty", "FlowPropertyID", "dbo.FlowProperty");
             DropForeignKey("dbo.FlowFlowProperty", "FlowID", "dbo.Flow");
-            DropForeignKey("dbo.CompositionParam", "ParamID", "dbo.Param");
-            DropForeignKey("dbo.CompositionParam", "FlowFlowPropertyID", "dbo.FlowFlowProperty");
             DropForeignKey("dbo.CompositionData", "FlowFlowPropertyID", "dbo.FlowFlowProperty");
-            DropForeignKey("dbo.CompositionData", "CompositionModelID", "dbo.CompostionModel");
+            DropForeignKey("dbo.CompositionData", "CompositionModelID", "dbo.CompositionModel");
             DropForeignKey("dbo.Background", "FlowID", "dbo.Flow");
             DropForeignKey("dbo.LCIA", "DirectionID", "dbo.Direction");
             DropForeignKey("dbo.CharacterizationParam", "LCAID", "dbo.LCIA");
             DropForeignKey("dbo.DependencyParam", "FragmentFlowID", "dbo.FragmentFlow");
             DropForeignKey("dbo.DistributionParam", "DependencyParamID", "dbo.DependencyParam");
-            DropForeignKey("dbo.DistributionParam", "ConservationParamID", "dbo.DependencyParam");
+            DropForeignKey("dbo.DistributionParam", "ConservationDependencyParamID", "dbo.DependencyParam");
             DropForeignKey("dbo.Background", "DirectionID", "dbo.Direction");
             DropForeignKey("dbo.BackgroundCache", "BackgroundID", "dbo.Background");
+            DropIndex("dbo.FlowPropertyParam", new[] { "FlowFlowPropertyID" });
+            DropIndex("dbo.FlowPropertyParam", new[] { "ParamID" });
             DropIndex("dbo.UnitConversion", new[] { "UnitGroupID" });
             DropIndex("dbo.UnitGroup", new[] { "ILCDEntityID" });
             DropIndex("dbo.UnitGroup", new[] { "ReferenceUnitConversionID" });
+            DropIndex("dbo.FragmentStage", new[] { "FragmentID" });
+            DropIndex("dbo.ScenarioParam", new[] { "ParamID" });
+            DropIndex("dbo.ScenarioParam", new[] { "ScenarioID" });
+            DropIndex("dbo.ScenarioGroup", new[] { "VisibilityID" });
+            DropIndex("dbo.ScenarioGroup", new[] { "OwnedBy" });
+            DropIndex("dbo.ScenarioBackground", new[] { "NodeTypeID" });
+            DropIndex("dbo.ScenarioBackground", new[] { "FlowID" });
+            DropIndex("dbo.ScenarioBackground", new[] { "ScenarioID" });
             DropIndex("dbo.ProcessEmissionParam", new[] { "ProcessFlowID" });
             DropIndex("dbo.ProcessEmissionParam", new[] { "ParamID" });
             DropIndex("dbo.ProcessDissipationParam", new[] { "ProcessDissipationID" });
@@ -884,29 +923,29 @@ namespace LcaDataModel.Migrations
             DropIndex("dbo.ProcessFlow", new[] { "DirectionID" });
             DropIndex("dbo.ProcessFlow", new[] { "FlowID" });
             DropIndex("dbo.ProcessFlow", new[] { "ProcessID" });
-            DropIndex("dbo.FragmentNodeProcess", new[] { "ProcessID" });
-            DropIndex("dbo.FragmentNodeProcess", new[] { "FragmentFlowID" });
             DropIndex("dbo.Process", new[] { "ILCDEntityID" });
             DropIndex("dbo.Process", new[] { "ReferenceFlowID" });
             DropIndex("dbo.Process", new[] { "ProcessTypeID" });
             DropIndex("dbo.Process", new[] { "ReferenceTypeID" });
-            DropIndex("dbo.ScenarioParam", new[] { "ParamID" });
-            DropIndex("dbo.ScenarioParam", new[] { "ScenarioID" });
-            DropIndex("dbo.ScenarioGroup", new[] { "VisibilityID" });
-            DropIndex("dbo.ScenarioGroup", new[] { "OwnedBy" });
-            DropIndex("dbo.ScenarioBackground", new[] { "NodeTypeID" });
-            DropIndex("dbo.ScenarioBackground", new[] { "FlowID" });
-            DropIndex("dbo.ScenarioBackground", new[] { "ScenarioID" });
-            DropIndex("dbo.Scenario", new[] { "ScenarioGroupID" });
-            DropIndex("dbo.NodeCache", new[] { "ScenarioID" });
-            DropIndex("dbo.NodeCache", new[] { "FragmentFlowID" });
-            DropIndex("dbo.ScoreCache", new[] { "LCIAMethodID" });
-            DropIndex("dbo.ScoreCache", new[] { "NodeCacheID" });
+            DropIndex("dbo.FragmentNodeProcess", new[] { "FlowID" });
+            DropIndex("dbo.FragmentNodeProcess", new[] { "ProcessID" });
+            DropIndex("dbo.FragmentNodeProcess", new[] { "FragmentFlowID" });
+            DropIndex("dbo.ProcessSubstitution", new[] { "ProcessID" });
+            DropIndex("dbo.ProcessSubstitution", new[] { "ScenarioID" });
+            DropIndex("dbo.ProcessSubstitution", new[] { "FragmentNodeProcessID" });
             DropIndex("dbo.LCIAMethod", new[] { "ILCDEntityID" });
             DropIndex("dbo.LCIAMethod", new[] { "ReferenceQuantity" });
             DropIndex("dbo.LCIAMethod", new[] { "IndicatorTypeID" });
             DropIndex("dbo.LCIAMethod", new[] { "ImpactCategoryID" });
-            DropIndex("dbo.FragmentStage", new[] { "FragmentID" });
+            DropIndex("dbo.ScoreCache", new[] { "LCIAMethodID" });
+            DropIndex("dbo.ScoreCache", new[] { "NodeCacheID" });
+            DropIndex("dbo.NodeCache", new[] { "ScenarioID" });
+            DropIndex("dbo.NodeCache", new[] { "FragmentFlowID" });
+            DropIndex("dbo.Scenario", new[] { "ScenarioGroupID" });
+            DropIndex("dbo.FragmentSubstitution", new[] { "SubFragmentID" });
+            DropIndex("dbo.FragmentSubstitution", new[] { "ScenarioID" });
+            DropIndex("dbo.FragmentSubstitution", new[] { "FragmentNodeFragmentID" });
+            DropIndex("dbo.FragmentNodeFragment", new[] { "FlowID" });
             DropIndex("dbo.FragmentNodeFragment", new[] { "SubFragmentID" });
             DropIndex("dbo.FragmentNodeFragment", new[] { "FragmentFlowID" });
             DropIndex("dbo.Fragment", new[] { "ILCDEntityID" });
@@ -918,18 +957,16 @@ namespace LcaDataModel.Migrations
             DropIndex("dbo.Classification", new[] { "CategoryID" });
             DropIndex("dbo.ILCDEntity", new[] { "DataTypeID" });
             DropIndex("dbo.ILCDEntity", new[] { "DataProviderID" });
+            DropIndex("dbo.ILCDEntity", new[] { "UUID", "Version" });
             DropIndex("dbo.FlowPropertyEmission", new[] { "FlowID" });
             DropIndex("dbo.FlowPropertyEmission", new[] { "FlowPropertyID" });
             DropIndex("dbo.FlowProperty", new[] { "ILCDEntityID" });
             DropIndex("dbo.FlowProperty", new[] { "UnitGroupID" });
-            DropIndex("dbo.FlowPropertyParam", new[] { "FlowFlowPropertyID" });
-            DropIndex("dbo.FlowPropertyParam", new[] { "ParamID" });
-            DropIndex("dbo.CompositionParam", new[] { "FlowFlowPropertyID" });
-            DropIndex("dbo.CompositionParam", new[] { "ParamID" });
+            DropIndex("dbo.FlowFlowProperty", new[] { "FlowPropertyID" });
             DropIndex("dbo.FlowFlowProperty", new[] { "FlowID" });
             DropIndex("dbo.CompositionData", new[] { "FlowFlowPropertyID" });
             DropIndex("dbo.CompositionData", new[] { "CompositionModelID" });
-            DropIndex("dbo.CompostionModel", new[] { "FlowID" });
+            DropIndex("dbo.CompositionModel", new[] { "FlowID" });
             DropIndex("dbo.Flow", new[] { "ILCDEntityID" });
             DropIndex("dbo.Flow", new[] { "FlowTypeID" });
             DropIndex("dbo.Flow", new[] { "ReferenceFlowProperty" });
@@ -939,7 +976,7 @@ namespace LcaDataModel.Migrations
             DropIndex("dbo.CharacterizationParam", new[] { "LCAID" });
             DropIndex("dbo.CharacterizationParam", new[] { "ParamID" });
             DropIndex("dbo.Param", new[] { "ParamTypeID" });
-            DropIndex("dbo.DistributionParam", new[] { "ConservationParamID" });
+            DropIndex("dbo.DistributionParam", new[] { "ConservationDependencyParamID" });
             DropIndex("dbo.DistributionParam", new[] { "DependencyParamID" });
             DropIndex("dbo.DependencyParam", new[] { "FragmentFlowID" });
             DropIndex("dbo.DependencyParam", new[] { "ParamID" });
@@ -947,7 +984,6 @@ namespace LcaDataModel.Migrations
             DropIndex("dbo.FragmentFlow", new[] { "DirectionID" });
             DropIndex("dbo.FragmentFlow", new[] { "FlowID" });
             DropIndex("dbo.FragmentFlow", new[] { "NodeTypeID" });
-            DropIndex("dbo.FragmentFlow", new[] { "ReferenceFlowPropertyID" });
             DropIndex("dbo.FragmentFlow", new[] { "FragmentStageID" });
             DropIndex("dbo.FragmentFlow", new[] { "FragmentID" });
             DropIndex("dbo.Background", new[] { "NodeTypeID" });
@@ -958,8 +994,16 @@ namespace LcaDataModel.Migrations
             DropIndex("dbo.BackgroundCache", new[] { "BackgroundID" });
             DropTable("dbo.ParamType");
             DropTable("dbo.FlowType");
+            DropTable("dbo.FlowPropertyParam");
             DropTable("dbo.UnitConversion");
             DropTable("dbo.UnitGroup");
+            DropTable("dbo.FragmentStage");
+            DropTable("dbo.ScenarioParam");
+            DropTable("dbo.Visibility");
+            DropTable("dbo.User");
+            DropTable("dbo.ScenarioGroup");
+            DropTable("dbo.NodeType");
+            DropTable("dbo.ScenarioBackground");
             DropTable("dbo.ReferenceType");
             DropTable("dbo.ProcessType");
             DropTable("dbo.ProcessEmissionParam");
@@ -968,21 +1012,16 @@ namespace LcaDataModel.Migrations
             DropTable("dbo.ProcessDissipation");
             DropTable("dbo.NodeEmissionParam");
             DropTable("dbo.ProcessFlow");
-            DropTable("dbo.FragmentNodeProcess");
             DropTable("dbo.Process");
-            DropTable("dbo.ScenarioParam");
-            DropTable("dbo.Visibility");
-            DropTable("dbo.User");
-            DropTable("dbo.ScenarioGroup");
-            DropTable("dbo.NodeType");
-            DropTable("dbo.ScenarioBackground");
-            DropTable("dbo.Scenario");
-            DropTable("dbo.NodeCache");
-            DropTable("dbo.ScoreCache");
+            DropTable("dbo.FragmentNodeProcess");
+            DropTable("dbo.ProcessSubstitution");
             DropTable("dbo.IndicatorType");
             DropTable("dbo.ImpactCategory");
             DropTable("dbo.LCIAMethod");
-            DropTable("dbo.FragmentStage");
+            DropTable("dbo.ScoreCache");
+            DropTable("dbo.NodeCache");
+            DropTable("dbo.Scenario");
+            DropTable("dbo.FragmentSubstitution");
             DropTable("dbo.FragmentNodeFragment");
             DropTable("dbo.Fragment");
             DropTable("dbo.DataProvider");
@@ -993,11 +1032,9 @@ namespace LcaDataModel.Migrations
             DropTable("dbo.ILCDEntity");
             DropTable("dbo.FlowPropertyEmission");
             DropTable("dbo.FlowProperty");
-            DropTable("dbo.FlowPropertyParam");
-            DropTable("dbo.CompositionParam");
             DropTable("dbo.FlowFlowProperty");
             DropTable("dbo.CompositionData");
-            DropTable("dbo.CompostionModel");
+            DropTable("dbo.CompositionModel");
             DropTable("dbo.Flow");
             DropTable("dbo.LCIA");
             DropTable("dbo.CharacterizationParam");

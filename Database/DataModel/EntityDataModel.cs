@@ -105,15 +105,17 @@ namespace LcaDataModel {
                 .Property(e => e.Name)
                 .IsUnicode(false);
 
-            modelBuilder.Entity<DependencyParam>()
-                .HasMany(e => e.DistributionParams)
-                .WithOptional(e => e.DependencyParam)
-                .HasForeignKey(e => e.ConservationParamID);
+            modelBuilder.Entity<DistributionParam>()
+                .HasKey(e => e.DependencyParamID);
 
-            modelBuilder.Entity<DependencyParam>()
-                .HasMany(e => e.DistributionParams1)
-                .WithOptional(e => e.DependencyParam1)
-                .HasForeignKey(e => e.DependencyParamID);
+            modelBuilder.Entity<DistributionParam>()
+                .HasRequired(e => e.DependencyParam)
+                .WithOptional(e => e.DistributionParam);
+
+            modelBuilder.Entity<DistributionParam>()
+                .HasRequired(e => e.ConservationDependencyParam)
+                .WithMany(d => d.ConservationDistributionParams)
+                .HasForeignKey(e => e.ConservationDependencyParamID);
 
             modelBuilder.Entity<Direction>()
                 .Property(e => e.Name)

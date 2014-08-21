@@ -10,7 +10,6 @@ namespace LcaDataModel.Migrations
         public Configuration()
         {
             AutomaticMigrationsEnabled = true;
-            ContextKey = "LcaDataModel.EntityDataModel";
         }
 
         protected override void Seed(LcaDataModel.EntityDataModel context)

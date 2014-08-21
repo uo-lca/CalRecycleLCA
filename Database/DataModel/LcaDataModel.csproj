@@ -83,41 +83,9 @@
     <Compile Include="IObjectState.cs" />
     <Compile Include="LCIA.cs" />
     <Compile Include="LCIAMethod.cs" />
-    <Compile Include="Migrations\201407012145544_InitialCreate.cs" />
-    <Compile Include="Migrations\201407012145544_InitialCreate.Designer.cs">
-      <DependentUpon>201407012145544_InitialCreate.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Migrations\201407021756141_FK_FlowFlowProperty_FlowProperty.cs" />
-    <Compile Include="Migrations\201407021756141_FK_FlowFlowProperty_FlowProperty.Designer.cs">
-      <DependentUpon>201407021756141_FK_FlowFlowProperty_FlowProperty.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Migrations\201407022035013_FK_FlowFlowProperty_FlowProperty_Fix.cs" />
-    <Compile Include="Migrations\201407022035013_FK_FlowFlowProperty_FlowProperty_Fix.Designer.cs">
-      <DependentUpon>201407022035013_FK_FlowFlowProperty_FlowProperty_Fix.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Migrations\201407282022157_InitialCreate1.cs" />
-    <Compile Include="Migrations\201407282022157_InitialCreate1.Designer.cs">
-      <DependentUpon>201407282022157_InitialCreate1.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Migrations\201408072132215_ProcessReferenceYear.cs" />
-    <Compile Include="Migrations\201408072132215_ProcessReferenceYear.Designer.cs">
-      <DependentUpon>201408072132215_ProcessReferenceYear.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Migrations\201408111906531_AddShortNameDropCompositionParam.cs" />
-    <Compile Include="Migrations\201408111906531_AddShortNameDropCompositionParam.Designer.cs">
-      <DependentUpon>201408111906531_AddShortNameDropCompositionParam.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Migrations\201408112352481_CompositionModel_Fix.cs" />
-    <Compile Include="Migrations\201408112352481_CompositionModel_Fix.Designer.cs">
-      <DependentUpon>201408112352481_CompositionModel_Fix.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Migrations\201408122338021_SubstitutionTables.cs" />
-    <Compile Include="Migrations\201408122338021_SubstitutionTables.Designer.cs">
-      <DependentUpon>201408122338021_SubstitutionTables.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Migrations\201408192235574_IX_ILCDEntity_UUID_Version.cs" />
-    <Compile Include="Migrations\201408192235574_IX_ILCDEntity_UUID_Version.Designer.cs">
-      <DependentUpon>201408192235574_IX_ILCDEntity_UUID_Version.cs</DependentUpon>
+    <Compile Include="Migrations\201408202246073_Initial.cs" />
+    <Compile Include="Migrations\201408202246073_Initial.Designer.cs">
+      <DependentUpon>201408202246073_Initial.cs</DependentUpon>
     </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="NodeCache.cs" />
@@ -158,32 +126,8 @@
     </None>
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="Migrations\201407012145544_InitialCreate.resx">
-      <DependentUpon>201407012145544_InitialCreate.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\201407021756141_FK_FlowFlowProperty_FlowProperty.resx">
-      <DependentUpon>201407021756141_FK_FlowFlowProperty_FlowProperty.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\201407022035013_FK_FlowFlowProperty_FlowProperty_Fix.resx">
-      <DependentUpon>201407022035013_FK_FlowFlowProperty_FlowProperty_Fix.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\201407282022157_InitialCreate1.resx">
-      <DependentUpon>201407282022157_InitialCreate1.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\201408072132215_ProcessReferenceYear.resx">
-      <DependentUpon>201408072132215_ProcessReferenceYear.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\201408111906531_AddShortNameDropCompositionParam.resx">
-      <DependentUpon>201408111906531_AddShortNameDropCompositionParam.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\201408112352481_CompositionModel_Fix.resx">
-      <DependentUpon>201408112352481_CompositionModel_Fix.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\201408122338021_SubstitutionTables.resx">
-      <DependentUpon>201408122338021_SubstitutionTables.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\201408192235574_IX_ILCDEntity_UUID_Version.resx">
-      <DependentUpon>201408192235574_IX_ILCDEntity_UUID_Version.cs</DependentUpon>
+    <EmbeddedResource Include="Migrations\201408202246073_Initial.resx">
+      <DependentUpon>201408202246073_Initial.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

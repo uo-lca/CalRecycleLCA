@@ -9,14 +9,13 @@ namespace LcaDataModel
     [Table("DistributionParam")]
     public partial class DistributionParam
     {
-        public int DistributionParamID { get; set; }
+        [Key]
+        public int DependencyParamID { get; set; }
 
-        public int? DependencyParamID { get; set; }
+        public int ConservationDependencyParamID { get; set; }
 
-        public int? ConservationParamID { get; set; }
-
+        // Navigation properties
         public virtual DependencyParam DependencyParam { get; set; }
-
-        public virtual DependencyParam DependencyParam1 { get; set; }
+        public virtual DependencyParam ConservationDependencyParam { get; set; }
     }
 }

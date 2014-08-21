@@ -376,6 +376,73 @@ namespace LcaDataLoader {
             return isImported;
         }
 
+        private static bool ImportParam(Row row, DbContextWrapper dbContext) {
+            bool isImported = false, isNew = true;
+            int id = Convert.ToInt32(row["ParamID"]);
+            Param ent = dbContext.Find<Param>(id);
+            if (ent == null) {
+                ent = new Param { ParamID = id };
+            }
+            else {
+                isNew = false;
+                Program.Logger.WarnFormat("Found Param with ParamID = {0}. It will be updated.", id);
+            }
+            ent.ParamTypeID = Convert.ToInt32(row["ParamTypeID"]);
+            ent.Name = row["Name"];
+            if (isNew) {
+                isImported = dbContext.AddEntity(ent);
+            }
+            else {
+                isImported = (dbContext.SaveChanges() > 0);
+            }
+            return isImported;
+        }
+
+        private static bool ImportDependencyParam(Row row, DbContextWrapper dbContext) {
+            bool isImported = false, isNew = true;
+            int id = Convert.ToInt32(row["DependencyParamID"]);
+            DependencyParam ent = dbContext.Find<DependencyParam>(id);
+            if (ent == null) {
+                ent = new DependencyParam { DependencyParamID = id };
+            }
+            else {
+                isNew = false;
+                Program.Logger.WarnFormat("Found DependencyParam with DependencyParamID = {0}. It will be updated.", id);
+            }
+            ent.ParamID = Convert.ToInt32(row["ParamID"]);
+            ent.FragmentFlowID = Convert.ToInt32(row["FragmentFlowID"]);
+            ent.Value = Convert.ToDouble(row["Value"]);
+            if (isNew) {
+                isImported = dbContext.AddEntity(ent);
+            }
+            else {
+                isImported = (dbContext.SaveChanges() > 0);
+            }
+            return isImported;
+        }
+
+        private static bool ImportDistributionParam(Row row, DbContextWrapper dbContext) {
+            bool isImported = false, isNew = true;
+            int id = Convert.ToInt32(row["DependencyParamID"]);
+            DistributionParam ent = dbContext.Find<DistributionParam>(id);
+            if (ent == null) {
+                ent = new DistributionParam { DependencyParamID = id };
+            }
+            else {
+                isNew = false;
+                Program.Logger.WarnFormat("Found DistributionParam with DependencyParamID = {0}. It will be updated.", id);
+            }
+            ent.ConservationDependencyParamID = Convert.ToInt32(row["ConservationDependencyParamID"]);
+            if (isNew) {
+                isImported = dbContext.AddEntity(ent);
+            }
+            else {
+                isImported = (dbContext.SaveChanges() > 0);
+            }
+            return isImported;
+        }
+
+
         private static IEnumerable<Row> ImportCSV(string fileName, Func<Row, DbContextWrapper, bool> importRow, DbContextWrapper dbContext) {
             int importCounter = 0;
             var table = DataAccess.DataTable.New.ReadCsv(fileName);
@@ -476,6 +543,10 @@ namespace LcaDataLoader {
                 ImportCSV(Path.Combine(dirName, "User.csv"), ImportUser, dbContext);
                 ImportCSV(Path.Combine(dirName, "ScenarioGroup.csv"), ImportScenarioGroup, dbContext);
                 ImportCSV(Path.Combine(dirName, "Scenario.csv"), ImportScenario, dbContext);
+                ImportCSV(Path.Combine(dirName, "Param.csv"), ImportParam, dbContext);
+                ImportCSV(Path.Combine(dirName, "ScenarioParam.csv"), ImportScenarioParam, dbContext);
+                ImportCSV(Path.Combine(dirName, "DependencyParam.csv"), ImportDependencyParam, dbContext);
+                ImportCSV(Path.Combine(dirName, "DistributionParam.csv"), ImportDistributionParam, dbContext);
             }
             else {
                 Program.Logger.WarnFormat("Scenarios folder, {0}, does not exist.", dirName);

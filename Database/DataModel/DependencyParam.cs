@@ -11,8 +11,7 @@ namespace LcaDataModel
     {
         public DependencyParam()
         {
-            DistributionParams = new HashSet<DistributionParam>();
-            DistributionParams1 = new HashSet<DistributionParam>();
+            ConservationDistributionParams = new HashSet<DistributionParam>();
         }
 
         public int DependencyParamID { get; set; }
@@ -27,8 +26,8 @@ namespace LcaDataModel
 
         public virtual Param Param { get; set; }
 
-        public virtual ICollection<DistributionParam> DistributionParams { get; set; }
-
-        public virtual ICollection<DistributionParam> DistributionParams1 { get; set; }
+        // Reverse navigation properties
+        public virtual DistributionParam DistributionParam { get; set; }
+        public virtual ICollection<DistributionParam> ConservationDistributionParams { get; set; }
     }
 }
