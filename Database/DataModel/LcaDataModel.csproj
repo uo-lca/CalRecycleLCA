@@ -87,6 +87,10 @@
     <Compile Include="Migrations\201408202246073_Initial.Designer.cs">
       <DependentUpon>201408202246073_Initial.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\201408212112191_ModifyBackground.cs" />
+    <Compile Include="Migrations\201408212112191_ModifyBackground.Designer.cs">
+      <DependentUpon>201408212112191_ModifyBackground.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="NodeCache.cs" />
     <Compile Include="NodeDissipationParam.cs" />
@@ -128,6 +132,9 @@
   <ItemGroup>
     <EmbeddedResource Include="Migrations\201408202246073_Initial.resx">
       <DependentUpon>201408202246073_Initial.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201408212112191_ModifyBackground.resx">
+      <DependentUpon>201408212112191_ModifyBackground.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

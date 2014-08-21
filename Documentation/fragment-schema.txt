@@ -401,12 +401,14 @@ The following tables are required:
    
     * DocID
 
-   Background - New Table ### PLEASE REVIEW
+   Background 
     * BackgroundID
     * FlowID
     * DirectionID (w.r.t. the foreground; i.e. Electricity is an Input)
-    * NodeTypeID (only Process or Fragment allowed)
-    * TargetID (NOT foreign key- interpret as ProcessID or FragmentID)
+    * NodeTypeID (only Process, Fragment or Cutoff allowed)
+    X TargetID (NOT foreign key- interpret as ProcessID or FragmentID)
+    * ILCDEntityID (FK to ILCDEntity) ILCDEntityID of target Process or Fragment, null when NodeType is Cutoff
+
 
     * DocID
 

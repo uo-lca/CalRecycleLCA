@@ -335,6 +335,40 @@ namespace LcaDataLoader {
             return isImported;
         }
 
+        /// <summary>
+        /// Import a row from Background.csv.
+        /// Row is skipped if the following errors are detected:
+        ///     A Flow with UUID = FlowUUID was not previously loaded.
+        ///     The row has a TargetUUID, but the ILCDEntityID table does not contain that UUID.
+        /// </summary>
+        /// <param name="row">The row to import</param>
+        /// <param name="dbContext">Current instance of DbContextWrapper</param>
+        /// <returns>true if a Background record was created or updated, ow false</returns>
+        private static bool ImportBackground(Row row, DbContextWrapper dbContext) {
+            bool isImported = false, isNew = true;
+            int id = Convert.ToInt32(row["BackgroundID"]);
+            int? flowID = dbContext.GetIlcdEntityID<Flow>(row["FlowUUID"]);
+            int? ilcdEntityID = null;
+            int nodeTypeID = Convert.ToInt32(row["NodeTypeID"]);
+            if (!string.IsNullOrEmpty(row["TargetUUID"])) {
+                ILCDEntity ilcdEntity = dbContext.GetIlcdEntity(row["TargetUUID"]);
+                if (ilcdEntity == null) {
+                    Program.Logger.ErrorFormat("Unable to find ILCDEntity with Background Target UUID, {1}. Skipping record.", row["TargetUUID"]);
+                } else {
+                    ilcdEntityID = ilcdEntity.ILCDEntityID;
+                }
+            }
+            if (flowID != null && (ilcdEntityID != null || nodeTypeID == 5 )) {
+                Background ent = dbContext.ProduceEntityWithID<Background>(id, out isNew);
+                ent.NodeTypeID = nodeTypeID;
+                ent.FlowID = Convert.ToInt32(flowID);
+                ent.DirectionID = Convert.ToInt32(row["DirectionID"]);
+                ent.ILCDEntityID = ilcdEntityID;
+                isImported = isNew ? dbContext.AddEntity(ent) : (dbContext.SaveChanges() > 0);
+            }
+            return isImported;
+        }
+
         private static bool ImportUser(Row row, DbContextWrapper dbContext) {
             bool isImported = false;
             int id = Convert.ToInt32(row["UserID"]);
@@ -525,6 +559,7 @@ namespace LcaDataLoader {
                 UpdateEntities(fRows, UpdateFragment, dbContext);
                 ImportCSV(Path.Combine(dirName, "FragmentNodeProcess.csv"), ImportFragmentNodeProcess, dbContext);
                 ImportCSV(Path.Combine(dirName, "FragmentNodeFragment.csv"), ImportFragmentNodeFragment, dbContext);
+                ImportCSV(Path.Combine(dirName, "Background.csv"), ImportBackground, dbContext);
             }
             else {
                 Program.Logger.WarnFormat("Fragment folder, {0}, does not exist.", dirName);
