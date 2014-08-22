@@ -40,6 +40,23 @@ namespace LcaDataModel {
         }
     }
 
+    public partial class DependencyParam : IEntity {
+        [NotMapped]
+        public int ID {
+            get { return DependencyParamID; }
+            set { DependencyParamID = value; }
+        }
+    }
+
+    // Weak entity - related to DependencyParam
+    public partial class DistributionParam : IEntity {
+        [NotMapped]
+        public int ID {
+            get { return DependencyParamID; }
+            set { DependencyParamID = value; }
+        }
+    }
+
     public partial class FlowFlowProperty : IEntity {
         [NotMapped]
         public int ID {
@@ -77,6 +94,14 @@ namespace LcaDataModel {
         public int ID {
             get { return LCIAID; }
             set { LCIAID = value; }
+        }
+    }
+
+    public partial class Param : IEntity {
+        [NotMapped]
+        public int ID {
+            get { return ParamID; }
+            set { ParamID = value; }
         }
     }
 
