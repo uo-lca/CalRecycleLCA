@@ -507,7 +507,10 @@ The following tables are required:
    Param
     * ParamID
     * ParamTypeID
+    + ScenarioID (moved from ScenarioParam)
     * Name
+
+    * DocID
 
     these fields are derived from TypMin and TypMax fields in data tables--
     not yet implemented
@@ -519,12 +522,10 @@ The following tables are required:
     * Max -- determined at invocation (in frontend) except for types 4, 6,
       	     7, where it is always 1.
 
-   ScenarioParam
+   ScenarioParam - DELETE TABLE
     * ScenarioParamID
     * ScenarioID
     * ParamID
-
-    * DocID
 
    DependencyParam
     * DependencyParamID
@@ -571,7 +572,7 @@ The following tables are required:
 
     * DocID
 
-   NodeDissipationParam
+   NodeDissipationParam - DEPRECATED
     * NodeDissipationParamID
     * ParamID (FK to Param, ParamTypeID must be 7)
     * ProcessDissipationID (FK to ProcessDissipation)
@@ -588,7 +589,7 @@ The following tables are required:
 
     * DocID
 
-   NodeEmissionParam
+   NodeEmissionParam - DEPRECATED
     * NodeEmissionParamID
     * ParamID (FK to Param, ParamTypeID must be 9)
     * ProcessFlowID (FK to ProcessFlow)
@@ -597,7 +598,7 @@ The following tables are required:
 
     * DocID
 
-   CharacterizationParam - New Table
+   CharacterizationParam
     * CharacterizationParamID
     * ParamID  (FK to Param, ParamTypeID must be 10)
     * LCIAID (FK)

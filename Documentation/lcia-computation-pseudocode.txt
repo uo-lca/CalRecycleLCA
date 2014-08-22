@@ -51,19 +51,24 @@ inventory = ComputeProcessLCI ( process_id, scenario_id )
 	      ON pf.ProcessFlowID = pep.ProcessFlowID
 	      WHERE pf.ProcessID = process_id
 
+  return inventory;
+
+  // skip this for now:
+
   // compute flow property dissipation emissions
-  dissipation = ComputeProcessDissipation( process_id, scenario_id )
+  // dissipation = ComputeProcessDissipation( process_id, scenario_id )
 
   // use dissipation value where present; inventory value elsewhere
-  return ( SELECT i.FlowID AS FlowID, i.DirectionID AS DirectionID, 
-  	      ( d.Result == NULL ? i.Result : d.Result ) AS Result
-	      FROM inventory i
-	      LEFT OUTER JOIN dissipation d on i.FlowID = d.FlowID
-	      WHERE i.DirectionID = d.DirectionID );
+  // return ( SELECT i.FlowID AS FlowID, i.DirectionID AS DirectionID, 
+  // 	      ( d.Result == NULL ? i.Result : d.Result ) AS Result
+  //	      FROM inventory i
+  //	      LEFT OUTER JOIN dissipation d on i.FlowID = d.FlowID
+  //	      WHERE i.DirectionID = d.DirectionID );
   
 }
 
 
+// skip this for now
 dissipation = ComputeProcessDissipation( process_id, scenario_id )
 {
   // returns a list of flows (FlowID, DirectionID, Result) resulting from
