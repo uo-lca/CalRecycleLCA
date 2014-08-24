@@ -17,13 +17,13 @@ namespace LcaDataModel
         [DatabaseGenerated(DatabaseGeneratedOption.None)]
         public int BackgroundID { get; set; }
 
-        public int? FlowID { get; set; }
+        public int FlowID { get; set; }
 
-        public int? DirectionID { get; set; }
+        public int DirectionID { get; set; }
 
-        public int? NodeTypeID { get; set; }
+        public int NodeTypeID { get; set; }
 
-        public int? TargetID { get; set; }
+        public int? ILCDEntityID { get; set; }
 
         public virtual Direction Direction { get; set; }
 

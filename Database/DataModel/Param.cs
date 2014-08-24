@@ -21,6 +21,7 @@ namespace LcaDataModel
             ScenarioParams = new HashSet<ScenarioParam>();
         }
 
+        [DatabaseGenerated(DatabaseGeneratedOption.None)]
         public int ParamID { get; set; }
 
         public int? ParamTypeID { get; set; }

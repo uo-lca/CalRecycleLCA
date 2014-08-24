@@ -30,18 +30,20 @@ namespace LcaDataModel.Migrations
                 c => new
                     {
                         BackgroundID = c.Int(nullable: false),
-                        FlowID = c.Int(),
-                        DirectionID = c.Int(),
-                        NodeTypeID = c.Int(),
-                        TargetID = c.Int(),
+                        FlowID = c.Int(nullable: false),
+                        DirectionID = c.Int(nullable: false),
+                        NodeTypeID = c.Int(nullable: false),
+                        ILCDEntityID = c.Int(),
                     })
                 .PrimaryKey(t => t.BackgroundID)
-                .ForeignKey("dbo.Direction", t => t.DirectionID)
-                .ForeignKey("dbo.Flow", t => t.FlowID)
-                .ForeignKey("dbo.NodeType", t => t.NodeTypeID)
+                .ForeignKey("dbo.Direction", t => t.DirectionID, cascadeDelete: true)
+                .ForeignKey("dbo.Flow", t => t.FlowID, cascadeDelete: true)
+                .ForeignKey("dbo.ILCDEntity", t => t.ILCDEntityID)
+                .ForeignKey("dbo.NodeType", t => t.NodeTypeID, cascadeDelete: true)
                 .Index(t => t.FlowID)
                 .Index(t => t.DirectionID)
-                .Index(t => t.NodeTypeID);
+                .Index(t => t.NodeTypeID)
+                .Index(t => t.ILCDEntityID);
             
             CreateTable(
                 "dbo.Direction",
@@ -84,7 +86,7 @@ namespace LcaDataModel.Migrations
                 "dbo.DependencyParam",
                 c => new
                     {
-                        DependencyParamID = c.Int(nullable: false, identity: true),
+                        DependencyParamID = c.Int(nullable: false),
                         ParamID = c.Int(),
                         FragmentFlowID = c.Int(),
                         Value = c.Double(),
@@ -112,9 +114,9 @@ namespace LcaDataModel.Migrations
                 "dbo.Param",
                 c => new
                     {
-                        ParamID = c.Int(nullable: false, identity: true),
+                        ParamID = c.Int(nullable: false),
                         ParamTypeID = c.Int(),
-                        Name = c.String(maxLength: 30, unicode: false),
+                        Name = c.String(maxLength: 255, unicode: false),
                         Min = c.Double(),
                         Typ = c.Double(),
                         Max = c.Double(),
@@ -881,6 +883,7 @@ namespace LcaDataModel.Migrations
             DropForeignKey("dbo.CategorySystem", "DataTypeID", "dbo.DataType");
             DropForeignKey("dbo.Category", "CategorySystemID", "dbo.CategorySystem");
             DropForeignKey("dbo.Category", "ParentCategoryID", "dbo.Category");
+            DropForeignKey("dbo.Background", "ILCDEntityID", "dbo.ILCDEntity");
             DropForeignKey("dbo.Flow", "ReferenceFlowProperty", "dbo.FlowProperty");
             DropForeignKey("dbo.FlowPropertyEmission", "FlowPropertyID", "dbo.FlowProperty");
             DropForeignKey("dbo.FlowPropertyEmission", "FlowID", "dbo.Flow");
@@ -986,6 +989,7 @@ namespace LcaDataModel.Migrations
             DropIndex("dbo.FragmentFlow", new[] { "NodeTypeID" });
             DropIndex("dbo.FragmentFlow", new[] { "FragmentStageID" });
             DropIndex("dbo.FragmentFlow", new[] { "FragmentID" });
+            DropIndex("dbo.Background", new[] { "ILCDEntityID" });
             DropIndex("dbo.Background", new[] { "NodeTypeID" });
             DropIndex("dbo.Background", new[] { "DirectionID" });
             DropIndex("dbo.Background", new[] { "FlowID" });

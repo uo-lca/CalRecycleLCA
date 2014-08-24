@@ -163,6 +163,29 @@ namespace LcaDataLoader {
             _DbContext.Set<T>().AddRange(entityList);
             SaveChanges();
         }
+        
+        /// <summary>
+        /// Find entity with a given ID and create it if it does not already exist.
+        /// Changes are not saved so that other properties can be set before saving.
+        /// New entity must be Added after updating properties in case AutoDetectChanges enabled.
+        /// Use this when loading entities from CSV. 
+        /// </summary>
+        /// <typeparam name="T">Entity Type</typeparam>
+        /// <param name="id">Entity ID</param>
+        /// <param name="isNew">Output: flags when a new entity was created.</param>
+        /// <returns>New or existing entity with matching ID</returns>
+        public T ProduceEntityWithID<T>(int id, out bool isNew) where T : class, IEntity, new() {
+            T ent = Find<T>(id);
+            if (ent == null) {
+                ent = new T { ID = id };
+                isNew = true;
+            }
+            else {
+                Program.Logger.WarnFormat("Found {1} with ID = {0}. Entity will not be added, but may be updated.", id, typeof(T).ToString());
+                isNew = false;
+            }
+            return ent;
+        }
 
         /// <summary>
         /// Create an entity with a given ID, if the ID does not already exist, and add it to the data model.
@@ -178,7 +201,7 @@ namespace LcaDataLoader {
                 _DbContext.Set<T>().Add(ent);
             }
             else {
-                Program.Logger.WarnFormat("Found {1} with ID = {0}. Entity will not be added.", id, typeof(T).ToString());
+                Program.Logger.WarnFormat("Found {1} with ID = {0}. Entity will not be added, but may be updated.", id, typeof(T).ToString());
             }
             return ent;
         }

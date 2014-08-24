@@ -10,6 +10,7 @@ namespace LcaDataModel
     public partial class DistributionParam
     {
         [Key]
+        [DatabaseGenerated(DatabaseGeneratedOption.None)]
         public int DependencyParamID { get; set; }
 
         public int ConservationDependencyParamID { get; set; }

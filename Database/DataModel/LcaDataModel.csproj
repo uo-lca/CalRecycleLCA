@@ -83,9 +83,9 @@
     <Compile Include="IObjectState.cs" />
     <Compile Include="LCIA.cs" />
     <Compile Include="LCIAMethod.cs" />
-    <Compile Include="Migrations\201408202246073_Initial.cs" />
-    <Compile Include="Migrations\201408202246073_Initial.Designer.cs">
-      <DependentUpon>201408202246073_Initial.cs</DependentUpon>
+    <Compile Include="Migrations\201408212337337_Initial.cs" />
+    <Compile Include="Migrations\201408212337337_Initial.Designer.cs">
+      <DependentUpon>201408212337337_Initial.cs</DependentUpon>
     </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="NodeCache.cs" />
@@ -126,8 +126,8 @@
     </None>
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="Migrations\201408202246073_Initial.resx">
-      <DependentUpon>201408202246073_Initial.cs</DependentUpon>
+    <EmbeddedResource Include="Migrations\201408212337337_Initial.resx">
+      <DependentUpon>201408212337337_Initial.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

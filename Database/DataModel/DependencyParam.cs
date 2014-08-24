@@ -13,7 +13,7 @@ namespace LcaDataModel
         {
             ConservationDistributionParams = new HashSet<DistributionParam>();
         }
-
+        [DatabaseGenerated(DatabaseGeneratedOption.None)]
         public int DependencyParamID { get; set; }
 
         public int? ParamID { get; set; }
