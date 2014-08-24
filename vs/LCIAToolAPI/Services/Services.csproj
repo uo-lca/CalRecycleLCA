@@ -129,16 +129,32 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="CharacterizationParamService.cs" />
     <Compile Include="DependencyParamService.cs" />
     <Compile Include="FlowFlowPropertyService.cs" />
+    <Compile Include="FlowPropertyEmissionService.cs" />
     <Compile Include="FlowPropertyParamService.cs" />
     <Compile Include="FlowPropertyService.cs" />
     <Compile Include="FragmentNodeProcessService.cs" />
     <Compile Include="FragmentTraversalV2.cs" />
+    <Compile Include="ICharacterizationParamService.cs" />
+    <Compile Include="IFlowPropertyEmissionService.cs" />
     <Compile Include="IFragmentNodeProcessService.cs" />
     <Compile Include="IFragmentTraversalV2.cs" />
+    <Compile Include="ILCIAComputationV2.cs" />
+    <Compile Include="ILCIAMethodService.cs" />
+    <Compile Include="ILCIAService.cs" />
+    <Compile Include="IProcessDissipationParamService.cs" />
+    <Compile Include="IProcessDissipationService.cs" />
+    <Compile Include="IProcessEmissionParamService.cs" />
     <Compile Include="IProcessFlowService.cs" />
     <Compile Include="IProcessService.cs" />
+    <Compile Include="LCIAComputationV2.cs" />
+    <Compile Include="LCIAMethodService.cs" />
+    <Compile Include="LCIAService.cs" />
+    <Compile Include="ProcessDissipationParamService.cs" />
+    <Compile Include="ProcessDissipationService.cs" />
+    <Compile Include="ProcessEmissionParamService.cs" />
     <Compile Include="ProcessFlowService.cs" />
     <Compile Include="ProcessService.cs" />
     <Compile Include="FlowService.cs" />
