@@ -14,7 +14,7 @@ namespace LcaDataModel
             BackgroundCaches = new HashSet<BackgroundCache>();
             NodeCaches = new HashSet<NodeCache>();
             ScenarioBackgrounds = new HashSet<ScenarioBackground>();
-            ScenarioParams = new HashSet<ScenarioParam>();
+            Params = new HashSet<Param>();
             FragmentSubstitutions = new HashSet<FragmentSubstitution>();
             ProcessSubstitutions = new HashSet<ProcessSubstitution>();
         }
@@ -35,7 +35,7 @@ namespace LcaDataModel
 
         public virtual ICollection<ScenarioBackground> ScenarioBackgrounds { get; set; }
 
-        public virtual ICollection<ScenarioParam> ScenarioParams { get; set; }
+        public virtual ICollection<Param> Params { get; set; }
 
         public virtual ICollection<FragmentSubstitution> FragmentSubstitutions { get; set; }
 

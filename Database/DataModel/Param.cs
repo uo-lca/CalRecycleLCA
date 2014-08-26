@@ -18,13 +18,14 @@ namespace LcaDataModel
             NodeEmissionParams = new HashSet<NodeEmissionParam>();
             ProcessDissipationParams = new HashSet<ProcessDissipationParam>();
             ProcessEmissionParams = new HashSet<ProcessEmissionParam>();
-            ScenarioParams = new HashSet<ScenarioParam>();
         }
 
         [DatabaseGenerated(DatabaseGeneratedOption.None)]
         public int ParamID { get; set; }
 
         public int? ParamTypeID { get; set; }
+
+        public int ScenarioID { get; set; }
 
         [StringLength(255)]
         public string Name { get; set; }
@@ -51,6 +52,6 @@ namespace LcaDataModel
 
         public virtual ICollection<ProcessEmissionParam> ProcessEmissionParams { get; set; }
 
-        public virtual ICollection<ScenarioParam> ScenarioParams { get; set; }
+        public virtual Scenario Scenario { get; set; }
     }
 }

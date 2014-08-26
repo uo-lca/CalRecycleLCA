@@ -60,7 +60,7 @@ namespace LcaDataModel {
         public virtual DbSet<Scenario> Scenarios { get; set; }
         public virtual DbSet<ScenarioBackground> ScenarioBackgrounds { get; set; }
         public virtual DbSet<ScenarioGroup> ScenarioGroups { get; set; }
-        public virtual DbSet<ScenarioParam> ScenarioParams { get; set; }
+        
         public virtual DbSet<ScoreCache> ScoreCaches { get; set; }
         public virtual DbSet<UnitConversion> UnitConversions { get; set; }
         public virtual DbSet<UnitGroup> UnitGroups { get; set; }

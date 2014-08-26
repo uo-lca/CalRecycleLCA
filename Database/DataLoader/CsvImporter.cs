@@ -421,6 +421,7 @@ namespace LcaDataLoader {
             int id = Convert.ToInt32(row["ParamID"]);
             Param ent = dbContext.ProduceEntityWithID<Param>(id, out isNew);
             ent.ParamTypeID = Convert.ToInt32(row["ParamTypeID"]);
+            ent.ScenarioID = Convert.ToInt32(row["ScenarioID"]);
             ent.Name = row["Name"];
             isImported = isNew ? dbContext.AddEntity(ent) : (dbContext.SaveChanges() > 0);
             return isImported;

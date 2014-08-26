@@ -87,6 +87,10 @@
     <Compile Include="Migrations\201408212337337_Initial.Designer.cs">
       <DependentUpon>201408212337337_Initial.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\201408261751080_RefactorScenarioParam.cs" />
+    <Compile Include="Migrations\201408261751080_RefactorScenarioParam.Designer.cs">
+      <DependentUpon>201408261751080_RefactorScenarioParam.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="NodeCache.cs" />
     <Compile Include="NodeDissipationParam.cs" />
@@ -109,7 +113,6 @@
     <Compile Include="Scenario.cs" />
     <Compile Include="ScenarioBackground.cs" />
     <Compile Include="ScenarioGroup.cs" />
-    <Compile Include="ScenarioParam.cs" />
     <Compile Include="ScoreCache.cs" />
     <Compile Include="UnitConversion.cs" />
     <Compile Include="UnitGroup.cs" />
@@ -128,6 +131,9 @@
   <ItemGroup>
     <EmbeddedResource Include="Migrations\201408212337337_Initial.resx">
       <DependentUpon>201408212337337_Initial.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201408261751080_RefactorScenarioParam.resx">
+      <DependentUpon>201408261751080_RefactorScenarioParam.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
