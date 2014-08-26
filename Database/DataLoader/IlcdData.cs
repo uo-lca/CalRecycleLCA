@@ -236,24 +236,17 @@ namespace LcaDataLoader {
             bool isSaved = false;
             string dataSetInternalID = "0";
             string uuid = GetCommonUUID();
-            int? entityID = ilcdDb.GetIlcdEntityID<UnitGroup>(uuid);
-            if (entityID == null) {
+            if (!ilcdDb.IlcdEntityAlreadyExists<UnitGroup>(uuid)) {
                 UnitGroup unitGroup = new UnitGroup();
                 SaveIlcdEntity(ilcdDb, unitGroup, DataTypeEnum.UnitGroup);
                 unitGroup.Name = GetCommonName();
                 // Get Reference Flow Property
                 dataSetInternalID = GetElementValue(ElementName("referenceToReferenceUnit"));
-                if (ilcdDb.AddIlcdEntity(unitGroup)) {
-                    _EntityIdDictionary[uuid] = unitGroup.UnitGroupID;
+                if (ilcdDb.AddIlcdEntity(unitGroup, uuid)) {
                     ilcdDb.AddEntities<UnitConversion>(CreateUnitConversionList(unitGroup, dataSetInternalID));
                     isSaved = true;
                 }
             }
-            else {
-                Program.Logger.WarnFormat("Unit Group with UUID {0} was already imported and will not be updated.", uuid);
-                _EntityIdDictionary[uuid] = Convert.ToInt32(entityID);
-            }
-            
             return isSaved;
         }
 
@@ -289,8 +282,7 @@ namespace LcaDataLoader {
             bool isSaved = false;
             string ugUUID;            
             string uuid = GetCommonUUID();
-            int? entityID = ilcdDb.GetIlcdEntityID<FlowProperty>(uuid);
-            if (entityID == null) {
+            if (!ilcdDb.IlcdEntityAlreadyExists<FlowProperty>(uuid)) {
                 FlowProperty flowProperty = new FlowProperty();
                 SaveIlcdEntity(ilcdDb, flowProperty, DataTypeEnum.FlowProperty);
                 flowProperty.Name = GetCommonName();
@@ -308,14 +300,7 @@ namespace LcaDataLoader {
                     } 
                 }
 
-                if (ilcdDb.AddIlcdEntity(flowProperty)) {
-                    _EntityIdDictionary[uuid] = flowProperty.FlowPropertyID;
-                    isSaved = true;
-                }
-            }
-            else {
-                Program.Logger.WarnFormat("FlowProperty with UUID {0} was already imported and will not be updated.", uuid);
-                _EntityIdDictionary[uuid] = Convert.ToInt32(entityID);
+                isSaved = ilcdDb.AddIlcdEntity(flowProperty, uuid);
             }
             
             return isSaved;
@@ -366,8 +351,7 @@ namespace LcaDataLoader {
                 fpID = GetFlowPropertyID(ilcdDb, fpElement);
                 flow.ReferenceFlowProperty = fpID;
 
-                if (ilcdDb.AddIlcdEntity(flow)) {
-                    _EntityIdDictionary[uuid] = flow.FlowID;
+                if (ilcdDb.AddIlcdEntity(flow, uuid)) {
                     ilcdDb.AddEntities<FlowFlowProperty>(CreateFFPList(ilcdDb, flow));
                     isSaved = true;
                 }
@@ -409,7 +393,7 @@ namespace LcaDataLoader {
                 refUUID = GetElementAttributeValue(ElementName("referenceQuantity"), "refObjectId");
                 Debug.Assert(refUUID != null);
                 lciaMethod.ReferenceQuantity = ilcdDb.GetIlcdEntityID<FlowProperty>(refUUID);
-                if (ilcdDb.AddIlcdEntity(lciaMethod)) {
+                if (ilcdDb.AddIlcdEntity(lciaMethod, uuid)) {
                     List<LCIA> lciaList =
                         LoadedDocument.Root.Descendants(ElementName("characterisationFactors")).Elements(ElementName("factor")).Select(f =>
                             CreateLCIA(ilcdDb, f, lciaMethod.ID)).ToList();
@@ -442,7 +426,7 @@ namespace LcaDataLoader {
             if (lookupName != null) {
                 process.ProcessTypeID = ilcdDb.LookupEntityID<ProcessType>(lookupName);
             }
-            if (ilcdDb.AddIlcdEntity(process)) {
+            if (ilcdDb.AddIlcdEntity(process, GetCommonUUID())) {
                 List<ProcessFlow> pfList =
                     LoadedDocument.Root.Descendants(ElementName("exchanges")).Elements(ElementName("exchange")).Select(f =>
                         CreateProcessFlow(ilcdDb, f, process.ID)).ToList();

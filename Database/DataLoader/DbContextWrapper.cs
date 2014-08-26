@@ -21,6 +21,9 @@ namespace LcaDataLoader {
         // Punctuation characters used to determine where to truncate name
         static char[] _NameDelimiters = new char[] { '(', '.', ',', ':', ';' };
 
+        // Map UUID to specific entity ID (FlowID, FlowPropertyID, etc.) for fast lookup
+        Dictionary<string, int> _EntityIdDictionary = new Dictionary<string, int>();
+
         // Flag: Has Dispose already been called? 
         bool disposed = false;
 
@@ -130,16 +133,16 @@ namespace LcaDataLoader {
         }
 
         /// <summary>
-        /// Insert ILCD entity into the database.
+        /// Insert ILCD entity into the database and cache ID for future lookup.
         /// </summary>
         /// <param name="ilcdEntity">An entity with a UUID.</param>
+        /// <param name="uuid">the UUID</param>
         /// <returns>true iff entity was successfully inserted</returns>
-        /// TODO : this method is no longer needed. Replace all references with AddEntity, defined below
-        public bool AddIlcdEntity(IIlcdEntity ilcdEntity) {
+        public bool AddIlcdEntity(IIlcdEntity ilcdEntity, string uuid) {
             bool isAdded = false;
-
             _DbContext.Set(ilcdEntity.GetType()).Add(ilcdEntity);
             if (SaveChanges() > 0) {
+                _EntityIdDictionary[uuid] = ilcdEntity.ID;
                 isAdded = true;
             }
             return isAdded;
@@ -394,6 +397,26 @@ namespace LcaDataLoader {
         public ILCDEntity GetIlcdEntity(string uuid) {
             ILCDEntity entity = (from il in _DbContext.ILCDEntities where il.UUID == uuid select il).FirstOrDefault();
             return entity;
+        }
+
+        /// <summary>
+        /// Use this method before creating an ILCD entity (excluding Process) 
+        /// to check if an ILCD entity with the same UUID already exists in the database.
+        /// In this case, do not create.
+        /// If an entity with the same UUID is found, this method logs a warning, and caches the ID for future lookup.
+        /// </summary>
+        ///  /// <param name="uuid">The UUID value</param>
+        /// <returns>true iff found</returns>
+        public bool IlcdEntityAlreadyExists<T>(string uuid) where T : class, IIlcdEntity {
+            int? entityID = GetIlcdEntityID<T>(uuid);
+            if (entityID == null) {
+                return false;
+            }
+            else {
+                Program.Logger.WarnFormat("{0} with UUID {1} was already imported.", uuid, typeof(T).ToString());
+                _EntityIdDictionary[uuid] = Convert.ToInt32(entityID);
+                return true;
+            }
         }
 
         /// <summary>
