@@ -149,7 +149,36 @@ namespace LcaDataLoader {
         }
 
         /// <summary>
-        /// Insert  entity into the database.
+        /// Search for entity by UUID and output its specific entity ID.
+        /// Use this method to get the entity ID of an ILCD entity that should 
+        /// have been imported into the database.
+        /// For example, if T is Flow, and a flow with the given UUID was previously loaded,
+        /// return its FlowID.
+        /// Searches local cache first, then database. 
+        /// If found in database, updates cache.
+        /// If not found, logs an error.
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="ilcdDb">Current DbContextWrapper instance</param>
+        /// <param name="uuid">The UUID</param>
+        /// <param name="outID">Output: Entity ID in its own table</param>
+        /// <returns>true iff the entity was found</returns>
+        public bool FindRefIlcdEntityID<T>(string uuid, out int outID) where T : class, IIlcdEntity {
+            bool found = _EntityIdDictionary.TryGetValue(uuid, out outID);
+            if (!found) {
+                int? nid = GetIlcdEntityID<T>(uuid);
+                if (nid != null) {
+                    outID = Convert.ToInt32(nid);
+                    _EntityIdDictionary[uuid] = outID;
+                    found = true;
+                }
+            }
+            return found;
+        }
+
+        /// <summary>
+        /// Insert entity into the database.
+        /// Use to add non-ILCD entities (have no UUID)
         /// </summary>
         /// <param name="entity">An entity modeled in LcaDataModel</param>
         /// <returns>true iff entity was successfully inserted</returns>
@@ -160,6 +189,7 @@ namespace LcaDataLoader {
 
         /// <summary>
         /// Insert  list of entities into the database.
+        /// Use to import relationships from ILCD data.
         /// </summary>
         /// <param name="entityList">List of entities modeled in LcaDataModel</param>
         public void AddEntities<T>(List<T> entityList) where T : class  {
@@ -171,7 +201,7 @@ namespace LcaDataLoader {
         /// Find entity with a given ID and create it if it does not already exist.
         /// Changes are not saved so that other properties can be set before saving.
         /// New entity must be Added after updating properties in case AutoDetectChanges enabled.
-        /// Use this when loading entities from CSV. 
+        /// Use this when loading non-ILCD entities from CSV. 
         /// </summary>
         /// <typeparam name="T">Entity Type</typeparam>
         /// <param name="id">Entity ID</param>
@@ -197,6 +227,7 @@ namespace LcaDataLoader {
         /// </summary>
         /// <param name="id">The entity ID</param>
         /// <returns>New or existing entity with matching ID</returns>
+        /// TODO: Replace usage of this method with new method above
         public T CreateEntityWithID<T>(int id) where T : class, IEntity, new() {
             T ent = Find<T>(id);
             if (ent == null) {
@@ -382,17 +413,6 @@ namespace LcaDataLoader {
         /// Use this method to check if an ILCDEntity with given UUID already exists in the database
         /// </summary>
         /// <param name="uuid">The UUID value</param>
-        /// <returns>true iff found</returns>
-        public bool IlcdUuidExists(string uuid) {
-            return (GetIlcdEntity(uuid) != null);
-        }
-
-        
-
-        /// <summary>
-        /// Use this method to check if an ILCDEntity with given UUID already exists in the database
-        /// </summary>
-        /// <param name="uuid">The UUID value</param>
         /// <returns>Instance of ILCDEntity if found, otherwise null</returns>
         public ILCDEntity GetIlcdEntity(string uuid) {
             ILCDEntity entity = (from il in _DbContext.ILCDEntities where il.UUID == uuid select il).FirstOrDefault();
@@ -400,13 +420,14 @@ namespace LcaDataLoader {
         }
 
         /// <summary>
-        /// Use this method before creating an ILCD entity (excluding Process) 
+        /// Use this method before creating an ILCD entity 
         /// to check if an ILCD entity with the same UUID already exists in the database.
         /// In this case, do not create.
         /// If an entity with the same UUID is found, this method logs a warning, and caches the ID for future lookup.
         /// </summary>
         ///  /// <param name="uuid">The UUID value</param>
         /// <returns>true iff found</returns>
+        /// TODO : Create new methods for ILCD entities where key is UUID + Version (Process)
         public bool IlcdEntityAlreadyExists<T>(string uuid) where T : class, IIlcdEntity {
             int? entityID = GetIlcdEntityID<T>(uuid);
             if (entityID == null) {

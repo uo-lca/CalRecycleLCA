@@ -22,9 +22,6 @@ namespace LcaDataLoader {
         /// </summary>
         public XDocument LoadedDocument { get; set; }
 
-        // Cache for use in references - map UUID to specific entity ID 
-        Dictionary<string, int> _EntityIdDictionary = new Dictionary<string, int>();
-
         /// <summary>
         /// Find descendant element with given name and return its value
         /// </summary>
@@ -162,6 +159,9 @@ namespace LcaDataLoader {
             string direction = (string)el.Element(ElementName(("exchangeDirection")));
             string location = (string)el.Element(ElementName(("location")));
             string name = (string)refEl.Element(_CommonNamespace + "shortDescription");
+            // Most of the referenced flows will not be found, so bypass method that
+            // searches cache
+            // TODO : use HashSet to cache missing flows
             Flow flow = ilcdDb.GetIlcdEntity<Flow>(uuid);
             int? id = null;
             if (flow == null) {
@@ -251,29 +251,6 @@ namespace LcaDataLoader {
         }
 
         /// <summary>
-        /// Search for entity by UUID and output its specific entity ID. 
-        /// Search local cache first, then database. 
-        /// If found in database, add to cache.
-        /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <param name="ilcdDb">Current DbContextWrapper instance</param>
-        /// <param name="uuid">The UUID</param>
-        /// <param name="outID">Output: Entity ID in its own table</param>
-        /// <returns>true iff the entity was found</returns>
-        private bool TryGetIlcdEntityID<T>(DbContextWrapper ilcdDb, string uuid, out int outID) where T : class, IIlcdEntity {
-            bool found = _EntityIdDictionary.TryGetValue(uuid, out outID);
-            if ( !found ) {
-                int? nid = ilcdDb.GetIlcdEntityID<T>(uuid);
-                if (nid != null) {
-                    outID = Convert.ToInt32(nid);
-                    _EntityIdDictionary[uuid] = outID;
-                    found = true;
-                }
-            }
-            return found;
-        }
-
-        /// <summary>
         /// Import data from loaded flowproperty file to new FlowProperty entity
         /// </summary>
         /// <param name="ilcdDb">Database context wrapper object</param>
@@ -293,10 +270,8 @@ namespace LcaDataLoader {
                 }
                 else {
                     int ugID;
-                    if (TryGetIlcdEntityID<UnitGroup>(ilcdDb, ugUUID, out ugID)) {
+                    if (ilcdDb.FindRefIlcdEntityID<UnitGroup>(ugUUID, out ugID)) {
                         flowProperty.UnitGroupID = ugID;
-                    } else {
-                        Program.Logger.ErrorFormat("Unable to find unit group matching flow property refObjectId = {0}", ugUUID);
                     } 
                 }
 
@@ -316,11 +291,10 @@ namespace LcaDataLoader {
         private int? GetFlowPropertyID(DbContextWrapper ilcdDb, XElement fpElement) {
             string fpUUID = fpElement.Element(ElementName("referenceToFlowPropertyDataSet")).Attribute("refObjectId").Value;
             int fpID;
-            if (TryGetIlcdEntityID<FlowProperty>(ilcdDb, fpUUID, out fpID)) {
+            if (ilcdDb.FindRefIlcdEntityID<FlowProperty>( fpUUID, out fpID)) {
                 return fpID;
             }
             else {
-                Program.Logger.ErrorFormat("Unable to find flow property matching flow refObjectId = {0}", fpUUID);
                 return null;
             }
         }
@@ -336,8 +310,7 @@ namespace LcaDataLoader {
             int? fpID;
             string dataSetInternalID = "0";
             string uuid = GetCommonUUID();
-            int? entityID = ilcdDb.GetIlcdEntityID<FlowProperty>(uuid);
-            if (entityID == null) {
+            if (!ilcdDb.IlcdEntityAlreadyExists<FlowProperty>(uuid)) {
                 XElement fpElement;
                 Flow flow = new Flow();
                 SaveIlcdEntity(ilcdDb, flow, DataTypeEnum.Flow);
@@ -356,10 +329,6 @@ namespace LcaDataLoader {
                     isSaved = true;
                 }
             }
-            else {
-                Program.Logger.WarnFormat("Flow with UUID {0} was already imported and will not be updated.", uuid);
-                _EntityIdDictionary[uuid] = Convert.ToInt32(entityID);
-            }
 
             return isSaved;
         }
@@ -369,8 +338,7 @@ namespace LcaDataLoader {
             string lookupName;
             string refUUID;
             string uuid = GetCommonUUID();
-            int? entityID = ilcdDb.GetIlcdEntityID<FlowProperty>(uuid);
-            if (entityID == null) {
+            if (!ilcdDb.IlcdEntityAlreadyExists<LCIAMethod>(uuid)) {
                 LCIAMethod lciaMethod = new LCIAMethod();
                 SaveIlcdEntity(ilcdDb, lciaMethod, DataTypeEnum.LCIAMethod);
                 lciaMethod.Name = GetCommonName();
@@ -392,7 +360,10 @@ namespace LcaDataLoader {
                 lciaMethod.UseAdvice = GetElementValue(ElementName("useAdviceForDataSet"));
                 refUUID = GetElementAttributeValue(ElementName("referenceQuantity"), "refObjectId");
                 Debug.Assert(refUUID != null);
-                lciaMethod.ReferenceQuantity = ilcdDb.GetIlcdEntityID<FlowProperty>(refUUID);
+                int refID;
+                if (ilcdDb.FindRefIlcdEntityID<FlowProperty>(refUUID, out refID)) {
+                    lciaMethod.ReferenceQuantity = refID;
+                }
                 if (ilcdDb.AddIlcdEntity(lciaMethod, uuid)) {
                     List<LCIA> lciaList =
                         LoadedDocument.Root.Descendants(ElementName("characterisationFactors")).Elements(ElementName("factor")).Select(f =>
@@ -402,10 +373,6 @@ namespace LcaDataLoader {
                     isSaved = true;
 
                 }
-                else {
-                    Program.Logger.WarnFormat("LCIA Method with UUID {0} was already imported and will not be updated.", uuid);
-                    _EntityIdDictionary[uuid] = Convert.ToInt32(entityID);
-                }
             }
             return isSaved;
         }
@@ -413,26 +380,29 @@ namespace LcaDataLoader {
         private bool SaveProcess(DbContextWrapper ilcdDb) {
             bool isSaved = false;
             string lookupName;
-            LcaDataModel.Process process = new LcaDataModel.Process();
-            SaveIlcdEntity(ilcdDb, process, DataTypeEnum.Process);
-            process.Name = GetElementValue(ElementName("baseName"));
-            process.ReferenceYear = GetElementValue(_CommonNamespace + "referenceYear");
-            process.Geography = GetElementAttributeValue(ElementName("locationOfOperationSupplyOrProduction"), "location");            
-            lookupName = GetElementAttributeValue(ElementName("quantitativeReference"), "type");
-            if (lookupName != null) {
-                process.ReferenceTypeID = ilcdDb.LookupEntityID<ReferenceType>(lookupName);
-            }
-            lookupName = GetElementValue(ElementName("typeOfDataSet"));
-            if (lookupName != null) {
-                process.ProcessTypeID = ilcdDb.LookupEntityID<ProcessType>(lookupName);
-            }
-            if (ilcdDb.AddIlcdEntity(process, GetCommonUUID())) {
-                List<ProcessFlow> pfList =
-                    LoadedDocument.Root.Descendants(ElementName("exchanges")).Elements(ElementName("exchange")).Select(f =>
-                        CreateProcessFlow(ilcdDb, f, process.ID)).ToList();
-                ilcdDb.AddEntities<ProcessFlow>(pfList);
+            string uuid = GetCommonUUID();
+            if (!ilcdDb.IlcdEntityAlreadyExists<LcaDataModel.Process>(uuid)) {
+                LcaDataModel.Process process = new LcaDataModel.Process();
+                SaveIlcdEntity(ilcdDb, process, DataTypeEnum.Process);
+                process.Name = GetElementValue(ElementName("baseName"));
+                process.ReferenceYear = GetElementValue(_CommonNamespace + "referenceYear");
+                process.Geography = GetElementAttributeValue(ElementName("locationOfOperationSupplyOrProduction"), "location");
+                lookupName = GetElementAttributeValue(ElementName("quantitativeReference"), "type");
+                if (lookupName != null) {
+                    process.ReferenceTypeID = ilcdDb.LookupEntityID<ReferenceType>(lookupName);
+                }
+                lookupName = GetElementValue(ElementName("typeOfDataSet"));
+                if (lookupName != null) {
+                    process.ProcessTypeID = ilcdDb.LookupEntityID<ProcessType>(lookupName);
+                }
+                if (ilcdDb.AddIlcdEntity(process, uuid)) {
+                    List<ProcessFlow> pfList =
+                        LoadedDocument.Root.Descendants(ElementName("exchanges")).Elements(ElementName("exchange")).Select(f =>
+                            CreateProcessFlow(ilcdDb, f, process.ID)).ToList();
+                    ilcdDb.AddEntities<ProcessFlow>(pfList);
 
-                isSaved = true;
+                    isSaved = true;
+                }
             }
             return isSaved;
         }
@@ -446,29 +416,25 @@ namespace LcaDataLoader {
             bool isSaved = false;
             Debug.Assert(LoadedDocument != null, "LoadedDocument must be set before calling Save.");
             string nsString = LoadedDocument.Root.Name.Namespace.ToString();
-            string commonUUID = GetCommonUUID();
-            if (ilcdDb.IlcdUuidExists(commonUUID)) {
-                Program.Logger.WarnFormat("UUID {0} was already imported and will not be updated.", commonUUID);
+          
+            switch (nsString) {
+                case "http://lca.jrc.it/ILCD/UnitGroup":
+                    isSaved = SaveUnitGroup(ilcdDb);
+                    break;
+                case "http://lca.jrc.it/ILCD/FlowProperty":
+                    isSaved = SaveFlowProperty(ilcdDb);
+                    break;
+                case "http://lca.jrc.it/ILCD/Flow":
+                    isSaved = SaveFlow(ilcdDb);
+                    break;
+                case "http://lca.jrc.it/ILCD/LCIAMethod":
+                    isSaved = SaveLciaMethod(ilcdDb);
+                    break;
+                case "http://lca.jrc.it/ILCD/Process":
+                    isSaved = SaveProcess(ilcdDb);
+                    break;
             }
-            else {
-                switch (nsString) {
-                    case "http://lca.jrc.it/ILCD/UnitGroup":
-                        isSaved = SaveUnitGroup(ilcdDb);
-                        break;
-                    case "http://lca.jrc.it/ILCD/FlowProperty":
-                        isSaved = SaveFlowProperty(ilcdDb);
-                        break;
-                    case "http://lca.jrc.it/ILCD/Flow":
-                        isSaved = SaveFlow(ilcdDb);
-                        break;
-                    case "http://lca.jrc.it/ILCD/LCIAMethod":
-                        isSaved = SaveLciaMethod(ilcdDb);
-                        break;
-                    case "http://lca.jrc.it/ILCD/Process":
-                        isSaved = SaveProcess(ilcdDb);
-                        break;
-                }
-            }
+
             return isSaved;
         }
 
