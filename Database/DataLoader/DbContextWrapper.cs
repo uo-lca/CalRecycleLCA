@@ -19,7 +19,7 @@ namespace LcaDataLoader {
         int _CurrentIlcdDataProviderID;
 
         // Punctuation characters used to determine where to truncate name
-        static char[] nameDelimiters = new char[] { '(', '.', ',', ':', ';' };
+        static char[] _NameDelimiters = new char[] { '(', '.', ',', ':', ';' };
 
         // Flag: Has Dispose already been called? 
         bool disposed = false;
@@ -55,7 +55,7 @@ namespace LcaDataLoader {
             }
 
             // name is longer, so try to find out where to cut
-            int index = name.LastIndexOfAny(nameDelimiters, length);
+            int index = name.LastIndexOfAny(_NameDelimiters, length);
             if (index < length * 2 / 3) {
                 index = name.LastIndexOf(' ', length);
             }
@@ -374,6 +374,7 @@ namespace LcaDataLoader {
             return flowTypeName.Equals("Elementary flow") ? Convert.ToInt32(FlowTypeEnum.ElementaryFlow) : Convert.ToInt32(FlowTypeEnum.IntermediateFlow);
         }
 
+
         /// <summary>
         /// Use this method to check if an ILCDEntity with given UUID already exists in the database
         /// </summary>
@@ -382,6 +383,8 @@ namespace LcaDataLoader {
         public bool IlcdUuidExists(string uuid) {
             return (GetIlcdEntity(uuid) != null);
         }
+
+        
 
         /// <summary>
         /// Use this method to check if an ILCDEntity with given UUID already exists in the database

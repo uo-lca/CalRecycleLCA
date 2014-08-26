@@ -22,6 +22,9 @@ namespace LcaDataLoader {
         /// </summary>
         public XDocument LoadedDocument { get; set; }
 
+        // Cache for use in references - map UUID to specific entity ID 
+        Dictionary<string, int> _EntityIdDictionary = new Dictionary<string, int>();
+
         /// <summary>
         /// Find descendant element with given name and return its value
         /// </summary>
@@ -231,17 +234,50 @@ namespace LcaDataLoader {
         /// <returns>true iff data was imported</returns>
         private bool SaveUnitGroup(DbContextWrapper ilcdDb) {
             bool isSaved = false;
-            string dataSetInternalID = "0"; 
-            UnitGroup unitGroup = new UnitGroup();
-            SaveIlcdEntity(ilcdDb, unitGroup, DataTypeEnum.UnitGroup);
-            unitGroup.Name = GetCommonName();
-            // Get Reference Flow Property
-            dataSetInternalID = GetElementValue(ElementName("referenceToReferenceUnit"));
-            if (ilcdDb.AddIlcdEntity(unitGroup)) {
-                ilcdDb.AddEntities<UnitConversion>(CreateUnitConversionList(unitGroup, dataSetInternalID));
+            string dataSetInternalID = "0";
+            string uuid = GetCommonUUID();
+            int? entityID = ilcdDb.GetIlcdEntityID<UnitGroup>(uuid);
+            if (entityID == null) {
+                UnitGroup unitGroup = new UnitGroup();
+                SaveIlcdEntity(ilcdDb, unitGroup, DataTypeEnum.UnitGroup);
+                unitGroup.Name = GetCommonName();
+                // Get Reference Flow Property
+                dataSetInternalID = GetElementValue(ElementName("referenceToReferenceUnit"));
+                if (ilcdDb.AddIlcdEntity(unitGroup)) {
+                    _EntityIdDictionary[uuid] = unitGroup.UnitGroupID;
+                    ilcdDb.AddEntities<UnitConversion>(CreateUnitConversionList(unitGroup, dataSetInternalID));
                     isSaved = true;
+                }
             }
+            else {
+                Program.Logger.WarnFormat("Unit Group with UUID {0} was already imported and will not be updated.", uuid);
+                _EntityIdDictionary[uuid] = Convert.ToInt32(entityID);
+            }
+            
             return isSaved;
+        }
+
+        /// <summary>
+        /// Search for entity by UUID and output its specific entity ID. 
+        /// Search local cache first, then database. 
+        /// If found in database, add to cache.
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="ilcdDb">Current DbContextWrapper instance</param>
+        /// <param name="uuid">The UUID</param>
+        /// <param name="outID">Output: Entity ID in its own table</param>
+        /// <returns>true iff the entity was found</returns>
+        private bool TryGetIlcdEntityID<T>(DbContextWrapper ilcdDb, string uuid, out int outID) where T : class, IIlcdEntity {
+            bool found = _EntityIdDictionary.TryGetValue(uuid, out outID);
+            if ( !found ) {
+                int? nid = ilcdDb.GetIlcdEntityID<T>(uuid);
+                if (nid != null) {
+                    outID = Convert.ToInt32(nid);
+                    _EntityIdDictionary[uuid] = outID;
+                    found = true;
+                }
+            }
+            return found;
         }
 
         /// <summary>
@@ -251,29 +287,35 @@ namespace LcaDataLoader {
         /// <returns>true iff data was imported</returns>
         private bool SaveFlowProperty(DbContextWrapper ilcdDb) {
             bool isSaved = false;
-            string ugUUID;
-            int? ugID = null;
-            FlowProperty flowProperty = new FlowProperty();
-            SaveIlcdEntity(ilcdDb, flowProperty, DataTypeEnum.FlowProperty);
-            flowProperty.Name = GetCommonName();
-            ugUUID = GetElementAttributeValue(ElementName("referenceToReferenceUnitGroup"), "refObjectId");
-            if (ugUUID == null) {
-                Program.Logger.WarnFormat("Unable to find referenceToReferenceUnitGroup in flow property {0}", 
-                    flowProperty.ILCDEntity.UUID);
-            }
-            else {
-                string referenceUUID = ugUUID;
-                ugID = ilcdDb.GetIlcdEntityID<UnitGroup>((string)referenceUUID);
-                if (ugID == null) {
-                    Program.Logger.WarnFormat("Unable to find unit group matching flow property refObjectId = {0}", ugUUID);
+            string ugUUID;            
+            string uuid = GetCommonUUID();
+            int? entityID = ilcdDb.GetIlcdEntityID<FlowProperty>(uuid);
+            if (entityID == null) {
+                FlowProperty flowProperty = new FlowProperty();
+                SaveIlcdEntity(ilcdDb, flowProperty, DataTypeEnum.FlowProperty);
+                flowProperty.Name = GetCommonName();
+                ugUUID = GetElementAttributeValue(ElementName("referenceToReferenceUnitGroup"), "refObjectId");
+                if (ugUUID == null) {
+                    Program.Logger.WarnFormat("Unable to find referenceToReferenceUnitGroup in flow property {0}",
+                        flowProperty.ILCDEntity.UUID);
                 }
                 else {
-                    flowProperty.UnitGroupID = ugID;
+                    int ugID;
+                    if (TryGetIlcdEntityID<UnitGroup>(ilcdDb, ugUUID, out ugID)) {
+                        flowProperty.UnitGroupID = ugID;
+                    } else {
+                        Program.Logger.ErrorFormat("Unable to find unit group matching flow property refObjectId = {0}", ugUUID);
+                    } 
+                }
+
+                if (ilcdDb.AddIlcdEntity(flowProperty)) {
+                    _EntityIdDictionary[uuid] = flowProperty.FlowPropertyID;
+                    isSaved = true;
                 }
             }
-
-            if (ilcdDb.AddIlcdEntity(flowProperty)) {
-                isSaved = true;
+            else {
+                Program.Logger.WarnFormat("FlowProperty with UUID {0} was already imported and will not be updated.", uuid);
+                _EntityIdDictionary[uuid] = Convert.ToInt32(entityID);
             }
             
             return isSaved;
@@ -288,11 +330,14 @@ namespace LcaDataLoader {
         /// <returns>Entity ID, if the UUID was extracted and a loaded entity ID was found, otherwise null</returns>
         private int? GetFlowPropertyID(DbContextWrapper ilcdDb, XElement fpElement) {
             string fpUUID = fpElement.Element(ElementName("referenceToFlowPropertyDataSet")).Attribute("refObjectId").Value;
-            int? fpID = ilcdDb.GetIlcdEntityID<FlowProperty>(fpUUID);
-            if (fpID == null) {
-                Program.Logger.WarnFormat("Unable to find flow property matching flow refObjectId = {0}", fpUUID);
+            int fpID;
+            if (TryGetIlcdEntityID<FlowProperty>(ilcdDb, fpUUID, out fpID)) {
+                return fpID;
             }
-            return fpID;
+            else {
+                Program.Logger.ErrorFormat("Unable to find flow property matching flow refObjectId = {0}", fpUUID);
+                return null;
+            }
         }
 
 
@@ -305,22 +350,31 @@ namespace LcaDataLoader {
             bool isSaved = false;
             int? fpID;
             string dataSetInternalID = "0";
-            XElement fpElement;
-            Flow flow = new Flow();
-            SaveIlcdEntity(ilcdDb, flow, DataTypeEnum.Flow);
-            // TODO : generate name from classification/category
-            flow.Name = GetElementValue(ElementName("baseName"));
-            flow.CASNumber = GetElementValue(ElementName("CASNumber"));
-            flow.FlowTypeID = ilcdDb.GetFlowTypeID(GetElementValue(ElementName("typeOfDataSet")));
-            // Get Reference Flow Property
-            dataSetInternalID = GetElementValue(ElementName("referenceToReferenceFlowProperty"));
-            fpElement = GetElementWithInternalId(ElementName("flowProperty"), dataSetInternalID);
-            fpID = GetFlowPropertyID(ilcdDb, fpElement);
-            flow.ReferenceFlowProperty = fpID;
+            string uuid = GetCommonUUID();
+            int? entityID = ilcdDb.GetIlcdEntityID<FlowProperty>(uuid);
+            if (entityID == null) {
+                XElement fpElement;
+                Flow flow = new Flow();
+                SaveIlcdEntity(ilcdDb, flow, DataTypeEnum.Flow);
+                // TODO : generate name from classification/category
+                flow.Name = GetElementValue(ElementName("baseName"));
+                flow.CASNumber = GetElementValue(ElementName("CASNumber"));
+                flow.FlowTypeID = ilcdDb.GetFlowTypeID(GetElementValue(ElementName("typeOfDataSet")));
+                // Get Reference Flow Property
+                dataSetInternalID = GetElementValue(ElementName("referenceToReferenceFlowProperty"));
+                fpElement = GetElementWithInternalId(ElementName("flowProperty"), dataSetInternalID);
+                fpID = GetFlowPropertyID(ilcdDb, fpElement);
+                flow.ReferenceFlowProperty = fpID;
 
-            if (ilcdDb.AddIlcdEntity(flow)) {
-                ilcdDb.AddEntities<FlowFlowProperty>(CreateFFPList(ilcdDb, flow));
-                isSaved = true;
+                if (ilcdDb.AddIlcdEntity(flow)) {
+                    _EntityIdDictionary[uuid] = flow.FlowID;
+                    ilcdDb.AddEntities<FlowFlowProperty>(CreateFFPList(ilcdDb, flow));
+                    isSaved = true;
+                }
+            }
+            else {
+                Program.Logger.WarnFormat("Flow with UUID {0} was already imported and will not be updated.", uuid);
+                _EntityIdDictionary[uuid] = Convert.ToInt32(entityID);
             }
 
             return isSaved;
@@ -330,36 +384,44 @@ namespace LcaDataLoader {
             bool isSaved = false;
             string lookupName;
             string refUUID;
-            LCIAMethod lciaMethod = new LCIAMethod();
-            SaveIlcdEntity(ilcdDb, lciaMethod, DataTypeEnum.LCIAMethod);
-            lciaMethod.Name = GetCommonName();
-            lciaMethod.Methodology = GetElementValue(ElementName("methodology"));
-            lookupName = GetElementValue(ElementName("impactCategory"));
-            if (lookupName != null) {
-                lciaMethod.ImpactCategoryID = ilcdDb.LookupEntityID<ImpactCategory>(lookupName);
-            }
-            lciaMethod.ImpactIndicator = GetElementValue(ElementName("impactIndicator"));
-            lookupName = GetElementValue(ElementName("typeOfDataSet"));
-            if (lookupName != null) {
-                lciaMethod.IndicatorTypeID = ilcdDb.LookupEntityID<IndicatorType>(lookupName);
-            }
-            lciaMethod.ReferenceYear = GetElementValue(ElementName("referenceYear"));
-            lciaMethod.Duration = GetElementValue(ElementName("duration"));
-            lciaMethod.ImpactLocation = GetElementValue(ElementName("impactLocation"));
-            lciaMethod.Normalization = Convert.ToBoolean(GetElementValue(ElementName("normalisation")));
-            lciaMethod.Weighting = Convert.ToBoolean(GetElementValue(ElementName("weighting")));
-            lciaMethod.UseAdvice = GetElementValue(ElementName("useAdviceForDataSet"));
-            refUUID = GetElementAttributeValue(ElementName("referenceQuantity"), "refObjectId");
-            Debug.Assert(refUUID != null);
-            lciaMethod.ReferenceQuantity = ilcdDb.GetIlcdEntityID<FlowProperty>(refUUID);
-            if (ilcdDb.AddIlcdEntity(lciaMethod)) {
-                List<LCIA> lciaList = 
-                    LoadedDocument.Root.Descendants(ElementName("characterisationFactors")).Elements(ElementName("factor")).Select(f =>
-                        CreateLCIA(ilcdDb, f, lciaMethod.ID)).ToList();
-                ilcdDb.AddEntities<LCIA>(lciaList);
+            string uuid = GetCommonUUID();
+            int? entityID = ilcdDb.GetIlcdEntityID<FlowProperty>(uuid);
+            if (entityID == null) {
+                LCIAMethod lciaMethod = new LCIAMethod();
+                SaveIlcdEntity(ilcdDb, lciaMethod, DataTypeEnum.LCIAMethod);
+                lciaMethod.Name = GetCommonName();
+                lciaMethod.Methodology = GetElementValue(ElementName("methodology"));
+                lookupName = GetElementValue(ElementName("impactCategory"));
+                if (lookupName != null) {
+                    lciaMethod.ImpactCategoryID = ilcdDb.LookupEntityID<ImpactCategory>(lookupName);
+                }
+                lciaMethod.ImpactIndicator = GetElementValue(ElementName("impactIndicator"));
+                lookupName = GetElementValue(ElementName("typeOfDataSet"));
+                if (lookupName != null) {
+                    lciaMethod.IndicatorTypeID = ilcdDb.LookupEntityID<IndicatorType>(lookupName);
+                }
+                lciaMethod.ReferenceYear = GetElementValue(ElementName("referenceYear"));
+                lciaMethod.Duration = GetElementValue(ElementName("duration"));
+                lciaMethod.ImpactLocation = GetElementValue(ElementName("impactLocation"));
+                lciaMethod.Normalization = Convert.ToBoolean(GetElementValue(ElementName("normalisation")));
+                lciaMethod.Weighting = Convert.ToBoolean(GetElementValue(ElementName("weighting")));
+                lciaMethod.UseAdvice = GetElementValue(ElementName("useAdviceForDataSet"));
+                refUUID = GetElementAttributeValue(ElementName("referenceQuantity"), "refObjectId");
+                Debug.Assert(refUUID != null);
+                lciaMethod.ReferenceQuantity = ilcdDb.GetIlcdEntityID<FlowProperty>(refUUID);
+                if (ilcdDb.AddIlcdEntity(lciaMethod)) {
+                    List<LCIA> lciaList =
+                        LoadedDocument.Root.Descendants(ElementName("characterisationFactors")).Elements(ElementName("factor")).Select(f =>
+                            CreateLCIA(ilcdDb, f, lciaMethod.ID)).ToList();
+                    ilcdDb.AddEntities<LCIA>(lciaList);
 
-                isSaved = true;
+                    isSaved = true;
 
+                }
+                else {
+                    Program.Logger.WarnFormat("LCIA Method with UUID {0} was already imported and will not be updated.", uuid);
+                    _EntityIdDictionary[uuid] = Convert.ToInt32(entityID);
+                }
             }
             return isSaved;
         }
