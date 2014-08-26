@@ -13,7 +13,7 @@ namespace LCAToolAPI
     public partial class Timer : System.Web.UI.Page
     {
         [Inject]
-        public IFragmentTraversal Model { get; set; }
+        public IFragmentTraversalV2 Model { get; set; }
 
         protected void Page_Load(object sender, EventArgs e)
         {

@@ -222,8 +222,6 @@
     <Content Include="Content\bootstrap.min.css" />
     <Content Include="Content\images\glyphicons-halflings-white.png" />
     <Content Include="Content\images\glyphicons-halflings.png" />
-    <Content Include="DependencyParamTest.aspx" />
-    <Content Include="FlowPropertyParamTest.aspx" />
     <Content Include="Global.asax" />
     <Content Include="packages.config" />
     <Content Include="Scripts\bootstrap.js" />
@@ -238,6 +236,7 @@
     <Content Include="Scripts\jquery-1.8.3.min.js" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="API\LCIAComputationController.cs" />
     <Compile Include="API\ProcessController.cs" />
     <Compile Include="API\FlowPropertyController.cs" />
     <Compile Include="API\FragmentController.cs" />
@@ -272,20 +271,6 @@
     <Compile Include="Areas\RouteDebugger\RequestHelper.cs" />
     <Compile Include="Areas\RouteDebugger\RouteDebuggerAreaRegistration.cs" />
     <Compile Include="Areas\RouteDebugger\RouteDebuggerConfig.cs" />
-    <Compile Include="DependencyParamTest.aspx.cs">
-      <DependentUpon>DependencyParamTest.aspx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="DependencyParamTest.aspx.designer.cs">
-      <DependentUpon>DependencyParamTest.aspx</DependentUpon>
-    </Compile>
-    <Compile Include="FlowPropertyParamTest.aspx.cs">
-      <DependentUpon>FlowPropertyParamTest.aspx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="FlowPropertyParamTest.aspx.designer.cs">
-      <DependentUpon>FlowPropertyParamTest.aspx</DependentUpon>
-    </Compile>
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>

@@ -43,7 +43,7 @@ namespace Services
         [Inject]
         private readonly IDependencyParamService _dependencyParamService;
         [Inject]
-        private readonly IScenarioParamService _scenarioParamService;
+        private readonly IParamService _paramService;
         [Inject]
         private readonly IFlowPropertyParamService _flowPropertyParamService;
         [Inject]
@@ -60,10 +60,10 @@ namespace Services
             IFragmentNodeFragmentService fragmentNodeFragmentService,
             IFlowFlowPropertyService flowFlowPropertyService,
             IDependencyParamService dependencyParamService,
-            IScenarioParamService scenarioParamService,
             IFlowPropertyParamService flowPropertyParamService,
             IUnitOfWork unitOfWork,
-            IFragmentService fragmentService)
+            IFragmentService fragmentService,
+            IParamService paramService)
         {
             _flowService = flowService;
             _fragmentFlowService = fragmentFlowService;
@@ -73,7 +73,7 @@ namespace Services
             _fragmentNodeFragmentService = fragmentNodeFragmentService;
             _flowFlowPropertyService = flowFlowPropertyService;
             _dependencyParamService = dependencyParamService;
-            _scenarioParamService = scenarioParamService;
+            _paramService = paramService;
             _flowPropertyParamService = flowPropertyParamService;
             _fragmentService = fragmentService;
             _unitOfWork = unitOfWork;
@@ -154,8 +154,6 @@ namespace Services
 
 
             //set theFlowId to termFlowId in cases where FlowID is null (eg records with a null for ParentFragmentFlowID)
-
-
             if (theFlowId == termFlowId || theFlowId == null)
             {
                 nodeConv = 1;
@@ -166,29 +164,25 @@ namespace Services
 
                 var conv = _flowFlowPropertyService.Query().Get()
                     .GroupJoin(_flowPropertyParamService.Query().Get() // Target table
-                , dp => dp.FlowFlowPropertyID
-                , sp => sp.FlowFlowPropertyID
-                , (dp, sp) => new { dependencyParams = dp, scenarioParams = sp })
-                .SelectMany(s => s.scenarioParams.DefaultIfEmpty()
-                , (s, scenarioparams) => new
+                , ffp => ffp.FlowFlowPropertyID
+                , fpp => fpp.FlowFlowPropertyID
+                , (ffp, fpp) => new { flowFlowProperties = ffp, flowPropertyParams = fpp })
+                .SelectMany(s => s.flowPropertyParams.DefaultIfEmpty()
+                , (s, flowPropertyParams) => new
                 {
 
-                    ParamID = scenarioparams == null ? 0 : scenarioparams.ParamID,
-                    FlowPropertyID = s.dependencyParams.FlowPropertyID,
-                    FlowID = s.dependencyParams.FlowID,
-                    MeanValue = s.dependencyParams.MeanValue,
-                    Value = scenarioparams == null ? 0 : scenarioparams.Value,
+                    ParamID = flowPropertyParams == null ? 0 : flowPropertyParams.ParamID,
+                    FlowPropertyID = s.flowFlowProperties.FlowPropertyID,
+                    FlowID = s.flowFlowProperties.FlowID,
+                    MeanValue = s.flowFlowProperties.MeanValue,
+                    Value = flowPropertyParams == null ? 0 : flowPropertyParams.Value,
                 })
-                    //we will join with scenario later - no point doing an expensive left outer join just to make it work
-                    //.Join(_scenarioParamService.Query().Get(), p => p.ParamID, pc => pc.ParamID, (p, pc) => new { p, pc })
                     .Where(x => x.FlowID == theFlowId)
                     .Where(x => x.FlowPropertyID == termFlow.ReferenceFlowProperty)
-                    //.Where(x => x.pc.ScenarioID == scenarioId)
                     .Select(b => new
                     {
                         Default = b.MeanValue,
-                        Subs = b.Value == null ? 0 : b.Value,
-                        //Result = b.p.pc.Value == null ? b.p.p.MeanValue : b.p.pc.Value
+                        Subs = b.Value == null ? 0 : b.Value
                     });
 
 
@@ -196,8 +190,6 @@ namespace Services
 
                 double? convDefault = conv.Select(x => x.Default).FirstOrDefault();
                 double? convSubs = conv.Select(x => x.Subs).FirstOrDefault();
-
-                //nodeConv = conv.Select(x => x.Result).FirstOrDefault();
 
                 if (convSubs != 0)
                 {
@@ -270,7 +262,7 @@ namespace Services
                         ParentFragmentFlowID = s.fragmentflows.ParentFragmentFlowID
                     })
 
-    .GroupJoin(_scenarioParamService.Query().Get() // Target table
+    .GroupJoin(_paramService.Query().Get() // Target table
                     , dp => dp.ParamID
                     , sp => sp.ParamID
                     , (dp, sp) => new { dependencyParams = dp, scenarioParams = sp })
@@ -290,7 +282,6 @@ namespace Services
 
 
     .Where(x => x.FFDirectionID == x.NFDirectionID);
-                //.Where(x => x.ScenarioID == scenarioId)
 
 
                 if (outFlows != null)
@@ -318,8 +309,6 @@ namespace Services
         public IEnumerable<NodeFlowModel> GetScenarioProductFlows(IEnumerable<FragmentFlow> theFragmentFlow, int scenarioId)
         {
             int? nodeTypeID = theFragmentFlow.Select(x => x.NodeTypeID).FirstOrDefault();
-
-            //NodeFlowModel nodeFlowModel = new NodeFlowModel();
 
             IEnumerable<NodeFlowModel> nodeFlowModel = null;
 

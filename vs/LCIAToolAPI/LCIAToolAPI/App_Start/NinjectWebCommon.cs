@@ -80,10 +80,8 @@ namespace LCAToolAPI.App_Start
             kernel.Bind<IUnitOfWork>().To<UnitOfWork>();
             kernel.Bind<IFragmentFlowService>().To<FragmentFlowService>();
             kernel.Bind<IDependencyParamService>().To<DependencyParamService>();
-            kernel.Bind<IFragmentTraversal>().To<FragmentTraversal>();
             kernel.Bind<IFragmentTraversalV2>().To<FragmentTraversalV2>();
             kernel.Bind<IFragmentLinkService>().To<FragmentLinkService>();
-            kernel.Bind<IScenarioParamService>().To<ScenarioParamService>();
             kernel.Bind<IParamService>().To<ParamService>();
             kernel.Bind<IProcessService>().To<ProcessService>();
             kernel.Bind<IFlowPropertyService>().To<FlowPropertyService>();
@@ -94,6 +92,14 @@ namespace LCAToolAPI.App_Start
             kernel.Bind<IFragmentNodeFragmentService>().To<FragmentNodeFragmentService>();
             kernel.Bind<IFragmentNodeProcessService>().To<FragmentNodeProcessService>();
             kernel.Bind<IProcessFlowService>().To<ProcessFlowService>();
+            kernel.Bind<ILCIAComputationV2>().To<LCIAComputationV2>();
+            kernel.Bind<IProcessEmissionParamService>().To<ProcessEmissionParamService>();
+            kernel.Bind<ILCIAMethodService>().To<LCIAMethodService>();
+            kernel.Bind<IFlowPropertyEmissionService>().To<FlowPropertyEmissionService>();
+            kernel.Bind<IProcessDissipationService>().To<ProcessDissipationService>();
+            kernel.Bind<IProcessDissipationParamService>().To<ProcessDissipationParamService>();
+            kernel.Bind<ILCIAService>().To<LCIAService>();
+            kernel.Bind<ICharacterizationParamService>().To<CharacterizationParamService>();
 
             //Trying to inject a generic service to avoid having a service for each model class
             //kernel.Bind(typeof(IService<Flow>)).To(typeof(Service<Flow>))
