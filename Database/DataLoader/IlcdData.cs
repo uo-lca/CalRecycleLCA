@@ -159,22 +159,22 @@ namespace LcaDataLoader {
             string direction = (string)el.Element(ElementName(("exchangeDirection")));
             string location = (string)el.Element(ElementName(("location")));
             string name = (string)refEl.Element(_CommonNamespace + "shortDescription");
-            // Most of the referenced flows will not be found, so bypass method that
-            // searches cache
-            // TODO : use HashSet to cache missing flows
-            Flow flow = ilcdDb.GetIlcdEntity<Flow>(uuid);
-            int? id = null;
-            if (flow == null) {
-                Program.Logger.WarnFormat("Unable to find flow matching LCIA refObjectId = {0}", uuid);
-            }
-            else {
-                id = flow.FlowID;
-            }
+            // Most of the referenced flows will not be found, so don't bother searching for them now.
+            // The program will update LCIA flow references before exiting. 
+            //Flow flow = ilcdDb.GetIlcdEntity<Flow>(uuid);
+            //int? id = null;
+            //if (flow == null) {
+            //    Program.Logger.WarnFormat("Unable to find flow matching LCIA refObjectId = {0}", uuid);
+            //}
+            //else {
+            //    id = flow.FlowID;
+            //}
             int? dirID = ilcdDb.LookupEntityID<Direction>(direction);
             if (dirID == null) {
                 Program.Logger.ErrorFormat("Unable to find ID for LCIA exchangeDirection = {0}", direction);
             }
-            lcia = new LCIA { FlowID = id, FlowUUID = uuid, FlowName = name,
+            lcia = new LCIA { //FlowID = id, 
+                              FlowUUID = uuid, FlowName = name,
                               DirectionID = dirID, Factor = meanValue, Geography = location, LCIAMethodID = lciaMethodID };
             return lcia;
         }
