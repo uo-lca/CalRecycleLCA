@@ -166,9 +166,13 @@ namespace LcaDataLoader {
         public bool FindRefIlcdEntityID<T>(string uuid, out int outID) where T : class, IIlcdEntity {
             bool found = _EntityIdDictionary.TryGetValue(uuid, out outID);
             if (!found) {
-                int? nid = GetIlcdEntityID<T>(uuid);
-                if (nid != null) {
-                    outID = Convert.ToInt32(nid);
+                IIlcdEntity entity = GetIlcdEntity<T>(uuid);
+                if (entity == null) {
+                    Program.Logger.ErrorFormat("Unable to find {0} with UUID, {1}.", typeof(T).ToString(), uuid);
+                    found = false;
+                }
+                else  {
+                    outID = entity.ID;
                     _EntityIdDictionary[uuid] = outID;
                     found = true;
                 }
@@ -297,7 +301,7 @@ namespace LcaDataLoader {
         }
 
         /// <summary>
-        /// Generic method to retrieve ILCD Entity by UUID.
+        /// Generic method to retrieve ILCD Entity from its own table (e.g., Flow, Process) by UUID.
         /// </summary>
         /// <param name="uuid">UUID value</param>
         /// <returns>Entity, if found, otherwise null</returns>
@@ -305,23 +309,6 @@ namespace LcaDataLoader {
             DbSet<T> dbSet = _DbContext.Set<T>();
             T entity = (from le in dbSet where le.ILCDEntity.UUID == uuid select le).FirstOrDefault();
             return entity;
-        }
-
-        /// <summary>
-        /// Generic method to look up ILCD Entity ID by UUID.
-        /// Report error if not found.
-        /// </summary>
-        /// <param name="uuid">UUID value</param>
-        /// <returns>Entity ID, if found, otherwise null</returns>
-        public int? GetIlcdEntityID<T>(string uuid) where T : class, IIlcdEntity {
-            IIlcdEntity entity = GetIlcdEntity<T>(uuid);
-            if (entity == null) {
-                Program.Logger.ErrorFormat("Unable to find {0} with UUID, {1}.", typeof(T).ToString(), uuid);
-                return null;
-            }
-            else {
-                return entity.ID;
-            }
         }
 
         /// <summary>
@@ -410,7 +397,7 @@ namespace LcaDataLoader {
 
 
         /// <summary>
-        /// Use this method to check if an ILCDEntity with given UUID already exists in the database
+        /// Use this method to search ILCDEntity by UUID 
         /// </summary>
         /// <param name="uuid">The UUID value</param>
         /// <returns>Instance of ILCDEntity if found, otherwise null</returns>
@@ -429,13 +416,13 @@ namespace LcaDataLoader {
         /// <returns>true iff found</returns>
         /// TODO : Create new methods for ILCD entities where key is UUID + Version (Process)
         public bool IlcdEntityAlreadyExists<T>(string uuid) where T : class, IIlcdEntity {
-            int? entityID = GetIlcdEntityID<T>(uuid);
-            if (entityID == null) {
+            IIlcdEntity entity = GetIlcdEntity<T>(uuid);
+            if (entity == null) {
                 return false;
             }
             else {
                 Program.Logger.WarnFormat("{0} with UUID {1} was already imported.", uuid, typeof(T).ToString());
-                _EntityIdDictionary[uuid] = Convert.ToInt32(entityID);
+                _EntityIdDictionary[uuid] = Convert.ToInt32(entity.ID);
                 return true;
             }
         }

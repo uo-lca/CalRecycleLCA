@@ -186,26 +186,35 @@ namespace LcaDataLoader {
         /// <param name="el">Process exchange element</param>
         /// <param name="processID">Process parent entity ID</param>
         private ProcessFlow CreateProcessFlow(DbContextWrapper ilcdDb, XElement el, int processID) {
+            ProcessFlow pf = null;
             string type = (string)el.Element(ElementName("referenceToVariable"));
             string varName = (string)el.Element(_CommonNamespace + "other").Element(_GabiNamespace + "GaBi").Attribute("IOType");
             double magnitude = (double)el.Element(ElementName("meanAmount"));
             double result = (double)el.Element(ElementName("resultingAmount"));
             double stdev = (double)el.Element(ElementName("relativeStandardDeviation95In"));
             string uuid = el.Element(ElementName("referenceToFlowDataSet")).Attribute("refObjectId").Value;
-            int? id = ilcdDb.GetIlcdEntityID<Flow>(uuid);
-            if (id == null) {
-                Program.Logger.WarnFormat("Unable to find flow matching exchange refObjectId = {0}", uuid);
+            int flowID;
+            if (ilcdDb.FindRefIlcdEntityID<Flow>(uuid, out flowID)) {
+
+                string direction = (string)el.Element(ElementName(("exchangeDirection")));
+                int? dirID = ilcdDb.LookupEntityID<Direction>(direction);
+                if (dirID == null) {
+                    Program.Logger.WarnFormat("Unable to find ID for exchangeDirection = {0}", direction);
+                }
+                string location = (string)el.Element(ElementName(("location")));
+                pf = new ProcessFlow {
+                    DirectionID = dirID,
+                    FlowID = flowID,
+                    Geography = location,
+                    Magnitude = magnitude,
+                    ProcessID = processID,
+                    Result = result,
+                    STDev = stdev,
+                    Type = type,
+                    VarName = varName
+                };
             }
-            string direction = (string)el.Element(ElementName(("exchangeDirection")));
-            int? dirID = ilcdDb.LookupEntityID<Direction>(direction);
-            if (dirID == null) {
-                Program.Logger.WarnFormat("Unable to find ID for exchangeDirection = {0}", direction);
-            }
-            string location = (string)el.Element(ElementName(("location")));
-            return new ProcessFlow { 
-                DirectionID = dirID, FlowID = id, Geography = location, 
-                Magnitude = magnitude, ProcessID = processID, Result = result,
-                STDev = stdev, Type = type, VarName = varName };
+            return pf;
         }
        
         /// <summary>
@@ -310,7 +319,7 @@ namespace LcaDataLoader {
             int? fpID;
             string dataSetInternalID = "0";
             string uuid = GetCommonUUID();
-            if (!ilcdDb.IlcdEntityAlreadyExists<FlowProperty>(uuid)) {
+            if (!ilcdDb.IlcdEntityAlreadyExists<Flow>(uuid)) {
                 XElement fpElement;
                 Flow flow = new Flow();
                 SaveIlcdEntity(ilcdDb, flow, DataTypeEnum.Flow);
