@@ -16,8 +16,6 @@ namespace Services
         [Inject]
         private readonly IProcessEmissionParamService _processEmissionParamService;
         [Inject]
-        private readonly IScenarioParamService _scenarioParamService;
-        [Inject]
         private readonly ILCIAMethodService _lciaMethodService;
         [Inject]
         private readonly IFlowService _flowService;
@@ -35,10 +33,11 @@ namespace Services
         private readonly ILCIAService _lciaService;
         [Inject]
         private readonly ICharacterizationParamService _characterizationParamService;
+        [Inject]
+        private readonly IParamService _paramService;
 
         public LCIAComputationV2(IProcessFlowService processFlowService,
             IProcessEmissionParamService processEmissionParamService,
-            IScenarioParamService scenarioParamService,
             ILCIAMethodService lciaMethodService,
             IFlowService flowService,
             IFlowFlowPropertyService flowFlowPropertyService,
@@ -47,7 +46,8 @@ namespace Services
             IProcessDissipationService processDissipationService,
             IProcessDissipationParamService processDissipationParamService,
             ILCIAService lciaService,
-            ICharacterizationParamService characterizationParamService)
+            ICharacterizationParamService characterizationParamService,
+            IParamService paramService)
         {
             if (processFlowService == null)
             {
@@ -61,11 +61,6 @@ namespace Services
             }
             _processEmissionParamService = processEmissionParamService;
 
-            if (scenarioParamService == null)
-            {
-                throw new ArgumentNullException("scenarioParamService is null");
-            }
-            _scenarioParamService = scenarioParamService;
 
             if (lciaMethodService == null)
             {
@@ -120,43 +115,57 @@ namespace Services
                 throw new ArgumentNullException("characterizationParamService is null");
             }
             _characterizationParamService = characterizationParamService;
+
+            if (paramService == null)
+            {
+                throw new ArgumentNullException("paramService is null");
+            }
+            _paramService = paramService;
         }
 
-        public void GetLCIAMethodsForComputeLCIA()
+        public IEnumerable<LCIAModel> GetLCIAMethodsForComputeLCIA()
         {
             var lciaMethods = _lciaMethodService.Query().Get();
-            ComputeLCIA(1, lciaMethods, 1);
+            var c = ComputeLCIA(1, lciaMethods, 1);
+            return c;
+
         }
 
-        public void ComputeLCIA(int processId, IEnumerable<LCIAMethod> lciaMethods, int scenarioId=1)
+        public IEnumerable<LCIAModel> ComputeLCIA(int processId, IEnumerable<LCIAMethod> lciaMethods, int scenarioId = 1)
         {
             var inventory = ComputeProcessLCI(processId, scenarioId);
+            IEnumerable<LCIAModel> lcias=null;
             foreach (var lciaMethodItem in lciaMethods)
             {
-                var lcia = ComputeProcessLCIA(inventory, lciaMethodItem, scenarioId);
-               //lciaMethodItem.
+               lcias= ComputeProcessLCIA(inventory, lciaMethodItem, scenarioId);
+               var scores = lcias.GroupBy(t => new
+                {
+                    t.Result,
+                    t.DirectionID,
+                    t.FlowID
+                })
+                .Select(group => new
+                {
+                    Result = group.Sum(a => a.Result),
+                    DirectionID = group.Key.DirectionID,
+                    FlowID = group.Key.FlowID
+                });
                 
             }
-//            [2:42:51 PM] Brandon Kuczenski: ComputeLCIA( process_id, scenario_id, list_of_lcia_methods)
-//{
-//[2:44:31 PM] Brandon Kuczenski:   inventory = ComputeProcessLCI (process_id, scenario_id );
-//  for j in list_of_lcia_methods do
-//  {
-//    lcia = ComputeProcessLCIA ( inventory, scenario_id, list_of_lcia_methods[j])
-            //this doesn't work.  There is no "score" in LCIAMethod
-//    score[j] = sum (lcia.Score)
-//  }
-//}
+
+            return lcias;
+            
+          
         }
 
         //inventory in pseudocode
         public IEnumerable<InventoryModel> ComputeProcessLCI(int processId, int scenarioId)
         {
-             // returns a list of flows: FlowID, DirectionID, Result
-  // Param types: ProcessEmissionParam
-  // FlowPropertyParam + ProcessDissipationParam
+            // returns a list of flows: FlowID, DirectionID, Result
+            // Param types: ProcessEmissionParam
+            // FlowPropertyParam + ProcessDissipationParam
             var inventory = _processFlowService.Query().Get()
-                .Where(x => x.ProcessID == processId)
+                //.Where(x => x.ProcessID == processId)
           .GroupJoin(_processEmissionParamService.Query().Get() // Target table
       , pf => pf.ProcessFlowID
       , pep => pep.ProcessFlowID
@@ -165,22 +174,22 @@ namespace Services
       , (s, processEmmissionParams) => new
       {
 
-            FlowID = s.processFlows.FlowID,
-                              DirectionID = s.processFlows.DirectionID,
-                              ParamID = processEmmissionParams.ParamID,
-                              Result = s.processFlows.Result,
-                              ParamValue = processEmmissionParams.Value
+          FlowID = s.processFlows.FlowID,
+          DirectionID = s.processFlows.DirectionID,
+          ParamID = processEmmissionParams == null ? 0 : processEmmissionParams.ParamID,
+          Result = s.processFlows.Result,
+          ParamValue = processEmmissionParams == null ? 0 : processEmmissionParams.Value
       })
-     .Join(_scenarioParamService.Query().Get(), pfep => pfep.ParamID, sp => sp.ParamID, (pfep, sp) => new { pfep, sp })
+     .Join(_paramService.Query().Get(), pfep => pfep.ParamID, sp => sp.ParamID, (pfep, sp) => new { pfep, sp })
     .Where(x => x.sp.ScenarioID == scenarioId)
       .Select(inv => new InventoryModel
                           {
                               FlowID = inv.pfep.FlowID,
-                              DirectionID = inv.pfep.DirectionID, 
+                              DirectionID = inv.pfep.DirectionID,
                               Result = inv.pfep.Result,
                               ParamValue = inv.pfep.ParamValue
                           });
-           
+
 
             foreach (var item in inventory)
             {
@@ -197,38 +206,38 @@ namespace Services
         public IEnumerable<ProcessFlow> ComputeProcessDissipation(int processId, int scenarioId)
         {
 
-             // Leave this as a stub for now - Brandon informed me on 8/22 that this would be changing signicantly in his pseudocode and to wait on it.
+            // Leave this as a stub for now - Brandon informed me on 8/22 that this would be changing signicantly in his pseudocode and to wait on it.
             throw new NotImplementedException();
 
 
-    //        var inflows = _processFlowService.Query().Get()
-    //            .Join(_flowService.Query().Get(), pf => pf.FlowID, f => f.FlowID, (pf, f) => new { pf, f })
-    //.Where(x => x.pf.DirectionID == 1)  // Input
-    //.Where(x => x.pf.ProcessID == 1)
-    //.Where(x => x.f.FlowTypeID == 1).ToList(); //IntemediateFlow
+            //        var inflows = _processFlowService.Query().Get()
+            //            .Join(_flowService.Query().Get(), pf => pf.FlowID, f => f.FlowID, (pf, f) => new { pf, f })
+            //.Where(x => x.pf.DirectionID == 1)  // Input
+            //.Where(x => x.pf.ProcessID == 1)
+            //.Where(x => x.f.FlowTypeID == 1).ToList(); //IntemediateFlow
 
 
-    //        var dissipation = inflows
-    //             .Join(_flowFlowPropertyService.Query().Get(), x => x.f.FlowID, ffp => ffp.FlowID, (i, ffp) => new { i, ffp })
-    //             .Join(_flowPropertyEmissionService.Query().Get(), x => x.ffp.FlowID, ffp => ffp.FlowID, (ffp, fpe) => new { ffp, fpe})
-    //             .Join(_processFlowService.Query().Get(), x => x.fpe.FlowID, pf => pf.FlowID, (fpe, pf) => new { fpe, pf})
-    //             .Join(_processDissipationService.Query().Get(), x => x.pf.ProcessFlowID, pd => pd.ProcessFlowID, (pf, pd) => new { pf, pd})
-    //             .GroupJoin(_processDissipationParamService.Query().Get() // Target table
-    //  , pd => pd.pd.ProcessDissipationID
-    //  , pdp => pdp.ProcessDissipationID
-    //  , (pd, pdp) => new { processDissipation = pd, processDissipationParams = pdp })
-    //  .SelectMany(s => s.processDissipationParams.DefaultIfEmpty()
-    //  , (s, processDissipationParams) => new
-    //  {
+            //        var dissipation = inflows
+            //             .Join(_flowFlowPropertyService.Query().Get(), x => x.f.FlowID, ffp => ffp.FlowID, (i, ffp) => new { i, ffp })
+            //             .Join(_flowPropertyEmissionService.Query().Get(), x => x.ffp.FlowID, ffp => ffp.FlowID, (ffp, fpe) => new { ffp, fpe})
+            //             .Join(_processFlowService.Query().Get(), x => x.fpe.FlowID, pf => pf.FlowID, (fpe, pf) => new { fpe, pf})
+            //             .Join(_processDissipationService.Query().Get(), x => x.pf.ProcessFlowID, pd => pd.ProcessFlowID, (pf, pd) => new { pf, pd})
+            //             .GroupJoin(_processDissipationParamService.Query().Get() // Target table
+            //  , pd => pd.pd.ProcessDissipationID
+            //  , pdp => pdp.ProcessDissipationID
+            //  , (pd, pdp) => new { processDissipation = pd, processDissipationParams = pdp })
+            //  .SelectMany(s => s.processDissipationParams.DefaultIfEmpty()
+            //  , (s, processDissipationParams) => new
+            //  {
 
-    //        ProcessDissipationID = s.processDissipation.pd.ProcessDissipationID,
-    //        Value = processDissipationParams.Param
-    //  })
-
-
+            //        ProcessDissipationID = s.processDissipation.pd.ProcessDissipationID,
+            //        Value = processDissipationParams.Param
+            //  })
 
 
-            
+
+
+
 
         }
 
@@ -247,7 +256,7 @@ namespace Services
       .SelectMany(s => s.characterizationParams.DefaultIfEmpty()
       , (s, characterizationParams) => new
       {
-          FlowID= s.lcias.l.i.FlowID,
+          FlowID = s.lcias.l.i.FlowID,
           DirectionID = s.lcias.l.i.DirectionID,
           Quantity = s.lcias.l.i.Result,
           LCIAID = characterizationParams.LCAID,
@@ -257,7 +266,7 @@ namespace Services
           Geography = s.lcias.l.l.Geography,
           Factor = s.lcias.l.l.Factor
       })
-      .Join(_scenarioParamService.Query().Get(), cp => cp.ParamID, sp => sp.ParamID, (cp, sp) => new { cp, sp })
+      .Join(_paramService.Query().Get(), cp => cp.ParamID, sp => sp.ParamID, (cp, sp) => new { cp, sp })
       .Select(lcparam => new LCIAModel
         {
             LCIAID = lcparam.cp.LCIAID,
@@ -269,7 +278,7 @@ namespace Services
             DirectionID = lcparam.cp.DirectionID,
             Geography = lcparam.cp.Geography,
             Result = lcparam.cp.Quantity,
-            LCParamValue =lcparam.cp.Value,
+            LCParamValue = lcparam.cp.Value,
             LCIAFactor = lcparam.cp.Factor
         })
         .Where(x => x.ScenarioID == scenarioId)
@@ -281,9 +290,9 @@ namespace Services
             {
                 double? factor;
                 double? result;
-        //        inventory.Result * (lcparam.Value == NULL 
-        //    ? LCIA.Factor : lcparam.Value) AS Factor,
-        //Quantity * Factor AS Result
+                //        inventory.Result * (lcparam.Value == NULL 
+                //    ? LCIA.Factor : lcparam.Value) AS Factor,
+                //Quantity * Factor AS Result
                 if (item.LCParamValue != null)
                 {
                     factor = item.Result * item.LCParamValue;

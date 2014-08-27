@@ -12,15 +12,30 @@ namespace LCAToolAPI.API
 {
     public class LCIAComputationController : ApiController
     {
-        // [Inject]
-        //private readonly ILCIAComputationV2 _lciaComputationV2;
+        [Inject]
+        private readonly ILCIAComputationV2 _lciaComputationV2;
 
 
-        // public LCIAComputationController(ILCIAComputationV2 lciaComputationV2)
-        //{
-              
-            
-        //}
+        public LCIAComputationController(ILCIAComputationV2 lciaComputationV2)
+        {
+
+            if (lciaComputationV2 == null)
+            {
+                throw new ArgumentNullException("lciaComputationV2 is null");
+            }
+
+            _lciaComputationV2 = lciaComputationV2;
+
+        }
+
+        //GET api/<controller>
+        [Route("api/compute")]
+        [System.Web.Http.AcceptVerbs("GET", "POST")]
+        [System.Web.Http.HttpGet]
+        public void Compute()
+        {
+            _lciaComputationV2.GetLCIAMethodsForComputeLCIA();
+        }
 
        
     }

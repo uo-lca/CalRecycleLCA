@@ -12,23 +12,13 @@ namespace LCAToolAPI.API
 {
     public class FragmentTraversalController : ApiController
     {
-        [Inject]
-        private readonly IFragmentTraversal _fragmentTraversal;
 
         [Inject]
         private readonly IFragmentTraversalV2 _fragmentTraversalV2;
 
 
-        public FragmentTraversalController(IFragmentTraversal fragmentTraversal, IFragmentTraversalV2 fragmentTraversalV2)
+        public FragmentTraversalController(IFragmentTraversalV2 fragmentTraversalV2)
         {
-
-            if (fragmentTraversal == null)
-            {
-                throw new ArgumentNullException("fragmentTraversal is null");
-            }
-
-            _fragmentTraversal = fragmentTraversal;
-
             if (fragmentTraversalV2 == null)
             {
                 throw new ArgumentNullException("fragmentTraversalV2 is null");
@@ -37,17 +27,6 @@ namespace LCAToolAPI.API
             _fragmentTraversalV2 = fragmentTraversalV2;
 
         }
-
-        //int scenarioId = 1;
-
-        //GET api/<controller>
-        //[Route("api/fragments/{fragmentID}/scenarios/{scenarioID}/traverse")]
-        //[System.Web.Http.AcceptVerbs("GET", "POST")]
-        //[System.Web.Http.HttpGet]
-        //public void Traversal( int fragmentID, int scenarioID )
-        //{
-        //    _fragmentTraversal.Traverse(fragmentID, scenarioID);
-        //}
 
         //GET api/<controller>
         [Route("api/fragments/{fragmentID}/scenarios/{scenarioID}/traverse")]
