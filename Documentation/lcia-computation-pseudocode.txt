@@ -12,7 +12,7 @@ LCIA = ComputeProcessLCIA( inventory, scenario_id, lcia_method_id )
   LCIA = SELECT inventory.FlowID AS FlowID, 
        	 	inventory.DirectionID AS DirectionID,
 		inventory.Result AS Quantity,
-		inventory.Result * (lcparam.Value == NULL 
+		(lcparam.Value == NULL 
 		  	? LCIA.Factor : lcparam.Value) AS Factor,
 		Quantity * Factor AS Result
 		FROM inventory INNER JOIN LCIA 
@@ -21,8 +21,8 @@ LCIA = ComputeProcessLCIA( inventory, scenario_id, lcia_method_id )
 		(
 		  SELECT chp.LCIAID, chp.Value
 		  FROM CharacterizationParam chp
-		  INNER JOIN ScenarioParam sp ON chp.ParamID = sp.ParamID
-	          WHERE sp.ScenarioID = scenario_id
+		  INNER JOIN Param p ON chp.ParamID = p.ParamID
+	          WHERE p.ScenarioID = scenario_id
 		) 
 		lcparam
 		ON LCIA.LCIAID = lcparam.LCIAID
@@ -44,8 +44,8 @@ inventory = ComputeProcessLCI ( process_id, scenario_id )
 	      (
 	        SELECT pep.ProcessFlowID, pep.Value
 		FROM ProcessEmissionParam pep 
-		INNER JOIN ScenarioParam sp ON pep.ParamID = sp.ParamID
-	        WHERE sp.ScenarioID = scenario_id
+		INNER JOIN Param p ON pep.ParamID = p.ParamID
+	        WHERE p.ScenarioID = scenario_id
 	      )
 	      pep
 	      ON pf.ProcessFlowID = pep.ProcessFlowID
@@ -96,16 +96,16 @@ dissipation = ComputeProcessDissipation( process_id, scenario_id )
 		(
 	          SELECT pdp.ProcessDissipationID, pdp.Value
 		  FROM ProcessDissipationParam pdp 
-		  INNER JOIN ScenarioParam sp ON pdp.ParamID = sp.ParamID
-	          WHERE sp.ScenarioID = scenario_id
+		  INNER JOIN Param p ON pdp.ParamID = p.ParamID
+	          WHERE p.ScenarioID = scenario_id
 	        ) pdparam
 		ON pd.ProcessDissipationID = pdparam.ProcessDissipationID
 		LEFT OUTER JOIN
 		(
 	          SELECT fpp.FlowFlowPropertyID, fpp.Value
 		  FROM FlowPropertyParam fpp 
-		  INNER JOIN ScenarioParam sp ON fpp.ParamID = sp.ParamID
-	          WHERE sp.ScenarioID = scenario_id
+		  INNER JOIN Param p ON fpp.ParamID = p.ParamID
+	          WHERE p.ScenarioID = scenario_id
 	        ) fpparam
 		ON ffp.FlowFlowPropertyID = fpparam.FlowFlowPropertyID
 		WHERE pf.ProcessID = process_id

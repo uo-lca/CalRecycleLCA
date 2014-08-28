@@ -395,7 +395,7 @@ The following tables are required:
 
    Fragment
     * FragmentID
-    * UUID - fragments should be included in ILCDEntity too
+    * ILCDEntityID
     * Name
     * ReferenceFragmentFlowID (FK to FragmentFlowID) (was RootNode) 
    
@@ -469,6 +469,13 @@ The following tables are required:
     * DocID
 
     Mapping of nodes with type "Fragment" to FragmentIDs
+
+    FragmentNodeComposition
+    * FragmentNodeCompositionID
+    * FragmentNodeProcessID
+    * CompositionModelID
+
+    FragmentFlows that end in processes may have their input flows 
 
 ## Scenarios and Parameters
 
@@ -606,6 +613,15 @@ The following tables are required:
 
     * DocID
 
+    A single param can be linked to multiple instances in the model- but
+    they will all be of the same type.
+
+    The lookup table used depends on the param type.
+
+    Distribution + conservation params are complicated because adjusting a
+    distribution param requires an equal and opposite adjustment to the
+    corresponding conservation param (this is handled in the front-end) 
+
    ProcessSubstitution 
     X ProcessSubstitutionID - Not Needed - primary key is composite (FragmentNodeProcessID, ScenarioID)
     * ScenarioID (FK to Scenario)
@@ -624,16 +640,6 @@ The following tables are required:
     It is a scenario design constraint that the substituted FragmentID must
     have the same list of product flows as the original FragmentID.
 
-    A single parameter value can be linked to multiple points in the model-
-    but they must all be of the same type (a param with type 1 cannot be
-    used to specify a FlowFlowProperty sensitivity)
-
-    The lookup table used depends on the param type.
-
-    Distribution + conservation params are complicated because adjusting a
-    distribution param requires an equal and opposite adjustment to the
-    corresponding conservation param (this is handled in the front-end) 
-
    CompositionModel
     * CompositionModelID
     * FlowID (FK)
@@ -647,15 +653,20 @@ The following tables are required:
    CompositionData
     * CompositionDataID
     * CompositionModelID (FK)
-    * FlowFlowPropertyID (FK)
+    % FlowPropertyID (FK)
     * Value
 
     * DocID
 
-    List of flow-flow property values that are relevant to a given
-    composition model.  These are stored as sets and can be easily invoked
-    by a user (or designer) to generate and populate a corresponding set of
+    List of flow property values that are relevant to a given composition
+    model.  These are stored as sets and can be easily invoked by a user
+    (or designer) to generate and populate a corresponding set of
     ParamInstances in a scenario.
+
+    CompositionSubstitution - NEW TABLE
+    * ScenarioID (FK)
+    * FragmentNodeCompositionID
+    * CompositionModelID
 
 ## Cached Computation Results
 
