@@ -21,7 +21,7 @@ namespace LcaDataModel
 
         public int? UnitGroupID { get; set; }
 
-        [StringLength(250)]
+        [StringLength(500)]
         public string LongName { get; set; }
 
         public double? Conversion { get; set; }

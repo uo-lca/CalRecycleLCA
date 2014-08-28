@@ -26,18 +26,27 @@ namespace LcaDataLoader {
         /// Find descendant element with given name and return its value
         /// </summary>
         /// <returns>Element value as a string</returns>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public string GetElementValue(XName elementName) {
+            return GetDescendantElementValue(LoadedDocument.Root, elementName);
+        }
+
+        /// <summary>
+        /// Find descendant element with given name and return the value of the
+        /// first one found.
+        /// </summary>
+        /// <param name="parentElement">Starting point of search</param>
+        /// <param name="elementName">descendant element name</param>
+        /// <returns>Element value as a string (null if not found)</returns>
+        public string GetDescendantElementValue(XElement parentElement, XName elementName) {
             IEnumerable<XElement> els =
-                from el in LoadedDocument.Root.Descendants(elementName)
+                from el in parentElement.Descendants(elementName)
                 select el;
             if (els.Count() == 0) {
                 return null;
             }
             else {
-                return LoadedDocument.Root
-                           .Descendants(elementName)
-                           .Select(s => s.Value)
-                           .First();
+                return els.Select(s => s.Value).First();
             }
         }
 
@@ -120,7 +129,8 @@ namespace LcaDataLoader {
                 UnitConversion uc = new UnitConversion {
                         Unit = (string)el.Element(ElementName("name")),
                         Conversion = (double)el.Element(ElementName("meanValue")),
-                        UnitGroupID = unitGroup.UnitGroupID
+                        UnitGroupID = unitGroup.UnitGroupID,
+                        LongName = (string)el.Element(ElementName("generalComment"))
                     };
                 if ( el.Attribute("dataSetInternalID").Value == refID) {
                     unitGroup.UnitConversion = uc;
