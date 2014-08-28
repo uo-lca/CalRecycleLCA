@@ -81,46 +81,23 @@ namespace LcaDataLoader {
 
         private static bool ImportFlowPropertyEmission(Row row, DbContextWrapper dbContext) {
             bool isImported = false;
-            int? fpID = dbContext.GetIlcdEntityID<FlowProperty>(row["FlowPropertyUUID"]);
-            int? fID = dbContext.GetIlcdEntityID<Flow>(row["EmissionUUID"]);
-            if (fpID != null && fID != null) {
+            int fpID, fID;
+            if (dbContext.FindRefIlcdEntityID<FlowProperty>(row["FlowPropertyUUID"], out fpID) &&
+                dbContext.FindRefIlcdEntityID<Flow>(row["EmissionUUID"], out fID)) {
+                double scale = Convert.ToDouble(row["Scale"]);
                 DbSet<FlowPropertyEmission> fpEmissions = dbContext.GetDbSet<FlowPropertyEmission>();
                 FlowPropertyEmission fpEmission = (from fpe in fpEmissions 
                                                    where fpe.FlowPropertyID == fpID && fpe.FlowID == fID
                                                    select fpe).FirstOrDefault();
                 if (fpEmission == null) {
-                    fpEmission = new FlowPropertyEmission { FlowPropertyID = fpID, FlowID = fID };
+                    fpEmission = new FlowPropertyEmission { FlowPropertyID = fpID, FlowID = fID, Scale = scale };
                     fpEmissions.Add(fpEmission);
                 }
                 else {
                     Program.Logger.WarnFormat("FlowPropertyEmission with FlowPropertyID={0} and FlowID={1} already exists and will be updated.", fpID, fID);
+                    fpEmission.Scale = scale;
                 }
-                fpEmission.Scale = Convert.ToDouble(row["Scale"]);
-                isImported = (dbContext.SaveChanges() > 0);
-            }
-            return isImported;
-        }
-
-        private static bool ImportFlowFlowProperty(Row row, DbContextWrapper dbContext) {
-            bool isImported = false;
-            int? pID = dbContext.GetIlcdEntityID<LcaDataModel.FlowProperty>(row["FlowPropertyUUID"]);
-            int? fID = dbContext.GetIlcdEntityID<Flow>(row["FlowUUID"]);
-            if (pID != null && fID != null) {
-                int fpID = Convert.ToInt32(pID);
-                int flowID = Convert.ToInt32(fID);
-                DbSet<FlowFlowProperty> dbSet = dbContext.GetDbSet<FlowFlowProperty>();
-                FlowFlowProperty obj = (from o in dbSet
-                                   where (o.FlowPropertyID == fpID) && (o.FlowID == flowID)
-                                   select o).FirstOrDefault();
-                if (obj == null) {
-                    obj = new FlowFlowProperty { FlowID = flowID, FlowPropertyID = fpID };
-                    dbSet.Add(obj);
-                }
-                else {
-                    Program.Logger.WarnFormat("FlowFlowProperty with FlowID={0} and FlowPropertyID={1} already exists and will be updated.", obj.FlowID, obj.FlowPropertyID);
-                }
-                obj.MeanValue = Convert.ToDouble(row["MeanValue"]);
-                obj.StDev = Convert.ToDouble(row["StDev"]);
+                
                 isImported = (dbContext.SaveChanges() > 0);
             }
             return isImported;
@@ -128,10 +105,10 @@ namespace LcaDataLoader {
 
         private static bool ImportProcessDissipation(Row row, DbContextWrapper dbContext) {
             bool isImported = false;
-            int? pID = dbContext.GetIlcdEntityID<LcaDataModel.Process>(row["ProcessUUID"]);
-            int? fID = dbContext.GetIlcdEntityID<Flow>(row["FlowUUID"]);
+            int pID, fID;
             int dirID = Convert.ToInt32(DirectionEnum.Output);
-            if (pID != null && fID != null) {
+            if (dbContext.FindRefIlcdEntityID<LcaDataModel.Process>(row["ProcessUUID"], out pID) &&
+                dbContext.FindRefIlcdEntityID<LcaDataModel.Flow>(row["FlowUUID"], out fID)) {
                 DbSet<ProcessFlow> dbSet = dbContext.GetDbSet<ProcessFlow>();
                 ProcessFlow obj = (from o in dbSet
                                    where (o.ProcessID == pID) && (o.FlowID == fID) && (o.DirectionID == dirID)
@@ -140,19 +117,20 @@ namespace LcaDataLoader {
                     Program.Logger.ErrorFormat("ProcessFlow with ProcessID = {0}, FlowID = {1}, and Output direction not found.", pID, fID);
                 }
                 else {
+                    double emissionFactor = Convert.ToDouble(row["EmissionFactor"]);
                     DbSet<ProcessDissipation> pdSet = dbContext.GetDbSet<ProcessDissipation>();
                     ProcessDissipation pd = 
                                       (from o in pdSet
                                        where o.ProcessFlowID == obj.ProcessFlowID
                                        select o).FirstOrDefault();
                     if (pd == null) {
-                        pd = new ProcessDissipation { ProcessFlowID = obj.ProcessFlowID };
+                        pd = new ProcessDissipation { ProcessFlowID = obj.ProcessFlowID, EmissionFactor = emissionFactor};
                         pdSet.Add(pd);
                     }
                     else {
                         Program.Logger.WarnFormat("ProcessDissipation with ProcessFlowID={0} already exists and will be updated.", obj.ProcessFlowID);
+                        pd.EmissionFactor = emissionFactor;
                     }
-                    pd.EmissionFactor = Convert.ToDouble(row["EmissionFactor"]);
                     isImported = (dbContext.SaveChanges() > 0);
                 }                
             }
@@ -172,92 +150,33 @@ namespace LcaDataLoader {
             return updated;
         }
 
-        private static ILCDEntity CreateIlcdEntity(string uuid, DataProviderEnum providerEnum, DataTypeEnum typeEnum, DbContextWrapper dbContext) {
-            ILCDEntity ilcdEntity = null;
-            if (dbContext.IlcdUuidExists(uuid)) {
-                Program.Logger.ErrorFormat("UUID {0} already exists. ILCDEntity for {0}, {1} will not be added.", uuid, 
-                    Convert.ToString(providerEnum), Convert.ToString(typeEnum));
-            }
-            else {
-                ilcdEntity = new ILCDEntity {
-                    UUID = uuid,
-                    DataProviderID = Convert.ToInt32(providerEnum),
-                    DataTypeID = Convert.ToInt32(typeEnum)                  
-                };
-                ilcdEntity = dbContext.GetDbSet<ILCDEntity>().Add(ilcdEntity);
-            }
-            return ilcdEntity;
-        }
-
-        private static bool ImportFlow(Row row, DbContextWrapper dbContext) {
-            bool isImported = false;
-            Flow flow = dbContext.GetIlcdEntity<Flow>(row["FlowUUID"]);
-            int? refID = dbContext.GetIlcdEntityID<FlowProperty>(row["ReferenceFlowPropertyUUID"]);
-            if (refID == null) {
-                Program.Logger.ErrorFormat("ReferenceFlowPropertyUUID not found. Flow {1} will not be imported.", row["FlowUUID"]);
-            }
-            else {
-                if (flow == null) {
-                    ILCDEntity ilcdEntity = CreateIlcdEntity(row["FlowUUID"], DataProviderEnum.append, DataTypeEnum.Flow, dbContext);
-                    if (ilcdEntity != null) {
-                        flow = new Flow();
-                        flow.ILCDEntity = ilcdEntity;
-                        dbContext.GetDbSet<Flow>().Add(flow);
-                    }
-                }
-                else {
-                    Program.Logger.WarnFormat("Flow with UUID {0} already exists. Flow will be updated.", row["FlowUUID"]);
-                }
-                if (flow != null) {
-                    flow.CASNumber = row["CASNumber"];
-                    flow.FlowTypeID = Convert.ToInt32(row["FlowTypeID"]);
-                    flow.ReferenceFlowProperty = refID;
-                    isImported = (dbContext.SaveChanges() > 0);
-                }
-            }
-            return isImported;
-        }
-
-        private static bool ImportFlowProperty(Row row, DbContextWrapper dbContext) {
-            bool isImported = false;
-            FlowProperty flowProperty = dbContext.GetIlcdEntity<FlowProperty>(row["FlowPropertyUUID"]);
-            int? ugID = dbContext.GetIlcdEntityID<UnitGroup>(row["UnitGroupUUID"]);
-            if (ugID == null) {
-                Program.Logger.ErrorFormat("UnitGroupUUID not found. FlowProperty {1} will not be imported.", row["FlowPropertyUUID"]);
-            }
-            else {
-                if (flowProperty == null) {
-                    ILCDEntity ilcdEntity = CreateIlcdEntity(row["FlowPropertyUUID"], DataProviderEnum.append, DataTypeEnum.FlowProperty, dbContext);
-                    if (ilcdEntity != null) {
-                        flowProperty = new FlowProperty();
-                        flowProperty.ILCDEntity = ilcdEntity;
-                        dbContext.GetDbSet<FlowProperty>().Add(flowProperty);
-                    }
-                }
-                else {
-                    Program.Logger.WarnFormat("FlowProperty with UUID {0} already exists. FlowProperty will be updated.", row["FlowPropertyUUID"]);
-                }
-                if (flowProperty != null) {
-                    flowProperty.Name = row["Name"];
-                    flowProperty.UnitGroupID = ugID;
-                    isImported = (dbContext.SaveChanges() > 0);
-                }
-            }
-            return isImported;
-        }
-
+        /// <summary>
+        /// Create Fragment record for row.
+        /// Fragment is like other ILCD data types in that it has a UUID.
+        /// However, it also has an external ID (FragmentID), created in MatLab, and 
+        /// FragmentID is used to reference fragments in other data sources. Therefore, this method
+        /// does not use IlcdEntity methods that optimize UUID -> ID lookup.
+        /// </summary>
+        /// <param name="row"></param>
+        /// <param name="dbContext"></param>
+        /// <returns></returns>
         private static bool CreateFragment(Row row, DbContextWrapper dbContext) {
             bool isImported = false;
             string uuid = row["FragmentUUID"];
             int fragmentID = Convert.ToInt32(row["FragmentID"]);
             if (!dbContext.EntityIdExists<Fragment>(fragmentID)) {
-                ILCDEntity ilcdEntity = CreateIlcdEntity(uuid, DataProviderEnum.fragments, DataTypeEnum.Fragment, dbContext);
-                if (ilcdEntity != null) {
-                    Fragment obj = dbContext.CreateEntityWithID<Fragment>(fragmentID);
-                    if (obj != null) {
-                        obj.ILCDEntity = ilcdEntity;
-                    }
-                    isImported = (dbContext.SaveChanges() > 0);
+                if (!dbContext.IlcdEntityAlreadyExists<Fragment>(uuid)) {
+                    ILCDEntity ilcdEntity = new ILCDEntity {
+                        UUID = uuid,
+                        DataProviderID = Convert.ToInt32(DataProviderEnum.fragments),
+                        DataTypeID = Convert.ToInt32(DataTypeEnum.Fragment)
+                    };
+                    dbContext.GetDbSet<ILCDEntity>().Add(ilcdEntity);
+                    Fragment obj = new Fragment {
+                        FragmentID = fragmentID,
+                        ILCDEntity = ilcdEntity
+                    };
+                    isImported = dbContext.AddEntity(obj);
                 }
             }
             return isImported;
@@ -306,8 +225,11 @@ namespace LcaDataLoader {
                 ent.Name = row["Name"];
                 ent.ShortName = dbContext.ShortenName(ent.Name, 30);
                 ent.NodeTypeID = Convert.ToInt32(row["NodeTypeID"]);
-                if (!string.IsNullOrEmpty(row["FlowUUID"]))
-                    ent.FlowID = dbContext.GetIlcdEntityID<Flow>(row["FlowUUID"]);
+                if (!string.IsNullOrEmpty(row["FlowUUID"])) {
+                    int flowID;
+                    if (dbContext.FindRefIlcdEntityID<Flow>(row["FlowUUID"], out flowID))
+                        ent.FlowID = flowID;
+                }
                 ent.DirectionID = Convert.ToInt32(row["DirectionID"]);
                 ent.ParentFragmentFlowID = TransformOptionalID(row["ParentFragmentFlowID"]);
                 if (dbContext.SaveChanges() > 0) isImported = true;
@@ -316,27 +238,32 @@ namespace LcaDataLoader {
         }
 
         private static bool ImportFragmentNodeProcess(Row row, DbContextWrapper dbContext) {
-            bool isImported = false;
+            bool isImported = false, isNew;
             int id = Convert.ToInt32(row["FragmentNodeProcessID"]);
-            FragmentNodeProcess ent = dbContext.CreateEntityWithID<FragmentNodeProcess>(id);
+            FragmentNodeProcess ent = dbContext.ProduceEntityWithID<FragmentNodeProcess>(id, out isNew);
             if (ent != null) {
+                int refID;
                 ent.FragmentFlowID = Convert.ToInt32(row["FragmentFlowID"]);
-                ent.ProcessID = dbContext.GetIlcdEntityID<LcaDataModel.Process>(row["ProcessUUID"]);
-                ent.FlowID = dbContext.GetIlcdEntityID<LcaDataModel.Flow>(row["FlowUUID"]);
-                isImported = (dbContext.SaveChanges() > 0);
+                if (dbContext.FindRefIlcdEntityID<LcaDataModel.Process>(row["ProcessUUID"], out refID))
+                    ent.ProcessID = refID;
+                if (dbContext.FindRefIlcdEntityID<LcaDataModel.Flow>(row["FlowUUID"], out refID))
+                    ent.FlowID = refID;
+                isImported = isNew ? dbContext.AddEntity(ent) : (dbContext.SaveChanges() > 0);
             }
             return isImported;
         }
 
         private static bool ImportFragmentNodeFragment(Row row, DbContextWrapper dbContext) {
-            bool isImported = false;
+            bool isImported = false, isNew;
             int id = Convert.ToInt32(row["FragmentNodeFragmentID"]);
-            FragmentNodeFragment ent = dbContext.CreateEntityWithID<FragmentNodeFragment>(id);
+            FragmentNodeFragment ent = dbContext.ProduceEntityWithID<FragmentNodeFragment>(id, out isNew);
             if (ent != null) {
+                int refID;
                 ent.FragmentFlowID = Convert.ToInt32(row["FragmentFlowID"]);
                 ent.SubFragmentID = Convert.ToInt32(row["SubFragmentID"]);
-                ent.FlowID = dbContext.GetIlcdEntityID<LcaDataModel.Flow>(row["FlowUUID"]);
-                isImported = (dbContext.SaveChanges() > 0);
+                if (dbContext.FindRefIlcdEntityID<LcaDataModel.Flow>(row["FlowUUID"], out refID))
+                    ent.FlowID = refID;
+                isImported = isNew ? dbContext.AddEntity(ent) : (dbContext.SaveChanges() > 0);
             }
             return isImported;
         }
@@ -353,24 +280,26 @@ namespace LcaDataLoader {
         private static bool ImportBackground(Row row, DbContextWrapper dbContext) {
             bool isImported = false, isNew = true;
             int id = Convert.ToInt32(row["BackgroundID"]);
-            int? flowID = dbContext.GetIlcdEntityID<Flow>(row["FlowUUID"]);
-            int? ilcdEntityID = null;
-            int nodeTypeID = Convert.ToInt32(row["NodeTypeID"]);
-            if (!string.IsNullOrEmpty(row["TargetUUID"])) {
-                ILCDEntity ilcdEntity = dbContext.GetIlcdEntity(row["TargetUUID"]);
-                if (ilcdEntity == null) {
-                    Program.Logger.ErrorFormat("Unable to find ILCDEntity with Background Target UUID, {1}. Skipping record.", row["TargetUUID"]);
-                } else {
-                    ilcdEntityID = ilcdEntity.ILCDEntityID;
+            int refID;
+            if (dbContext.FindRefIlcdEntityID<Flow>(row["FlowUUID"], out refID)) {
+                int? ilcdEntityID = null;
+                int nodeTypeID = Convert.ToInt32(row["NodeTypeID"]);
+                if (!string.IsNullOrEmpty(row["TargetUUID"])) {
+                    ILCDEntity ilcdEntity = dbContext.GetIlcdEntity(row["TargetUUID"]);
+                    if (ilcdEntity == null) {
+                        Program.Logger.ErrorFormat("Unable to find ILCDEntity with Background Target UUID, {1}. Skipping record.", row["TargetUUID"]);
+                    } else {
+                        ilcdEntityID = ilcdEntity.ILCDEntityID;
+                    }
                 }
-            }
-            if (flowID != null && (ilcdEntityID != null || nodeTypeID == 5 )) {
-                Background ent = dbContext.ProduceEntityWithID<Background>(id, out isNew);
-                ent.NodeTypeID = nodeTypeID;
-                ent.FlowID = Convert.ToInt32(flowID);
-                ent.DirectionID = Convert.ToInt32(row["DirectionID"]);
-                ent.ILCDEntityID = ilcdEntityID;
-                isImported = isNew ? dbContext.AddEntity(ent) : (dbContext.SaveChanges() > 0);
+                if (ilcdEntityID != null || nodeTypeID == 5 ) {
+                    Background ent = dbContext.ProduceEntityWithID<Background>(id, out isNew);
+                    ent.NodeTypeID = nodeTypeID;
+                    ent.FlowID = refID;
+                    ent.DirectionID = Convert.ToInt32(row["DirectionID"]);
+                    ent.ILCDEntityID = ilcdEntityID;
+                    isImported = isNew ? dbContext.AddEntity(ent) : (dbContext.SaveChanges() > 0);
+                }
             }
             return isImported;
         }
@@ -497,9 +426,6 @@ namespace LcaDataLoader {
                 ImportAppendCSV(dirName, "CategorySystem", ImportCategorySystem, dbContext);
                 rows = ImportAppendCSV(dirName, "Category", CreateCategory, dbContext);
                 if (rows != null) UpdateEntities(rows, UpdateCategory, dbContext);
-                ImportAppendCSV(dirName, "Flow-append", ImportFlow, dbContext);
-                ImportAppendCSV(dirName, "FlowProperty-append", ImportFlowProperty, dbContext);
-                ImportAppendCSV(dirName, "FlowFlowProperty-append", ImportFlowFlowProperty, dbContext);
                 ImportAppendCSV(dirName, "FlowPropertyEmission", ImportFlowPropertyEmission, dbContext);
                 ImportAppendCSV(dirName, "ProcessDissipation", ImportProcessDissipation, dbContext);
                 // Import Classification last because it references UUIDs in other files
