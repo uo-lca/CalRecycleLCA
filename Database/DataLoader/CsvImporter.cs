@@ -107,7 +107,7 @@ namespace LcaDataLoader {
             bool isImported = false;
             int pID, fID;
             int dirID = Convert.ToInt32(DirectionEnum.Output);
-            if (dbContext.FindRefIlcdEntityID<LcaDataModel.Process>(row["ProcessUUID"], out pID) &&
+            if (dbContext.FindRefIlcdEntityID<LcaDataModel.Process>(row["ProcessUUID"], out pID, row["ProcessVersion"]) &&
                 dbContext.FindRefIlcdEntityID<LcaDataModel.Flow>(row["FlowUUID"], out fID)) {
                 DbSet<ProcessFlow> dbSet = dbContext.GetDbSet<ProcessFlow>();
                 ProcessFlow obj = (from o in dbSet
@@ -244,7 +244,7 @@ namespace LcaDataLoader {
             if (ent != null) {
                 int refID;
                 ent.FragmentFlowID = Convert.ToInt32(row["FragmentFlowID"]);
-                if (dbContext.FindRefIlcdEntityID<LcaDataModel.Process>(row["ProcessUUID"], out refID))
+                if (dbContext.FindRefIlcdEntityID<LcaDataModel.Process>(row["ProcessUUID"], out refID, row["ProcessVersion"]))
                     ent.ProcessID = refID;
                 if (dbContext.FindRefIlcdEntityID<LcaDataModel.Flow>(row["FlowUUID"], out refID))
                     ent.FlowID = refID;
@@ -285,9 +285,11 @@ namespace LcaDataLoader {
                 int? ilcdEntityID = null;
                 int nodeTypeID = Convert.ToInt32(row["NodeTypeID"]);
                 if (!string.IsNullOrEmpty(row["TargetUUID"])) {
-                    ILCDEntity ilcdEntity = dbContext.GetIlcdEntity(row["TargetUUID"]);
+                    string version = null;
+                    if (NodeTypeEnum.Process.Equals(nodeTypeID)) version= row["ProcessVersion"];
+                    ILCDEntity ilcdEntity = dbContext.GetIlcdEntity(row["TargetUUID"], version);
                     if (ilcdEntity == null) {
-                        Program.Logger.ErrorFormat("Unable to find ILCDEntity with Background Target UUID, {1}. Skipping record.", row["TargetUUID"]);
+                        Program.Logger.ErrorFormat("Unable to find ILCDEntity with Background Target UUID, {1} {2}. Skipping record.", row["TargetUUID"], row["ProcessVersion"]);
                     } else {
                         ilcdEntityID = ilcdEntity.ILCDEntityID;
                     }

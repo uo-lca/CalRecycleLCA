@@ -137,12 +137,13 @@ namespace LcaDataLoader {
         /// </summary>
         /// <param name="ilcdEntity">An entity with a UUID.</param>
         /// <param name="uuid">the UUID</param>
+        /// <param name="version">only provide version when external key is UUID + Version</param>
         /// <returns>true iff entity was successfully inserted</returns>
-        public bool AddIlcdEntity(IIlcdEntity ilcdEntity, string uuid) {
+        public bool AddIlcdEntity(IIlcdEntity ilcdEntity, string uuid, string version=null) {
             bool isAdded = false;
             _DbContext.Set(ilcdEntity.GetType()).Add(ilcdEntity);
             if (SaveChanges() > 0) {
-                _EntityIdDictionary[uuid] = ilcdEntity.ID;
+                _EntityIdDictionary[makeKey(uuid, version)] = ilcdEntity.ID;
                 isAdded = true;
             }
             return isAdded;
@@ -162,18 +163,20 @@ namespace LcaDataLoader {
         /// <param name="ilcdDb">Current DbContextWrapper instance</param>
         /// <param name="uuid">The UUID</param>
         /// <param name="outID">Output: Entity ID in its own table</param>
+        /// <param name="version">Only provide version when external key is UUID + Version</param>
         /// <returns>true iff the entity was found</returns>
-        public bool FindRefIlcdEntityID<T>(string uuid, out int outID) where T : class, IIlcdEntity {
-            bool found = _EntityIdDictionary.TryGetValue(uuid, out outID);
+        public bool FindRefIlcdEntityID<T>(string uuid, out int outID, string version=null) where T : class, IIlcdEntity {
+            string externalKey = makeKey(uuid, version);
+            bool found = _EntityIdDictionary.TryGetValue(externalKey, out outID);
             if (!found) {
-                IIlcdEntity entity = GetIlcdEntity<T>(uuid);
+                IIlcdEntity entity = GetIlcdEntity<T>(uuid, version);
                 if (entity == null) {
-                    Program.Logger.ErrorFormat("Unable to find {0} with UUID, {1}.", typeof(T).ToString(), uuid);
+                    Program.Logger.ErrorFormat("Unable to find {0} with key, {1}.", typeof(T).ToString(), externalKey);
                     found = false;
                 }
                 else  {
                     outID = entity.ID;
-                    _EntityIdDictionary[uuid] = outID;
+                    _EntityIdDictionary[externalKey] = outID;
                     found = true;
                 }
             }
@@ -301,13 +304,22 @@ namespace LcaDataLoader {
         }
 
         /// <summary>
-        /// Generic method to retrieve ILCD Entity from its own table (e.g., Flow, Process) by UUID.
+        /// Generic method to lookup ILCD Entity by UUID and (optionally) Version. 
+        /// Return the object from its specific class (e.g., Flow, Process).
         /// </summary>
         /// <param name="uuid">UUID value</param>
-        /// <returns>Entity, if found, otherwise null</returns>
-        public T GetIlcdEntity<T>(string uuid) where T : class, IIlcdEntity {
+        /// <param name="version">Only needed for ILCD data types where multiple versions may be imported (Process)</param>
+        /// <returns>IIlcdEntity object, if found, otherwise null</returns>
+        public T GetIlcdEntity<T>(string uuid, string version = null) where T : class, IIlcdEntity {
             DbSet<T> dbSet = _DbContext.Set<T>();
-            T entity = (from le in dbSet where le.ILCDEntity.UUID == uuid select le).FirstOrDefault();
+            T entity = String.IsNullOrEmpty(version) ?
+                (from le in dbSet where le.ILCDEntity.UUID == uuid select le).FirstOrDefault()
+                :
+                (from le in dbSet
+                 where le.ILCDEntity.UUID == uuid && le.ILCDEntity.Version == version
+                 select le).FirstOrDefault()
+                 ;
+
             return entity;
         }
 
@@ -398,31 +410,42 @@ namespace LcaDataLoader {
 
         /// <summary>
         /// Use this method to search ILCDEntity by UUID 
+        /// and optionally, Version
         /// </summary>
         /// <param name="uuid">The UUID value</param>
+        /// <param name="version">Only needed for ILCD data type where multiple versions may be imported (Process)</param>
         /// <returns>Instance of ILCDEntity if found, otherwise null</returns>
-        public ILCDEntity GetIlcdEntity(string uuid) {
-            ILCDEntity entity = (from il in _DbContext.ILCDEntities where il.UUID == uuid select il).FirstOrDefault();
+        public ILCDEntity GetIlcdEntity(string uuid, string version=null) {
+            ILCDEntity entity =
+                String.IsNullOrEmpty(version) ?
+                (from il in _DbContext.ILCDEntities where il.UUID == uuid select il).FirstOrDefault()
+                :
+                (from il in _DbContext.ILCDEntities where il.UUID == uuid && il.Version == version select il).FirstOrDefault();
             return entity;
         }
 
+        private string makeKey(string uuid, string version=null) {
+            return String.IsNullOrEmpty(version) ? uuid : String.Format("{0} {1}", uuid, version);
+        }
+
         /// <summary>
-        /// Use this method before creating an ILCD entity 
-        /// to check if an ILCD entity with the same UUID already exists in the database.
+        /// Use this method before creating an ILCD entity. 
+        /// Checks if an ILCD entity with the same UUID and (optionally) Version already exists in the database.
         /// In this case, do not create.
-        /// If an entity with the same UUID is found, this method logs a warning, and caches the ID for future lookup.
+        /// Version should only be provided for data type where UUID and Version is the external key (Process). 
+        /// If an entity is found, this method logs a warning, and caches the ID for future lookup.
         /// </summary>
         ///  /// <param name="uuid">The UUID value</param>
         /// <returns>true iff found</returns>
-        /// TODO : Create new methods for ILCD entities where key is UUID + Version (Process)
-        public bool IlcdEntityAlreadyExists<T>(string uuid) where T : class, IIlcdEntity {
-            IIlcdEntity entity = GetIlcdEntity<T>(uuid);
+        public bool IlcdEntityAlreadyExists<T>(string uuid, string version=null) where T : class, IIlcdEntity {
+            IIlcdEntity entity = GetIlcdEntity<T>(uuid, version);
             if (entity == null) {
                 return false;
             }
             else {
-                Program.Logger.WarnFormat("{0} with UUID {1} was already imported.", uuid, typeof(T).ToString());
-                _EntityIdDictionary[uuid] = Convert.ToInt32(entity.ID);
+                string externalKey = makeKey(uuid, version);
+                Program.Logger.WarnFormat("{0} with key {1} was already imported.", typeof(T).ToString(), externalKey);
+                _EntityIdDictionary[externalKey] = Convert.ToInt32(entity.ID);
                 return true;
             }
         }

@@ -400,7 +400,8 @@ namespace LcaDataLoader {
             bool isSaved = false;
             string lookupName;
             string uuid = GetCommonUUID();
-            if (!ilcdDb.IlcdEntityAlreadyExists<LcaDataModel.Process>(uuid)) {
+            string version = GetCommonVersion();
+            if (!ilcdDb.IlcdEntityAlreadyExists<LcaDataModel.Process>(uuid, version)) {
                 LcaDataModel.Process process = new LcaDataModel.Process();
                 SaveIlcdEntity(ilcdDb, process, DataTypeEnum.Process);
                 process.Name = GetElementValue(ElementName("baseName"));
@@ -414,7 +415,7 @@ namespace LcaDataLoader {
                 if (lookupName != null) {
                     process.ProcessTypeID = ilcdDb.LookupEntityID<ProcessType>(lookupName);
                 }
-                if (ilcdDb.AddIlcdEntity(process, uuid)) {
+                if (ilcdDb.AddIlcdEntity(process, uuid, version)) {
                     List<ProcessFlow> pfList =
                         LoadedDocument.Root.Descendants(ElementName("exchanges")).Elements(ElementName("exchange")).Select(f =>
                             CreateProcessFlow(ilcdDb, f, process.ID)).ToList();
