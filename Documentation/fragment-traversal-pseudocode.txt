@@ -53,8 +53,8 @@ success = NodeRecurse( fragment_flow_id, scenario_id, flow_magnitude )
 		(
 		  SELECT fpp.Value AS Value
 		  FROM FlowPropertyParam fpp 
-		  INNER JOIN ScenarioParam sp ON fpp.ParamID = sp.ParamID
-		  WHERE ScenarioID = scenario_id
+		  INNER JOIN Param p ON fpp.ParamID = p.ParamID
+		  WHERE p.ScenarioID = scenario_id
 		) 
 		fpparam
 		ON FlowFlowPropertyID
@@ -68,6 +68,8 @@ success = NodeRecurse( fragment_flow_id, scenario_id, flow_magnitude )
   node_scale = 1 / inflow.Result;
   node_weight = flow_magnitude * node_conv * node_scale;
 
+  SetNodeCache( fragment_flow_id, scenario_id, flow_magnitude, node_weight );
+  
   if node_weight == 0
   {
     // no need to go further
@@ -75,8 +77,6 @@ success = NodeRecurse( fragment_flow_id, scenario_id, flow_magnitude )
     return;
   }
 
-  SetNodeCache( fragment_flow_id, scenario_id, flow_magnitude, node_weight );
-  
   // now map outgoing fragment edges to other product flows
   // NO NEED to EXCLUDE inflows because it will not show up in the join
   outflows = SELECT ff.FragmentFlowID, ff.FlowID, ff.DirectionID,
@@ -89,8 +89,8 @@ success = NodeRecurse( fragment_flow_id, scenario_id, flow_magnitude )
 	       SELECT dp.FragmentFlowID AS FragmentFlowID,
 	       	      dp.Value AS Value 
 	       FROM DependencyParam dp
-	       INNER JOIN ScenarioParam sp ON dp.ParamID = sp.ParamID
-	       WHERE sp.ScenarioID = scenario_id
+	       INNER JOIN Param p ON dp.ParamID = p.ParamID
+	       WHERE p.ScenarioID = scenario_id
 	     )
 	     dpparam
 	     ON ff.FragmentFlowID = dpparam.FragmentFlowID
