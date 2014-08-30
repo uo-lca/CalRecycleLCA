@@ -329,6 +329,38 @@ The following tables are required:
     importer must find the ProcessFlowID that matches the identified
     Process AND Flow.
 
+   CompositionModel
+    * CompositionModelID
+    * FlowID (FK)
+    * Name
+
+    * DocID
+
+    List of intermediate flows for which composition parameters are
+    relevant (multiple entries allowed for each FlowID)
+
+   CompositionData
+    * CompositionDataID
+    * CompositionModelID (FK)
+    % FlowPropertyID (FK)
+    * Value
+
+    * DocID
+
+    List of flow property values that are relevant to a given composition
+    model.  These are stored as sets and can be easily invoked by a user
+    (or designer) to generate and populate a corresponding set of
+    ParamInstances in a scenario.
+
+   ProcessComposition
+    * ProcessCompositionID
+    * ProcessID
+    * InFlowID
+    * CompositionModelID
+
+    FragmentFlows that end in processes may have their input flows 
+
+
 ### Indices, constraints
 
     * Every table needs a primary key
@@ -469,13 +501,6 @@ The following tables are required:
     * DocID
 
     Mapping of nodes with type "Fragment" to FragmentIDs
-
-    FragmentNodeComposition
-    * FragmentNodeCompositionID
-    * FragmentNodeProcessID
-    * CompositionModelID
-
-    FragmentFlows that end in processes may have their input flows 
 
 ## Scenarios and Parameters
 
@@ -640,32 +665,9 @@ The following tables are required:
     It is a scenario design constraint that the substituted FragmentID must
     have the same list of product flows as the original FragmentID.
 
-   CompositionModel
-    * CompositionModelID
-    * FlowID (FK)
-    * Name
-
-    * DocID
-
-    List of intermediate flows for which composition parameters are
-    relevant (multiple entries allowed for each FlowID)
-
-   CompositionData
-    * CompositionDataID
-    * CompositionModelID (FK)
-    % FlowPropertyID (FK)
-    * Value
-
-    * DocID
-
-    List of flow property values that are relevant to a given composition
-    model.  These are stored as sets and can be easily invoked by a user
-    (or designer) to generate and populate a corresponding set of
-    ParamInstances in a scenario.
-
     CompositionSubstitution - NEW TABLE
     * ScenarioID (FK)
-    * FragmentNodeCompositionID
+    * ProcessCompositionID
     * CompositionModelID
 
 ## Cached Computation Results

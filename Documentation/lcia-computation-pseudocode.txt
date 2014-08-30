@@ -1,6 +1,17 @@
 ==========
 Tue Jul 29 11:31:27 -0700 2014
 
+scores[...] = ProcessLCIA( process_id, scenario_id, lciamethod_ids[...])
+{
+  inventory = ComputeProcessLCI( process_id, scenario_id );
+  for k=1:length(lciamethod_ids)
+  {
+    scores[k] = ComputeProcessLCIA(inventory, scenario_id, 
+    	      		           lciamethod_ids[k] );
+  }
+}
+
+
 LCIA = ComputeProcessLCIA( inventory, scenario_id, lcia_method_id )
 {
   // returns LCIA: a list of scores: FlowID, DirectionID, Quantity, Factor,
@@ -51,73 +62,92 @@ inventory = ComputeProcessLCI ( process_id, scenario_id )
 	      ON pf.ProcessFlowID = pep.ProcessFlowID
 	      WHERE pf.ProcessID = process_id
 
+  if ~isempty( SELECT ProcessCompositionID FROM ProcessComposition
+     	       WHERE ProcessID = process_id )
+  {
+    // dissipation is a list of emissions derived from the pairing of a
+    // composition model with an emission factor.  Flows resulting from
+    // dissipation modeling replace (override) direct inventory flows.
+    dissipation = ComputeDissipation( process_id, scenario_id );
+    inventory = SELECT inventory.FlowID AS FlowID,
+    	      	       inventory.DirectionID AS DirectionID,
+		       ( dissipation.Result == NULL 
+		           ? inventory.Result : dissipation.Result) AS Result
+		FROM inventory LEFT OUTER JOIN dissipation 
+		ON inventory.FlowID = dissipation.FlowID
+  }
+
   return inventory;
 
-  // skip this for now:
-
-  // compute flow property dissipation emissions
-  // dissipation = ComputeProcessDissipation( process_id, scenario_id )
-
-  // use dissipation value where present; inventory value elsewhere
-  // return ( SELECT i.FlowID AS FlowID, i.DirectionID AS DirectionID, 
-  // 	      ( d.Result == NULL ? i.Result : d.Result ) AS Result
-  //	      FROM inventory i
-  //	      LEFT OUTER JOIN dissipation d on i.FlowID = d.FlowID
-  //	      WHERE i.DirectionID = d.DirectionID );
-  
 }
 
 
-// skip this for now
-dissipation = ComputeProcessDissipation( process_id, scenario_id )
+dissipation = ComputeDissipation ( process_id, scenario_id )
 {
-  // returns a list of flows (FlowID, DirectionID, Result) resulting from
-  // flow property dissipation.
-  // inflows is a list of intermediate FlowIDs entering the process
-  inflows = SELECT pf.FlowID FROM ProcessFlow pf
-  	    INNER JOIN Flow ON pf.FlowID = Flow.FlowID
-	    WHERE pf.DirectionID = 1 // Input
-	      AND pf.ProcessID = process_id
-	      AND Flow.FlowTypeID = 1 // Product Flow
+  // three steps here:
+  // 1. determine the flow composition model on a scenario-specific basis
+  // 2. apply EmissionFactors (with params) to the composition
 
-  dissipation = SELECT pf.FlowID, pf.DirectionID, 
-  	        ( pdparam.Value == NULL 
-		  ? pd.EmissionFactor : pdparam.Value) AS Factor,
-  	        fpe.Scale * ( fpparam.Value == NULL 
-		  	      ? ffp.MeanValue : fpparam.Value) AS Property,
-		FROM inflows
-		INNER JOIN FlowFlowProperty ffp ON inflows.FlowID = ffp.FlowID
+  // objective is to identify the correct CompositionModel to use.
+  // the following two pseudocode blocks are equivalent:
+  { // option 1:
+  ProcessComp = SELECT * FROM ProcessComposition 
+  	      	WHERE ProcessID = process_id;
+  CompModel = ProcessComp.CompositionModelID;
+
+  SubsComp = SELECT * FROM CompositionSubstitution 
+  	     WHERE ProcessCompositionID = ProcessComp.ProcessCompositionID
+	       AND ScenarioID = scenario_id;
+
+  if ~isempty( SubsComp)
+    CompModel = SubsComp.CompositionModelID;
+
+  }{ // option 2
+  CompModel = SELECT ( cs.CompositionModelID == NULL 
+			? pc.CompositionModelID
+			: cs.CompositionModelID) AS CompositionModelID
+	      FROM ProcessComposition pc
+	      LEFT OUTER JOIN CompositionSubstitution cs
+	      ON pc.ProcessCompositionID = cs.ProcessCompositionID
+	      WHERE pc.ProcessID = process_id
+	        AND cs.ScenarioID = scenario_id;
+  } 
+
+  // Emission Factor list with fields: FlowID, EmissionFactor
+  efs = SELECT pf.FlowID AS FlowID,
+      	( pdparam.Value == NULL ? pd.EmissionFactor : pdparam.Value)
+	AS EmissionFactor
+      	FROM ProcessDissipation pd
+	LEFT OUTER JOIN
+	(
+	  SELECT pdp.ProcessDissipationID, pdp.Value
+	  FROM ProcessDissipationParam pdp
+	  INNER JOIN Param p on pdp.ParamID = p.ParamID
+	  WHERE p.ScenarioID = scenario_id 
+	) pdparam
+	ON pd.ProcessDissipationID = pdparam.ProcessDissipationID
+	INNER JOIN ProcessFlow pf
+	ON pd.ProcessFlowID = pf.ProcessFlowID
+	WHERE pf.ProcessID = process_id
+	  AND pf.DirectionID = 2 ; // output
+	
+  // now link emission factors to composition measurements by way of
+  // FlowPropertyEmission.
+  // fields: FlowID, DirectionID (all Output), Result
+  // for now, do not parameterize composition data
+  // otherwise, there is one more left outer join below
+  dissipation = SELECT efs.FlowID AS FlowID,
+  	      	efs.DirectionID AS DirectionID,
+		(efs.EmissionFactor * fpe.Scale * cd.Value) AS Result
+  	      	FROM CompositionData cd
 		INNER JOIN FlowPropertyEmission fpe
-		  ON fpe.FlowPropertyID = ffp.FlowPropertyID
-		INNER JOIN ProcessFlow pf ON fpe.FlowID = pf.FlowID
-		INNER JOIN ProcessDissipation pd 
-		  ON pd.ProcessFlowID = pf.ProcessFlowID
-		LEFT OUTER JOIN
-		(
-	          SELECT pdp.ProcessDissipationID, pdp.Value
-		  FROM ProcessDissipationParam pdp 
-		  INNER JOIN Param p ON pdp.ParamID = p.ParamID
-	          WHERE p.ScenarioID = scenario_id
-	        ) pdparam
-		ON pd.ProcessDissipationID = pdparam.ProcessDissipationID
-		LEFT OUTER JOIN
-		(
-	          SELECT fpp.FlowFlowPropertyID, fpp.Value
-		  FROM FlowPropertyParam fpp 
-		  INNER JOIN Param p ON fpp.ParamID = p.ParamID
-	          WHERE p.ScenarioID = scenario_id
-	        ) fpparam
-		ON ffp.FlowFlowPropertyID = fpparam.FlowFlowPropertyID
-		WHERE pf.ProcessID = process_id
+		ON cd.FlowProperty = fpe.FlowProperty
+		INNER JOIN efs
+		ON efs.FlowID = fpe.FlowID
+		WHERE cd.CompositionModel = CompModel;
 
-  return( SELECT pf.FlowID AS FlowID, pf.DirectionID AS DirectionID,
-  	        (Factor * Property) AS Result
-		FROM dissipation );
+  // and that's the end
 }
-
-
-
-
 
 
 

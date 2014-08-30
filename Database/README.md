@@ -51,9 +51,9 @@ LcaDataLoader -r "C:\LCA_Data" -s "Full UO LCA Flat Export BK"
 LcaDataLoader -r "C:\LCA_Data" -s "Full UO LCA Flat Export Ecoinvent"
 LcaDataLoader -r "C:\LCA_Data" -s "Full UO LCA Flat Export Improper"
 LcaDataLoader -r "C:\LCA_Data" -s "Full UO LCA Flat Export PE-SP24"
+LcaDataLoader -r "C:\LCA_Data" -s "Full UO LCA Flat Export PE-SP22"
 LcaDataLoader -r "C:\LCA_Data" -s "ELCD-LCIA"
 LcaDataLoader -r "C:\LCA_Data" -c
-LcaDataLoader -r "C:\LCA_Data" -s "Full UO LCA Flat Export PE-SP22"
 </pre></code>
 
 
