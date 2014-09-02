@@ -147,7 +147,8 @@ namespace LcaDataModel {
 
     /// <summary>
     /// Interface to common ILCD Entity properties. Hides differences in column names.
-    /// All ILCD entities have UUID
+    /// All ILCD entities have have a reference to ILCDEntity, the table where UUIDs 
+    /// and metadata are stored.
     /// </summary>
     public interface IIlcdEntity : IEntity {
         // UUID accessor signature  

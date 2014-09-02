@@ -10,15 +10,15 @@ var LCA = {
     //baseURI: "http://kbcalr.isber.ucsb.edu/api/",
     baseURI: "http://localhost:60393/api/",
     testDataFolder: "TestData/",
-    loadedData: [],  // Data loaded via web API (or from TestData)
+    loadedData: {}, // Data loaded via web API (or from TestData)
     spinner: null,
-    indexedData: [], // Associative arrays of loaded data, ID -> data object
-    enumData: [],    // Associative arrays of enum data, ID -> name
-    urlVars: []     // Associative array of parameters in querystring
+    indexedData: {}, // Associative array of loaded data, keyed by web api resource name
+    enumData: {},   // Associative arrays of enum data
+    urlVars: {}    // Associative array of parameters in querystring
 };
 
-/**
- * Create an associative array for enumerated data type (JavaScript has no enum type)
+    /**
+     * Create an associative array for enumerated data type (JavaScript has no enum type)
  * Key for first value is 1 and is incremented by 1 for each of the subsequent values.
  * @param {Array} values	Array of string values
  * @return {Array} the associative array.
@@ -273,7 +273,6 @@ LCA.loadUrlVars = function() {
     for (var i = 0; i < hashes.length; i++) {
         hash = hashes[i].split('=');
         varName = hash[0].toLowerCase();
-        LCA.urlVars.push(varName);
         LCA.urlVars[varName] = hash[1];
     }
 };

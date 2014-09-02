@@ -47,10 +47,11 @@ Usage Instructions
 1. Download data from [GitHub Repository LCA_Data](https://github.com/uo-lca/LCA_Data/) to the server where data is to be loaded.
 2. As a user who has access to update data in UsedOilLCA, load ILCD data archives first, then CSV files. The ILCD archives overlap. If an ILCD entity has been loaded from one archive, it will not be overwritten when an archive containing the same entity is loaded. CSV files contain references to ILCD entities, so they should be loaded last. Suppose that LCA_Data has been downloaded to C:\LCA_Data, the following sequence of commands will load all the files.
 <pre><code>
-LcaDataLoader -r "C:\LCA_Data" -s "Full UO LCA Flat Export BK 2014_05_05"
-LcaDataLoader -r "C:\LCA_Data" -s "Full UO LCA Flat Export Ecoinvent 2014_04_24"
-LcaDataLoader -r "C:\LCA_Data" -s "Full UO LCA Flat Export Improper 2014_04_01"
-LcaDataLoader -r "C:\LCA_Data" -s "Full UO LCA Flat Export PE 2014_04_24"
+LcaDataLoader -r "C:\LCA_Data" -s "Full UO LCA Flat Export BK"
+LcaDataLoader -r "C:\LCA_Data" -s "Full UO LCA Flat Export Ecoinvent"
+LcaDataLoader -r "C:\LCA_Data" -s "Full UO LCA Flat Export Improper"
+LcaDataLoader -r "C:\LCA_Data" -s "Full UO LCA Flat Export PE-SP24"
+LcaDataLoader -r "C:\LCA_Data" -s "Full UO LCA Flat Export PE-SP22"
 LcaDataLoader -r "C:\LCA_Data" -s "ELCD-LCIA"
 LcaDataLoader -r "C:\LCA_Data" -c
 </pre></code>

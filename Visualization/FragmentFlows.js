@@ -29,7 +29,8 @@ function FragmentFlows() {
         height = 600 - margin.top - margin.bottom,  // diagram height
         sankeyWidth = width - 100; // leave room for labels on right
 
-    var formatNumber = d3.format("^.2g"),
+    var formatNumber = d3.format("^.2g"),   // Round numbers to 2 significant digits
+                                            // TODO: make this user configurable
         svg,
         color = d3.scale.ordinal();
     /**
@@ -134,12 +135,12 @@ function FragmentFlows() {
         nodeLinks.forEach( function (l) {
             if ("flowID" in l) {
                 var flowPropertyID = selectedFlowPropertyID,
-                    magnitude = l.magnitude,
+                    magnitude = formatNumber(l.magnitude),
                     unit = "";
                 flow = LCA.indexedData.flows[l.flowID];
                 if (l.magnitude === null && "referenceFlowPropertyID" in flow) {
                     flowPropertyID = flow.referenceFlowPropertyID;
-                    magnitude = getMagnitude(curFragment.links[l.fragmentFlowID], flowPropertyID);
+                    magnitude = formatNumber(getMagnitude(curFragment.links[l.fragmentFlowID], flowPropertyID));
                 }
                 if ("referenceUnitName" in LCA.indexedData.flowProperties[flowPropertyID]) {
                     unit = LCA.indexedData.flowProperties[flowPropertyID].referenceUnitName;
@@ -171,7 +172,7 @@ function FragmentFlows() {
         webApiFilter = "fragments/" + selectedFragmentID;
         
         apiResourceNames = ["fragments", "flowproperties", "links", "flows"];
-        LCA.loadedData = [];
+        LCA.loadedData = {};
         LCA.loadData(apiResourceNames[0], false, onFragmentsLoaded);
         LCA.loadData(apiResourceNames[1], false, onFlowPropertiesLoaded, webApiFilter);
         LCA.loadData(apiResourceNames[2], false, onFragmentLinksLoaded, webApiFilter);

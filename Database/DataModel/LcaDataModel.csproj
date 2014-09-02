@@ -83,13 +83,9 @@
     <Compile Include="IObjectState.cs" />
     <Compile Include="LCIA.cs" />
     <Compile Include="LCIAMethod.cs" />
-    <Compile Include="Migrations\201408212337337_Initial.cs" />
-    <Compile Include="Migrations\201408212337337_Initial.Designer.cs">
-      <DependentUpon>201408212337337_Initial.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Migrations\201408261751080_RefactorScenarioParam.cs" />
-    <Compile Include="Migrations\201408261751080_RefactorScenarioParam.Designer.cs">
-      <DependentUpon>201408261751080_RefactorScenarioParam.cs</DependentUpon>
+    <Compile Include="Migrations\201408281820416_Initial.cs" />
+    <Compile Include="Migrations\201408281820416_Initial.Designer.cs">
+      <DependentUpon>201408281820416_Initial.cs</DependentUpon>
     </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="NodeCache.cs" />
@@ -129,11 +125,8 @@
     </None>
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="Migrations\201408212337337_Initial.resx">
-      <DependentUpon>201408212337337_Initial.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\201408261751080_RefactorScenarioParam.resx">
-      <DependentUpon>201408261751080_RefactorScenarioParam.cs</DependentUpon>
+    <EmbeddedResource Include="Migrations\201408281820416_Initial.resx">
+      <DependentUpon>201408281820416_Initial.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

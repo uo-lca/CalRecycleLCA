@@ -19,7 +19,10 @@ namespace LcaDataLoader {
         int _CurrentIlcdDataProviderID;
 
         // Punctuation characters used to determine where to truncate name
-        static char[] nameDelimiters = new char[] { '(', '.', ',', ':', ';' };
+        static char[] _NameDelimiters = new char[] { '(', '.', ',', ':', ';' };
+
+        // Map UUID to specific entity ID (FlowID, FlowPropertyID, etc.) for fast lookup
+        Dictionary<string, int> _EntityIdDictionary = new Dictionary<string, int>();
 
         // Flag: Has Dispose already been called? 
         bool disposed = false;
@@ -55,7 +58,7 @@ namespace LcaDataLoader {
             }
 
             // name is longer, so try to find out where to cut
-            int index = name.LastIndexOfAny(nameDelimiters, length);
+            int index = name.LastIndexOfAny(_NameDelimiters, length);
             if (index < length * 2 / 3) {
                 index = name.LastIndexOf(' ', length);
             }
@@ -130,23 +133,59 @@ namespace LcaDataLoader {
         }
 
         /// <summary>
-        /// Insert ILCD entity into the database.
+        /// Insert ILCD entity into the database and cache ID for future lookup.
         /// </summary>
         /// <param name="ilcdEntity">An entity with a UUID.</param>
+        /// <param name="uuid">the UUID</param>
+        /// <param name="version">only provide version when external key is UUID + Version</param>
         /// <returns>true iff entity was successfully inserted</returns>
-        /// TODO : this method is no longer needed. Replace all references with AddEntity, defined below
-        public bool AddIlcdEntity(IIlcdEntity ilcdEntity) {
+        public bool AddIlcdEntity(IIlcdEntity ilcdEntity, string uuid, string version=null) {
             bool isAdded = false;
-
             _DbContext.Set(ilcdEntity.GetType()).Add(ilcdEntity);
             if (SaveChanges() > 0) {
+                _EntityIdDictionary[makeKey(uuid, version)] = ilcdEntity.ID;
                 isAdded = true;
             }
             return isAdded;
         }
 
         /// <summary>
-        /// Insert  entity into the database.
+        /// Search for entity by UUID and output its specific entity ID.
+        /// Use this method to get the entity ID of an ILCD entity that should 
+        /// have been imported into the database.
+        /// For example, if T is Flow, and a flow with the given UUID was previously loaded,
+        /// return its FlowID.
+        /// Searches local cache first, then database. 
+        /// If found in database, updates cache.
+        /// If not found, logs an error.
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="ilcdDb">Current DbContextWrapper instance</param>
+        /// <param name="uuid">The UUID</param>
+        /// <param name="outID">Output: Entity ID in its own table</param>
+        /// <param name="version">Only provide version when external key is UUID + Version</param>
+        /// <returns>true iff the entity was found</returns>
+        public bool FindRefIlcdEntityID<T>(string uuid, out int outID, string version=null) where T : class, IIlcdEntity {
+            string externalKey = makeKey(uuid, version);
+            bool found = _EntityIdDictionary.TryGetValue(externalKey, out outID);
+            if (!found) {
+                IIlcdEntity entity = GetIlcdEntity<T>(uuid, version);
+                if (entity == null) {
+                    Program.Logger.ErrorFormat("Unable to find {0} with key, {1}.", typeof(T).ToString(), externalKey);
+                    found = false;
+                }
+                else  {
+                    outID = entity.ID;
+                    _EntityIdDictionary[externalKey] = outID;
+                    found = true;
+                }
+            }
+            return found;
+        }
+
+        /// <summary>
+        /// Insert entity into the database.
+        /// Use to add non-ILCD entities (have no UUID)
         /// </summary>
         /// <param name="entity">An entity modeled in LcaDataModel</param>
         /// <returns>true iff entity was successfully inserted</returns>
@@ -157,6 +196,7 @@ namespace LcaDataLoader {
 
         /// <summary>
         /// Insert  list of entities into the database.
+        /// Use to import relationships from ILCD data.
         /// </summary>
         /// <param name="entityList">List of entities modeled in LcaDataModel</param>
         public void AddEntities<T>(List<T> entityList) where T : class  {
@@ -168,7 +208,7 @@ namespace LcaDataLoader {
         /// Find entity with a given ID and create it if it does not already exist.
         /// Changes are not saved so that other properties can be set before saving.
         /// New entity must be Added after updating properties in case AutoDetectChanges enabled.
-        /// Use this when loading entities from CSV. 
+        /// Use this when loading non-ILCD entities from CSV. 
         /// </summary>
         /// <typeparam name="T">Entity Type</typeparam>
         /// <param name="id">Entity ID</param>
@@ -194,6 +234,7 @@ namespace LcaDataLoader {
         /// </summary>
         /// <param name="id">The entity ID</param>
         /// <returns>New or existing entity with matching ID</returns>
+        /// TODO: Replace usage of this method with new method above
         public T CreateEntityWithID<T>(int id) where T : class, IEntity, new() {
             T ent = Find<T>(id);
             if (ent == null) {
@@ -263,31 +304,23 @@ namespace LcaDataLoader {
         }
 
         /// <summary>
-        /// Generic method to retrieve ILCD Entity by UUID.
+        /// Generic method to lookup ILCD Entity by UUID and (optionally) Version. 
+        /// Return the object from its specific class (e.g., Flow, Process).
         /// </summary>
         /// <param name="uuid">UUID value</param>
-        /// <returns>Entity, if found, otherwise null</returns>
-        public T GetIlcdEntity<T>(string uuid) where T : class, IIlcdEntity {
+        /// <param name="version">Only needed for ILCD data types where multiple versions may be imported (Process)</param>
+        /// <returns>IIlcdEntity object, if found, otherwise null</returns>
+        public T GetIlcdEntity<T>(string uuid, string version = null) where T : class, IIlcdEntity {
             DbSet<T> dbSet = _DbContext.Set<T>();
-            T entity = (from le in dbSet where le.ILCDEntity.UUID == uuid select le).FirstOrDefault();
-            return entity;
-        }
+            T entity = String.IsNullOrEmpty(version) ?
+                (from le in dbSet where le.ILCDEntity.UUID == uuid select le).FirstOrDefault()
+                :
+                (from le in dbSet
+                 where le.ILCDEntity.UUID == uuid && le.ILCDEntity.Version == version
+                 select le).FirstOrDefault()
+                 ;
 
-        /// <summary>
-        /// Generic method to look up ILCD Entity ID by UUID.
-        /// Report error if not found.
-        /// </summary>
-        /// <param name="uuid">UUID value</param>
-        /// <returns>Entity ID, if found, otherwise null</returns>
-        public int? GetIlcdEntityID<T>(string uuid) where T : class, IIlcdEntity {
-            IIlcdEntity entity = GetIlcdEntity<T>(uuid);
-            if (entity == null) {
-                Program.Logger.ErrorFormat("Unable to find {0} with UUID, {1}.", typeof(T).ToString(), uuid);
-                return null;
-            }
-            else {
-                return entity.ID;
-            }
+            return entity;
         }
 
         /// <summary>
@@ -374,23 +407,47 @@ namespace LcaDataLoader {
             return flowTypeName.Equals("Elementary flow") ? Convert.ToInt32(FlowTypeEnum.ElementaryFlow) : Convert.ToInt32(FlowTypeEnum.IntermediateFlow);
         }
 
+
         /// <summary>
-        /// Use this method to check if an ILCDEntity with given UUID already exists in the database
+        /// Use this method to search ILCDEntity by UUID 
+        /// and optionally, Version
         /// </summary>
         /// <param name="uuid">The UUID value</param>
-        /// <returns>true iff found</returns>
-        public bool IlcdUuidExists(string uuid) {
-            return (GetIlcdEntity(uuid) != null);
+        /// <param name="version">Only needed for ILCD data type where multiple versions may be imported (Process)</param>
+        /// <returns>Instance of ILCDEntity if found, otherwise null</returns>
+        public ILCDEntity GetIlcdEntity(string uuid, string version=null) {
+            ILCDEntity entity =
+                String.IsNullOrEmpty(version) ?
+                (from il in _DbContext.ILCDEntities where il.UUID == uuid select il).FirstOrDefault()
+                :
+                (from il in _DbContext.ILCDEntities where il.UUID == uuid && il.Version == version select il).FirstOrDefault();
+            return entity;
+        }
+
+        private string makeKey(string uuid, string version=null) {
+            return String.IsNullOrEmpty(version) ? uuid : String.Format("{0} {1}", uuid, version);
         }
 
         /// <summary>
-        /// Use this method to check if an ILCDEntity with given UUID already exists in the database
+        /// Use this method before creating an ILCD entity. 
+        /// Checks if an ILCD entity with the same UUID and (optionally) Version already exists in the database.
+        /// In this case, do not create.
+        /// Version should only be provided for data type where UUID and Version is the external key (Process). 
+        /// If an entity is found, this method logs a warning, and caches the ID for future lookup.
         /// </summary>
-        /// <param name="uuid">The UUID value</param>
-        /// <returns>Instance of ILCDEntity if found, otherwise null</returns>
-        public ILCDEntity GetIlcdEntity(string uuid) {
-            ILCDEntity entity = (from il in _DbContext.ILCDEntities where il.UUID == uuid select il).FirstOrDefault();
-            return entity;
+        ///  /// <param name="uuid">The UUID value</param>
+        /// <returns>true iff found</returns>
+        public bool IlcdEntityAlreadyExists<T>(string uuid, string version=null) where T : class, IIlcdEntity {
+            IIlcdEntity entity = GetIlcdEntity<T>(uuid, version);
+            if (entity == null) {
+                return false;
+            }
+            else {
+                string externalKey = makeKey(uuid, version);
+                Program.Logger.WarnFormat("{0} with key {1} was already imported.", typeof(T).ToString(), externalKey);
+                _EntityIdDictionary[externalKey] = Convert.ToInt32(entity.ID);
+                return true;
+            }
         }
 
         /// <summary>

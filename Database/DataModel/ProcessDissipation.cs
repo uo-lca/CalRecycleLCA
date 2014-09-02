@@ -19,8 +19,6 @@ namespace LcaDataModel
 
         public int? ProcessFlowID { get; set; }
 
-        public int? FlowPropertyEmissionID { get; set; }
-
         public double? EmissionFactor { get; set; }
 
         public virtual ICollection<NodeDissipationParam> NodeDissipationParams { get; set; }

@@ -301,7 +301,7 @@ namespace LcaDataModel {
 
             modelBuilder.Entity<UnitConversion>()
                 .Property(e => e.LongName)
-                .IsUnicode(false);
+                .IsUnicode(true);
 
             modelBuilder.Entity<UnitConversion>()
                 .HasMany(e => e.UnitGroups)
