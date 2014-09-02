@@ -8,6 +8,7 @@ namespace Services
 {
     public interface IService<TEntity> where TEntity : class
     {
+        TEntity FindById(object id);
         void Insert(TEntity entity);
         void InsertGraph(TEntity entity);
         void Update(TEntity entity);

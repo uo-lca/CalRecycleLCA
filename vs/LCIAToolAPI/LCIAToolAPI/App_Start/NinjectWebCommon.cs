@@ -82,26 +82,39 @@ namespace LCAToolAPI.App_Start
             kernel.Bind<IDependencyParamService>().To<DependencyParamService>();
             kernel.Bind<IFragmentTraversalV2>().To<FragmentTraversalV2>();
             kernel.Bind<IFragmentLinkService>().To<FragmentLinkService>();
-            kernel.Bind<IParamService>().To<ParamService>();
+            kernel.Bind<IProcessService>().To<ProcessService>();
             kernel.Bind<IFlowPropertyService>().To<FlowPropertyService>();
             kernel.Bind<IFlowPropertyParamService>().To<FlowPropertyParamService>();
-            kernel.Bind<IFlowFlowPropertyService>().To<FlowFlowPropertyService>();
             kernel.Bind<IFlowService>().To<FlowService>();
-            kernel.Bind<INodeCacheService>().To<NodeCacheService>();
-            kernel.Bind<IFragmentNodeFragmentService>().To<FragmentNodeFragmentService>();
-            kernel.Bind<IFragmentNodeProcessService>().To<FragmentNodeProcessService>();
-            kernel.Bind<IProcessFlowService>().To<ProcessFlowService>();
             kernel.Bind<ILCIAComputationV2>().To<LCIAComputationV2>();
-            kernel.Bind<IProcessEmissionParamService>().To<ProcessEmissionParamService>();
-            kernel.Bind<ILCIAMethodService>().To<LCIAMethodService>();
-            kernel.Bind<IFlowPropertyEmissionService>().To<FlowPropertyEmissionService>();
-            kernel.Bind<IProcessDissipationService>().To<ProcessDissipationService>();
-            kernel.Bind<IProcessDissipationParamService>().To<ProcessDissipationParamService>();
-            kernel.Bind<ILCIAService>().To<LCIAService>();
-            kernel.Bind<ICharacterizationParamService>().To<CharacterizationParamService>();
-            //kernel.Bind(typeof(IService<LCIA>)).To(typeof(Service<>));
-            kernel.Bind(typeof(IService<LCIAMethod>)).To(typeof(Service<LCIAMethod>));
-            kernel.Bind(typeof(IService<Process>)).To(typeof(Service<Process>));
+
+            kernel.Bind(typeof(IService<>)).To(typeof(Service<>));
+
+            //kernel.Bind(typeof(IService<LCIAMethod>)).To(typeof(Service<LCIAMethod>));
+            //kernel.Bind(typeof(IService<Process>)).To(typeof(Service<Process>));
+            //kernel.Bind(typeof(IService<Flow>)).To(typeof(Service<Flow>));
+            //kernel.Bind(typeof(IService<FragmentFlow>)).To(typeof(Service<FragmentFlow>));
+            //kernel.Bind(typeof(IService<NodeCache>)).To(typeof(Service<NodeCache>));
+            //kernel.Bind(typeof(IService<FragmentNodeProcess>)).To(typeof(Service<FragmentNodeProcess>));
+            //kernel.Bind(typeof(IService<ProcessFlow>)).To(typeof(Service<ProcessFlow>));
+            //kernel.Bind(typeof(IService<FragmentNodeFragment>)).To(typeof(Service<FragmentNodeFragment>));
+            //kernel.Bind(typeof(IService<FlowFlowProperty>)).To(typeof(Service<FlowFlowProperty>));
+            //kernel.Bind(typeof(IService<DependencyParam>)).To(typeof(Service<DependencyParam>));
+            //kernel.Bind(typeof(IService<Param>)).To(typeof(Service<Param>));
+            //kernel.Bind(typeof(IService<FlowPropertyParam>)).To(typeof(Service<FlowPropertyParam>));
+            //kernel.Bind(typeof(IService<Fragment>)).To(typeof(Service<Fragment>));
+            //kernel.Bind(typeof(IService<ProcessEmissionParam>)).To(typeof(Service<ProcessEmissionParam>));
+            //kernel.Bind(typeof(IService<FlowPropertyEmission>)).To(typeof(Service<FlowPropertyEmission>));
+            //kernel.Bind(typeof(IService<ProcessDissipation>)).To(typeof(Service<ProcessDissipation>));
+            //kernel.Bind(typeof(IService<ProcessDissipationParam>)).To(typeof(Service<ProcessDissipationParam>));
+            //kernel.Bind(typeof(IService<LCIA>)).To(typeof(Service<LCIA>));
+            //kernel.Bind(typeof(IService<CharacterizationParam>)).To(typeof(Service<CharacterizationParam>));
+            //kernel.Bind(typeof(IService<Param>)).To(typeof(Service<Param>));
+        
+        
+        //[Inject]
+        //private readonly IService<Param> _paramService;
+
             kernel.Bind<ITestGenericService>().To<TestGenericService>();
         }
 

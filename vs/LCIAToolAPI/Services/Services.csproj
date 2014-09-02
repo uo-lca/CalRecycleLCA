@@ -129,52 +129,32 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="CharacterizationParamService.cs" />
     <Compile Include="DependencyParamService.cs" />
-    <Compile Include="FlowFlowPropertyService.cs" />
-    <Compile Include="FlowPropertyEmissionService.cs" />
     <Compile Include="FlowPropertyParamService.cs" />
     <Compile Include="FlowPropertyService.cs" />
-    <Compile Include="FragmentNodeProcessService.cs" />
     <Compile Include="FragmentTraversalV2.cs" />
-    <Compile Include="ICharacterizationParamService.cs" />
-    <Compile Include="IFlowPropertyEmissionService.cs" />
-    <Compile Include="IFragmentNodeProcessService.cs" />
     <Compile Include="IFragmentTraversalV2.cs" />
     <Compile Include="ILCIAComputationV2.cs" />
-    <Compile Include="ILCIAMethodService.cs" />
-    <Compile Include="ILCIAService.cs" />
-    <Compile Include="IProcessDissipationParamService.cs" />
-    <Compile Include="IProcessDissipationService.cs" />
-    <Compile Include="IProcessEmissionParamService.cs" />
-    <Compile Include="IProcessFlowService.cs" />
+    <Compile Include="IProcessService.cs">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="ITestGenericService.cs" />
     <Compile Include="LCIAComputationV2.cs" />
-    <Compile Include="LCIAMethodService.cs" />
-    <Compile Include="LCIAService.cs" />
-    <Compile Include="ProcessDissipationParamService.cs" />
-    <Compile Include="ProcessDissipationService.cs" />
-    <Compile Include="ProcessEmissionParamService.cs" />
-    <Compile Include="ProcessFlowService.cs" />
     <Compile Include="FlowService.cs" />
     <Compile Include="FragmentFlowService.cs" />
     <Compile Include="FragmentLinkService.cs" />
-    <Compile Include="FragmentNodeFragmentService.cs" />
     <Compile Include="FragmentService.cs" />
     <Compile Include="IDependencyParamService.cs" />
-    <Compile Include="IFlowFlowPropertyService.cs" />
     <Compile Include="IFlowPropertyParamService.cs" />
     <Compile Include="IFlowPropertyService.cs" />
     <Compile Include="IFlowService.cs" />
     <Compile Include="IFragmentFlowService.cs" />
     <Compile Include="IFragmentLinkService.cs" />
-    <Compile Include="IFragmentNodeFragmentService.cs" />
     <Compile Include="IFragmentService.cs" />
-    <Compile Include="INodeCacheService.cs" />
-    <Compile Include="IParamService.cs" />
     <Compile Include="IService.cs" />
-    <Compile Include="NodeCacheService.cs" />
-    <Compile Include="ParamService.cs" />
+    <Compile Include="ProcessService.cs">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Service.cs" />
     <Compile Include="TestGenericService.cs" />

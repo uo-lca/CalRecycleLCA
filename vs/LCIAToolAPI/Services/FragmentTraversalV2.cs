@@ -14,56 +14,44 @@ namespace Services
     //Version 2 of fragment traversal - rewritten to reflect the pseudocode dated Mon Jul 28 00:32:01 -0700 2014
     public class FragmentTraversalV2 : IFragmentTraversalV2
     {
-        //Trying to inject a generic service to avoid having a service for each model class - reduce bloat in architecture.
-        //[Inject]
-        //private readonly IService<Flow> _flowService;
-        //[Inject]
-        //private readonly IService<FragmentFlow> _fragmentFlowService;
-        //public FragmentTraversalV2(IService<Flow> flowService, IService<FragmentFlow> fragmentFlowService)
-        //{ 
-        //    _flowService = flowService;
-        //    _fragmentFlowService = fragmentFlowService;
-        //}
-
-
         [Inject]
-        private readonly IFlowService _flowService;
+        private readonly IService<Flow> _flowService;
         [Inject]
-        private readonly IFragmentFlowService _fragmentFlowService;
+        private readonly IService<FragmentFlow> _fragmentFlowService;
         [Inject]
-        private readonly INodeCacheService _nodeCacheService;
+        private readonly IService<NodeCache> _nodeCacheService;
         [Inject]
-        private readonly IFragmentNodeProcessService _fragmentNodeProcessService;
+        private readonly IService<FragmentNodeProcess> _fragmentNodeProcessService;
         [Inject]
-        private readonly IProcessFlowService _processFlowService;
+        private readonly IService<ProcessFlow> _processFlowService;
         [Inject]
-        private readonly IFragmentNodeFragmentService _fragmentNodeFragmentService;
+        private readonly IService<FragmentNodeFragment> _fragmentNodeFragmentService;
         [Inject]
-        private readonly IFlowFlowPropertyService _flowFlowPropertyService;
+        private readonly IService<FlowFlowProperty> _flowFlowPropertyService;
         [Inject]
-        private readonly IDependencyParamService _dependencyParamService;
+        private readonly IService<DependencyParam> _dependencyParamService;
         [Inject]
-        private readonly IParamService _paramService;
+        private readonly IService<Param> _paramService;
         [Inject]
-        private readonly IFlowPropertyParamService _flowPropertyParamService;
+        private readonly IService<FlowPropertyParam> _flowPropertyParamService;
         [Inject]
-        private readonly IFragmentService _fragmentService;
+        private readonly IService<Fragment> _fragmentService;
         [Inject]
         private readonly IUnitOfWork _unitOfWork;
 
 
-        public FragmentTraversalV2(IFlowService flowService,
-            IFragmentFlowService fragmentFlowService,
-            INodeCacheService nodeCacheService,
-            IFragmentNodeProcessService fragmentNodeProcessService,
-            IProcessFlowService processFlowService,
-            IFragmentNodeFragmentService fragmentNodeFragmentService,
-            IFlowFlowPropertyService flowFlowPropertyService,
-            IDependencyParamService dependencyParamService,
-            IFlowPropertyParamService flowPropertyParamService,
-            IUnitOfWork unitOfWork,
-            IFragmentService fragmentService,
-            IParamService paramService)
+        public FragmentTraversalV2(IService<Flow> flowService,
+            IService<FragmentFlow> fragmentFlowService,
+            IService<NodeCache> nodeCacheService,
+            IService<FragmentNodeProcess> fragmentNodeProcessService,
+            IService<ProcessFlow> processFlowService,
+            IService<FragmentNodeFragment> fragmentNodeFragmentService,
+            IService<FlowFlowProperty> flowFlowPropertyService,
+            IService<DependencyParam> dependencyParamService,
+            IService<FlowPropertyParam> flowPropertyParamService,
+            IService<Fragment> fragmentService,
+            IService<Param> paramService,
+            IUnitOfWork unitOfWork)
         {
             _flowService = flowService;
             _fragmentFlowService = fragmentFlowService;
