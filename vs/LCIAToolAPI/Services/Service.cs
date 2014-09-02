@@ -7,16 +7,21 @@ using Repository;
 
 namespace Services
 {
-    public abstract class Service<TEntity> : IService<TEntity> where TEntity : class
+    public class Service<TEntity> : IService<TEntity> where TEntity : class
     {
         #region Private Fields
         private readonly IRepository<TEntity> _repository;
         #endregion Private Fields
 
         #region Constructor
-        protected Service(IRepository<TEntity> repository) { _repository = repository; }
+        public Service(IRepository<TEntity> repository) { _repository = repository; }
         #endregion Constructor
 
+
+        public virtual TEntity FindById(object id)
+        {
+            return _repository.FindById(id);
+        }
 
         public virtual void Insert(TEntity entity) { _repository.Insert(entity); }
 

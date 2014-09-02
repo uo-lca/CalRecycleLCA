@@ -135,7 +135,6 @@
     <Compile Include="Models\LCIAModel.cs" />
     <Compile Include="Models\NodeFlowModel.cs" />
     <Compile Include="Models\OutFlowModel.cs" />
-    <Compile Include="Models\ProcessModel.cs" />
     <Compile Include="Models\FlowPropertyModel.cs" />
     <Compile Include="Models\FlowModel.cs" />
     <Compile Include="Models\FlowPropertyParamModel.cs" />

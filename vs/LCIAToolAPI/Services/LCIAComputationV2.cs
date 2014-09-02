@@ -135,27 +135,42 @@ namespace Services
         {
             var inventory = ComputeProcessLCI(processId, scenarioId);
             IEnumerable<LCIAModel> lcias=null;
-            foreach (var lciaMethodItem in lciaMethods)
+            IEnumerable<LCIAModel> scores = null;
+
+          
+            foreach (var lciaMethodItem in lciaMethods.ToList())
             {
+               
                lcias= ComputeProcessLCIA(inventory, lciaMethodItem, scenarioId);
-               var scores = lcias.GroupBy(t => new
-                {
-                    t.Result,
-                    t.DirectionID,
-                    t.FlowID
-                })
-                .Select(group => new
-                {
-                    Result = group.Sum(a => a.Result),
-                    DirectionID = group.Key.DirectionID,
-                    FlowID = group.Key.FlowID
-                });
-                
+              
+                  scores = lcias.ToList()
+                       .GroupBy(t => new
+                    {
+                        t.Result,
+                        t.DirectionID,
+                        t.FlowID
+                    })
+                    .Select(group => new LCIAModel
+                    {
+                        Result = group.Sum(a => a.Result),
+                        DirectionID = group.Key.DirectionID,
+                        FlowID = group.Key.FlowID
+                    });
+             
+
             }
 
-            return lcias;
-            
-          
+
+
+            var lciaMethodScores = scores
+                .Select(lm => new LCIAModel
+                {
+                    Result = lm.Result,
+                    DirectionID = lm.DirectionID,
+                    FlowID = lm.FlowID
+                });
+
+            return lciaMethodScores;
         }
 
         //inventory in pseudocode
@@ -165,7 +180,7 @@ namespace Services
             // Param types: ProcessEmissionParam
             // FlowPropertyParam + ProcessDissipationParam
             var inventory = _processFlowService.Query().Get()
-                //.Where(x => x.ProcessID == processId)
+                .Where(x => x.ProcessID == processId)
           .GroupJoin(_processEmissionParamService.Query().Get() // Target table
       , pf => pf.ProcessFlowID
       , pep => pep.ProcessFlowID
@@ -180,14 +195,29 @@ namespace Services
           Result = s.processFlows.Result,
           ParamValue = processEmmissionParams == null ? 0 : processEmmissionParams.Value
       })
-     .Join(_paramService.Query().Get(), pfep => pfep.ParamID, sp => sp.ParamID, (pfep, sp) => new { pfep, sp })
-    .Where(x => x.sp.ScenarioID == scenarioId)
+        .GroupJoin(_paramService.Query().Get() // Target table
+      , pep => pep.ParamID
+      , p => p.ParamID
+      , (pep, p) => new { processEmmissionParams = pep, parameters = p })
+      .SelectMany(s => s.parameters.DefaultIfEmpty()
+      , (s, parameters) => new
+      {
+
+          FlowID = s.processEmmissionParams.FlowID,
+          DirectionID = s.processEmmissionParams.DirectionID,
+          ParamID = parameters == null ? 0 : parameters.ParamID,
+          Result = s.processEmmissionParams.Result,
+          ParamValue = s.processEmmissionParams == null ? 0 : s.processEmmissionParams.ParamValue
+      })
+     //leave this where clause out for now as there are no records in ProcessEmissionParam table with which to join on the Param table
+    //so this where clause will result in no records being returned
+    //.Where(x => x.sp.ScenarioID == scenarioId)
       .Select(inv => new InventoryModel
                           {
-                              FlowID = inv.pfep.FlowID,
-                              DirectionID = inv.pfep.DirectionID,
-                              Result = inv.pfep.Result,
-                              ParamValue = inv.pfep.ParamValue
+                              FlowID = inv.FlowID,
+                              DirectionID = inv.DirectionID,
+                              Result = inv.Result,
+                              ParamValue = inv.ParamValue
                           });
 
 
@@ -243,12 +273,11 @@ namespace Services
 
         public IEnumerable<LCIAModel> ComputeProcessLCIA(IEnumerable<InventoryModel> inventory, LCIAMethod lciaMethodItem, int scenarioId)
         {
-            //// Leave this as a stub for now
-            //throw new NotImplementedException();
-
             var lcias = inventory
                 .Join(_lciaService.Query().Get(), i => i.FlowID, l => l.FlowID, (i, l) => new { i, l })
+                .Where(x => x.l.FlowID != null)
                 .Join(_lciaMethodService.Query().Get(), l => l.l.LCIAMethodID, lm => lm.LCIAMethodID, (l, lm) => new { l, lm })
+                 .Where(x => x.l.l.LCIAMethodID == lciaMethodItem.LCIAMethodID)
                  .GroupJoin(_characterizationParamService.Query().Get() // Target table
       , l => l.l.l.LCIAID
       , cp => cp.LCAID
@@ -259,50 +288,53 @@ namespace Services
           FlowID = s.lcias.l.i.FlowID,
           DirectionID = s.lcias.l.i.DirectionID,
           Quantity = s.lcias.l.i.Result,
-          LCIAID = characterizationParams.LCAID,
-          Value = characterizationParams.Value,
-          ParamID = characterizationParams.ParamID,
+          LCIAID = characterizationParams == null ? 0 : characterizationParams.LCAID,
+          Value = characterizationParams == null ? 0 : characterizationParams.Value,
+          ParamID = characterizationParams == null ? 0 : characterizationParams.ParamID,
           LCIAMethodID = s.lcias.lm.LCIAMethodID,
           Geography = s.lcias.l.l.Geography,
           Factor = s.lcias.l.l.Factor
       })
-      .Join(_paramService.Query().Get(), cp => cp.ParamID, sp => sp.ParamID, (cp, sp) => new { cp, sp })
-      .Select(lcparam => new LCIAModel
-        {
-            LCIAID = lcparam.cp.LCIAID,
-            FlowID = lcparam.cp.FlowID,
-            Value = lcparam.cp.Value,
-            ParamID = lcparam.cp.ParamID,
-            ScenarioID = lcparam.sp.ScenarioID,
-            LCIAMethodID = lcparam.cp.LCIAMethodID,
-            DirectionID = lcparam.cp.DirectionID,
-            Geography = lcparam.cp.Geography,
-            Result = lcparam.cp.Quantity,
-            LCParamValue = lcparam.cp.Value,
-            LCIAFactor = lcparam.cp.Factor
-        })
-        .Where(x => x.ScenarioID == scenarioId)
-        .Where(x => x.LCIAMethodID == lciaMethodItem.LCIAMethodID)
-        .Where(x => x.DirectionID == inventory.Select(i => i.DirectionID).FirstOrDefault())
-        .Where(x => x.Geography == null);
+      .GroupJoin(_paramService.Query().Get() // Target table
+      , cp => cp.ParamID
+      , p => p.ParamID
+      , (cp, p) => new { characterizationParams = cp, parameters = p })
+      .SelectMany(s => s.parameters.DefaultIfEmpty()
+      , (s, parameters) => new LCIAModel
+      {
+          FlowID = s.characterizationParams.FlowID,
+          DirectionID = s.characterizationParams.DirectionID,
+          Result = s.characterizationParams.Quantity,
+          LCIAID = s.characterizationParams.LCIAID,
+          LCParamValue = s.characterizationParams.Value,
+          ParamID = parameters == null ? 0 : parameters.ParamID,
+          LCIAMethodID = s.characterizationParams.LCIAMethodID,
+          Geography = s.characterizationParams.Geography,
+          LCIAFactor = s.characterizationParams.Factor,
+          ScenarioID = parameters == null ? 0 : parameters.ScenarioID
+      }).ToList();
+                //leave this where clause out for now as there are no records in CharacterizationParam table with which to join on the Param table
+                //so this where clause will result in no records being returned
+                //.Where(x => x.ScenarioID == scenarioId)
+        //.Where(x => x.DirectionID == inventory.Select(i => i.DirectionID).FirstOrDefault());
+        //.Where(x => x.Geography == null);
 
+            double? computationResult;
             foreach (var item in lcias)
             {
-                double? factor;
-                double? result;
                 //        inventory.Result * (lcparam.Value == NULL 
                 //    ? LCIA.Factor : lcparam.Value) AS Factor,
                 //Quantity * Factor AS Result
-                if (item.LCParamValue != null)
+                if (item.LCParamValue == 0)
                 {
-                    factor = item.Result * item.LCParamValue;
-                    result = item.Result * factor;
+                    computationResult = (item.Result * item.LCIAFactor);
                 }
                 else
                 {
-                    factor = item.Result * item.LCIAFactor;
-                    result = item.Result * factor;
+                    computationResult = (item.Result * item.LCParamValue);
                 }
+
+                item.ComputationResult = computationResult;
 
             }
 

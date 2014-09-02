@@ -1,4 +1,5 @@
 ﻿using Entities.Models;
+using LcaDataModel;
 using Ninject;
 using Services;
 using System;
@@ -11,26 +12,39 @@ namespace LCAToolAPI.API
 {
     public class ProcessController : ApiController
     {
-        [Inject]
-        private readonly IProcessService _processService ;
+        //[Inject]
+        //private readonly IProcessService _processService ;
 
 
-        public ProcessController(IProcessService processService)
+        //public ProcessController(IProcessService processService)
+        //{
+
+        //    if (processService == null)
+        //    {
+        //        throw new ArgumentNullException("processService is null");
+        //    }
+
+        //    _processService = processService;
+
+        //}
+
+        private readonly IService<Process> _processService;
+
+        public ProcessController(IService<Process> processService)
         {
-
-            if (processService == null)
-            {
-                throw new ArgumentNullException("processService is null");
-            }
-
             _processService = processService;
-
         }
+
+        //[Route("api/processes")]
+        //[System.Web.Http.HttpGet]
+        //public IEnumerable<ProcessModel> GetProcesses() {
+        //    return _processService.GetProcesses();
 
         [Route("api/processes")]
         [System.Web.Http.HttpGet]
-        public IEnumerable<ProcessModel> GetProcesses() {
-            return _processService.GetProcesses();
+        public IEnumerable<Process> GetProcesses()
+        {
+            return _processService.Query().Get();
         }
     }
 }

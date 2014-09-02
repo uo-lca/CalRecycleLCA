@@ -148,7 +148,7 @@
     <Compile Include="IProcessDissipationService.cs" />
     <Compile Include="IProcessEmissionParamService.cs" />
     <Compile Include="IProcessFlowService.cs" />
-    <Compile Include="IProcessService.cs" />
+    <Compile Include="ITestGenericService.cs" />
     <Compile Include="LCIAComputationV2.cs" />
     <Compile Include="LCIAMethodService.cs" />
     <Compile Include="LCIAService.cs" />
@@ -156,7 +156,6 @@
     <Compile Include="ProcessDissipationService.cs" />
     <Compile Include="ProcessEmissionParamService.cs" />
     <Compile Include="ProcessFlowService.cs" />
-    <Compile Include="ProcessService.cs" />
     <Compile Include="FlowService.cs" />
     <Compile Include="FragmentFlowService.cs" />
     <Compile Include="FragmentLinkService.cs" />
@@ -178,6 +177,7 @@
     <Compile Include="ParamService.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Service.cs" />
+    <Compile Include="TestGenericService.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\..\Database\DataModel\LcaDataModel.csproj">

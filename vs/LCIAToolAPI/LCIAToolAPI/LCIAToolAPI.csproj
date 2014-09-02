@@ -245,6 +245,7 @@
     <Compile Include="API\FragmentLinkController.cs" />
     <Compile Include="API\FragmentTraversalController.cs" />
     <Compile Include="API\HttpResponseMessage.cs" />
+    <Compile Include="API\TestGenericServiceController.cs" />
     <Compile Include="App_Start\BundleConfig.cs" />
     <Compile Include="App_Start\NinjectWeb.cs" />
     <Compile Include="App_Start\NinjectWebApi.cs" />

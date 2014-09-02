@@ -83,7 +83,6 @@ namespace LCAToolAPI.App_Start
             kernel.Bind<IFragmentTraversalV2>().To<FragmentTraversalV2>();
             kernel.Bind<IFragmentLinkService>().To<FragmentLinkService>();
             kernel.Bind<IParamService>().To<ParamService>();
-            kernel.Bind<IProcessService>().To<ProcessService>();
             kernel.Bind<IFlowPropertyService>().To<FlowPropertyService>();
             kernel.Bind<IFlowPropertyParamService>().To<FlowPropertyParamService>();
             kernel.Bind<IFlowFlowPropertyService>().To<FlowFlowPropertyService>();
@@ -100,13 +99,10 @@ namespace LCAToolAPI.App_Start
             kernel.Bind<IProcessDissipationParamService>().To<ProcessDissipationParamService>();
             kernel.Bind<ILCIAService>().To<LCIAService>();
             kernel.Bind<ICharacterizationParamService>().To<CharacterizationParamService>();
-
-            //Trying to inject a generic service to avoid having a service for each model class
-            //kernel.Bind(typeof(IService<Flow>)).To(typeof(Service<Flow>))
-            //    .When(request => request.Service == typeof(IService<Flow>));
-
-            //kernel.Bind(typeof(IService<>)).To(typeof(Service))
-            //    .When(request => request.Service == typeof(IService<FragmentFlow>));
+            //kernel.Bind(typeof(IService<LCIA>)).To(typeof(Service<>));
+            kernel.Bind(typeof(IService<LCIAMethod>)).To(typeof(Service<LCIAMethod>));
+            kernel.Bind(typeof(IService<Process>)).To(typeof(Service<Process>));
+            kernel.Bind<ITestGenericService>().To<TestGenericService>();
         }
 
         public static void RegisterNinject(HttpConfiguration configuration)
