@@ -1,13 +1,14 @@
 ==========
 Tue Jul 29 11:31:27 -0700 2014
 
-scores[...] = ProcessLCIA( process_id, scenario_id, lciamethod_ids[...])
+score[...] = ProcessLCIA( process_id, scenario_id, lciamethod_ids[...])
 {
   inventory = ComputeProcessLCI( process_id, scenario_id );
   for k=1:length(lciamethod_ids)
   {
-    scores[k] = ComputeProcessLCIA(inventory, scenario_id, 
+    LCIA = ComputeProcessLCIA(inventory, scenario_id, 
     	      		           lciamethod_ids[k] );
+    score[k] = sum ( LCIA.Result );
   }
 }
 
@@ -86,6 +87,10 @@ dissipation = ComputeDissipation ( process_id, scenario_id )
 {
   // three steps here:
   // 1. determine the flow composition model on a scenario-specific basis
+  // 1a. 'InFlowID' is strictly for validation purposes: must have unit
+  //    magnitude, 'Input' direction, and 'mass' reference property, and
+  //    must match the FlowID of the chosen CompositionModel. No validation
+  //    is performed here.
   // 2. apply EmissionFactors (with params) to the composition
 
   // objective is to identify the correct CompositionModel to use.
@@ -265,18 +270,5 @@ ComputeNodeScores( fragment_id, scenario_id, list_of_lcia_methods L )
 
 
 FragmentScore = ComputeFragmentLCIA ( fragment_id, scenario_id, lcia_method_id )
-{
-  FragmentScore = SELECT nc.NodeCacheID AS NodeCacheID,
-  	      	     nc.NodeWeight AS NodeWeight,
-		     sc.ImpactScore AS ImpactScore,
-		     NodeWeight * ImpactScore AS LCIA,
-		FROM FragmentFlow INNER JOIN NodeCache nc ON FragmentFlowID
-		INNER JOIN ScoreCache sc ON NodeCacheID
-		WHERE FragmentFlow.FragmentID = fragment_id
-		  AND ScenarioID = scenario_id
-		  AND sc.LCIAMethodID = lcia_method_id;
-
-  // later-- add in grouping by stage
-}
 
 

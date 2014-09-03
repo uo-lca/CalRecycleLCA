@@ -1,3 +1,9 @@
+==========
+Tue Sep 02 14:19:57 -0700 2014
+
+NOTE: the contents of this file are deprecated.
+
+
 ComputeBackground( ScenarioID, ListOfLCIAMethods L)
 {
   // First generate a list of scenario-specific background resolutions
