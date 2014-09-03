@@ -136,10 +136,10 @@ node_flows = GetScenarioProductFlows ( the_fragment_flow, scenario_id)
     {
       process_id = SELECT ( ps.ProcessID == NULL
       			    ? fnp.ProcessID : ps.ProcessID ) as ProcessID
-      		   FROM the_fragment_flow 
-      		   INNER JOIN FragmentNodeProcess fnp
+      		   FROM FragmentNodeProcess fnp
       		   LEFT OUTER JOIN  ProcessSubstitution ps
-		     WHERE ps.ScenarioID = scenario_id
+		   WHERE fnp.FragmentFlowID = the_fragment_flow.FragmentFlowID
+		     AND ps.ScenarioID = scenario_id
      
       node_flows = SELECT pf.FlowID,
                           pf.DirectionID,
@@ -153,10 +153,10 @@ node_flows = GetScenarioProductFlows ( the_fragment_flow, scenario_id)
       subfragment_id = SELECT ( fs.SubFragmentID == NULL 
       		   	        ? fnf.SubFragmentID 
 				: fs.SubFragmentID ) as SubFragmentID
-      		    FROM the_fragment_flow 
-      		    INNER JOIN FragmentNodeFragment fnf
+      		    FROM FragmentNodeFragment fnf
       		    LEFT OUTER JOIN  FragmentSubstitution fs
-		    WHERE fs.ScenarioID = scenario_id
+		    WHERE fnf.FragmentFlowID = the_fragment_flow.FragmentFlowID
+		      AND fs.ScenarioID = scenario_id
 
       // recursive traversal
       FragmentTraverse( subfragment_id, scenario_id);
