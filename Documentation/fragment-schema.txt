@@ -358,8 +358,10 @@ The following tables are required:
     * InFlowID
     * CompositionModelID
 
-    FragmentFlows that end in processes may have their input flows 
-
+    'InFlowID' is strictly for validation purposes: must have unit
+    magnitude, 'Input' direction, and 'mass' reference property, and
+    must match the FlowID of the chosen CompositionModel. No validation
+    is performed here.
 
 ### Indices, constraints
 
@@ -529,6 +531,7 @@ The following tables are required:
     * ScenarioBackgroundID
     * ScenarioID
     * FlowID
+    * DirectionID
     * NodeTypeID (only Process or Fragment allowed)
     * TargetID (NOT a foreign key- interpret as ProcessID or FragmentID)
 

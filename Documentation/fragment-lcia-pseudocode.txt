@@ -1,0 +1,156 @@
+==========
+Fri Aug 22 10:56:01 -0700 2014
+Tue 09-02 14:18:44 -0700
+
+// code for computing LCIA of fragments.  The basic approach is to simply
+// iterate through FragmentFlows and determine the score for each node.  If
+// the node is a Background type, resolve it according to scenario settings.
+
+
+
+LCIA = ComputeFragmentLCIA ( fragment_id, scenario_id, lcia_method_id )
+{
+  // for now: return one record per FragmentFlow
+  LCIA = SELECT ff.FragmentFlowID AS FragmentFlowID,
+  	      	     nc.NodeWeight AS Activity,
+		     sc.ImpactScore AS ImpactScore,
+		     Activity * ImpactScore AS Result,
+		FROM FragmentFlow ff INNER JOIN NodeCache nc 
+		ON ff.FragmentFlowID = nc.FragmentFlowID
+		INNER JOIN ScoreCache sc
+		ON nc.NodeCacheID = sc.NodeCacheID
+		WHERE ff.FragmentID = fragment_id
+		  AND nc.ScenarioID = scenario_id
+		  AND sc.LCIAMethodID = lcia_method_id;
+}
+
+
+
+LCIA = ComputeFragmentLCIA ( fragment_id, scenario_id, lcia_method_id )
+{
+  // for later: return one record per FragmentStage
+  LCIA = SELECT ff.FragmentStageID AS FragmentStageID,
+       	 	sum(nc.NodeWeight * sc.ImpactScore) AS Result
+		FROM FragmentFlow ff INNER JOIN NodeCache nc
+		ON ff.FragmentFlowID = nc.FragmentFlowID
+		INNER JOIN ScoreCache sc
+		ON nc.NodeCacheID = sc.NodeCacheID
+		WHERE ff.FragmentID = fragment_id
+		  AND nc.ScenarioID = scenario_id
+		  AND sc.LCIAMethodID = lcia_method_id
+		GROUP BY FragmentStageID;
+
+}
+
+
+
+success = FragmentFlowLCIA ( fragment_id, scenario_id, lciamethod_ids[...] )
+{
+  // set score cache for fragment / scenario / method: iterate through
+  // fragmentflows 
+
+  fragment_flows = SELECT FragmentFlowID, NodeTypeID
+  		   FROM FragmentFlow
+		   WHERE FragmentID = fragment_id;
+
+  for i in fragment_flows
+  {
+    node_cache_id = SELECT NodeCacheID FROM NodeCache
+    		    WHERE FragmentFlowID = i.FragmentFlowID
+		      AND ScenarioID = scenario_id;
+
+    my_node_type = i.NodeTypeID;
+    switch my_node_type // background
+    { 
+      case 1 // process
+      {
+	// note: this first chunk is taken from GetScenarioProductFlows
+	target_id = SELECT ( ps.ProcessID == NULL
+      			    ? fnp.ProcessID : ps.ProcessID ) as ProcessID
+      		   FROM FragmentNodeProcess fnp
+      		   LEFT OUTER JOIN  ProcessSubstitution ps
+		   WHERE fnp.FragmentFlowID = i.FragmentFlowID
+		     AND ps.ScenarioID = scenario_id;
+      }
+      case 2 // fragment
+      {
+	// note: this first chunk is taken from GetScenarioProductFlows
+	target_id = SELECT ( fs.SubFragmentID == NULL 
+      		   	        ? fnf.SubFragmentID 
+				: fs.SubFragmentID ) as SubFragmentID
+      		    FROM FragmentNodeFragment fnf
+      		    LEFT OUTER JOIN  FragmentSubstitution fs
+		    WHERE fnf.FragmentFlowID = i.FragmentFlowID
+		      AND fs.ScenarioID = scenario_id
+
+	// recursive traversal
+	FragmentFlowLCIA( target_id, scenario_id, lciamethod_ids);
+      }
+      case 3 // InputOutput
+      {
+        // nothing to do
+      }
+      case 4 // Background
+      {
+        // value of my_node_type gets updated by ResolveBackground:
+	// should be set to either 1 (Process) or 2 (Fragment)
+        target_id = ResolveBackground ( i.FlowID, i.DirectionID, scenario_id, 
+		    		      	&my_node_type );
+      }
+    }
+
+    switch my_node_type
+    { // InputOutput & Cutoff excluded
+      case Process
+      {
+	
+	score[...] = ProcessLCIA( target_id, scenario_id, lciamethod_ids);
+	for j=1:length(lciamethod_ids)
+	{
+	  SetScoreCache( node_cache_id, lciamehod_ids[j], scores[j]);
+	}
+      }
+      case Fragment
+      {
+	for j=1:length(lciamethod_ids)
+	{
+	  LCIA = ComputeFragmentLCIA( target_id, scenario_id,
+	       	 		      	lciamethod_ids[j]);
+
+	  score = sum(LCIA.Result);
+	  SetScoreCache( node_cache_id, lciamethod_ids[j], score );
+	}
+      }
+    }
+  }
+}
+
+
+target_id = ResolveBackground ( flow_id, direction_id, scenario_id, &node_type_id )
+{
+  // resolve a given flow to a particular background system
+  // first: check to see if there is a scenario-specific value
+  B = SELECT * FROM ScenarioBackground
+      WHERE ScenarioID = scenario_id
+        AND FlowID = flow_id
+	AND DirectionID = direction_id;
+
+  if isempty(B)
+  {
+    B = SELECT * FROM Background
+      	WHERE FlowID = flow_id
+	  AND DirectionID = direction_id;
+
+    if isempty(B)
+      catch exception!
+  }
+
+  // this is supposed to update the value of the reference
+  node_type_id = B.NodeTypeID;
+
+  if node_type_id == 5
+    target_id = 0;
+  else
+    target_id = B.TargetID;
+}
+
