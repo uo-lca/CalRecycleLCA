@@ -1,29 +1,27 @@
-
+﻿
 <!DOCTYPE html>
 <html class="no-js">
 
 <head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <title>CalRecycle Used Oil LCIA Computation</title>
-    <meta name="description" content="Visualization - LCIA Computation">
+    <title>CalRecycle Used Oil Lifecycle Impact Assessment</title>
+    <meta name="description" content="LCIA Computation Waterfall Chart">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <!-- Place favicon.ico and apple-touch-icon(s) in the root directory -->
     <!-- Stylesheets -->
     <!--    <link rel="stylesheet" href="dist/css/normalize.css">-->
     <link rel="stylesheet" type="text/css" href="http://www.calrecycle.ca.gov/CSSShared/CAStandard/ca_master.css" />
     <link rel="stylesheet" type="text/css" href="http://www.calrecycle.ca.gov/CSSShared/CAStandard/ca_department.css">
-
     <link rel="stylesheet" type="text/css" href="http://www.calrecycle.ca.gov/CSS/DRRR_color_scheme.css" />
-    <link rel="stylesheet" type="text/css" href="LCA.css">    
-    <link rel="stylesheet" type="text/css" href="IntermediateFlows.css">
-
+    <link rel="stylesheet" type="text/css" href="LciaComputation.css">
     <!-- JavaScript -->
-    <script src="d3.min.js"></script>
-    <script src="colorbrewer.js"></script>
-    <script src="sankey.js"></script>
-    <script src="LCA.js"></script>
-    <script src="IntermediateFlows.js"></script>
+    <script type="text/javascript" src="http://ajax.aspnetcdn.com/ajax/jQuery/jquery-2.1.1.min.js"></script>
+    <script type="text/javascript" src="d3.min.js"></script>
+    <script type="text/javascript" src="colorbrewer.js"></script>
+    <script type="text/javascript" src="waterfall.js"></script>
+    <script type="text/javascript" src="LCA.js"></script>
+    <script type="text/javascript" src="LciaWaterfall.js"></script>
 </head>
 
 <body>
@@ -41,20 +39,32 @@
     </div>
 
     <div class="container">
-        <h1>Intermediate Flows</h1>
+        <h1>Used Oil Lifecycle Impact Assessment</h1>
         <a id="goHome" href="index.html">Used Oil LCA Tool Home</a>
         <fieldset>
             <p>
-                <label for="processSelect">Process</label>
-                <select name="processSelect" id="processSelect">
+                <label id="fragmentLabel">Fragment:</label>
+                <span id="fragmentName"></span>
+            </p>
+            <p>
+                <label for="impactCategorySelect">Impact Category</label>
+                <select name="impactCategorySelect" id="impactCategorySelect">
                 </select>
+            </p>
+            <p>
+                <label for="lciaMethodSelect">LCIA Method</label>
+                <select name="lciaMethodSelect" id="lciaMethodSelect">
+                </select>
+            </p>
+            <p>
+                <label id="impactLabel">Impact Score:</label>
+                <span id="impactScore"></span>
             </p>
         </fieldset>
         <div id="chartcontainer"></div>
     </div>
-    <script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
     <script>
-        $(document).ready(processFlow);
+        $(document).ready(lciaWaterfall);
     </script>
 
 </body>

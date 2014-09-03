@@ -9,7 +9,7 @@
 var LCA = {
     //baseURI: "http://kbcalr.isber.ucsb.edu/api/",
     baseURI: "http://localhost:60393/api/",
-    testDataFolder: "TestData/",
+    testDataFolder: "",
     loadedData: {}, // Data loaded via web API (or from TestData)
     spinner: null,
     indexedData: {}, // Associative array of loaded data, keyed by web api resource name
