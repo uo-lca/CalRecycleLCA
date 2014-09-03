@@ -1,5 +1,4 @@
 {
-    // Input
     "scenarios": [ "2010 Base Year", "ReRe", "MDO", "RFO" ],
     "stages": [ "Collection + Waste", "Reprocessing", "Use", "Displaced Use", "Displaced Prod." ],
     "values": [
@@ -7,7 +6,5 @@
         [ 33164483.71, 105282168.8, 75957482.38, -76401504.77, -308726203.9 ],
         [ 33164483.71, 49654623.73, 580662627.9, -580795905.1, -143718257.3 ],
         [ 33164483.71, 1387904.628, 971982747.9, -929293149.7, -204159991.3 ]
-    ] //,
-    //Output
-    //"segments": [ { "scenario": "2010 Base Year", "stage": "Collection + Waste", "value": 35945437.59, "x": 0, "dx": 1, "y":  0, "dy":  1 }, ... ]
+    ]
 }
