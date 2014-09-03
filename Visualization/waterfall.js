@@ -23,7 +23,7 @@ d3.waterfall = function () {
         return waterfall;
     };
 
-    waterfall.stages = function (_) {
+    waterfall.stages = function (_) {   
         if (!arguments.length) return stages;
         stages = _;
         return waterfall;
@@ -36,34 +36,42 @@ d3.waterfall = function () {
     };
 
     waterfall.layout = function () {
-        var i = 0, j = 0, minVal = 0.0, maxVal = 0.0;
-        waterfall.xScale = d3.scale.linear().range([0, size[0]]).nice();
-        waterfall.yScale = d3.scale.ordinal().rangeRoundBands([0, size[1]], 0.1);
-        waterfall.segments = [[]];
+        var i = 0, j = 0, minVal = 0.0, maxVal = 0.0,
+            xScale = d3.scale.linear().range([0, size[0]]).nice(),
+            yScale = d3.scale.ordinal().rangeRoundBands([0, size[1]], 0.1),
+            segments = [[]];
         for (i = 0; i < scenarios.length; i++) {
             //first calculate the left edge for each stage
             var endVal = 0.0,
                 scenarioStages = [];
 
             for (j = 0; j < stages.length; j++) {
-                segment = {};
-                segment.scenario = scenarios[i]
-                segment.stage = stages[j];
-                segment.startVal = endVal;
-                segment.value = values[i][j];
-                segment.endVal = segment.startVal + segment.value;
-                segment.xVal = segment.startVal < segment.endVal ? segment.startVal : segment.endVal;
-                segment.width = Math.abs(segment.value);
-                endVal = segment.endVal;
-                scenarioStages.push(segment);
-                if (endVal < minVal) {
-                    minVal = endVal;
-                } else if (endVal > maxVal) {
-                    maxVal = endVal;
+                // NULL value means this stage is not relevant in this scenario,
+                // no segment created
+                if (values[i][j] !== null) {
+                    segment = {};
+                    segment.scenario = scenarios[i]
+                    segment.stage = stages[j];
+                    segment.startVal = endVal;
+                    segment.value = values[i][j];
+                    segment.endVal = segment.startVal + segment.value;
+                    endVal = segment.endVal;
+                    scenarioStages.push(segment);
+                    if (endVal < minVal) {
+                        minVal = endVal;
+                    } else if (endVal > maxVal) {
+                        maxVal = endVal;
+                    }
                 }
             }
             waterfall.segments.push(scenarioStages);
         }
+        xScale.domain([minVal, maxVal]);
+        yScale.domain(stages);
+
+        waterfall.xScale = xScale;  // d3 scale for x axis
+        waterfall.yScale = yScale;  // d3 scale for y axis
+        waterfall.segments = segments;  // data for drawing waterfall segments
 
         return waterfall;
     };
