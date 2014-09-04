@@ -37,6 +37,12 @@ d3.waterfall = function () {
         return waterfall;
     };
 
+    waterfall.segmentPadding = function (_) {
+        if (!arguments.length) { return segmentPadding; }
+        segmentPadding = _;
+        return waterfall;
+    };
+
     waterfall.scenarios = function (_) {
         if (!arguments.length) { return scenarios; }
         scenarios = _;
@@ -60,6 +66,7 @@ d3.waterfall = function () {
         seg.y = (segmentPadding + segmentHeight) * index;
         seg.width = Math.abs(xScale(seg.value) - xScale(0));
         seg.color = colorScale(seg.stage);
+        seg.lineX = xScale(seg.endVal);
     }
 
     waterfall.layout = function () {
@@ -98,7 +105,7 @@ d3.waterfall = function () {
 
         for (i = 0; i < scenarios.length; i++) {
             segments[i].forEach(setGraphicAttributes);
-        }
+        }       
 
         waterfall.xScale = xScale;  
         waterfall.segments = segments;  

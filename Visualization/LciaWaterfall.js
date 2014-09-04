@@ -29,9 +29,11 @@ function LciaWaterfall() {
         width = 600 - margin.left - margin.right,   // diagram width
         height = 1000 - margin.top - margin.bottom;  // diagram height
 
+    var stageColors = colorbrewer.Spectral[7].slice(1,6);
+
     var waterfall = d3.waterfall()
         .width(width)
-        .colors(colorbrewer.Spectral[5]);
+        .colors(stageColors);
 
     var formatNumber = d3.format("^.2g"),   // Round numbers to 2 significant digits
                                             // TODO: make this user configurable
@@ -78,10 +80,15 @@ function LciaWaterfall() {
                 .style("text-anchor", "left")
                 .text(scenario);
         }
-        bars = chartGroup.selectAll("rect")
+        barGroup = chartGroup.selectAll(".bar.g")
             .data(scenarioSegments);
+
+        barGroup.enter().append("g")
+                .attr("class", "bar g");
+
+        barGroup.exit().remove();
         
-        bars.enter().append("rect")
+        barGroup.append("rect")
             .attr("class", "bar rect")
             .attr("height", waterfall.segmentHeight())
             .attr("x", function (d) {
@@ -97,7 +104,38 @@ function LciaWaterfall() {
                 return d.color;
             });
 
-        bars.exit().remove();
+        barGroup.append("text")
+            .attr("class", "bar text")
+            .attr("x", function (d) {
+                return (d.width < 50) ? 
+                    d.x + d.width + 5 :
+                    d.x + d.width / 2 - 5;
+            })
+            .attr("y", function (d) {
+                return d.y + (waterfall.segmentHeight() / 2);
+            })
+            .attr("dy", ".71em")
+            .text(function (d) {
+                return formatNumber(d.value);
+            });
+
+        barGroup.append("line")
+            .attr("class", "bar line")
+            .attr("x1", function (d) {
+                return d.lineX;
+            })
+            .attr("y1", function (d) {
+                return d.y + waterfall.segmentHeight();
+            })
+            .attr("x2", function (d) {
+                return d.lineX;
+            })
+            .attr("y2", function (d) {
+                return d.y + waterfall.segmentHeight() + waterfall.segmentPadding();
+            })
+            .style("stroke", function (d) {
+                return d.color;
+            });            
 
         if (scenarioSegments.length > 0) {
             return top + scenarioSegments[scenarioSegments.length - 1].y + waterfall.segmentHeight() + margin.bottom;
