@@ -66,7 +66,7 @@ d3.waterfall = function () {
         seg.y = (segmentPadding + segmentHeight) * index;
         seg.width = Math.abs(xScale(seg.value) - xScale(0));
         seg.color = colorScale(seg.stage);
-        seg.lineX = xScale(seg.endVal);
+        seg.endX = xScale(seg.endVal);
     }
 
     waterfall.layout = function () {
