@@ -12,13 +12,11 @@ LCIA = ComputeFragmentLCIA ( fragment_id, scenario_id, lcia_method_id )
 {
   // for now: return one record per FragmentFlow
   LCIA = SELECT ff.FragmentFlowID AS FragmentFlowID,
-  	      	     nc.NodeWeight AS Activity,
-		     sc.ImpactScore AS ImpactScore,
-		     Activity * ImpactScore AS Result,
+		(nc.NodeWeight * sc.ImpactScore) AS Result,
 		FROM FragmentFlow ff INNER JOIN NodeCache nc 
-		ON ff.FragmentFlowID = nc.FragmentFlowID
+		  ON ff.FragmentFlowID = nc.FragmentFlowID
 		INNER JOIN ScoreCache sc
-		ON nc.NodeCacheID = sc.NodeCacheID
+		  ON nc.NodeCacheID = sc.NodeCacheID
 		WHERE ff.FragmentID = fragment_id
 		  AND nc.ScenarioID = scenario_id
 		  AND sc.LCIAMethodID = lcia_method_id;
@@ -32,9 +30,9 @@ LCIA = ComputeFragmentLCIA ( fragment_id, scenario_id, lcia_method_id )
   LCIA = SELECT ff.FragmentStageID AS FragmentStageID,
        	 	sum(nc.NodeWeight * sc.ImpactScore) AS Result
 		FROM FragmentFlow ff INNER JOIN NodeCache nc
-		ON ff.FragmentFlowID = nc.FragmentFlowID
+		  ON ff.FragmentFlowID = nc.FragmentFlowID
 		INNER JOIN ScoreCache sc
-		ON nc.NodeCacheID = sc.NodeCacheID
+		  ON nc.NodeCacheID = sc.NodeCacheID
 		WHERE ff.FragmentID = fragment_id
 		  AND nc.ScenarioID = scenario_id
 		  AND sc.LCIAMethodID = lcia_method_id
@@ -49,7 +47,7 @@ success = FragmentFlowLCIA ( fragment_id, scenario_id, lciamethod_ids[...] )
   // set score cache for fragment / scenario / method: iterate through
   // fragmentflows 
 
-  fragment_flows = SELECT FragmentFlowID, NodeTypeID
+  fragment_flows = SELECT FragmentFlowID, NodeTypeID, FlowID, DirectionID
   		   FROM FragmentFlow
 		   WHERE FragmentID = fragment_id;
 
@@ -83,7 +81,7 @@ success = FragmentFlowLCIA ( fragment_id, scenario_id, lciamethod_ids[...] )
 		    WHERE fnf.FragmentFlowID = i.FragmentFlowID
 		      AND fs.ScenarioID = scenario_id
 
-	// recursive traversal
+	// recursive LCIA computation, results to cache
 	FragmentFlowLCIA( target_id, scenario_id, lciamethod_ids);
       }
       case 3 // InputOutput
@@ -107,7 +105,7 @@ success = FragmentFlowLCIA ( fragment_id, scenario_id, lciamethod_ids[...] )
 	score[...] = ProcessLCIA( target_id, scenario_id, lciamethod_ids);
 	for j=1:length(lciamethod_ids)
 	{
-	  SetScoreCache( node_cache_id, lciamehod_ids[j], scores[j]);
+	  SetScoreCache( node_cache_id, lciamehod_ids[j], score[j]);
 	}
       }
       case Fragment
@@ -130,14 +128,14 @@ target_id = ResolveBackground ( flow_id, direction_id, scenario_id, &node_type_i
 {
   // resolve a given flow to a particular background system
   // first: check to see if there is a scenario-specific value
-  B = SELECT * FROM ScenarioBackground
+  B = SELECT NodeTypeID, TargetID FROM ScenarioBackground
       WHERE ScenarioID = scenario_id
         AND FlowID = flow_id
 	AND DirectionID = direction_id;
 
   if isempty(B)
   {
-    B = SELECT * FROM Background
+    B = SELECT NodeTypeID, TargetID FROM Background
       	WHERE FlowID = flow_id
 	  AND DirectionID = direction_id;
 
