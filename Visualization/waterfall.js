@@ -4,42 +4,70 @@
  * Developed to enable reusabilty.
  */
 d3.waterfall = function () {
+    /*global d3 */
     var waterfall = {},
-        size = [500, 200],  // chart width, height
+        // Input
+        width = 500,  // overall chart width
+        segmentHeight = 24,
+        segmentPadding = 8,
         scenarios = [],     // each scenario gets a chart
         stages = [],        // stages within each scenario 
-        values = [[]];      // 2 dimensional array of values (for each scenario, then for each stage).
+        values = [],      // 2 dimensional array of values (first dimension: scenario, second dimension: stage)
+        colors = [],        // Array of colors (one for every stage)
+        // Output   
+        segments = [],    // 2D array of waterfall segments, one for each non-null value
+        xScale = d3.scale.linear(),             // d3 scale maps aggregate value to chart's x axis
+        colorScale = d3.scale.ordinal(); // d3 scale maps stages to colors
 
+    waterfall.colors = function (_) {
+        if (!arguments.length) { return colors; }
+        colors = _;
+        return waterfall;
+    };
 
-    waterfall.size = function (_) {
-        if (!arguments.length) return size;
-        size = _;
+    waterfall.width = function (_) {
+        if (!arguments.length) { return width; }
+        width = _;
+        return waterfall;
+    };
+
+    waterfall.segmentHeight = function (_) {
+        if (!arguments.length) { return segmentHeight; }
+        segmentHeight = _;
         return waterfall;
     };
 
     waterfall.scenarios = function (_) {
-        if (!arguments.length) return scenarios;
+        if (!arguments.length) { return scenarios; }
         scenarios = _;
         return waterfall;
     };
 
     waterfall.stages = function (_) {   
-        if (!arguments.length) return stages;
+        if (!arguments.length) { return stages; }
         stages = _;
         return waterfall;
     };
 
     waterfall.values = function (_) {
-        if (!arguments.length) return values;
+        if (!arguments.length) { return values; }
         values = _;
         return waterfall;
     };
 
+    function setGraphicAttributes(seg, index) {
+        seg.x = xScale(Math.min(seg.startVal, seg.endVal));
+        seg.y = (segmentPadding + segmentHeight) * index;
+        seg.width = Math.abs(xScale(seg.value) - xScale(0));
+        seg.color = colorScale(seg.stage);
+    }
+
     waterfall.layout = function () {
-        var i = 0, j = 0, minVal = 0.0, maxVal = 0.0,
-            xScale = d3.scale.linear().range([0, size[0]]).nice(),
-            yScale = d3.scale.ordinal().rangeRoundBands([0, size[1]], 0.1),
-            segments = [[]];
+        var i = 0, j = 0, minVal = 0.0, maxVal = 0.0;
+        xScale.range([0, width]).nice();
+        colorScale.range(colors);
+        colorScale.domain(stages);
+        segments = [];
         for (i = 0; i < scenarios.length; i++) {
             //first calculate the left edge for each stage
             var endVal = 0.0,
@@ -49,8 +77,8 @@ d3.waterfall = function () {
                 // NULL value means this stage is not relevant in this scenario,
                 // no segment created
                 if (values[i][j] !== null) {
-                    segment = {};
-                    segment.scenario = scenarios[i]
+                    var segment = {};
+                    segment.scenario = scenarios[i];
                     segment.stage = stages[j];
                     segment.startVal = endVal;
                     segment.value = values[i][j];
@@ -64,14 +92,16 @@ d3.waterfall = function () {
                     }
                 }
             }
-            waterfall.segments.push(scenarioStages);
+            segments.push(scenarioStages);
         }
-        xScale.domain([minVal, maxVal]);
-        yScale.domain(stages);
+        xScale.domain([minVal, maxVal]);       
 
-        waterfall.xScale = xScale;  // d3 scale for x axis
-        waterfall.yScale = yScale;  // d3 scale for y axis
-        waterfall.segments = segments;  // data for drawing waterfall segments
+        for (i = 0; i < scenarios.length; i++) {
+            segments[i].forEach(setGraphicAttributes);
+        }
+
+        waterfall.xScale = xScale;  
+        waterfall.segments = segments;  
 
         return waterfall;
     };

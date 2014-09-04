@@ -7,12 +7,13 @@
 /// <reference path="d3.min.js" />
 /// <reference path="waterfall.js" />
 /// <reference path="d3-tip.js" />
+/// <reference path="colorbrewer.js" />
 /// <reference path="LciaWaterfall.html" />
 
-function FragmentFlows() {
+function LciaWaterfall() {
 
     // library globals - used to avoid jslint errors
-    /*global d3, colorbrewer, LCA, console */
+    /*global d3, colorbrewer, LCA */
 
     // Current selections
     var selectedFragmentID = 8,
@@ -26,34 +27,51 @@ function FragmentFlows() {
         left: 20
     },
         width = 600 - margin.left - margin.right,   // diagram width
-        height = 500 - margin.top - margin.bottom;  // diagram height
+        height = 1000 - margin.top - margin.bottom;  // diagram height
 
     var waterfall = d3.waterfall()
-        .size([width, height]);
+        .width(width)
+        .colors(colorbrewer.Spectral[5]);
+
     var formatNumber = d3.format("^.2g"),   // Round numbers to 2 significant digits
                                             // TODO: make this user configurable
         svg,
-        color = d3.scale.ordinal(),
         transitionTime = 250,   // d3 transition time in ms
-        updateOnly = false;     // Flag when diagram should be updated, as opposed to drawn from scratch
+        updateOnly = false,     // Flag when diagram should be updated, as opposed to drawn from scratch
+        waterfallData = {};
+
+    /**
+     * Initial preparation of svg element.
+     */
+    function prepareSvg() {
+        svg = d3.select("#chartcontainer")
+            .append("svg")
+            .attr("width", width + margin.left + margin.right)
+            .attr("height", height + margin.top + margin.bottom)
+            .append("g")
+            .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+    }
      
     /**
-     * Display waterfall chart for one scenario
+     * Display waterfall chart for a scenario
+      * @param {String}  scenario    Element at waterfall.scenarios[index]
+     *  @param {Number}  index       
+     *  @param {Number}  bottom      bottom of last chart (X coordinate)  
+     * @returns {Number} bottom of this chart    
      */
-    function displayScenario(scenario, index) {
-        var topPos = margin.top + (height * index),
-            chartGroup, bars
-        chartID = "scenario" + index,
-        xScale = waterfall.xScale,
-        yScale = waterfall.yScale,
-        transitionTime = 0;
+    function displayScenario(scenario, index, bottom) {
+        var top = margin.top + bottom,
+            chartGroup, bars,
+            chartID = "scenario" + index,
+            scenarioSegments = waterfall.segments[index],
+            transitionTime = 0;
 
         if (updateOnly) {
             transitionTime = 250;
             chartGroup = svg.select("#" + chartID);
         } else {
             chartGroup = svg.append("g").attr("id", chartID)
-                .attr("transform", "translate(" + margin.left + "," + topPos + ")");
+                .attr("transform", "translate(" + margin.left + "," + top + ")");
 
             chartGroup.append("text").attr("x", 0)
                 .attr("y", 0)
@@ -61,41 +79,54 @@ function FragmentFlows() {
                 .text(scenario);
         }
         bars = chartGroup.selectAll("rect")
-            .data(waterfall.segments[index]);
+            .data(scenarioSegments);
         
         bars.enter().append("rect")
             .attr("class", "bar rect")
-            .attr("height", yScale.rangeBand())
+            .attr("height", waterfall.segmentHeight())
             .attr("x", function (d) {
-                return xScale(Math.min(d.startVal, d.endVal));
+                return d.x;
             })
             .attr("y", function (d) {
-                return yScale(d.stage);
+                return d.y;
             })
             .attr("width", function (d) {
-                return Math.abs(xScale(d.value) - xScale(0));
+                return d.width;
             })
+            .style("fill", function (d) {
+                return d.color;
+            });
+
+        bars.exit().remove();
+
+        if (scenarioSegments.length > 0) {
+            return top + scenarioSegments[scenarioSegments.length - 1].y + waterfall.segmentHeight() + margin.bottom;
+        } else {
+            return top;
+        }
+    }
+
+    function setWaterfallData() {
+        waterfallData = LCA.loadedData.waterfall;
+        waterfall.scenarios(waterfallData.scenarios)
+        .stages(waterfallData.stages)
+        .values(waterfallData.values);
     }
 
     /**
      * Display LCIA results
-     * @param {Object}  data    Results prepared as waterfall input data
-     * @param {Boolean}  rebuild    Flag to indicate if this is a full redraw or an update
      */
-    function displayResults(data, rebuild) {
+    function displayResults() {
+        var bottom = 0;
 
-        var link, node;
-
-        if (rebuild) {
+        if (!updateOnly) {
             svg.selectAll("g").remove();
         }
-        waterfall.scenarios(data.scenarios)
-            .stages(data.stages)
-            .values(data.values)
-            .layout();
+        waterfall.layout();
 
-        updateOnly = !rebuild;
-        waterfall.scenarios.forEach(displayScenario);
+        waterfallData.scenarios.forEach(function (scenario, index) {
+            bottom = displayScenario(scenario, index, bottom);
+        });
     }
 
     /**
@@ -103,7 +134,10 @@ function FragmentFlows() {
      */
     function onDataLoaded() {
         if ("waterfall" in LCA.loadedData) {
-            displayResults( LCA.loadedData.waterfall, true);
+            if (LCA.loadedData.waterfall != null) {
+                setWaterfallData();
+                displayResults();
+            }
         }
     }
 
@@ -131,7 +165,7 @@ function FragmentFlows() {
         //    onMethodChange, selectedMethodID);
 
         prepareSvg();
-        LCA.loadData("waterfall.json", true, onDataLoaded);
+        LCA.loadData("waterfall", true, onDataLoaded);
 
     }
 
