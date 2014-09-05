@@ -17,7 +17,8 @@ function LciaWaterfall() {
 
     // Current selections
     var selectedFragmentID = 8,
-        fragmentName = "";
+        fragmentName = "",
+        unit = "kg CO2-Equiv.";
 
     // SVG margins
     var margin = {
@@ -191,9 +192,7 @@ function LciaWaterfall() {
     function displayResults() {
         var bottom = 0;
 
-        if (!updateOnly) {
-            svg.selectAll("g").remove();
-        }
+        d3.select("#unitName").text(unit);
         waterfall.layout();
         xAxis.scale(waterfall.xScale);
         waterfallData.scenarios.forEach(function (scenario, index) {
