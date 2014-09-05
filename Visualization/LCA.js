@@ -277,7 +277,51 @@ LCA.loadUrlVars = function() {
     }
 };
 
-// TODO : replace usage of following function with newer functions above
+/**
+ * Make a simple legend from chart data and color scale
+ * @param {Object} svg          d3 selection to contain legend
+ * @param {Array} data          Chart data
+ * @param {Object} scale        d3 scale mapping data to colors
+ * // TODO : Add optional property for legend text
+ */
+LCA.makeLegend = function (svg, data, scale) {
+    var rowHeight = 20,
+        boxSize = 18,
+        colPadding = 6,
+        textY = 9,
+        colXs = [0, boxSize + colPadding],
+        legend,
+        newRows;
+
+    // Update legend data
+    legend = svg.selectAll(".legend").data(data);
+    // Add rows, if necessary
+    newRows = legend.enter().append("g").attr("class", "legend")
+        .attr("transform", function (d, i) {
+            var rowY = (i + 1) * rowHeight;
+            return "translate(0," + rowY + ")";
+        });
+    newRows.append("rect")
+        .attr("x", colXs[0])
+        .attr("width", boxSize)
+        .attr("height", boxSize)
+        .style("fill", function (d) {
+            return scale(d);
+        });
+    newRows.append("text")
+        .attr("x", colXs[1])
+        .attr("y", textY)
+        .attr("dy", ".35em")
+        .attr("class", "legend text")
+        .text(function (d) {
+            return d;
+        });
+
+    // Remove unused rows
+    legend.exit().remove();
+};
+
+// TODO : replace usage of following function with newer loadSelectionList
 /**
  * Prepare select element. Load with data and initialize selection
  * @param {String} jsonURL          URL for JSON data (web API endpoint or file)

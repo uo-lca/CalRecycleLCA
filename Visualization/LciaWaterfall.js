@@ -42,11 +42,18 @@ function LciaWaterfall() {
         transitionTime = 250,   // d3 transition time in ms
         updateOnly = false,     // Flag when diagram should be updated, as opposed to drawn from scratch
         waterfallData = {};
+    var legendSvg;
 
     /**
      * Initial preparation of svg element.
      */
     function prepareSvg() {
+        legendSvg = d3.select("#legend")
+                    .append("svg")
+                    .attr("width", 150 )
+                    .attr("height", 150)
+                    .append("g")
+                    .attr("transform", "translate(" + 5 + "," + 5 + ")");
         svg = d3.select("#chartcontainer")
             .append("svg")
             .attr("width", width + margin.left + margin.right)
@@ -194,6 +201,7 @@ function LciaWaterfall() {
 
         d3.select("#unitName").text(unit);
         waterfall.layout();
+        LCA.makeLegend(legendSvg, waterfall.stages(), waterfall.colorScale);
         xAxis.scale(waterfall.xScale);
         waterfallData.scenarios.forEach(function (scenario, index) {
             bottom = displayScenario(scenario, index, bottom);

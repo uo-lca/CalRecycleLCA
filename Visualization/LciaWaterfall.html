@@ -41,23 +41,28 @@
     <div class="container">
         <h1>Used Oil Lifecycle Impact Assessment</h1>
         <a id="goHome" href="index.html">Used Oil LCA Tool Home</a>
-        <fieldset>
-            <p>
-                <label id="fragmentLabel">Fragment:</label>
-                <span id="fragmentName"></span>
-            </p>
-            <p>
-                <label for="lciaMethodSelect">LCIA Method</label>
-                <select name="lciaMethodSelect" id="lciaMethodSelect">
-                </select>
-            </p>
-            <p>
-                <label id="unitLabel">Unit:</label>
-                <span id="unitName"></span>
-            </p>
-        </fieldset>
+        <div>
+            <div id="fields" class="block div">
+                <fieldset>
+                    <p>
+                        <label id="fragmentLabel">Fragment:</label>
+                        <span id="fragmentName"></span>
+                    </p>
+                    <p>
+                        <label for="lciaMethodSelect">LCIA Method</label>
+                        <select name="lciaMethodSelect" id="lciaMethodSelect"></select>
+                    </p>
+                    <p>
+                        <label id="unitLabel">Unit:</label>
+                        <span id="unitName"></span>
+                    </p>
+                </fieldset>
+            </div>
+            <div id="legend" class="block div">
+            </div>
+        </div>
         <div id="chartcontainer"></div>
-    </div>
+        </div>
     <script>
         $(document).ready(LciaWaterfall);
     </script>

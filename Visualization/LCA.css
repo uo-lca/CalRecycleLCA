@@ -32,6 +32,11 @@ text {
     font: 10px sans-serif;
 }
 
+.block.div {
+    display: inline-block;
+    vertical-align: top;
+}
+
 /*
 .dropdown.label {
     font-weight: bold;

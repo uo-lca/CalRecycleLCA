@@ -107,7 +107,8 @@ d3.waterfall = function () {
             segments[i].forEach(setGraphicAttributes);
         }       
 
-        waterfall.xScale = xScale;  
+        waterfall.xScale = xScale;
+        waterfall.colorScale = colorScale;
         waterfall.segments = segments;  
 
         return waterfall;
