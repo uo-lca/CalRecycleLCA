@@ -10,6 +10,8 @@ Tue 09-02 14:18:44 -0700
 
 LCIA = ComputeFragmentLCIA ( fragment_id, scenario_id, lcia_method_id )
 {
+  // need to somehow test whether ScoreCache has been populated
+
   // for now: return one record per FragmentFlow
   LCIA = SELECT ff.FragmentFlowID AS FragmentFlowID,
 		(nc.NodeWeight * sc.ImpactScore) AS Result,
@@ -47,18 +49,24 @@ success = FragmentFlowLCIA ( fragment_id, scenario_id, lciamethod_ids[...] )
   // set score cache for fragment / scenario / method: iterate through
   // fragmentflows 
 
-  fragment_flows = SELECT FragmentFlowID, NodeTypeID, FlowID, DirectionID
-  		   FROM FragmentFlow
-		   WHERE FragmentID = fragment_id;
+  // this does nothing if traversal has already been completed
+  FragmentTraverse( fragment_id, scenario_id ); 
+
+  fragment_flows = SELECT nc.NodeCacheID AS NodeCacheID, 
+  		   	  nc.FragmentFlowID AS FragmentFlowID, 
+			  ff.NodeTypeID AS NodeTypeID,
+			  ff.FlowID AS FlowID,
+			  ff.DirectionID AS DirectionID
+  		   FROM NodeCache nc INNER JOIN FragmentFlow ff
+		   ON nc.FragmentFlowID = ff.FragmentFlowID
+		   WHERE ff.FragmentID = fragment_id
+		     AND nc.ScenarioID = scenario_id;
 
   for i in fragment_flows
   {
-    node_cache_id = SELECT NodeCacheID FROM NodeCache
-    		    WHERE FragmentFlowID = i.FragmentFlowID
-		      AND ScenarioID = scenario_id;
 
     my_node_type = i.NodeTypeID;
-    switch my_node_type // background
+    switch my_node_type
     { 
       case 1 // process
       {
@@ -105,7 +113,7 @@ success = FragmentFlowLCIA ( fragment_id, scenario_id, lciamethod_ids[...] )
 	score[...] = ProcessLCIA( target_id, scenario_id, lciamethod_ids);
 	for j=1:length(lciamethod_ids)
 	{
-	  SetScoreCache( node_cache_id, lciamehod_ids[j], score[j]);
+	  SetScoreCache( i.NodeCacheID, lciamehod_ids[j], score[j]);
 	}
       }
       case Fragment
@@ -116,7 +124,7 @@ success = FragmentFlowLCIA ( fragment_id, scenario_id, lciamethod_ids[...] )
 	       	 		      	lciamethod_ids[j]);
 
 	  score = sum(LCIA.Result);
-	  SetScoreCache( node_cache_id, lciamethod_ids[j], score );
+	  SetScoreCache( i.NodeCacheID, lciamethod_ids[j], score );
 	}
       }
     }
