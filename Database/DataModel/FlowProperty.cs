@@ -11,6 +11,7 @@ namespace LcaDataModel
     {
         public FlowProperty()
         {
+            CompositionDataSet = new HashSet<CompositionData>();
             Flows = new HashSet<Flow>();
             FlowFlowProperties = new HashSet<FlowFlowProperty>();
             FlowPropertyEmissions = new HashSet<FlowPropertyEmission>();
@@ -33,6 +34,8 @@ namespace LcaDataModel
         public virtual ILCDEntity ILCDEntity { get; set; }
 
         public virtual UnitGroup UnitGroup { get; set; }
+
+        public virtual ICollection<CompositionData> CompositionDataSet { get; set; }
 
         public virtual ICollection<FlowPropertyEmission> FlowPropertyEmissions { get; set; }
 

@@ -11,14 +11,14 @@ namespace LcaDataModel
     {
         public int CompositionDataID { get; set; }
 
-        public int? CompositionModelID { get; set; }
+        public int CompositionModelID { get; set; }
 
-        public int? FlowFlowPropertyID { get; set; }
+        public int FlowPropertyID { get; set; }
 
-        public double? Value { get; set; }
+        public double Value { get; set; }
 
-        public virtual CompositionModel CompostionModel { get; set; }
+        public virtual CompositionModel CompositionModel { get; set; }
 
-        public virtual FlowFlowProperty FlowFlowProperty { get; set; }
+        public virtual FlowProperty FlowProperty { get; set; }
     }
 }

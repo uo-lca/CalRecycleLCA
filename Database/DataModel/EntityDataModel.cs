@@ -3,6 +3,7 @@ namespace LcaDataModel {
     using System.Data.Entity;
     using System.ComponentModel.DataAnnotations.Schema;
     using System.Linq;
+    using System.Data.Entity.ModelConfiguration.Conventions;
 
     public partial class EntityDataModel : DbContext {
         public EntityDataModel()
@@ -19,8 +20,9 @@ namespace LcaDataModel {
         public virtual DbSet<CategorySystem> CategorySystems { get; set; }
         public virtual DbSet<CharacterizationParam> CharacterizationParams { get; set; }
         public virtual DbSet<Classification> Classifications { get; set; }
-        public virtual DbSet<CompositionData> CompositionDatas { get; set; }
-        public virtual DbSet<CompositionModel> CompostionModels { get; set; }
+        public virtual DbSet<CompositionData> CompositionDataSet { get; set; }
+        public virtual DbSet<CompositionModel> CompositionModels { get; set; }
+        public virtual DbSet<CompositionSubstitution> CompositionSubstitutions { get; set; }
         public virtual DbSet<DataProvider> DataProviders { get; set; }
         public virtual DbSet<DataType> DataTypes { get; set; }
         public virtual DbSet<DependencyParam> DependencyParams { get; set; }
@@ -50,6 +52,7 @@ namespace LcaDataModel {
         public virtual DbSet<Param> Params { get; set; }
         public virtual DbSet<ParamType> ParamTypes { get; set; }
         public virtual DbSet<Process> Processes { get; set; }
+        public virtual DbSet<ProcessComposition> ProcessCompositions { get; set; }
         public virtual DbSet<ProcessDissipation> ProcessDissipations { get; set; }
         public virtual DbSet<ProcessDissipationParam> ProcessDissipationParams { get; set; }
         public virtual DbSet<ProcessEmissionParam> ProcessEmissionParams { get; set; }
@@ -68,6 +71,8 @@ namespace LcaDataModel {
         public virtual DbSet<Visibility> Visibilities { get; set; }
 
         protected override void OnModelCreating(DbModelBuilder modelBuilder) {
+            modelBuilder.Conventions.Remove<OneToManyCascadeDeleteConvention>();
+
             modelBuilder.Entity<Category>()
                 .Property(e => e.ExternalClassID)
                 .IsUnicode(false);

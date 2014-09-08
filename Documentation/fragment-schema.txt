@@ -353,15 +353,12 @@ The following tables are required:
     ParamInstances in a scenario.
 
    ProcessComposition
-    * ProcessCompositionID
-    * ProcessID
-    * InFlowID
-    * CompositionModelID
+    * ProcessCompositionID 
+    * ProcessID (FK)
+    X InFlowID      Not needed, same as FlowID in referenced CompositionModel
+    * CompositionModelID    (FK)
 
-    'InFlowID' is strictly for validation purposes: must have unit
-    magnitude, 'Input' direction, and 'mass' reference property, and
-    must match the FlowID of the chosen CompositionModel. No validation
-    is performed here.
+    Cross Validation needed : CompositionModel.FlowID corresponds to *a* FlowID with "Input" direction and "Mass" reference property belonging to ProcessComposition.ProcessID
 
 ### Indices, constraints
 
@@ -533,7 +530,8 @@ The following tables are required:
     * FlowID
     * DirectionID
     * NodeTypeID (only Process or Fragment allowed)
-    * TargetID (NOT a foreign key- interpret as ProcessID or FragmentID)
+    X TargetID (NOT a foreign key- interpret as ProcessID or FragmentID)
+	+ ILCDEntityID (FK to ILCDEntity) ILCDEntityID of target Process or Fragment, null when NodeType is Cutoff
 
     * DocID
 
@@ -669,9 +667,9 @@ The following tables are required:
     have the same list of product flows as the original FragmentID.
 
     CompositionSubstitution - NEW TABLE
-    * ScenarioID (FK)
-    * ProcessCompositionID
-    * CompositionModelID
+    * ScenarioID (PK, FK)
+    * ProcessCompositionID (PK, FK)
+    * CompositionModelID (FK)
 
 ## Cached Computation Results
 

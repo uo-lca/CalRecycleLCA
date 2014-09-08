@@ -11,18 +11,18 @@ namespace LcaDataModel
     {
         public CompositionModel()
         {
-            CompositionDatas = new HashSet<CompositionData>();
+            CompositionDataSet = new HashSet<CompositionData>();
         }
 
         [Key]
         public int CompositionModelID { get; set; }
 
-        public int? FlowID { get; set; }
+        public int FlowID { get; set; }
 
         [StringLength(50)]
         public string Name { get; set; }
 
-        public virtual ICollection<CompositionData> CompositionDatas { get; set; }
+        public virtual ICollection<CompositionData> CompositionDataSet { get; set; }
 
         public virtual Flow Flow { get; set; }
     }
