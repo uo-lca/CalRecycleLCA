@@ -358,7 +358,7 @@ The following tables are required:
     X InFlowID      Not needed, same as FlowID in referenced CompositionModel
     * CompositionModelID    (FK)
 
-    Cross Validation needed : CompositionModel.FlowID corresponds to *a* FlowID with "Input" direction and "Mass" reference property belonging to ProcessComposition.ProcessID
+    Future Cross Validation:  for each ProcessComposition, pc, pc.CompositionModel.Flow is a flow of pc.Process 
 
 ### Indices, constraints
 
