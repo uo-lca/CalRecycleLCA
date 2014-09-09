@@ -306,6 +306,81 @@ namespace LcaDataLoader {
             return isImported;
         }
 
+        /// <summary>
+        /// Import a row from CompositionModel.csv.
+        /// Row is skipped if a Flow with UUID = FlowUUID was not previously loaded.
+        /// </summary>
+        /// <param name="row">The row to import</param>
+        /// <param name="dbContext">Current instance of DbContextWrapper</param>
+        /// <returns>true if a CompositionModel record was created or updated, ow false</returns>
+        private static bool ImportCompositionModel(Row row, DbContextWrapper dbContext) {
+            bool isImported = false, isNew = true;
+            int id = Convert.ToInt32(row["CompositionModelID"]);
+            int refID;
+            if (dbContext.FindRefIlcdEntityID<Flow>(row["FlowUUID"], out refID)) {
+                CompositionModel ent = dbContext.ProduceEntityWithID<CompositionModel>(id, out isNew);
+                ent.FlowID = refID;
+                ent.Name = (row["Name"]);
+                isImported = isNew ? dbContext.AddEntity(ent) : (dbContext.SaveChanges() > 0);
+            }
+            return isImported;
+        }
+
+        /// <summary>
+        /// Import a row from CompositionData.csv.
+        /// Row is skipped if a Flow with UUID = FlowUUID was not previously loaded.
+        /// </summary>
+        /// <param name="row">The row to import</param>
+        /// <param name="dbContext">Current instance of DbContextWrapper</param>
+        /// <returns>true if a CompositionData record was created or updated, ow false</returns>
+        private static bool ImportCompositionData(Row row, DbContextWrapper dbContext) {
+            bool isImported = false, isNew = true;
+            int id = Convert.ToInt32(row["CompositionDataID"]);
+            int refID;
+            if (dbContext.FindRefIlcdEntityID<FlowProperty>(row["FlowPropertyUUID"], out refID)) {
+                CompositionData ent = dbContext.ProduceEntityWithID<CompositionData>(id, out isNew);
+                ent.FlowPropertyID = refID;
+                ent.CompositionModelID = Convert.ToInt32(row["CompositionModelID"]);
+                ent.Value = Convert.ToDouble(row["Value"]);
+                isImported = isNew ? dbContext.AddEntity(ent) : (dbContext.SaveChanges() > 0);
+            }
+            return isImported;
+        }
+            
+            
+        /// <summary>
+        /// Import a row from ProcessComposition.csv.
+        /// Row is skipped if flow with InFlowUUID does not match CompositionModel flow
+        /// </summary>
+        /// <param name="row">The row to import</param>
+        /// <param name="dbContext">Current instance of DbContextWrapper</param>
+        /// <returns>true if a ProcessComposition record was created or updated, ow false</returns>
+        private static bool ImportProcessComposition(Row row, DbContextWrapper dbContext) {
+            bool isImported = false, isNew = true;
+            int id = Convert.ToInt32(row["ProcessCompositionID"]),
+                modelID = Convert.ToInt32(row["CompositionModelID"]);
+            CompositionModel model = dbContext.Find<CompositionModel>(modelID);
+            if (model == null) {
+                Program.Logger.ErrorFormat("CompositionModelID = {0} was not found. Skipping ProcessComposition {1}.", modelID, id);
+            } else {
+                int processID, flowID;
+                if (dbContext.FindRefIlcdEntityID<LcaDataModel.Process>(row["ProcessUUID"], out processID, row["ProcessVersion"]) &&
+                    dbContext.FindRefIlcdEntityID<Flow>(row["InFlowUUID"], out flowID)) {
+                    if (model.FlowID == flowID) {
+                        ProcessComposition ent = dbContext.ProduceEntityWithID<ProcessComposition>(id, out isNew);
+                        ent.ProcessID = processID;
+                        ent.CompositionModelID = modelID;
+                        isImported = isNew ? dbContext.AddEntity(ent) : (dbContext.SaveChanges() > 0);
+                    }
+                    else {
+                        Program.Logger.ErrorFormat("InFlowUUID = {0} does not correspond to flow for CompositionModel {1}. Skipping ProcessComposition {2}.", 
+                            row["InFlowUUID"], modelID, id);
+                    }
+                }
+            }           
+            return isImported;
+        }
+
         private static bool ImportUser(Row row, DbContextWrapper dbContext) {
             bool isImported = false;
             int id = Convert.ToInt32(row["UserID"]);
@@ -430,6 +505,9 @@ namespace LcaDataLoader {
                 if (rows != null) UpdateEntities(rows, UpdateCategory, dbContext);
                 ImportAppendCSV(dirName, "FlowPropertyEmission", ImportFlowPropertyEmission, dbContext);
                 ImportAppendCSV(dirName, "ProcessDissipation", ImportProcessDissipation, dbContext);
+                ImportAppendCSV(dirName, "CompositionModel", ImportCompositionModel, dbContext);
+                ImportAppendCSV(dirName, "CompositionData", ImportCompositionData, dbContext);
+                ImportAppendCSV(dirName, "ProcessComposition", ImportProcessComposition, dbContext);
                 // Import Classification last because it references UUIDs in other files
                 // Improve performance by disabling AutoDetectChanges and only executing Adds (no updates).
                 dbContext.SetAutoDetectChanges(false);

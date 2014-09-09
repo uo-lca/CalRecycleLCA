@@ -12,6 +12,7 @@ namespace LcaDataModel
         public Process()
         {
             FragmentNodeProcesses = new HashSet<FragmentNodeProcess>();
+            ProcessCompositions = new HashSet<ProcessComposition>();
             ProcessFlows = new HashSet<ProcessFlow>();
             ProcessSubstitutions = new HashSet<ProcessSubstitution>();
         }
@@ -44,6 +45,8 @@ namespace LcaDataModel
         public virtual ProcessType ProcessType { get; set; }
 
         public virtual ReferenceType ReferenceType { get; set; }
+
+        public virtual ICollection<ProcessComposition> ProcessCompositions { get; set; }
 
         public virtual ICollection<ProcessFlow> ProcessFlows { get; set; }
         

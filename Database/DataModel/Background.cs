@@ -28,6 +28,8 @@ namespace LcaDataModel
         public virtual Direction Direction { get; set; }
 
         public virtual Flow Flow { get; set; }
+        
+        public virtual ILCDEntity ILCDEntity { get; set; }
 
         public virtual NodeType NodeType { get; set; }
 

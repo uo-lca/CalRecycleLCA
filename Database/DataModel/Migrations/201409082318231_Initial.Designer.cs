@@ -13,7 +13,7 @@ namespace LcaDataModel.Migrations
         
         string IMigrationMetadata.Id
         {
-            get { return "201408281820416_Initial"; }
+            get { return "201409082318231_Initial"; }
         }
         
         string IMigrationMetadata.Source

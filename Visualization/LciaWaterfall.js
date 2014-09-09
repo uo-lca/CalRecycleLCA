@@ -17,33 +17,43 @@ function LciaWaterfall() {
 
     // Current selections
     var selectedFragmentID = 8,
-        fragmentName = "";
+        fragmentName = "",
+        unit = "kg CO2-Equiv.";
 
     // SVG margins
     var margin = {
         top: 10,
-        right: 20,
+        right: 50,
         bottom: 30,
         left: 20
     },
         width = 600 - margin.left - margin.right,   // diagram width
         height = 1000 - margin.top - margin.bottom;  // diagram height
 
+    var stageColors = colorbrewer.Spectral[7].slice(1, 6);       
+
     var waterfall = d3.waterfall()
         .width(width)
-        .colors(colorbrewer.Spectral[5]);
+        .colors(stageColors);
 
     var formatNumber = d3.format("^.2g"),   // Round numbers to 2 significant digits
-                                            // TODO: make this user configurable
+        xAxis = d3.svg.axis().orient("bottom").tickFormat(formatNumber),                                    
         svg,
         transitionTime = 250,   // d3 transition time in ms
         updateOnly = false,     // Flag when diagram should be updated, as opposed to drawn from scratch
         waterfallData = {};
+    var legendSvg;
 
     /**
      * Initial preparation of svg element.
      */
     function prepareSvg() {
+        legendSvg = d3.select("#legend")
+                    .append("svg")
+                    .attr("width", 150 )
+                    .attr("height", 150)
+                    .append("g")
+                    .attr("transform", "translate(" + 5 + "," + 5 + ")");
         svg = d3.select("#chartcontainer")
             .append("svg")
             .attr("width", width + margin.left + margin.right)
@@ -61,27 +71,70 @@ function LciaWaterfall() {
      */
     function displayScenario(scenario, index, bottom) {
         var top = margin.top + bottom,
-            chartGroup, bars,
+            padding = 10,
+            chartGroup, barGroup,
             chartID = "scenario" + index,
             scenarioSegments = waterfall.segments[index],
-            transitionTime = 0;
+            transitionTime = 0,
+            chartHeight = 0,
+            minVal = 0.0, maxVal = 0.0;
 
         if (updateOnly) {
             transitionTime = 250;
-            chartGroup = svg.select("#" + chartID);
+            chartGroup = svg.select("#" + chartID).select(".chart");
         } else {
             chartGroup = svg.append("g").attr("id", chartID)
                 .attr("transform", "translate(" + margin.left + "," + top + ")");
-
             chartGroup.append("text").attr("x", 0)
                 .attr("y", 0)
                 .style("text-anchor", "left")
                 .text(scenario);
+            chartGroup = chartGroup.append("g")
+                .attr("class", "chart")
+                .attr("transform", "translate(" + padding + "," + padding + ")");
         }
-        bars = chartGroup.selectAll("rect")
+        if (scenarioSegments.length > 0) {
+            chartHeight = scenarioSegments[scenarioSegments.length - 1].y
+                        + waterfall.segmentHeight() + waterfall.segmentPadding();
+            minVal = d3.min(scenarioSegments, function (d) {
+                return d.endVal;
+            });
+            maxVal = d3.max(scenarioSegments, function (d) {
+                return d.endVal;
+            });
+            xAxis.tickValues([minVal, maxVal]);
+        }
+        if (updateOnly) {
+            chartGroup.select(".grid-background")
+                .attr("height", chartHeight);
+            
+        } else {
+            chartGroup.append("rect")
+                .attr("class", "grid-background")
+                .attr("width", width)
+                .attr("height", chartHeight);            
+        }
+        chartGroup.select(".grid").remove();
+        chartGroup.select(".axis").remove();
+        if (scenarioSegments.length > 0) {
+            chartGroup.append("g")
+                .attr("class", "grid")
+                .attr("transform", "translate(0," + chartHeight + ")")
+                .call(xAxis.tickSize(-chartHeight));
+            chartGroup.append("g")
+                .attr("class", "axis")
+                .attr("transform", "translate(0," + chartHeight + ")")
+                .call(xAxis.tickSize(0));
+        }            
+        barGroup = chartGroup.selectAll(".bar.g")
             .data(scenarioSegments);
-        
-        bars.enter().append("rect")
+
+        barGroup.enter().append("g")
+                .attr("class", "bar g");
+
+        barGroup.exit().remove();
+
+        barGroup.append("rect")
             .attr("class", "bar rect")
             .attr("height", waterfall.segmentHeight())
             .attr("x", function (d) {
@@ -97,13 +150,40 @@ function LciaWaterfall() {
                 return d.color;
             });
 
-        bars.exit().remove();
+        barGroup.append("text")
+            .attr("class", "bar text")
+            .attr("x", function (d) {
+                return (d.width < 50) ?
+                    d.x + d.width + 5 :
+                    d.x + d.width / 2 - 5;
+            })
+            .attr("y", function (d) {
+                return d.y + (waterfall.segmentHeight() / 2);
+            })
+            .attr("dy", ".71em")
+            .text(function (d) {
+                return formatNumber(d.value);
+            });
 
-        if (scenarioSegments.length > 0) {
-            return top + scenarioSegments[scenarioSegments.length - 1].y + waterfall.segmentHeight() + margin.bottom;
-        } else {
-            return top;
-        }
+        barGroup.append("line")
+            .attr("class", "bar line")
+            .attr("x1", function (d) {
+                return d.endX;
+            })
+            .attr("y1", function (d) {
+                return d.y + waterfall.segmentHeight();
+            })
+            .attr("x2", function (d) {
+                return d.endX;
+            })
+            .attr("y2", function (d) {
+                return d.y + waterfall.segmentHeight() + waterfall.segmentPadding();
+            })
+            .style("stroke", function (d) {
+                return d.color;
+            });
+
+            return top + chartHeight + margin.bottom + 2*padding; 
     }
 
     function setWaterfallData() {
@@ -119,11 +199,10 @@ function LciaWaterfall() {
     function displayResults() {
         var bottom = 0;
 
-        if (!updateOnly) {
-            svg.selectAll("g").remove();
-        }
+        d3.select("#unitName").text(unit);
         waterfall.layout();
-
+        LCA.makeLegend(legendSvg, waterfall.stages(), waterfall.colorScale);
+        xAxis.scale(waterfall.xScale);
         waterfallData.scenarios.forEach(function (scenario, index) {
             bottom = displayScenario(scenario, index, bottom);
         });
@@ -134,7 +213,7 @@ function LciaWaterfall() {
      */
     function onDataLoaded() {
         if ("waterfall" in LCA.loadedData) {
-            if (LCA.loadedData.waterfall != null) {
+            if (LCA.loadedData.waterfall !== null) {
                 setWaterfallData();
                 displayResults();
             }

@@ -55,7 +55,8 @@
     <Compile Include="CharacterizationParam.cs" />
     <Compile Include="Classification.cs" />
     <Compile Include="CompositionData.cs" />
-    <Compile Include="CompostionModel.cs" />
+    <Compile Include="CompositionSubstitution.cs" />
+    <Compile Include="CompositionModel.cs" />
     <Compile Include="DataProvider.cs" />
     <Compile Include="DataType.cs" />
     <Compile Include="DbContextExtension.cs" />
@@ -83,9 +84,9 @@
     <Compile Include="IObjectState.cs" />
     <Compile Include="LCIA.cs" />
     <Compile Include="LCIAMethod.cs" />
-    <Compile Include="Migrations\201408281820416_Initial.cs" />
-    <Compile Include="Migrations\201408281820416_Initial.Designer.cs">
-      <DependentUpon>201408281820416_Initial.cs</DependentUpon>
+    <Compile Include="Migrations\201409082318231_Initial.cs" />
+    <Compile Include="Migrations\201409082318231_Initial.Designer.cs">
+      <DependentUpon>201409082318231_Initial.cs</DependentUpon>
     </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="NodeCache.cs" />
@@ -96,6 +97,7 @@
     <Compile Include="Param.cs" />
     <Compile Include="ParamType.cs" />
     <Compile Include="Process.cs" />
+    <Compile Include="ProcessComposition.cs" />
     <Compile Include="ProcessDissipation.cs" />
     <Compile Include="ProcessDissipationParam.cs" />
     <Compile Include="ProcessEmissionParam.cs" />
@@ -125,8 +127,8 @@
     </None>
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="Migrations\201408281820416_Initial.resx">
-      <DependentUpon>201408281820416_Initial.cs</DependentUpon>
+    <EmbeddedResource Include="Migrations\201409082318231_Initial.resx">
+      <DependentUpon>201409082318231_Initial.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

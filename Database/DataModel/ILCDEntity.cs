@@ -12,6 +12,7 @@ namespace LcaDataModel
         public ILCDEntity()
         {
             Backgrounds = new HashSet<Background>();
+            ScenarioBackgrounds = new HashSet<ScenarioBackground>();
             Classifications = new HashSet<Classification>();
             Flows = new HashSet<Flow>();
             FlowProperties = new HashSet<FlowProperty>();
@@ -38,6 +39,8 @@ namespace LcaDataModel
 
         // Inverse navigation
         public virtual ICollection<Background> Backgrounds { get; set; }
+
+        public virtual ICollection<ScenarioBackground> ScenarioBackgrounds { get; set; }
 
         public virtual ICollection<Classification> Classifications { get; set; }
 

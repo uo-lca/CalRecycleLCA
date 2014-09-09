@@ -40,6 +40,22 @@ namespace LcaDataModel {
         }
     }
 
+    public partial class CompositionModel : IEntity {
+        [NotMapped]
+        public int ID {
+            get { return CompositionModelID; }
+            set { CompositionModelID = value; }
+        }
+    }
+
+    public partial class CompositionData : IEntity {
+        [NotMapped]
+        public int ID {
+            get { return CompositionDataID; }
+            set { CompositionDataID = value; }
+        }
+    }
+
     public partial class DependencyParam : IEntity {
         [NotMapped]
         public int ID {
@@ -102,6 +118,14 @@ namespace LcaDataModel {
         public int ID {
             get { return ParamID; }
             set { ParamID = value; }
+        }
+    }
+
+    public partial class ProcessComposition : IEntity {
+        [NotMapped]
+        public int ID {
+            get { return ProcessCompositionID; }
+            set { ProcessCompositionID = value; }
         }
     }
 

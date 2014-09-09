@@ -24,8 +24,17 @@ fieldset p {
     display: table-row;
 }
 
+fieldset span {
+     padding: 5px;
+}
+
 text {
     font: 10px sans-serif;
+}
+
+.block.div {
+    display: inline-block;
+    vertical-align: top;
 }
 
 /*
@@ -67,6 +76,10 @@ text {
   text-anchor: start;
 }
 
+.title.text {
+  font: 12px sans-serif;
+}
+
 .connect.line  {
   stroke-width: 2;
 }
@@ -89,6 +102,31 @@ text {
 
 .link:hover {
   stroke-opacity: .5;
+}
+
+.grid-background {
+  fill: #ddd;
+}
+
+.grid line {
+  stroke: #fff;
+}
+
+.grid .minor line {
+  stroke-opacity: .5;
+}
+
+.grid text {
+  display: none;
+}
+
+.axis line {
+  stroke: #000;
+}
+
+.axis path,
+.grid path {
+  display: none;
 }
 
 

@@ -14,7 +14,7 @@
     <link rel="stylesheet" type="text/css" href="http://www.calrecycle.ca.gov/CSSShared/CAStandard/ca_master.css" />
     <link rel="stylesheet" type="text/css" href="http://www.calrecycle.ca.gov/CSSShared/CAStandard/ca_department.css">
     <link rel="stylesheet" type="text/css" href="http://www.calrecycle.ca.gov/CSS/DRRR_color_scheme.css" />
-    <link rel="stylesheet" type="text/css" href="LciaComputation.css">
+    <link rel="stylesheet" type="text/css" href="LCA.css">
     <!-- JavaScript -->
     <script type="text/javascript" src="http://ajax.aspnetcdn.com/ajax/jQuery/jquery-2.1.1.min.js"></script>
     <script type="text/javascript" src="d3.min.js"></script>
@@ -41,28 +41,28 @@
     <div class="container">
         <h1>Used Oil Lifecycle Impact Assessment</h1>
         <a id="goHome" href="index.html">Used Oil LCA Tool Home</a>
-        <fieldset>
-            <p>
-                <label id="fragmentLabel">Fragment:</label>
-                <span id="fragmentName"></span>
-            </p>
-            <p>
-                <label for="impactCategorySelect">Impact Category</label>
-                <select name="impactCategorySelect" id="impactCategorySelect">
-                </select>
-            </p>
-            <p>
-                <label for="lciaMethodSelect">LCIA Method</label>
-                <select name="lciaMethodSelect" id="lciaMethodSelect">
-                </select>
-            </p>
-            <p>
-                <label id="impactLabel">Impact Score:</label>
-                <span id="impactScore"></span>
-            </p>
-        </fieldset>
+        <div>
+            <div id="fields" class="block div">
+                <fieldset>
+                    <p>
+                        <label id="fragmentLabel">Fragment:</label>
+                        <span id="fragmentName"></span>
+                    </p>
+                    <p>
+                        <label for="lciaMethodSelect">LCIA Method</label>
+                        <select name="lciaMethodSelect" id="lciaMethodSelect"></select>
+                    </p>
+                    <p>
+                        <label id="unitLabel">Unit:</label>
+                        <span id="unitName"></span>
+                    </p>
+                </fieldset>
+            </div>
+            <div id="legend" class="block div">
+            </div>
+        </div>
         <div id="chartcontainer"></div>
-    </div>
+        </div>
     <script>
         $(document).ready(LciaWaterfall);
     </script>

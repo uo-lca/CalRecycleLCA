@@ -67,7 +67,7 @@ namespace Services {
                 DirectionID = Convert.ToInt32(ff.DirectionID),
                 FlowID = ff.FlowID,
                 ParentFragmentFlowID = ff.ParentFragmentFlowID,
-                ProcessID = (ff.NodeTypeID == 1) ? ff.FragmentNodeProcesses.FirstOrDefault().FragmentNodeProcessID : nullID,
+                ProcessID = (ff.NodeTypeID == 1) ? ff.FragmentNodeProcesses.FirstOrDefault().ProcessID : nullID,
                 SubFragmentID = (ff.NodeTypeID == 2) ? ff.FragmentNodeFragments.FirstOrDefault().SubFragmentID : nullID,
                 LinkMagnitudes = (ff.FlowID == null) ? null : GetLinkMagnitudes(ff, scenarioID)
             };
