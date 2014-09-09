@@ -6,8 +6,9 @@ using System.Threading.Tasks;
 
 namespace Entities.Models
 {
-    public class ScenarioProductFlowModel
+    public class ResolveBackgroundModel
     {
-
+        public int? NodeTypeID { get; set; }
+        public int? TargetID { get; set; }
     }
 }

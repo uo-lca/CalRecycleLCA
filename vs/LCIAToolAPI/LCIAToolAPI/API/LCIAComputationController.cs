@@ -1,4 +1,6 @@
-﻿using LcaDataModel;
+﻿
+using Entities.Models;
+using LcaDataModel;
 using Ninject;
 using Services;
 using System;
@@ -32,9 +34,9 @@ namespace LCAToolAPI.API
         [Route("api/compute")]
         [System.Web.Http.AcceptVerbs("GET", "POST")]
         [System.Web.Http.HttpGet]
-        public void Compute()
+        public IEnumerable<LCIAModel> Compute()
         {
-            _lciaComputationV2.GetLCIAMethodsForComputeLCIA();
+            return _lciaComputationV2.GetLCIAMethodsForComputeLCIA();
         }
 
        

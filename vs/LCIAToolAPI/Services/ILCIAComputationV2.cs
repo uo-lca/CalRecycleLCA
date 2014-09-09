@@ -14,5 +14,6 @@ namespace Services
         IEnumerable<ProcessFlow> ComputeProcessDissipation(int processId, int scenarioId = 1);
         IEnumerable<LCIAModel> ComputeProcessLCIA(IEnumerable<InventoryModel> inventory, LCIAMethod lciaMethodItem, int scenarioId = 1);
         IEnumerable<LCIAModel> GetLCIAMethodsForComputeLCIA();
+        IEnumerable<LCIAModel> ProcessLCIA(int processId, IEnumerable<LCIAMethod> lciaMethods, int scenarioId = 1);
     }
 }

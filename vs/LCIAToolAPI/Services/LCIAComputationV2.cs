@@ -126,12 +126,18 @@ namespace Services
         public IEnumerable<LCIAModel> GetLCIAMethodsForComputeLCIA()
         {
             var lciaMethods = _lciaMethodService.Query().Get();
-            var c = ComputeLCIA(1, lciaMethods, 1);
-            return c;
+            var c = ProcessLCIA(1, lciaMethods, 1);
+            return c.Select(lciamethods =>
+                        new LCIAModel
+                        {
+                            Result = lciamethods.Result,
+                            DirectionID = lciamethods.DirectionID,
+                            FlowID = lciamethods.FlowID
+                        }).ToList();
 
         }
 
-        public IEnumerable<LCIAModel> ComputeLCIA(int processId, IEnumerable<LCIAMethod> lciaMethods, int scenarioId = 1)
+        public IEnumerable<LCIAModel> ProcessLCIA(int processId, IEnumerable<LCIAMethod> lciaMethods, int scenarioId = 1)
         {
             var inventory = ComputeProcessLCI(processId, scenarioId);
             IEnumerable<LCIAModel> lcias=null;
@@ -142,21 +148,23 @@ namespace Services
             {
                
                lcias= ComputeProcessLCIA(inventory, lciaMethodItem, scenarioId);
-              
-                  scores = lcias.ToList()
-                       .GroupBy(t => new
-                    {
-                        t.Result,
-                        t.DirectionID,
-                        t.FlowID
-                    })
-                    .Select(group => new LCIAModel
-                    {
-                        Result = group.Sum(a => a.Result),
-                        DirectionID = group.Key.DirectionID,
-                        FlowID = group.Key.FlowID
-                    });
-             
+
+               if (lcias.Count() != 0)
+               {
+                   scores = lcias.ToList()
+                        .GroupBy(t => new
+                     {
+                         t.Result,
+                         t.DirectionID,
+                         t.FlowID
+                     })
+                     .Select(group => new LCIAModel
+                     {
+                         Result = group.Sum(a => a.Result),
+                         DirectionID = group.Key.DirectionID,
+                         FlowID = group.Key.FlowID
+                     });
+               }
 
             }
 
@@ -238,36 +246,6 @@ namespace Services
 
             // Leave this as a stub for now - Brandon informed me on 8/22 that this would be changing signicantly in his pseudocode and to wait on it.
             throw new NotImplementedException();
-
-
-            //        var inflows = _processFlowService.Query().Get()
-            //            .Join(_flowService.Query().Get(), pf => pf.FlowID, f => f.FlowID, (pf, f) => new { pf, f })
-            //.Where(x => x.pf.DirectionID == 1)  // Input
-            //.Where(x => x.pf.ProcessID == 1)
-            //.Where(x => x.f.FlowTypeID == 1).ToList(); //IntemediateFlow
-
-
-            //        var dissipation = inflows
-            //             .Join(_flowFlowPropertyService.Query().Get(), x => x.f.FlowID, ffp => ffp.FlowID, (i, ffp) => new { i, ffp })
-            //             .Join(_flowPropertyEmissionService.Query().Get(), x => x.ffp.FlowID, ffp => ffp.FlowID, (ffp, fpe) => new { ffp, fpe})
-            //             .Join(_processFlowService.Query().Get(), x => x.fpe.FlowID, pf => pf.FlowID, (fpe, pf) => new { fpe, pf})
-            //             .Join(_processDissipationService.Query().Get(), x => x.pf.ProcessFlowID, pd => pd.ProcessFlowID, (pf, pd) => new { pf, pd})
-            //             .GroupJoin(_processDissipationParamService.Query().Get() // Target table
-            //  , pd => pd.pd.ProcessDissipationID
-            //  , pdp => pdp.ProcessDissipationID
-            //  , (pd, pdp) => new { processDissipation = pd, processDissipationParams = pdp })
-            //  .SelectMany(s => s.processDissipationParams.DefaultIfEmpty()
-            //  , (s, processDissipationParams) => new
-            //  {
-
-            //        ProcessDissipationID = s.processDissipation.pd.ProcessDissipationID,
-            //        Value = processDissipationParams.Param
-            //  })
-
-
-
-
-
 
         }
 
