@@ -69,7 +69,7 @@ namespace Services
 
 
 
-        public bool Traverse(int? fragmentId = 11, int scenarioId = 1)
+        public bool Traverse(int? fragmentId = 0, int scenarioId = 0)
         {
             int refFlow = _fragmentFlowService.Query()
                 .Filter(q => q.FragmentID == fragmentId)
@@ -165,6 +165,21 @@ namespace Services
                     MeanValue = s.flowFlowProperties.MeanValue,
                     Value = flowPropertyParams == null ? 0 : flowPropertyParams.Value,
                 })
+                .GroupJoin(_paramService.Query().Get() // Target table
+                , fpp => fpp.ParamID
+                , p => p.ParamID
+                , (fpp, p) => new { flowPropertyParams = fpp, parameters = p })
+                .SelectMany(s => s.parameters.DefaultIfEmpty()
+                , (s, parameters) => new
+                {
+
+                    ParamID = parameters == null ? 0 : parameters.ParamID,
+                    FlowPropertyID = s.flowPropertyParams.FlowPropertyID,
+                    FlowID = s.flowPropertyParams.FlowID,
+                    MeanValue = s.flowPropertyParams.MeanValue,
+                    Value = s.flowPropertyParams.Value,
+                    ScenarioID = parameters == null ? 0 : parameters.ScenarioID
+                })
                     .Where(x => x.FlowID == theFlowId)
                     .Where(x => x.FlowPropertyID == termFlow.ReferenceFlowProperty)
                     .Select(b => new
@@ -250,14 +265,15 @@ namespace Services
                         ParentFragmentFlowID = s.fragmentflows.ParentFragmentFlowID
                     })
 
-    .GroupJoin(_paramService.Query().Get() // Target table
+    .GroupJoin(_paramService.Query().Get()
+   .Where(x => x.ScenarioID == scenarioId)
                     , dp => dp.ParamID
                     , sp => sp.ParamID
                     , (dp, sp) => new { dependencyParams = dp, scenarioParams = sp })
                     .SelectMany(s => s.scenarioParams.DefaultIfEmpty()
                     , (s, scenarioparams) => new OutFlowModel
                     {
-                        ScenarioID = scenarioparams == null ? 1 : scenarioparams.ScenarioID,
+                        ScenarioID = scenarioparams == null ? scenarioId : scenarioparams.ScenarioID,
                         FragmentFlowID = s.dependencyParams.FragmentFlowID,
                         FlowID = s.dependencyParams.FlowID,
                         FFDirectionID = s.dependencyParams.FFDirectionID,

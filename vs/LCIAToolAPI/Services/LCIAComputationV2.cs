@@ -137,7 +137,7 @@ namespace Services
 
         }
 
-        public IEnumerable<LCIAModel> ProcessLCIA(int processId, IEnumerable<LCIAMethod> lciaMethods, int scenarioId = 1)
+        public IEnumerable<LCIAModel> ProcessLCIA(int? processId, IEnumerable<LCIAMethod> lciaMethods, int? scenarioId = 1)
         {
             var inventory = ComputeProcessLCI(processId, scenarioId);
             IEnumerable<LCIAModel> lcias=null;
@@ -182,7 +182,7 @@ namespace Services
         }
 
         //inventory in pseudocode
-        public IEnumerable<InventoryModel> ComputeProcessLCI(int processId, int scenarioId)
+        public IEnumerable<InventoryModel> ComputeProcessLCI(int? processId, int? scenarioId)
         {
             // returns a list of flows: FlowID, DirectionID, Result
             // Param types: ProcessEmissionParam
@@ -249,7 +249,7 @@ namespace Services
 
         }
 
-        public IEnumerable<LCIAModel> ComputeProcessLCIA(IEnumerable<InventoryModel> inventory, LCIAMethod lciaMethodItem, int scenarioId)
+        public IEnumerable<LCIAModel> ComputeProcessLCIA(IEnumerable<InventoryModel> inventory, LCIAMethod lciaMethodItem, int? scenarioId)
         {
             var lcias = inventory
                 .Join(_lciaService.Query().Get(), i => i.FlowID, l => l.FlowID, (i, l) => new { i, l })
