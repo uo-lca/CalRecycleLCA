@@ -87,6 +87,7 @@ namespace LCAToolAPI.App_Start
             kernel.Bind<IFlowPropertyParamService>().To<FlowPropertyParamService>();
             kernel.Bind<IFlowService>().To<FlowService>();
             kernel.Bind<ILCIAComputationV2>().To<LCIAComputationV2>();
+            kernel.Bind<IResourceService>().To<ResourceService>();
 
             kernel.Bind(typeof(IService<>)).To(typeof(Service<>));
 

@@ -129,6 +129,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Models\LCIAMethodResource.cs" />
     <Compile Include="Models\DependencyParamModel.cs" />
     <Compile Include="Models\FragmentLCIAModel.cs" />
     <Compile Include="Models\FragmentModel.cs" />
@@ -150,7 +151,6 @@
       <SubType>Designer</SubType>
     </None>
     <None Include="packages.config" />
-    <None Include="WebAPIEntities.cd" />
   </ItemGroup>
   <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
