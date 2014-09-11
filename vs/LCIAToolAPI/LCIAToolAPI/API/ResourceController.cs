@@ -28,10 +28,50 @@ namespace LCAToolAPI.API
             _ResourceService = resourceService;
         }
 
+        [Route("api/fragments")]
+        [HttpGet]
+        public IEnumerable<FragmentResource> GetFragments() {
+            return _ResourceService.GetFragmentResources();
+        }
+
+        [Route("api/fragments/{fragmentID:int}")]
+        [HttpGet]
+        public FragmentResource GetFragment(int fragmentID) {
+            FragmentResource fr = _ResourceService.GetFragmentResource(fragmentID);
+            if (fr == null) {
+                throw new HttpResponseException(HttpStatusCode.NotFound);
+            }
+            return fr;
+        }
+
+        [Route("api/fragments/{fragmentID:int}/fragmentflows")]
+        [HttpGet]
+        public IEnumerable<FragmentFlowResource> GetFragmentFlowResources(int fragmentID) {
+            // Use default scenario
+            return _ResourceService.GetFragmentFlowResources(fragmentID, 1);
+        }
+
+        [Route("api/fragments/{fragmentID:int}/scenarios/{scenarioID:int}/fragmentflows")]
+        [HttpGet]
+        public IEnumerable<FragmentFlowResource> GetFragmentFlowResources(int fragmentID, int scenarioID) {
+            return _ResourceService.GetFragmentFlowResources(fragmentID, scenarioID);
+        }
+
+        [Route("api/fragments/{fragmentID:int}/flows")]
+        [HttpGet]
+        public IEnumerable<FlowResource> GetFlowsByFragment(int fragmentID) {
+            return _ResourceService.GetFlowsByFragment(fragmentID);
+        }
+
+        [Route("api/fragments/{fragmentID:int}/flowproperties")]
+        [HttpGet]
+        public IEnumerable<FlowPropertyResource> GetFlowPropertiesByFragment(int fragmentID) {
+            return _ResourceService.GetFlowPropertiesByFragment(fragmentID);
+        }
+
         [Route("api/lciamethods")]
-        [System.Web.Http.HttpGet]
-        public IEnumerable<LCIAMethodResource> GetLCIAMethodResources()
-        {
+        [HttpGet]
+        public IEnumerable<LCIAMethodResource> GetLCIAMethodResources() {
             return _ResourceService.GetLCIAMethodResources();
         }
     }

@@ -25,6 +25,6 @@ namespace Entities.Models {
         public bool Normalization { get; set; }
         public bool Weighting { get; set; }
         public string UseAdvice { get; set; }
-        public int FlowPropertyID { get; set; }
+        public int ReferenceFlowPropertyID { get; set; }     // ILCD ReferenceQuantity
     }
 }
