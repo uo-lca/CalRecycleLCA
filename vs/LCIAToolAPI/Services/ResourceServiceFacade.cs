@@ -75,10 +75,11 @@ namespace Services {
             if (flowPropertyService == null) {
                 throw new ArgumentNullException("flowPropertyService");
             }
-            _ImpactCategoryService = impactCategoryService;
+            _FlowPropertyService = flowPropertyService;           
             if (impactCategoryService == null) {
                 throw new ArgumentNullException("impactCategoryService");
             }
+            _ImpactCategoryService = impactCategoryService;
             if (lciaMethodService == null) {
                 throw new ArgumentNullException("lciaMethodService");
             }
@@ -272,6 +273,16 @@ namespace Services {
         public IEnumerable<FlowResource> GetFlowsByFragment(int fragmentID) {
             IEnumerable<Flow> flows = _FlowService.Query()
                                       .Filter(f => f.FragmentFlows.Any(ff => ff.FragmentID == fragmentID))
+                                      .Get();
+            return flows.Select(f => Transform(f)).ToList();
+        }
+
+        /// <summary>
+        /// Get list of flows related to a process (via ProcessFlow)
+        /// </summary>
+        public IEnumerable<FlowResource> GetFlowsByProcess(int processID) {
+            IEnumerable<Flow> flows = _FlowService.Query()
+                                      .Filter(f => f.ProcessFlows.Any(pf => pf.ProcessID == processID))
                                       .Get();
             return flows.Select(f => Transform(f)).ToList();
         }

@@ -12,6 +12,7 @@ namespace Services {
         FragmentResource GetFragmentResource(int fragmentID);
         IEnumerable<FragmentFlowResource> GetFragmentFlowResources(int fragmentID, int scenarioID);
         IEnumerable<FlowResource> GetFlowsByFragment(int fragmentID);
+        IEnumerable<FlowResource> GetFlowsByProcess(int processID);
         IEnumerable<FlowPropertyResource> GetFlowPropertiesByFragment(int fragmentID);
         IEnumerable<ProcessResource> GetProcesses();
         IEnumerable<ImpactCategoryResource> GetImpactCategories();
