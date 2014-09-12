@@ -139,20 +139,14 @@
     <Compile Include="IFragmentLCIAComputation.cs" />
     <Compile Include="IFragmentTraversalV2.cs" />
     <Compile Include="ILCIAComputationV2.cs" />
-    <Compile Include="IProcessService.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="IResourceService.cs" />
+    <Compile Include="IResourceServiceFacade.cs" />
     <Compile Include="ITestGenericService.cs" />
     <Compile Include="LCIAComputationV2.cs" />
     <Compile Include="IDependencyParamService.cs" />
     <Compile Include="IFlowPropertyParamService.cs" />
     <Compile Include="IService.cs" />
-    <Compile Include="ProcessService.cs">
-      <SubType>Code</SubType>
-    </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="ResourceService.cs" />
+    <Compile Include="ResourceServiceFacade.cs" />
     <Compile Include="Service.cs" />
     <Compile Include="TestGenericService.cs" />
   </ItemGroup>

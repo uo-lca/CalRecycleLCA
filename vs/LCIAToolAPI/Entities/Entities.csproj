@@ -141,7 +141,7 @@
     <Compile Include="Models\FlowResource.cs" />
     <Compile Include="Models\FlowPropertyParamModel.cs" />
     <Compile Include="Models\FragmentFlowResource.cs" />
-    <Compile Include="Models\ProcessModel.cs" />
+    <Compile Include="Models\ProcessResource.cs" />
     <Compile Include="Models\ResolveBackgroundModel.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

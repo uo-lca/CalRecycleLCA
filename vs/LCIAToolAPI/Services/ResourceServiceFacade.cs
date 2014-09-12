@@ -9,45 +9,50 @@ using Ninject;
 
 namespace Services {
     /// <summary>
-    /// Service implementing web API operations on resource data
-    /// Transforms EF entities to web API resources
+    /// Web API Services Facade
+    /// Gets LcaDataModel entities and transforms them to web API resources.
+    /// Executes Traversal and Computation as needed.
     /// </summary>
-    public class ResourceService : IResourceService {
-        [Inject]
-        private readonly IService<LCIAMethod> _LciaMethodService;
+    public class ResourceServiceFacade : IResourceServiceFacade {
+        //
+        // LcaDataModel services
+        //
         [Inject]
         private readonly IService<Fragment> _FragmentService;
         [Inject]
         private readonly IService<FragmentFlow> _FragmentFlowService;
         [Inject]
-        private readonly IFragmentTraversalV2 _FragmentTraversalV2;
-        [Inject]
         private readonly IService<Flow> _FlowService;
         [Inject]
         private readonly IService<FlowProperty> _FlowPropertyService;
+        [Inject]
+        private readonly IService<LCIAMethod> _LciaMethodService;
+        [Inject]
+        private readonly IService<Process> _ProcessService;
+        //
+        // Traversal and Computation components
+        //
+        [Inject]
+        private readonly IFragmentTraversalV2 _FragmentTraversalV2;
 
         /// <summary>
         /// Constructor for use with Ninject dependency injection
-        /// Injects the following Service parameters
         /// </summary>
-        /// <param name="lciaMethodService"></param>
         /// <param name="fragmentService"></param>
         /// <param name="fragmentFlowService"></param>
         /// <param name="fragmentTraversalV2"></param>
         /// <param name="flowService"></param>
         /// <param name="flowPropertyService"></param>
-        public ResourceService(IService<LCIAMethod> lciaMethodService,
-                               IService<Fragment> fragmentService,
+        /// <param name="lciaMethodService"></param>
+        /// <param name="processService"></param>
+        public ResourceServiceFacade( IService<Fragment> fragmentService,
                                IService<FragmentFlow> fragmentFlowService,
                                IFragmentTraversalV2 fragmentTraversalV2,
                                IService<Flow> flowService,
-                               IService<FlowProperty> flowPropertyService
-                              ) 
+                               IService<FlowProperty> flowPropertyService,
+                               IService<LCIAMethod> lciaMethodService,
+                               IService<Process> processService ) 
         {
-            if (lciaMethodService == null) {
-                throw new ArgumentNullException("lciaMethodService");
-            }
-            _LciaMethodService = lciaMethodService;
             if (fragmentService == null) {
                 throw new ArgumentNullException("fragmentService");
             }
@@ -68,6 +73,14 @@ namespace Services {
                 throw new ArgumentNullException("flowPropertyService");
             }
             _FlowPropertyService = flowPropertyService;
+            if (lciaMethodService == null) {
+                throw new ArgumentNullException("lciaMethodService");
+            }
+            _LciaMethodService = lciaMethodService;
+            if (processService == null) {
+                throw new ArgumentNullException("processService");
+            }
+            _ProcessService = processService;
         }
 
         // TransformNullable methods are a workaround for imprecise relationship modeling
@@ -199,6 +212,17 @@ namespace Services {
             };
         }
 
+         public ProcessResource Transform(Process p) {
+             return new ProcessResource {
+                 ProcessID = p.ProcessID,
+                 Name = p.Name,
+                 ProcessTypeID = TransformNullable(p.ProcessTypeID, "Process.ProcessTypeID"),
+                 ReferenceTypeID = p.ReferenceTypeID,
+                 ReferenceFlowID = p.ReferenceFlowID,
+                 ReferenceYear = p.ReferenceYear
+             };
+         }
+
         // Get list methods 
 
         public IEnumerable<LCIAMethodResource> GetLCIAMethodResources() {
@@ -273,6 +297,15 @@ namespace Services {
             else {
                 return Transform(fragment);
             }
+        }
+
+        /// <summary>
+        /// Get Process data and transform to API resource model
+        /// </summary>
+        /// <returns>List of ProcessResource objects</returns>
+        public IEnumerable<ProcessResource> GetProcesses() {
+            IEnumerable<Process> pData = _ProcessService.Query().Get();
+            return pData.Select(p => Transform(p)).ToList();
         }
     }
 }

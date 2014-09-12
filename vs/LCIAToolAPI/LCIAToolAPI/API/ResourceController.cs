@@ -17,9 +17,9 @@ namespace LCAToolAPI.API
     public class ResourceController : ApiController
     {
         [Inject]
-        private readonly IResourceService _ResourceService;
+        private readonly IResourceServiceFacade _ResourceService;
 
-        public ResourceController(ResourceService resourceService)
+        public ResourceController(ResourceServiceFacade resourceService)
         {
             if (resourceService == null)
             {
@@ -73,6 +73,12 @@ namespace LCAToolAPI.API
         [HttpGet]
         public IEnumerable<LCIAMethodResource> GetLCIAMethodResources() {
             return _ResourceService.GetLCIAMethodResources();
+        }
+
+        [Route("api/processes")]
+        [System.Web.Http.HttpGet]
+        public IEnumerable<ProcessResource> GetProcesses() {
+            return _ResourceService.GetProcesses();
         }
     }
 }
