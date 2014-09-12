@@ -134,6 +134,7 @@
   <ItemGroup>
     <Compile Include="DependencyParamService.cs" />
     <Compile Include="FlowPropertyParamService.cs" />
+    <Compile Include="FragmentLCIAComputation.cs" />
     <Compile Include="FragmentTraversalV2.cs" />
     <Compile Include="IFragmentLCIAComputation.cs" />
     <Compile Include="IFragmentTraversalV2.cs" />
