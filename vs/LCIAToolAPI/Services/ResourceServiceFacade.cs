@@ -231,8 +231,18 @@ namespace Services {
 
         // Get list methods 
 
-        public IEnumerable<LCIAMethodResource> GetLCIAMethodResources() {
-            IEnumerable<LCIAMethod> lciaMethods = _LciaMethodService.Query().Get();
+         /// <summary>
+         /// Get LCIAMethodResource list with optional filter by ImpactCategory
+         /// </summary>
+         public IEnumerable<LCIAMethodResource> GetLCIAMethodResources(int? impactCategoryID = null) {
+            IEnumerable<LCIAMethod> lciaMethods;
+            if (impactCategoryID == null) {
+                lciaMethods = _LciaMethodService.Query().Get();
+            }
+            else {
+                lciaMethods = _LciaMethodService.Query().
+                              Filter(d => d.ImpactCategoryID == impactCategoryID).Get();
+            }
             return lciaMethods.Select(lm => Transform(lm)).ToList();
         }
 
@@ -325,5 +335,6 @@ namespace Services {
                 Name = d.Name
             }).ToList();
         }
+
     }
 }

@@ -75,6 +75,12 @@ namespace LCAToolAPI.API
             return _ResourceService.GetImpactCategories();
         }
 
+        [Route("api/impactcategories/{impactCategoryID:int}/lciamethods")]
+        [HttpGet]
+        public IEnumerable<LCIAMethodResource> GetLCIAMethodsByImpactCategory(int impactCategoryID) {
+            return _ResourceService.GetLCIAMethodResources(impactCategoryID);
+        }
+
         [Route("api/lciamethods")]
         [HttpGet]
         public IEnumerable<LCIAMethodResource> GetLCIAMethodResources() {
@@ -82,15 +88,14 @@ namespace LCAToolAPI.API
         }
 
         [Route("api/processes")]
-        [System.Web.Http.HttpGet]
+        [HttpGet]
         public IEnumerable<ProcessResource> GetProcesses() {
             return _ResourceService.GetProcesses();
         }
 
         /* TODO:
          * 
-         * [Route("api/impactcategories")] 
-         * [Route("api/impactcategories/{impactCategoryID:int}/lciamethods")] 
+         *  
          * [Route("api/processes/{processID:int}")]
          * [Route("api/processes/{processID:int}/flows")]
          * [Route("api/processes/{processID:int}/lciamethods/{lciaMethodID:int}/lciaresults")]     optional scenario parameter

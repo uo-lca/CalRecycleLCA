@@ -7,7 +7,7 @@ using Entities.Models;
 
 namespace Services {
     public interface IResourceServiceFacade {
-        IEnumerable<LCIAMethodResource> GetLCIAMethodResources();
+        IEnumerable<LCIAMethodResource> GetLCIAMethodResources(int? impactCategoryID = null);
         IEnumerable<FragmentResource> GetFragmentResources();
         FragmentResource GetFragmentResource(int fragmentID);
         IEnumerable<FragmentFlowResource> GetFragmentFlowResources(int fragmentID, int scenarioID);
