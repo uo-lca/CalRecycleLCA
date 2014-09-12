@@ -15,5 +15,8 @@ namespace Entities.Models
         public int? psProcessID { get; set; }
         public int? fnpSubFragmentID { get; set; }
         public int? psSubFragmentID { get; set; }
+        public int? NodeTypeID { get; set; }
+        public int? FlowID { get; set; }
+        public int? DirectionID { get; set; }
     }
 }
