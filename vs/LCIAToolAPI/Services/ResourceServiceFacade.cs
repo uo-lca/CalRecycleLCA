@@ -26,6 +26,8 @@ namespace Services {
         [Inject]
         private readonly IService<FlowProperty> _FlowPropertyService;
         [Inject]
+        private readonly IService<ImpactCategory> _ImpactCategoryService;
+        [Inject]
         private readonly IService<LCIAMethod> _LciaMethodService;
         [Inject]
         private readonly IService<Process> _ProcessService;
@@ -50,6 +52,7 @@ namespace Services {
                                IFragmentTraversalV2 fragmentTraversalV2,
                                IService<Flow> flowService,
                                IService<FlowProperty> flowPropertyService,
+                               IService<ImpactCategory> impactCategoryService,
                                IService<LCIAMethod> lciaMethodService,
                                IService<Process> processService ) 
         {
@@ -72,7 +75,10 @@ namespace Services {
             if (flowPropertyService == null) {
                 throw new ArgumentNullException("flowPropertyService");
             }
-            _FlowPropertyService = flowPropertyService;
+            _ImpactCategoryService = impactCategoryService;
+            if (impactCategoryService == null) {
+                throw new ArgumentNullException("impactCategoryService");
+            }
             if (lciaMethodService == null) {
                 throw new ArgumentNullException("lciaMethodService");
             }
@@ -306,6 +312,18 @@ namespace Services {
         public IEnumerable<ProcessResource> GetProcesses() {
             IEnumerable<Process> pData = _ProcessService.Query().Get();
             return pData.Select(p => Transform(p)).ToList();
+        }
+
+        /// <summary>
+        /// Get ImpactCategory data and transform to API resource model
+        /// </summary>
+        /// <returns>List of ImpactCategoryResource objects</returns>
+        public IEnumerable<ImpactCategoryResource> GetImpactCategories() {
+            IEnumerable<ImpactCategory> data = _ImpactCategoryService.Query().Get();
+            return data.Select(d => new ImpactCategoryResource {
+                ImpactCategoryID = d.ID,
+                Name = d.Name
+            }).ToList();
         }
     }
 }
