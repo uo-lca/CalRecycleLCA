@@ -6,13 +6,13 @@ using System.Threading.Tasks;
 
 namespace Entities.Models {
     /// <summary>
-    /// ProcessModel - Used for producing process web service data.
-    /// Simplifies database model by omitting relationships and ILCDEntityID
+    /// ProcessResource - Used for producing process web service data.
+    /// Simplifies EF model by omitting navigation properties and ILCDEntityID
     ///
-    /// Maintains Pascal case of properties in Data model. These are automatically converted to
+    /// Maintains Pascal case of properties in EF model. These are automatically converted to
     /// camel case during JSON serialization.
     /// </summary>
-    public class ProcessModel {
+    public class ProcessResource {
 
         public int ProcessID { get; set; }
 

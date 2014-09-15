@@ -17,9 +17,9 @@ namespace LCAToolAPI.API
     public class ResourceController : ApiController
     {
         [Inject]
-        private readonly IResourceService _ResourceService;
+        private readonly IResourceServiceFacade _ResourceService;
 
-        public ResourceController(ResourceService resourceService)
+        public ResourceController(ResourceServiceFacade resourceService)
         {
             if (resourceService == null)
             {
@@ -28,11 +28,83 @@ namespace LCAToolAPI.API
             _ResourceService = resourceService;
         }
 
+        [Route("api/fragments")]
+        [HttpGet]
+        public IEnumerable<FragmentResource> GetFragments() {
+            return _ResourceService.GetFragmentResources();
+        }
+
+        [Route("api/fragments/{fragmentID:int}")]
+        [HttpGet]
+        public FragmentResource GetFragment(int fragmentID) {
+            FragmentResource fr = _ResourceService.GetFragmentResource(fragmentID);
+            if (fr == null) {
+                throw new HttpResponseException(HttpStatusCode.NotFound);
+            }
+            return fr;
+        }
+
+        [Route("api/fragments/{fragmentID:int}/fragmentflows")]
+        [HttpGet]
+        public IEnumerable<FragmentFlowResource> GetFragmentFlowResources(int fragmentID) {
+            // Use default scenario
+            return _ResourceService.GetFragmentFlowResources(fragmentID, 1);
+        }
+
+        [Route("api/fragments/{fragmentID:int}/scenarios/{scenarioID:int}/fragmentflows")]
+        [HttpGet]
+        public IEnumerable<FragmentFlowResource> GetFragmentFlowResources(int fragmentID, int scenarioID) {
+            return _ResourceService.GetFragmentFlowResources(fragmentID, scenarioID);
+        }
+
+        [Route("api/fragments/{fragmentID:int}/flows")]
+        [HttpGet]
+        public IEnumerable<FlowResource> GetFlowsByFragment(int fragmentID) {
+            return _ResourceService.GetFlowsByFragment(fragmentID);
+        }
+
+        [Route("api/fragments/{fragmentID:int}/flowproperties")]
+        [HttpGet]
+        public IEnumerable<FlowPropertyResource> GetFlowPropertiesByFragment(int fragmentID) {
+            return _ResourceService.GetFlowPropertiesByFragment(fragmentID);
+        }
+
+        [Route("api/impactcategories")]
+        [HttpGet]
+        public IEnumerable<ImpactCategoryResource> ImpactCategories() {
+            return _ResourceService.GetImpactCategories();
+        }
+
+        [Route("api/impactcategories/{impactCategoryID:int}/lciamethods")]
+        [HttpGet]
+        public IEnumerable<LCIAMethodResource> GetLCIAMethodsByImpactCategory(int impactCategoryID) {
+            return _ResourceService.GetLCIAMethodResources(impactCategoryID);
+        }
+
         [Route("api/lciamethods")]
-        [System.Web.Http.HttpGet]
-        public IEnumerable<LCIAMethodResource> GetLCIAMethodResources()
-        {
+        [HttpGet]
+        public IEnumerable<LCIAMethodResource> GetLCIAMethodResources() {
             return _ResourceService.GetLCIAMethodResources();
         }
+
+        [Route("api/processes")]
+        [HttpGet]
+        public IEnumerable<ProcessResource> GetProcesses() {
+            return _ResourceService.GetProcesses();
+        }
+
+        [Route("api/processes/{processID:int}/flows")]
+        [HttpGet]
+        public IEnumerable<FlowResource> GetFlowsByProcess(int processID) {
+            return _ResourceService.GetFlowsByProcess(processID);
+        }
+
+        /* TODO:
+         * 
+         * [Route("api/processes/{processID:int}")]
+         * [Route("api/processes/{processID:int}/lciamethods/{lciaMethodID:int}/lciaresults")]     optional scenario parameter
+         * [Route("api/fragments/{fragmentID:int}/lciaresults")]    optional scenario parameter
+         * 
+         */
     }
 }

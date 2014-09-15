@@ -6,19 +6,19 @@ using System.Threading.Tasks;
 
 namespace Entities.Models {
     /// <summary>
-    /// FragmentModel - Used for producing fragment web service data.
-    /// Simplifies database model by omitting relationships and ILCDEntityID
+    /// FragmentResource - Used for producing fragment web service data.
+    /// Simplifies EF model by omitting navigation properties and ILCDEntityID
     ///
     /// Maintains Pascal case of properties in Data model. These are automatically converted to
     /// camel case during JSON serialization.
     /// </summary>
-    public class FragmentModel {
+    public class FragmentResource {
 
         public int FragmentID { get; set; }
 
         public string Name { get; set; }
 
-        public int? ReferenceFragmentFlowID { get; set; }
+        public int  ReferenceFragmentFlowID { get; set; }
 
     }
 }

@@ -134,34 +134,19 @@
   <ItemGroup>
     <Compile Include="DependencyParamService.cs" />
     <Compile Include="FlowPropertyParamService.cs" />
-    <Compile Include="FlowPropertyService.cs" />
+    <Compile Include="FragmentLCIAComputation.cs" />
     <Compile Include="FragmentTraversalV2.cs" />
     <Compile Include="IFragmentLCIAComputation.cs" />
     <Compile Include="IFragmentTraversalV2.cs" />
     <Compile Include="ILCIAComputationV2.cs" />
-    <Compile Include="IProcessService.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="IResourceService.cs" />
+    <Compile Include="IResourceServiceFacade.cs" />
     <Compile Include="ITestGenericService.cs" />
     <Compile Include="LCIAComputationV2.cs" />
-    <Compile Include="FlowService.cs" />
-    <Compile Include="FragmentFlowService.cs" />
-    <Compile Include="FragmentLinkService.cs" />
-    <Compile Include="FragmentService.cs" />
     <Compile Include="IDependencyParamService.cs" />
     <Compile Include="IFlowPropertyParamService.cs" />
-    <Compile Include="IFlowPropertyService.cs" />
-    <Compile Include="IFlowService.cs" />
-    <Compile Include="IFragmentFlowService.cs" />
-    <Compile Include="IFragmentLinkService.cs" />
-    <Compile Include="IFragmentService.cs" />
     <Compile Include="IService.cs" />
-    <Compile Include="ProcessService.cs">
-      <SubType>Code</SubType>
-    </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="ResourceService.cs" />
+    <Compile Include="ResourceServiceFacade.cs" />
     <Compile Include="Service.cs" />
     <Compile Include="TestGenericService.cs" />
   </ItemGroup>

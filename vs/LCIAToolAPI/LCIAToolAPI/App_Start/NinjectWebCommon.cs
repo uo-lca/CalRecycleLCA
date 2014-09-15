@@ -73,21 +73,15 @@ namespace LCAToolAPI.App_Start
         /// <param name="kernel">The kernel.</param>
         private static void RegisterServices(IKernel kernel)
         {
-            kernel.Bind<IFragmentService>().To<FragmentService>();
             kernel.Bind(typeof(IRepository<>)).To(typeof(Repository<>));
             kernel.Bind(typeof(IRepository<Param>)).To(typeof(Repository<Param>));
             kernel.Bind<IDbContext>().To<UsedOilLCAContext>();
             kernel.Bind<IUnitOfWork>().To<UnitOfWork>();
-            kernel.Bind<IFragmentFlowService>().To<FragmentFlowService>();
             kernel.Bind<IDependencyParamService>().To<DependencyParamService>();
             kernel.Bind<IFragmentTraversalV2>().To<FragmentTraversalV2>();
-            kernel.Bind<IFragmentLinkService>().To<FragmentLinkService>();
-            kernel.Bind<IProcessService>().To<ProcessService>();
-            kernel.Bind<IFlowPropertyService>().To<FlowPropertyService>();
             kernel.Bind<IFlowPropertyParamService>().To<FlowPropertyParamService>();
-            kernel.Bind<IFlowService>().To<FlowService>();
             kernel.Bind<ILCIAComputationV2>().To<LCIAComputationV2>();
-            kernel.Bind<IResourceService>().To<ResourceService>();
+            kernel.Bind<IResourceServiceFacade>().To<ResourceServiceFacade>();
 
             kernel.Bind(typeof(IService<>)).To(typeof(Service<>));
 

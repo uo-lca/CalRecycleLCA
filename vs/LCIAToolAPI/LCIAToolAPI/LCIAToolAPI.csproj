@@ -240,14 +240,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="API\LCIAComputationController.cs" />
-    <Compile Include="API\ProcessController.cs" />
-    <Compile Include="API\FlowPropertyController.cs" />
-    <Compile Include="API\FragmentController.cs" />
-    <Compile Include="API\FragmentFlowController.cs" />
-    <Compile Include="API\FlowController.cs" />
-    <Compile Include="API\FragmentLinkController.cs" />
     <Compile Include="API\FragmentTraversalController.cs" />
-    <Compile Include="API\HttpResponseMessage.cs" />
     <Compile Include="API\ResourceController.cs" />
     <Compile Include="API\TestGenericServiceController.cs" />
     <Compile Include="App_Start\BundleConfig.cs" />

@@ -5,21 +5,22 @@ using System.Text;
 using System.Threading.Tasks;
 
 namespace Entities.Models {
+
     /// <summary>
-    /// LinkMagnitude - associates Flow Property with Magnitude (Sankey link width).
-    /// Embedded in FragmentLink model.
+    /// FlowPropertyMagnitude - associates Flow Property with Magnitude.
+    /// Embedded in FragmentFlowResource model.
     /// </summary>
-    public class LinkMagnitude {
+    public class FlowPropertyMagnitude {
         public int FlowPropertyID { get; set; }
         public double Magnitude { get; set; }  // NodeCache.FlowMagnitude * FlowFlowProperty.MeanValue
-                                                
+
     }
-    
+
     /// <summary>
-    /// FragmentLink - model for Sankey diagram link 
-    /// Contains collection of LinkMagnitude objects.
+    /// A FragmentFlowResource is a FragmentFlow merged with related Node data
+    /// Contains collection of FlowMagnitude objects - one for every property of the flow
     /// </summary>
-    public class FragmentLink {
+    public class FragmentFlowResource {
         //
         // FragmentFlow Properties
         //
@@ -36,6 +37,6 @@ namespace Entities.Models {
         public int? ProcessID { get; set; }     // FragmentNodeProcess.ProcessID, when NodeType is Process
         public int? SubFragmentID { get; set; } // FragmentNodeFragment.SubFragmentID, when NodeType is Fragment
 
-        public ICollection<LinkMagnitude> LinkMagnitudes { get; set; }
+        public ICollection<FlowPropertyMagnitude> FlowPropertyMagnitudes { get; set; }
     }
 }

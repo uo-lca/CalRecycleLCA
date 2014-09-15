@@ -55,7 +55,7 @@ function FragmentFlows() {
         curFragment = null, // reference to selected fragment in LCA.indexedData
         minNodeHeight = 3,  // Minimum height of sankey node/link
         parentFragments = [], // Array of fragments traversed by clicking on sub-fragment
-        reverseIndex = [];      // Associates fragment links with graph nodes
+        reverseIndex = [];      // Associates fragment fragmentflows with graph nodes
 
     /**
      * Initial preparation of svg element.
@@ -140,7 +140,7 @@ function FragmentFlows() {
                 flow = LCA.indexedData.flows[l.flowID];
                 if (l.magnitude === null && "referenceFlowPropertyID" in flow) {
                     flowPropertyID = flow.referenceFlowPropertyID;
-                    magnitude = formatNumber(getMagnitude(curFragment.links[l.fragmentFlowID], flowPropertyID));
+                    magnitude = formatNumber(getMagnitude(curFragment.fragmentflows[l.fragmentFlowID], flowPropertyID));
                 }
                 if ("referenceUnitName" in LCA.indexedData.flowProperties[flowPropertyID]) {
                     unit = LCA.indexedData.flowProperties[flowPropertyID].referenceUnitName;
@@ -171,7 +171,7 @@ function FragmentFlows() {
         nodeTip.hide();
         webApiFilter = "fragments/" + selectedFragmentID;
         
-        apiResourceNames = ["fragments", "flowproperties", "links", "flows"];
+        apiResourceNames = ["fragments", "flowproperties", "fragmentflows", "flows"];
         LCA.loadedData = {};
         LCA.loadData(apiResourceNames[0], false, onFragmentsLoaded);
         LCA.loadData(apiResourceNames[1], false, onFlowPropertiesLoaded, webApiFilter);
@@ -282,14 +282,14 @@ function FragmentFlows() {
      * @return {Number} The magnitude, if link has the flow property. Otherwise, null.
      */
     function getMagnitude(link, flowPropertyID) {
-        var magnitude = null, linkMagnitudes = [];
-        if ("linkMagnitudes" in link) {
-            linkMagnitudes = link.linkMagnitudes.filter(function (lm) {
+        var magnitude = null, flowPropertyMagnitudes = [];
+        if ("flowPropertyMagnitudes" in link) {
+            flowPropertyMagnitudes = link.flowPropertyMagnitudes.filter(function (lm) {
                 return +lm.flowPropertyID === flowPropertyID;
             });
         }
-        if (linkMagnitudes && linkMagnitudes.length > 0) {
-            magnitude = linkMagnitudes[0].magnitude;
+        if (flowPropertyMagnitudes && flowPropertyMagnitudes.length > 0) {
+            magnitude = flowPropertyMagnitudes[0].magnitude;
         }
         return magnitude;
     }
@@ -487,7 +487,7 @@ function FragmentFlows() {
             })) {
                 // All requests executed successfully
                 if (curFragment) {
-                    buildGraph( curFragment.links);
+                    buildGraph( curFragment.fragmentflows);
                 }
             }
         }
@@ -512,7 +512,7 @@ function FragmentFlows() {
         
         panelSelection.style("display", "none");
 
-        buildGraph(LCA.indexedData.fragments[selectedFragmentID].links, true);
+        buildGraph(LCA.indexedData.fragments[selectedFragmentID].fragmentflows, true);
     }
 
     /**
@@ -542,12 +542,12 @@ function FragmentFlows() {
     }
 
     /**
-     * Invoked after links have been loaded and fragments have loaded and indexed.
+     * Invoked after fragmentflows have been loaded and fragments have loaded and indexed.
      */
     function onFragmentLinksLoaded() {
-        if ("fragments" in LCA.indexedData && "links" in LCA.loadedData) {
+        if ("fragments" in LCA.indexedData && "fragmentflows" in LCA.loadedData) {
             if (curFragment) {
-                curFragment.links = LCA.indexData("links", "fragmentFlowID");
+                curFragment.fragmentflows = LCA.indexData("fragmentflows", "fragmentFlowID");
             }
             onDataLoaded();
         }
@@ -566,8 +566,8 @@ function FragmentFlows() {
     function getFragmentFlowName(data) {
         var name = "";
         if ("fragmentFlowID" in data) {
-            if ("shortName" in curFragment.links[data.fragmentFlowID]) {
-                name = curFragment.links[data.fragmentFlowID].shortName;
+            if ("shortName" in curFragment.fragmentflows[data.fragmentFlowID]) {
+                name = curFragment.fragmentflows[data.fragmentFlowID].shortName;
             }
         }
         return name;
@@ -593,7 +593,7 @@ function FragmentFlows() {
         prepareNodeView();
         LCA.startSpinner("chartcontainer");
         //toolTip = LCA.createToolTip(".container");
-        apiResourceNames = ["fragments", "processes", "flowproperties", "links", "flows"];
+        apiResourceNames = ["fragments", "processes", "flowproperties", "fragmentflows", "flows"];
         LCA.loadData(apiResourceNames[0], false, onFragmentsLoaded);
         LCA.loadData(apiResourceNames[1], false, onProcessesLoaded);
         LCA.loadData(apiResourceNames[2], false, onFlowPropertiesLoaded, webApiFilter);
