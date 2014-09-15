@@ -130,6 +130,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Models\ImpactCategoryResource.cs" />
+    <Compile Include="Models\LCIAResultResource.cs" />
     <Compile Include="Models\LCIAMethodResource.cs" />
     <Compile Include="Models\DependencyParamModel.cs" />
     <Compile Include="Models\FragmentLCIAModel.cs" />
