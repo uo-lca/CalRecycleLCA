@@ -80,9 +80,9 @@ LCA.startSpinner = function startSpinner(tgtElementId) {
         zIndex: 2e9, // The z-index (defaults to 2000000000)
         top: '50%', // Top position relative to parent in px
         left: '50%' // Left position relative to parent in px
-    },
-    target = window.document.getElementById(tgtElementId);
-    LCA.spinner = new Spinner(opts).spin(target);
+    };
+    LCA.spinTarget = window.document.getElementById(tgtElementId);
+    LCA.spinner = new Spinner(opts).spin(LCA.spinTarget);
     LCA.outstandingRequests = 0;
 };
 
@@ -193,7 +193,7 @@ LCA.updateTable = function (table, data, columns) {
  * @param {String} routePrefix      Web API route prefix
  */
 LCA.loadData = function (resourceName, useTestData, callback, routePrefix) {
-
+    
     if (resourceName in LCA.loadedData) {
         delete LCA.loadedData[resourceName];
     }
@@ -205,8 +205,9 @@ LCA.loadData = function (resourceName, useTestData, callback, routePrefix) {
     if (useTestData) {
         jsonURL += ".json";
     }
+    console.log("Request data from  " + jsonURL);
     if (LCA.spinner && LCA.outstandingRequests === 0) {
-        LCA.spinner.spin();
+        LCA.spinner.spin(LCA.spinTarget);
     }
     ++LCA.outstandingRequests;
     d3.json(jsonURL, function (error, jsonData) {
@@ -219,6 +220,7 @@ LCA.loadData = function (resourceName, useTestData, callback, routePrefix) {
             console.error(error);
             LCA.loadedData[resourceName] = null;
         } else {
+            console.log("Got data from " + jsonURL);
             LCA.loadedData[resourceName] = jsonData;
         }
         callback.call();

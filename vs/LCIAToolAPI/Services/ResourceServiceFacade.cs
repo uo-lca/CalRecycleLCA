@@ -259,7 +259,8 @@ namespace Services {
                  ProcessTypeID = TransformNullable(p.ProcessTypeID, "Process.ProcessTypeID"),
                  ReferenceTypeID = p.ReferenceTypeID,
                  ReferenceFlowID = p.ReferenceFlowID,
-                 ReferenceYear = p.ReferenceYear
+                 ReferenceYear = p.ReferenceYear,
+                 Version = p.ILCDEntity.Version
              };
          }
 
@@ -389,15 +390,11 @@ namespace Services {
         /// <param name="flowTypeID">Optional process flow type filter</param>
         /// <returns>List of ProcessResource objects</returns>
         public IEnumerable<ProcessResource> GetProcesses(int? flowTypeID=null) {
-            IEnumerable<Process> pData;
-            if ( flowTypeID == null) {
-                pData = _ProcessService.Query().Get();
+            var query = _ProcessService.Query().Include(p => p.ILCDEntity);
+            if (flowTypeID != null) {
+                query = query.Filter(p => p.ProcessFlows.Any(pf => pf.Flow.FlowTypeID == flowTypeID));
             }
-            else {
-                pData = _ProcessService.Query()
-                        .Filter(p => p.ProcessFlows.Any(pf => pf.Flow.FlowTypeID == flowTypeID))
-                        .Get();
-            }
+            IEnumerable<Process> pData = query.Get();
             return pData.Select(p => Transform(p)).ToList();
         }
 

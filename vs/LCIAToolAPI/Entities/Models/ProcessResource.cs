@@ -8,6 +8,7 @@ namespace Entities.Models {
     /// <summary>
     /// ProcessResource - Used for producing process web service data.
     /// Simplifies EF model by omitting navigation properties and ILCDEntityID
+    /// Add ILCD Version because we have multiple versions of some ILCD processes.
     ///
     /// Maintains Pascal case of properties in EF model. These are automatically converted to
     /// camel case during JSON serialization.
@@ -27,5 +28,7 @@ namespace Entities.Models {
         public int ProcessTypeID { get; set; }
 
         public int? ReferenceFlowID { get; set; }
+
+        public string Version { get; set; } // ILCDEntity.Version
     }
 }
