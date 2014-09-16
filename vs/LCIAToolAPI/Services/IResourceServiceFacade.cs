@@ -15,8 +15,9 @@ namespace Services {
         IEnumerable<FlowResource> GetFlowsByProcess(int processID);
         IEnumerable<FlowPropertyResource> GetFlowPropertiesByFragment(int fragmentID);
         IEnumerable<FlowPropertyResource> GetFlowPropertiesByProcess(int processID);
-        IEnumerable<ProcessResource> GetProcesses();
+        IEnumerable<ProcessResource> GetProcesses(int? flowTypeID = null);
         IEnumerable<ImpactCategoryResource> GetImpactCategories();
         IEnumerable<LCIAResultResource> GetLCIAResultResources(int processID, int lciaMethodID, int? scenarioID = 1);
+        IEnumerable<FlowTypeResource> GetFlowTypes();
     }
 }

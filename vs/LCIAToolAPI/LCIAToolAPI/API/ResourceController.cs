@@ -28,6 +28,12 @@ namespace LCAToolAPI.API
             _ResourceService = resourceService;
         }
 
+        [Route("api/flowTypes")]
+        [HttpGet]
+        public IEnumerable<FlowTypeResource> GetFlowTypes() {
+            return _ResourceService.GetFlowTypes();
+        }
+
         [Route("api/fragments")]
         [HttpGet]
         public IEnumerable<FragmentResource> GetFragments() {
@@ -91,6 +97,12 @@ namespace LCAToolAPI.API
         [HttpGet]
         public IEnumerable<ProcessResource> GetProcesses() {
             return _ResourceService.GetProcesses();
+        }
+
+        [Route("api/flowtypes/{flowTypeID:int}/processes")]
+        [HttpGet]
+        public IEnumerable<ProcessResource> GetProcesses(int flowTypeID) {
+            return _ResourceService.GetProcesses(flowTypeID);
         }
 
         [Route("api/processes/{processID:int}/flows")]
