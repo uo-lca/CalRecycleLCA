@@ -3,29 +3,21 @@
  */
 function lciaComputation() {
 
-
     // library globals
-    /*global d3, console, window, $, colorbrewer, LCA */
+    /*global d3, colorbrewer, LCA */
 
     /**
      * lciaComputation variables
      */
     var // Data loaded from web API
-    processList = [],
-        impactCategoryList = [],
-        methodList = [],
         lciaResultData = [],
-        // Web API methods
-        processesURL,
-        impactCategoriesURL,
-        methodsURL,
-        lciaResultsURL,
-        // Current selections
-        selectedProcessID = 2,
-        selectedImpactCategoryID = 10,
-        selectedMethodID = 1,
+        // Current resource ID selections - 0 means none selected
+        selectedProcessID = 0,
+        selectedImpactCategoryID = 0,
+        selectedMethodID = 0,
         // Score for current selection
         impactScore = 0;
+
     /**
      * d3 variables
      */
@@ -81,70 +73,13 @@ function lciaComputation() {
     }
 
     /**
-     * Update list of LCIA methods
-     */
-    function updateMethods() {
-        var paramURL;
-
-        paramURL = methodsURL + "?impactCategoryid=" + selectedImpactCategoryID;
-
-        d3.json(paramURL, function (error, jsonData) {
-            var selectOptions;
-
-            if (error) {
-                window.alert("Unable to query LCIA Methods.");
-                console.error(error);
-                return false;
-            } else {
-                jsonData.sort(compareNames);
-
-                selectOptions = d3.select("#lciaMethodSelect")
-                    .selectAll("option")
-                    .data(jsonData);
-
-                selectOptions.enter()
-                    .append("option");
-
-                selectOptions.exit().remove();
-
-                selectOptions.attr("value", function (d) {
-                    return d.LCIAMethodID;
-                })
-                    .text(function (d) {
-                        return d.Name;
-                    });
-                //
-                // Select first method
-                //
-                selectedMethodID = jsonData[0].LCIAMethodID;
-                d3.select("#lciaMethodSelect")
-                    .select("option")
-                    .attr("selected", true);
-                displayResults();
-            }
-
-        });
-    }
-
-    /**
-     * Execute LCIA computation for selected process and method, then display results.
-     */
-    function displayResults() {
-        var paramURL;
-
-        paramURL = lciaResultsURL + "?processid=" + selectedProcessID + "&lciaMethodId=" + selectedMethodID;
-        d3.json(paramURL, visualizeResults);
-    }
-
-    /**
      * Change event handler for process selection list.
      * Triggers LCIA computation update.
      */
     function onProcessChange() {
-        var paramURL;
 
         selectedProcessID = this.options[this.selectedIndex].value;
-        displayResults();
+        getLciaResults();
     }
 
     /**
@@ -153,7 +88,7 @@ function lciaComputation() {
     function onMethodChange() {
 
         selectedMethodID = this.options[this.selectedIndex].value;
-        displayResults();
+        getLciaResults();
     }
 
     /**
@@ -162,14 +97,7 @@ function lciaComputation() {
      */
     function onImpactCategoryChange() {
         selectedImpactCategoryID = this.options[this.selectedIndex].value;
-        updateMethods();
-    }
-
-    /**
-     * Compare function used to sort array of objects by Name.
-     */
-    function compareNames(a, b) {
-        return d3.ascending(a.Name, b.Name);
+        loadMethods();
     }
 
     /**
@@ -226,8 +154,7 @@ function lciaComputation() {
             legend,
             newRows,
             squares,
-            flows,
-            flowHeader;
+            flows;
 
         makeLegendHeader(colXs[1], colXs[2], textY, flowData && flowData.length > 0);
         //TO DO: Make legend data update work, and only remove unused rows.
@@ -236,7 +163,7 @@ function lciaComputation() {
         legend = svg.select(".legendgroup").selectAll(".legend").data(flowData);
         // Add rows, if necessary
         newRows = legend.enter().append("g").attr("class", "legend");
-        newRows.filter(function (d, i) {
+        newRows.filter(function (d) {
             return d.LCIAResult > 0 && (x(d.x1) - x(d.x0) > 1);
         })
             .append("rect")
@@ -276,10 +203,9 @@ function lciaComputation() {
 
     /**
      * Callback function for LCIA computation.
-     * @param {string} error          Web API GET error
      * @param {Array} results  JSON data from web API
      */
-    function visualizeResults(error, results) {
+    function visualizeResults(results) {
         var flowList = [],
             runningTotal = 0,
             rects,
@@ -288,12 +214,6 @@ function lciaComputation() {
             colorIndex = 1, // Index to color scale (ImpactCategoryID - 1)
             reverseScale; // Clone of color scale in reverse order (dark to light)
 
-
-        if (error) {
-            window.alert("Error executing LCIA Computation.");
-            console.error(error);
-            return false;
-        }
         impactScore = 0;
         lciaResultData = results;
         lciaResultData.sort(compareLciaResults);
@@ -301,13 +221,15 @@ function lciaComputation() {
             return d.Flow;
         });
         color.domain(flowList);
-        if (flowList.length < 3)
+        if (flowList.length < 3) {
             colorClassSize = 3;
-        else if (flowList.length < 9)
+        } else if (flowList.length < 9) {
             colorClassSize = flowList.length;
+        }
         colorIndex = selectedImpactCategoryID - 1;
-        if (colorIndex in colorScales)
+        if (colorIndex in colorScales) {
             colorScale = colorScales[colorIndex];
+        }
         reverseScale = colorScale[colorClassSize].slice();
         reverseScale.reverse();
         color.range(reverseScale);
@@ -350,26 +272,121 @@ function lciaComputation() {
         makeLegend(lciaResultData);
     }
 
+    function onProcessesLoaded() {
+        if ("processes" in LCA.loadedData) {
+            if (LCA.loadedData.processes.length > 0) {
+                // If no default setting, select first process
+                selectedProcessID = LCA.loadedData.processes[0].processID;
+                loadFlowProperties();
+                loadFlows();
+                LCA.loadSelectionList(LCA.loadedData.processes,
+                        "#processSelect", "processID", onProcessChange, selectedProcessID);
+                getLciaResults();
+            }
+        }
+    }
+
+    function onImpactCategoriesLoaded() {
+        if ("impactcategories" in LCA.loadedData) {
+            if (LCA.loadedData.impactcategories.length > 0) {
+                // If no default setting, select first category
+                selectedImpactCategoryID = LCA.loadedData.impactcategories[0].impactCategoryID;
+                loadMethods();
+                LCA.loadSelectionList(LCA.loadedData.impactcategories,
+                        "#impactCategorySelect", "impactCategoryID", onImpactCategoryChange, selectedImpactCategoryID);
+            }
+        }
+    }
+
+    function onMethodsLoaded() {
+        if ("lciamethods" in LCA.loadedData) {
+            if (selectedMethodID === null && LCA.loadedData.lciamethods.length > 0) {
+                // If no default setting, select first LCIA method
+                selectedMethodID = LCA.loadedData.lciamethods[0].lciaMethodID;
+
+                LCA.loadSelectionList(LCA.loadedData.lciamethods,
+                   "#lciaMethodSelect", "lciaMethodID", onMethodChange, selectedMethodID);
+                getLciaResults();
+            }
+        }
+    }
+
+    function onFlowPropertiesLoaded() {
+        if ("flowproperties" in LCA.loadedData) {
+            LCA.indexedData.flowProperties = LCA.indexData("flowproperties", "flowPropertyID");
+        }
+    }
+
+    function onFlowsLoaded() {
+        if ("flows" in LCA.loadedData) {
+            LCA.indexedData.flows = LCA.indexData("flows", "flowID");
+        }
+    }
+
+    function onResultsLoaded() {
+        if ("lciaresults" in LCA.loadedData) {
+            visualizeResults(LCA.loadedData.lciaresults);
+        }
+    }
+
+    /**
+      * Get all processes from web API
+      */
+    function loadProcesses() {
+        selectedProcessID = 0;
+        LCA.loadData("processes", false, onProcessesLoaded);
+    }
+
+    /**
+      * Get all flows related to selected process
+      */
+    function loadFlows() {
+        LCA.loadData("flows", false, onFlowsLoaded, "processes/" + selectedProcessID);
+    }
+
+    /**
+      * Get all flow properties related to selected process
+      */
+    function loadFlowProperties() {
+        LCA.loadData("flowproperties", false, onFlowPropertiesLoaded, "processes/" + selectedProcessID);
+    }
+
+    /**
+      * Get all impact categories from web API
+      */
+    function loadImpactCategories() {
+        selectedImpactCategoryID = 0;
+        LCA.loadData("impactcategories", false, onImpactCategoriesLoaded);
+    }
+
+    /**
+     * Load LCIA methods having selected Impact Category
+     */
+    function loadMethods() {
+        selectedMethodID = 0;
+        LCA.loadData("lciamethods", false, onMethodsLoaded, "impactcategories/" + selectedImpactCategoryID);
+    }
+
+    /**
+      * If a process and a method have been selected,
+      * get LCIA computation results from web API
+      */
+    function getLciaResults() {
+        if (selectedProcessID > 0 && selectedMethodID > 0) {
+            LCA.loadData("lciaresults", false, onResultsLoaded,
+            "processes/" + selectedProcessID + "/lciamethods/" + selectedMethodID);
+        }
+    }
+
     /**
      * Starting point for lciaComputation
      */
     function init() {
-        var filteredMethodsURL;
-        LCA.baseURI = "http://publictest.calrecycle.ca.gov/LCIATool/api/";
 
-        processesURL = LCA.baseURI + "process?flows=1";
-        impactCategoriesURL = LCA.baseURI + "impactcategory";
-        methodsURL = LCA.baseURI + "lciamethod";
-        lciaResultsURL = LCA.baseURI + "LCIAComputation";
-        filteredMethodsURL = methodsURL + "?impactCategoryid=" + selectedImpactCategoryID;
-
-        LCA.prepareSelect(processesURL, "#processSelect", "ProcessID", onProcessChange, selectedProcessID);
-        LCA.prepareSelect(impactCategoriesURL, "#impactCategorySelect", "ImpactCategoryID",
-            onImpactCategoryChange, selectedImpactCategoryID);
-        LCA.prepareSelect(filteredMethodsURL, "#lciaMethodSelect", "LCIAMethodID",
-            onMethodChange, selectedMethodID);
         prepareSvg();
-        displayResults();
+        LCA.startSpinner("chartcontainer");
+        loadProcesses();
+        loadImpactCategories();
     }
 
     LCA.init(init);
