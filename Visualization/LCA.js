@@ -14,7 +14,8 @@ var LCA = {
     spinner: null,
     indexedData: {}, // Associative array of loaded data, keyed by web api resource name
     enumData: {},   // Associative arrays of enum data
-    urlVars: {}    // Associative array of parameters in querystring
+    urlVars: {},    // Associative array of parameters in querystring
+    outstandingRequests: 0  // Used to decide when to start/stop spinner
 };
 
     /**
@@ -82,6 +83,7 @@ LCA.startSpinner = function startSpinner(tgtElementId) {
     },
     target = window.document.getElementById(tgtElementId);
     LCA.spinner = new Spinner(opts).spin(target);
+    LCA.outstandingRequests = 0;
 };
 
 /**
@@ -193,8 +195,7 @@ LCA.updateTable = function (table, data, columns) {
 LCA.loadData = function (resourceName, useTestData, callback, routePrefix) {
 
     if (resourceName in LCA.loadedData) {
-        callback.call();
-        return false;
+        delete LCA.loadedData[resourceName];
     }
     var jsonURL = (useTestData ? LCA.testDataFolder : LCA.baseURI);
     if (arguments.length === 4) {
@@ -204,7 +205,15 @@ LCA.loadData = function (resourceName, useTestData, callback, routePrefix) {
     if (useTestData) {
         jsonURL += ".json";
     }
+    if (LCA.spinner && LCA.outstandingRequests === 0) {
+        LCA.spinner.spin();
+    }
+    ++LCA.outstandingRequests;
     d3.json(jsonURL, function (error, jsonData) {
+        --LCA.outstandingRequests;
+        if (LCA.spinner && LCA.outstandingRequests === 0) {
+            LCA.spinner.stop();
+        }
         if (error) {
             window.alert("Error executing GET on " + jsonURL);
             console.error(error);

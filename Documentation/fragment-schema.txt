@@ -168,6 +168,14 @@ The following tables are required:
     file.  Any table not containing a UUID field gets an optional  DocID
     foreign key.
 
+    The URI could refer to a CalRecycle-maintained Content Management
+    System, for instance, that would enable users to edit content based on
+    their authorization.  Comments should be editable (selectively) via the
+    API and front-end.
+
+    If that were the case, then there would need to be some way to ensure
+    that DocIDs are persistent-- complicating their use during external
+    data loading.
 
 ## Standard ILCD-based Tables
 
@@ -337,7 +345,7 @@ The following tables are required:
     * DocID
 
     List of intermediate flows for which composition parameters are
-    relevant (multiple entries allowed for each FlowID)
+    relevant (multiple entries allowed for each FlowID).  
 
    CompositionData
     * CompositionDataID
@@ -514,24 +522,27 @@ The following tables are required:
     * Visibility - public or private, or some other specification.
 
     A scenario group is a set of scenarios owned by a single user that are
-    all useful to compare against one another.  All scenarios in a given
-    scenario group are computed together.
+    all subject to the same access control.  Users may see scenarios in
+    ScenarioGroupID 1 and their own ScenarioGroupID (and possibly others)
 
    Scenario
     * ScenarioID
     * ScenarioGroupID(FK to ScenarioGroup)
     * Name
+    + TopLevelFragmentID (FK to Fragment) - shown in initial view
+    + ActivityLevel (float) - scaling of initial view
 
     * DocID
 
    ScenarioBackground - ### PLEASE REVIEW
+   [could be named BackgroundSubstitution]
     * ScenarioBackgroundID
     * ScenarioID
     * FlowID
     * DirectionID
     * NodeTypeID (only Process or Fragment allowed)
     X TargetID (NOT a foreign key- interpret as ProcessID or FragmentID)
-	+ ILCDEntityID (FK to ILCDEntity) ILCDEntityID of target Process or Fragment, null when NodeType is Cutoff
+    + ILCDEntityID (FK to ILCDEntity) ILCDEntityID of target Process or Fragment, null when NodeType is Cutoff
 
     * DocID
 
@@ -566,8 +577,6 @@ The following tables are required:
     * FragmentFlowID (was FragmentEdgeID) (FK to FragmentFlowID)
     * Value (float) unit value of param (phi=0) (aka scenario setting)
 
-    * DocID
-
    DistributionParam
     X DistributionParamID - not needed
     * DependencyParamID (FK to DependencyParamID, PK for this table)
@@ -576,23 +585,17 @@ The following tables are required:
       note: both DependencyParamID and ConservationDependencyParamID must
       have the same ParamID [with ParamTypeID=2]
 
-    * DocID
-
    FlowPropertyParam
     * FlowPropertyParamID
     * ParamID (FK to Param, ParamTypeID must be 4)
     * FlowFlowPropertyID (FK)
     * Value (float) unit value of param (phi=0) (aka scenario setting)
 
-    * DocID
-
    CompositionParam -- DELETE TABLE
     * CompositionParamID
     * ParamID (FK to Param, ParamTypeID must be 5)
     * FlowFlowPropertyID (FK)
     * Value (float) unit value of param (phi=0) (aka scenario setting)
-
-    * DocID
 
     Note: types 4 and 5 both link to FlowFlowPropertyIDs; so type 5 is
     removed. 
@@ -603,8 +606,6 @@ The following tables are required:
     * ProcessDissipationID (FK)
     * Value (float) unit value of param (phi=0) (aka scenario setting)
 
-    * DocID
-
    NodeDissipationParam - DEPRECATED
     * NodeDissipationParamID
     * ParamID (FK to Param, ParamTypeID must be 7)
@@ -612,15 +613,11 @@ The following tables are required:
     * FragmentFlowID (FK to FragmentFlow)
     * Value (float) unit value of param (phi=0) (aka scenario setting)
 
-    * DocID
-
    ProcessEmissionParam
     * ProcessEmissionParamID
     * ParamID (FK to Param, ParamTypeID must be 8)
     * ProcessFlowID (FK)
     * Value (float) unit value of param (phi=0) (aka scenario setting)
-
-    * DocID
 
    NodeEmissionParam - DEPRECATED
     * NodeEmissionParamID
@@ -629,15 +626,11 @@ The following tables are required:
     * FragmentFlowID (FK to FragmentFlow)
     * Value (float) unit value of param (phi=0) (aka scenario setting)
 
-    * DocID
-
    CharacterizationParam
     * CharacterizationParamID
     * ParamID  (FK to Param, ParamTypeID must be 10)
     * LCIAID (FK)
     * Value (float) unit value of param (phi=0) (aka scenario setting)
-
-    * DocID
 
     A single param can be linked to multiple instances in the model- but
     they will all be of the same type.
@@ -654,6 +647,8 @@ The following tables are required:
     * FragmentNodeProcessID (FK)
     * ProcessID (FK)
 
+    * DocID
+
     It is a scenario design constraint that the substituted ProcessID must
     have the same list of product flows as the original ProcessID.
 
@@ -663,6 +658,8 @@ The following tables are required:
     * FragmentNodeFragmentID (FK)
     * SubFragmentID (FK)
 
+    * DocID
+
     It is a scenario design constraint that the substituted FragmentID must
     have the same list of product flows as the original FragmentID.
 
@@ -670,6 +667,8 @@ The following tables are required:
     * ScenarioID (PK, FK)
     * ProcessCompositionID (PK, FK)
     * CompositionModelID (FK)
+
+    * DocID
 
 ## Cached Computation Results
 
@@ -705,7 +704,7 @@ The following tables are required:
     Size of NodeCache table = # of nodes x # of scenarios 
 
    ScoreCache - New Table
-    * ScoreCacheID
+    X ScoreCacheID
     * NodeCacheID (was FragmentScoreID) (FK)
     * LCIAMethodID (FK)
     * ImpactScore - for a unit activity (computed during LCIA)
