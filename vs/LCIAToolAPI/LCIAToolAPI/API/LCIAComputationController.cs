@@ -31,12 +31,12 @@ namespace LCAToolAPI.API
         }
 
         //GET api/<controller>
-        [Route("api/compute")]
+         [Route("api/processes/{ProcessID}/scenarios/{scenarioID}/compute")]
         [System.Web.Http.AcceptVerbs("GET", "POST")]
         [System.Web.Http.HttpGet]
-        public IEnumerable<LCIAModel> Compute()
+        public double Compute(int processId, int scenarioId)
         {
-            return _lciaComputationV2.GetLCIAMethodsForComputeLCIA();
+            return _lciaComputationV2.Compute(processId, scenarioId);
         }
 
        

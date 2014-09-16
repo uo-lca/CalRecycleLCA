@@ -54,6 +54,10 @@ namespace Services
         private readonly IService<CharacterizationParam> _characterizationParamService;
         [Inject]
         private readonly IService<Param> _paramService;
+        [Inject]
+        private readonly IService<DependencyParam> _dependencyParamService;
+        [Inject]
+        private readonly IService<Fragment> _fragmentService;
          [Inject]
         private readonly IUnitOfWork _unitOfWork;
 
@@ -78,6 +82,8 @@ namespace Services
             IService<LCIA> lciaService,
             IService<CharacterizationParam> characterizationParamService,
             IService<Param> paramService,
+            IService<DependencyParam> dependencyParamService,
+            IService<Fragment> fragmentService,
             IUnitOfWork unitOfWork)
         {
             if (fragmentFlowService == null)
@@ -201,6 +207,24 @@ namespace Services
             }
             _paramService = paramService;
 
+            if (lciaMethodService == null)
+            {
+                throw new ArgumentNullException("lciaMethodService is null");
+            }
+            _lciaMethodService = lciaMethodService;
+
+            if (dependencyParamService == null)
+            {
+                throw new ArgumentNullException("dependencyParamService is null");
+            }
+            _dependencyParamService = dependencyParamService;
+
+            if (fragmentService == null)
+            {
+                throw new ArgumentNullException("fragmentService is null");
+            }
+            _fragmentService = fragmentService;
+
             if (unitOfWork == null)
             {
                 throw new ArgumentNullException("unitOfWork is null");
@@ -241,15 +265,27 @@ namespace Services
             return lcia;
         }
 
-        public IEnumerable<FragmentLCIAModel> FragmentFlowLCIA(int? fragmentId, int? scenarioId, IEnumerable<LCIAMethod> lciaMethods)
+        public IEnumerable<FragmentLCIAModel> FragmentFlowLCIA(int? fragmentId, int scenarioId, IEnumerable<LCIAMethod> lciaMethods)
         {
             // set score cache for fragment / scenario / method: iterate through
             // fragmentflows 
 
 
             // this does nothing if traversal has already been completed - FIGURE OUT THIS PART ON THURSDAY
-            //FragmentTraverse(fragment_id, scenario_id); 
+            FragmentTraversalV2 fragmentTraversalV2 = new FragmentTraversalV2(_flowService,
+                            _fragmentFlowService,
+                            _nodeCacheService,
+                            _fragmentNodeProcessService,
+                            _processFlowService,
+                            _fragmentNodeFragmentService,
+                            _flowFlowPropertyService,
+                            _dependencyParamService,
+                            _flowPropertyParamService,
+                            _fragmentService,
+                            _paramService,
+                            _unitOfWork);
 
+            fragmentTraversalV2.Traverse(fragmentId, scenarioId);
 
             var fragmentFlows = _nodeCacheService.Query().Get()
                 .Where(x => x.ScenarioID == scenarioId)
@@ -308,7 +344,7 @@ namespace Services
                         var scores = lciaComputation.ProcessLCIA(targetId, lciaMethods, scenarioId);
                         foreach (var lciaMethodItem in lciaMethods)
                         {
-                            SetScoreCache(nodeCacheId, lciaMethodItem.LCIAMethodID, scores.Select(x => x.Result).FirstOrDefault());
+                            SetScoreCache(nodeCacheId, lciaMethodItem.LCIAMethodID, scores);
                         }
 
                         break;
