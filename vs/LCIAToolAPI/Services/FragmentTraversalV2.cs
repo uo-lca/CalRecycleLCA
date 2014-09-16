@@ -220,16 +220,7 @@ namespace Services
             //do not save to NodeCache and abandon recursion if nodeweight == 0
             if (nodeWeight != 0)
             {
-                var nodeCache = new NodeCache
-                {
-                    FragmentFlowID = fragmentFlowId,
-                    ScenarioID = scenarioId,
-                    FlowMagnitude = flowMagnitude,
-                    NodeWeight = nodeWeight
-                };
-
-                _nodeCacheService.InsertGraph(nodeCache);
-                _unitOfWork.Save();
+              
 
                 var outFlows = _fragmentFlowService.Query().Get()
                     .Where(x => x.ParentFragmentFlowID == fragmentFlowId)
@@ -292,20 +283,34 @@ namespace Services
                 {
                     foreach (var item in outFlows)
                     {
-                        double outflowMagnitude = Convert.ToDouble(nodeWeight * item.Result);
-                        int outflowScenarioId = Convert.ToInt32(item.ScenarioID);
-                        int outflowFragmentFlowID = Convert.ToInt32(item.FragmentFlowID);
-                        if (item.ParamValue == null)
+                      
+                        if (item.Result == null)
                         {
                             throw new ArgumentNullException("This value cannot be null.");
                         }
                         else
                         {
-                            item.Result = item.ParamValue;
-                            NodeRecurse(outflowFragmentFlowID, outflowScenarioId, outflowMagnitude);
+                            if (item.ParamValue != 0  && scenarioId != 0)
+                            {
+                                item.Result = item.ParamValue;
+                            }
+                            double outflowMagnitude = Convert.ToDouble(nodeWeight * item.Result);
+                            int outflowFragmentFlowID = Convert.ToInt32(item.FragmentFlowID);
+                            NodeRecurse(outflowFragmentFlowID, scenarioId, outflowMagnitude);
                         }
                     }
                 }
+
+                var nodeCache = new NodeCache
+                {
+                    FragmentFlowID = fragmentFlowId,
+                    ScenarioID = scenarioId,
+                    FlowMagnitude = flowMagnitude,
+                    NodeWeight = nodeWeight
+                };
+
+                _nodeCacheService.InsertGraph(nodeCache);
+                _unitOfWork.Save();
             }
 
         }
