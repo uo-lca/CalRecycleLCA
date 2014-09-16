@@ -36,6 +36,8 @@ namespace Services {
         //
         [Inject]
         private readonly IFragmentTraversalV2 _FragmentTraversalV2;
+        [Inject]
+        private readonly ILCIAComputationV2 _LCIAComputation;
 
         /// <summary>
         /// Constructor for use with Ninject dependency injection
@@ -53,8 +55,9 @@ namespace Services {
                                IService<Flow> flowService,
                                IService<FlowProperty> flowPropertyService,
                                IService<ImpactCategory> impactCategoryService,
+                               ILCIAComputationV2 lciaComputation,
                                IService<LCIAMethod> lciaMethodService,
-                               IService<Process> processService ) 
+                               IService<Process> processService) 
         {
             if (fragmentService == null) {
                 throw new ArgumentNullException("fragmentService");
@@ -80,6 +83,10 @@ namespace Services {
                 throw new ArgumentNullException("impactCategoryService");
             }
             _ImpactCategoryService = impactCategoryService;
+            if (lciaComputation == null) {
+                throw new ArgumentNullException("lciaComputation");
+            }
+            _LCIAComputation = lciaComputation;
             if (lciaMethodService == null) {
                 throw new ArgumentNullException("lciaMethodService");
             }
@@ -126,6 +133,23 @@ namespace Services {
             }
             else {
                 return Convert.ToBoolean(propVal);
+            }
+        }
+
+        /// <summary>
+        /// Transforms double? to double 
+        /// Use to handle EF entity property with type double? that should never actually be NULL.
+        /// Throws exception if property has NULL value
+        /// </summary>
+        /// <param name="propVal">EF property value</param>
+        /// <param name="propName">EF property name</param>
+        /// <returns>bool value</returns>
+        private double TransformNullable(double? propVal, string propName) {
+            if (propVal == null) {
+                throw new ArgumentNullException(propName);
+            }
+            else {
+                return Convert.ToDouble(propVal);
             }
         }
 
@@ -230,6 +254,19 @@ namespace Services {
              };
          }
 
+         public LCIAResultResource Transform(LCIAModel m) {
+             return new LCIAResultResource {
+                LCIAMethodID = TransformNullable(m.LCIAMethodID, "LCIAModel.LCIAMethodID"),
+                FlowID = TransformNullable(m.FlowID, "LCIAModel.FlowID"),
+                DirectionID = TransformNullable(m.DirectionID, "LCIAModel.DirectionID"),
+                Quantity = Convert.ToDouble(m.Result),
+                Factor = (m.LCParamValue == null || m.LCParamValue == 0) ?
+                        Convert.ToDouble(m.LCIAFactor) : 
+                        Convert.ToDouble(m.LCParamValue),
+                Result = Convert.ToDouble(m.ComputationResult)
+             };
+         }
+
         // Get list methods 
 
          /// <summary>
@@ -285,6 +322,17 @@ namespace Services {
                                       .Filter(f => f.ProcessFlows.Any(pf => pf.ProcessID == processID))
                                       .Get();
             return flows.Select(f => Transform(f)).ToList();
+        }
+
+        /// <summary>
+        /// Get list of flow properties related to a process (via FlowFlowProperty and ProcessFlow)
+        /// </summary>
+        public IEnumerable<FlowPropertyResource> GetFlowPropertiesByProcess(int processID) {
+            IEnumerable<FlowProperty> flowProperties = _FlowPropertyService.Query()
+                .Include(fp => fp.UnitGroup.UnitConversion)
+                .Filter(fp => fp.Flows.Any(f => f.ProcessFlows.Any(pf => pf.ProcessID == processID)))
+                .Get();
+            return flowProperties.Select(fp => Transform(fp)).ToList();
         }
 
         /// <summary>
@@ -345,6 +393,23 @@ namespace Services {
                 ImpactCategoryID = d.ID,
                 Name = d.Name
             }).ToList();
+        }
+
+        /// <summary>
+        /// Execute Process LCIA and return computation results in LCIAResultResource objects
+        /// </summary>
+        /// <returns>List of LCIAResultResource objects or null if lciaMethodID not found</returns> 
+        public IEnumerable<LCIAResultResource> GetLCIAResultResources(int processID, int lciaMethodID, int? scenarioID = 1) {
+            LCIAMethod lciaMethod = _LciaMethodService.FindById(lciaMethodID);
+            if (lciaMethod == null) {
+                // TODO: figure how to handle this sort of error
+                return null;
+            }
+            else {
+                IEnumerable<InventoryModel> inventory = _LCIAComputation.ComputeProcessLCI(processID, scenarioID);
+                IEnumerable<LCIAModel> lciaResults = _LCIAComputation.ComputeProcessLCIA(inventory, lciaMethod, scenarioID);
+                return lciaResults.Select(m => Transform(m)).ToList();
+            }
         }
 
     }

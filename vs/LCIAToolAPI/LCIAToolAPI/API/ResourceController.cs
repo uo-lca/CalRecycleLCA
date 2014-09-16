@@ -99,10 +99,27 @@ namespace LCAToolAPI.API
             return _ResourceService.GetFlowsByProcess(processID);
         }
 
+        [Route("api/processes/{processID:int}/flowproperties")]
+        [HttpGet]
+        public IEnumerable<FlowPropertyResource> GetFlowPropertiesByProcess(int processID) {
+            return _ResourceService.GetFlowPropertiesByProcess(processID);
+        }
+
+        [Route("api/processes/{processID:int}/lciamethods/{lciaMethodID:int}/lciaresults")]
+        [HttpGet]
+        public IEnumerable<LCIAResultResource> GetLCIAResultResources(int processID, int lciaMethodID) {
+            return _ResourceService.GetLCIAResultResources(processID, lciaMethodID);
+        }
+
+        [Route("api/processes/{processID:int}/lciamethods/{lciaMethodID:int}/scenarios/{scenarioID:int}/lciaresults")]
+        [HttpGet]
+        public IEnumerable<LCIAResultResource> GetLCIAResultResources(int processID, int lciaMethodID, int scenarioID) {
+            return _ResourceService.GetLCIAResultResources(processID, lciaMethodID, scenarioID);
+        }
+
         /* TODO:
          * 
          * [Route("api/processes/{processID:int}")]
-         * [Route("api/processes/{processID:int}/lciamethods/{lciaMethodID:int}/lciaresults")]     optional scenario parameter
          * [Route("api/fragments/{fragmentID:int}/lciaresults")]    optional scenario parameter
          * 
          */
