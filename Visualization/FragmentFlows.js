@@ -479,9 +479,6 @@ function FragmentFlows() {
             return n1 in LCA.loadedData;
         })) {
             // All requests executed
-            if (LCA.spinner) {
-                LCA.spinner.stop();
-            }
             if (apiResourceNames.every(function (n2) {
                 return LCA.loadedData[n2] !== null;
             })) {
@@ -591,7 +588,7 @@ function FragmentFlows() {
         prepareSvg();
         prepareToolTip();
         prepareNodeView();
-        LCA.startSpinner("chartcontainer");
+        LCA.createSpinner("chartcontainer");
         //toolTip = LCA.createToolTip(".container");
         apiResourceNames = ["fragments", "processes", "flowproperties", "fragmentflows", "flows"];
         LCA.loadData(apiResourceNames[0], false, onFragmentsLoaded);

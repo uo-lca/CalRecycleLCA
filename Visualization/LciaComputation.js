@@ -16,7 +16,8 @@ function lciaComputation() {
         selectedImpactCategoryID = 0,
         selectedMethodID = 0,
         // Score for current selection
-        impactScore = 0;
+        impactScore = 0,
+        startupProcessID = 116;
 
     /**
      * d3 variables
@@ -52,7 +53,7 @@ function lciaComputation() {
                        colorbrewer.Greens, colorbrewer.YlOrBr, colorbrewer.BuGn,
                        colorbrewer.PuBuGn, colorbrewer.Greys, colorbrewer.YlGnBu];
 
-    var svg, msg;
+    var svg = null, msg = null;
 
     /**
      * Initial preparation of svg element.
@@ -73,7 +74,7 @@ function lciaComputation() {
     }
 
     function prepareMsg() {
-        msg = d3.select("#chartcontainer").append("p").append("i").text("Get data...");
+        msg = d3.select("#chartcontainer").append("p").append("i");
     }
 
     /**
@@ -221,11 +222,7 @@ function lciaComputation() {
             colorIndex = 1, // Index to color scale (ImpactCategoryID - 1)
             reverseScale; // Clone of color scale in reverse order (dark to light)
 
-        if (results.length > 0) {
-            msg.style("display", "none");
-        } else {
-            msg.text("No impact to display.");
-        }
+ 
         impactScore = 0;
         lciaResultData = results;
         lciaResultData.sort(compareLciaResults);
@@ -282,19 +279,41 @@ function lciaComputation() {
                 return color(d.flowID);
             });
         makeLegend(lciaResultData);
+        if (results.length > 0) {
+            resume("");
+        } else {
+            resume("No impact to display.");
+        }
     }
 
-    function addVersionToDupName(processArray) {
+    /**
+     * Prepare process resources for selection list by appending property value to non-distinct
+     * names.
+     * @param {Array} processArray   Process resources from web API
+     */
+    function distinguishProcessNames(processArray) {
         if (processArray.length > 1) {
             var curName = processArray[0].name;
             for (var i = 1; i < processArray.length; ++i) {
                 var curP = processArray[i],
                     prevP = processArray[i - 1];
                 if (curP.name === curName) {
-                    curP.name = curP.name.concat(" (Version ", curP.version, ")");
-                    if (prevP.name === curName) {
-                        prevP.name = prevP.name.concat(" (Version ", prevP.version, ")");
-                    }                   
+                    if (curP.geography !== prevP.geography ) {
+                        curP.name = curP.name.concat(" [", curP.geography, "]");
+                        if (prevP.name === curName) {
+                            prevP.name = prevP.name.concat("  [", prevP.geography, "]");
+                        }
+                    } else if ( curP.version !== prevP.version) {
+                        curP.name = curP.name.concat(" [", curP.version, "]");
+                        if (prevP.name === curName) {
+                            prevP.name = prevP.name.concat("  [", prevP.version, "]");
+                        }
+                    } else {
+                        curP.name = curP.name.concat(" [id:", curP.processID, "]");
+                        if (prevP.name === curName) {
+                            prevP.name = prevP.name.concat("  [id:", prevP.processID, "]");
+                        }
+                    }
                 } else {
                     curName = curP.name;
                 }
@@ -302,30 +321,44 @@ function lciaComputation() {
         }
     }
 
+    /**
+     * After processes have been loaded, prepare process selection list,
+     * select first process (if none pre-selected),
+     * request resources depending on process filter, 
+     * and request LCIA results
+     */
     function onProcessesLoaded() {
         if ("processes" in LCA.loadedData) {
             var processArray = LCA.loadedData.processes;
-
             processArray.sort(LCA.compareNames);            
             if (processArray.length > 0) {
-                // If no default setting, select first process
-                if (selectedProcessID === 0) {
+                // Set selectedProcessID to startupProcessID,
+                // if it exists. 
+                if (processArray.some(function (p) {
+                    return p.processID === startupProcessID;
+                })) {
+                    selectedProcessID = startupProcessID;
+                } else {
                     selectedProcessID = processArray[0].processID;
                 }
                 loadFlowProperties();
                 loadFlows();
-                addVersionToDupName(processArray);
+                distinguishProcessNames(processArray);
                 LCA.loadSelectionList(processArray,
                         "#processSelect", "processID", onProcessChange, selectedProcessID);
-                getLciaResults();
             }
         }
     }
 
+    /**
+     * After impact categories have been loaded, 
+     * prepare selection list,
+     * select first one,
+     * request LCIA methods with selected impact category
+     */
     function onImpactCategoriesLoaded() {
         if ("impactcategories" in LCA.loadedData) {
             if (LCA.loadedData.impactcategories.length > 0) {
-                // If no default setting, select first category
                 selectedImpactCategoryID = LCA.loadedData.impactcategories[0].impactCategoryID;
                 loadMethods();
                 LCA.loadSelectionList(LCA.loadedData.impactcategories,
@@ -334,15 +367,23 @@ function lciaComputation() {
         }
     }
 
+    /**
+     * After LCIA methods have been loaded, 
+     * prepare selection list,
+     * select first one (if none pre-selected),
+     * request LCIA results
+     */
     function onMethodsLoaded() {
         if ("lciamethods" in LCA.loadedData) {
-            if (selectedMethodID === 0 && LCA.loadedData.lciamethods.length > 0) {
+            if (LCA.loadedData.lciamethods.length > 0) {
                 // If no default setting, select first LCIA method
                 selectedMethodID = LCA.loadedData.lciamethods[0].lciaMethodID;
-
                 LCA.loadSelectionList(LCA.loadedData.lciamethods,
                    "#lciaMethodSelect", "lciaMethodID", onMethodChange, selectedMethodID);
                 getLciaResults();
+            } else {
+                selectedMethodID = 0;
+                LCA.emptySelectionList("#lciaMethodSelect");
             }
         }
     }
@@ -356,12 +397,12 @@ function lciaComputation() {
     function onFlowsLoaded() {
         if ("flows" in LCA.loadedData) {
             LCA.indexedData.flows = LCA.indexData("flows", "flowID");
-            onResultsLoaded();
+            getLciaResults();
         }
     }
 
     function onResultsLoaded() {
-        if ("lciaresults" in LCA.loadedData && "flows" in LCA.indexedData) {
+        if ("lciaresults" in LCA.loadedData) {
             visualizeResults(LCA.loadedData.lciaresults);
         }
     }
@@ -406,11 +447,28 @@ function lciaComputation() {
       * get LCIA computation results from web API
       */
     function getLciaResults() {
-        if (selectedProcessID > 0 && selectedMethodID > 0) {
-            msg.style("display", "block").text("Compute LCIA...");
+        if ( selectedProcessID > 0 && selectedMethodID > 0) {
+            wait("Compute LCIA...");
             LCA.loadData("lciaresults", false, onResultsLoaded,
             "processes/" + selectedProcessID + "/lciamethods/" + selectedMethodID);
         }
+    }
+
+    function wait(message) {
+        d3.select("#impactScore").text("");
+        svg.style("opacity", 0.1);
+        msg.style("display", "block").text(message);
+        d3.select("#processSelect").property("disabled", true);
+        d3.select("#impactCategorySelect").property("disabled", true);
+        d3.select("#lciaMethodSelect").property("disabled", true);
+    }
+
+    function resume(message) {       
+        msg.text(message);
+        svg.style("opacity", 1);
+        d3.select("#processSelect").property("disabled", false);
+        d3.select("#impactCategorySelect").property("disabled", false);
+        d3.select("#lciaMethodSelect").property("disabled", false);
     }
 
     /**
@@ -420,9 +478,10 @@ function lciaComputation() {
 
         prepareMsg();
         prepareSvg();
-        LCA.startSpinner("chartcontainer");
+        LCA.createSpinner("chartcontainer");
+        wait("Load Data...");
         if ("processid" in LCA.urlVars) {
-            selectedProcessID = +LCA.urlVars.processid;
+            startupProcessID = +LCA.urlVars.processid;
         }
         loadProcesses();
         loadImpactCategories();

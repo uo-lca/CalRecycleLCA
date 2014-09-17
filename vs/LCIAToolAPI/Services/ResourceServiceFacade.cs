@@ -256,6 +256,7 @@ namespace Services {
              return new ProcessResource {
                  ProcessID = p.ProcessID,
                  Name = p.Name,
+                 Geography = p.Geography,
                  ProcessTypeID = TransformNullable(p.ProcessTypeID, "Process.ProcessTypeID"),
                  ReferenceTypeID = p.ReferenceTypeID,
                  ReferenceFlowID = p.ReferenceFlowID,
@@ -400,10 +401,13 @@ namespace Services {
 
         /// <summary>
         /// Get ImpactCategory data and transform to API resource model
+        /// Omit categories that are not related to any LCIAMethod
         /// </summary>
         /// <returns>List of ImpactCategoryResource objects</returns>
         public IEnumerable<ImpactCategoryResource> GetImpactCategories() {
-            IEnumerable<ImpactCategory> data = _ImpactCategoryService.Query().Get();
+            IEnumerable<ImpactCategory> data = _ImpactCategoryService.Query()
+                .Filter(i => i.LCIAMethods.Count() > 0)
+                .Get();
             return data.Select(d => new ImpactCategoryResource {
                 ImpactCategoryID = d.ID,
                 Name = d.Name
@@ -412,6 +416,7 @@ namespace Services {
 
         /// <summary>
         /// Execute Process LCIA and return computation results in LCIAResultResource objects
+        /// Work around problem in LCIA computation: should be filtering out LCIA with Geography 
         /// </summary>
         /// <returns>List of LCIAResultResource objects or null if lciaMethodID not found</returns> 
         public IEnumerable<LCIAResultResource> GetLCIAResultResources(int processID, int lciaMethodID, int? scenarioID = 1) {
@@ -422,7 +427,8 @@ namespace Services {
             }
             else {
                 IEnumerable<InventoryModel> inventory = _LCIAComputation.ComputeProcessLCI(processID, scenarioID);
-                IEnumerable<LCIAModel> lciaResults = _LCIAComputation.ComputeProcessLCIA(inventory, lciaMethod, scenarioID);
+                IEnumerable<LCIAModel> lciaResults = _LCIAComputation.ComputeProcessLCIA(inventory, lciaMethod, scenarioID)
+                    .Where(l => String.IsNullOrEmpty(l.Geography));
                 return lciaResults.Select(m => Transform(m)).ToList();
             }
         }
