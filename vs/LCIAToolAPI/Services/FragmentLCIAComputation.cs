@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 
 namespace Services
 {
-    public class FragmentLCIAComputation
+    public class FragmentLCIAComputation : IFragmentLCIAComputation
     {
         [Inject]
         private readonly IService<FragmentFlow> _fragmentFlowService;
@@ -54,8 +54,14 @@ namespace Services
         private readonly IService<CharacterizationParam> _characterizationParamService;
         [Inject]
         private readonly IService<Param> _paramService;
-         [Inject]
+        [Inject]
+        private readonly IService<DependencyParam> _dependencyParamService;
+        [Inject]
+        private readonly IService<Fragment> _fragmentService;
+        [Inject]
         private readonly IUnitOfWork _unitOfWork;
+        [Inject]
+        private readonly IUnitOfWork _unitOfWork1;
 
         public FragmentLCIAComputation(IService<FragmentFlow> fragmentFlowService,
             IService<ScoreCache> scoreCacheService,
@@ -78,7 +84,10 @@ namespace Services
             IService<LCIA> lciaService,
             IService<CharacterizationParam> characterizationParamService,
             IService<Param> paramService,
-            IUnitOfWork unitOfWork)
+            IService<DependencyParam> dependencyParamService,
+            IService<Fragment> fragmentService,
+            IUnitOfWork unitOfWork,
+            IUnitOfWork unitOfWork1)
         {
             if (fragmentFlowService == null)
             {
@@ -201,18 +210,42 @@ namespace Services
             }
             _paramService = paramService;
 
+            if (lciaMethodService == null)
+            {
+                throw new ArgumentNullException("lciaMethodService is null");
+            }
+            _lciaMethodService = lciaMethodService;
+
+            if (dependencyParamService == null)
+            {
+                throw new ArgumentNullException("dependencyParamService is null");
+            }
+            _dependencyParamService = dependencyParamService;
+
+            if (fragmentService == null)
+            {
+                throw new ArgumentNullException("fragmentService is null");
+            }
+            _fragmentService = fragmentService;
+
             if (unitOfWork == null)
             {
                 throw new ArgumentNullException("unitOfWork is null");
             }
             _unitOfWork = unitOfWork;
+
+            if (unitOfWork1 == null)
+            {
+                throw new ArgumentNullException("unitOfWork1 is null");
+            }
+            _unitOfWork1 = unitOfWork1;
         }
 
-        public IEnumerable<FragmentLCIAModel> GetLCIAMethodsForComputeFragmentLCIA()
+        public void FragmentLCIACompute(int fragmentId, int scenarioId)
         {
-            var lciaMethods = _lciaMethodService.Query().Get();
-            var c = FragmentFlowLCIA(11, 1, lciaMethods);
-            return c.ToList();
+            var lciaMethods = _lciaMethodService.Query().Get().ToList();
+            var c = FragmentFlowLCIA(fragmentId, scenarioId, lciaMethods).ToList();
+            //return c.ToList();
 
         }
 
@@ -241,29 +274,43 @@ namespace Services
             return lcia;
         }
 
-        public IEnumerable<FragmentLCIAModel> FragmentFlowLCIA(int? fragmentId, int? scenarioId, IEnumerable<LCIAMethod> lciaMethods)
+        public IEnumerable<FragmentLCIAModel> FragmentFlowLCIA(int? fragmentId, int scenarioId, IEnumerable<LCIAMethod> lciaMethods)
         {
             // set score cache for fragment / scenario / method: iterate through
             // fragmentflows 
 
 
             // this does nothing if traversal has already been completed - FIGURE OUT THIS PART ON THURSDAY
-            //FragmentTraverse(fragment_id, scenario_id); 
+            FragmentTraversalV2 fragmentTraversalV2 = new FragmentTraversalV2(_flowService,
+                            _fragmentFlowService,
+                            _nodeCacheService,
+                            _fragmentNodeProcessService,
+                            _processFlowService,
+                            _fragmentNodeFragmentService,
+                            _flowFlowPropertyService,
+                            _dependencyParamService,
+                            _flowPropertyParamService,
+                            _fragmentService,
+                            _paramService,
+                            _unitOfWork);
 
+            fragmentTraversalV2.Traverse(fragmentId, scenarioId);
 
             var fragmentFlows = _nodeCacheService.Query().Get()
                 .Where(x => x.ScenarioID == scenarioId)
                 .Join(_fragmentFlowService.Query().Get(), nc => nc.FragmentFlowID, ff => ff.FragmentFlowID, (nc, ff) => new { nc, ff })
-                .Where(x => x.ff.FragmentID == fragmentId);
+                .Where(x => x.ff.FragmentID == fragmentId).ToList();
 
             foreach (var item in fragmentFlows)
             {
-                int nodeCacheId = Convert.ToInt32(_nodeCacheService.Query().Get()
+                var nodeCache = _nodeCacheService.Query().Get()
                     .Where(x => x.FragmentFlowID == Convert.ToInt32(item.ff.FragmentFlowID))
-                    .Where(x => x.ScenarioID == scenarioId));
+                    .Where(x => x.ScenarioID == scenarioId);
+
+                int nodeCacheId = Convert.ToInt32(nodeCache.Select(x => x.NodeCacheID).FirstOrDefault());
 
                 int nodeTypeId = Convert.ToInt32(item.ff.NodeTypeID);
-                int? targetId;
+                int? targetId = 0;
                 switch (nodeTypeId)
                 {
                     case 1:
@@ -281,22 +328,26 @@ namespace Services
       {
           fnpProcessID = x.fragmentNodeProcesses.ProcessID,
           psProcessID = processSubstitutions == null ? 0 : processSubstitutions.ProcessID
-      });
+      }).ToList();
                         foreach (var target1Item in target1)
                         {
                             if (target1Item.psProcessID == 0)
                             {
-                                target1Item.psProcessID = target1Item.fnpProcessID;
+                                targetId = target1Item.fnpProcessID;
+                            }
+                            else
+                            {
+                                targetId = target1Item.psProcessID;
                             }
                         }
 
-                        targetId = Convert.ToInt32(target1.Select(x => x.psProcessID).FirstOrDefault());
+
 
                         LCIAComputationV2 lciaComputation = new LCIAComputationV2(_processFlowService,
-                            _processEmissionParamService, 
-                            _lciaMethodService, 
-                            _flowService, 
-                            _flowFlowPropertyService, 
+                            _processEmissionParamService,
+                            _lciaMethodService,
+                            _flowService,
+                            _flowFlowPropertyService,
                             _flowPropertyParamService,
                             _flowPropertyEmissionService,
                             _processDissipationService,
@@ -304,12 +355,16 @@ namespace Services
                             _lciaService,
                             _characterizationParamService,
                             _paramService);
- 
-                        var scores = lciaComputation.ProcessLCIA(targetId, lciaMethods, scenarioId);
-                        foreach (var lciaMethodItem in lciaMethods)
-                        {
-                            SetScoreCache(nodeCacheId, lciaMethodItem.LCIAMethodID, scores.Select(x => x.Result).FirstOrDefault());
+
+                        var score = lciaComputation.ProcessLCIA(targetId, lciaMethods, scenarioId);
+                        
+                        IList<ScoreCache> scoreCaches = new List<ScoreCache>();
+                        foreach (var lciaMethodItem in lciaMethods.AsQueryable())
+                       {
+                           SetScoreCache(nodeCacheId, lciaMethodItem.LCIAMethodID, score);
+                         
                         }
+                        _unitOfWork.Save();
 
                         break;
                     case 2:
@@ -378,7 +433,7 @@ namespace Services
                       NodeTypeID = x.ff.NodeTypeID,
                       FlowID = x.ff.FlowID,
                       DirectionID = x.ff.DirectionID
-                  }); 
+                  });
         }
 
 
@@ -430,15 +485,11 @@ namespace Services
 
         public void SetScoreCache(int? nodeCacheId, int? lciaMethodId, double? result)
         {
-            var scoreCache = new ScoreCache
-            {
-                NodeCacheID = nodeCacheId,
-                LCIAMethodID = lciaMethodId,
-                ImpactScore = result
-            };
-
+            ScoreCache scoreCache = new ScoreCache();
+            scoreCache.NodeCacheID = nodeCacheId;
+            scoreCache.LCIAMethodID = lciaMethodId;
+            scoreCache.ImpactScore = result;
             _scoreCacheService.InsertGraph(scoreCache);
-            _unitOfWork.Save();
         }
 
     }

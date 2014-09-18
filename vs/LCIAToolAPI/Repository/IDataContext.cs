@@ -9,6 +9,7 @@ namespace Repository
     public interface IDataContext : IDisposable
     {
         int SaveChanges();
+        int BulkSave();
         void SyncObjectState(object entity);
     }
 }

@@ -123,62 +123,48 @@ namespace Services
             _paramService = paramService;
         }
 
-        public IEnumerable<LCIAModel> GetLCIAMethodsForComputeLCIA()
+        public double LCIACompute(int processId, int scenarioId)
         {
             var lciaMethods = _lciaMethodService.Query().Get();
-            var c = ProcessLCIA(1, lciaMethods, 1);
-            return c.Select(lciamethods =>
-                        new LCIAModel
-                        {
-                            Result = lciamethods.Result,
-                            DirectionID = lciamethods.DirectionID,
-                            FlowID = lciamethods.FlowID
-                        }).ToList();
+            var result = ProcessLCIA(processId, lciaMethods, scenarioId);
+            return result;
 
         }
 
-        public IEnumerable<LCIAModel> ProcessLCIA(int? processId, IEnumerable<LCIAMethod> lciaMethods, int? scenarioId = 1)
+        public double ProcessLCIA(int? processId, IEnumerable<LCIAMethod> lciaMethods, int? scenarioId = 1)
         {
             var inventory = ComputeProcessLCI(processId, scenarioId);
             IEnumerable<LCIAModel> lcias=null;
             IEnumerable<LCIAModel> scores = null;
 
-          
             foreach (var lciaMethodItem in lciaMethods.ToList())
             {
                
-               lcias= ComputeProcessLCIA(inventory, lciaMethodItem, scenarioId);
+               lcias= ComputeProcessLCIA(inventory, lciaMethodItem, scenarioId).ToList();
 
                if (lcias.Count() != 0)
                {
                    scores = lcias.ToList()
                         .GroupBy(t => new
                      {
+                         t.LCIAMethodID,
                          t.Result,
                          t.DirectionID,
                          t.FlowID
                      })
                      .Select(group => new LCIAModel
                      {
-                         Result = group.Sum(a => a.Result),
+                         Result = group.Key.Result,
                          DirectionID = group.Key.DirectionID,
-                         FlowID = group.Key.FlowID
+                         FlowID = group.Key.FlowID,
+                         LCIAMethodID = group.Key.LCIAMethodID
                      });
                }
 
             }
+            double total = Convert.ToDouble(scores.Sum(x => x.Result));
 
-
-
-            var lciaMethodScores = scores
-                .Select(lm => new LCIAModel
-                {
-                    Result = lm.Result,
-                    DirectionID = lm.DirectionID,
-                    FlowID = lm.FlowID
-                });
-
-            return lciaMethodScores;
+            return total;
         }
 
         //inventory in pseudocode
@@ -300,9 +286,6 @@ namespace Services
             double? computationResult;
             foreach (var item in lcias)
             {
-                //        inventory.Result * (lcparam.Value == NULL 
-                //    ? LCIA.Factor : lcparam.Value) AS Factor,
-                //Quantity * Factor AS Result
                 if (item.LCParamValue == 0)
                 {
                     computationResult = (item.Result * item.LCIAFactor);
