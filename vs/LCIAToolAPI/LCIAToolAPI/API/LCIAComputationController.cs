@@ -16,9 +16,11 @@ namespace LCAToolAPI.API
     {
         [Inject]
         private readonly ILCIAComputationV2 _lciaComputationV2;
+        [Inject]
+        private readonly IFragmentLCIAComputation _fragmentLCIAComputation;
 
 
-        public LCIAComputationController(ILCIAComputationV2 lciaComputationV2)
+        public LCIAComputationController(ILCIAComputationV2 lciaComputationV2, IFragmentLCIAComputation fragmentLCIAComputation)
         {
 
             if (lciaComputationV2 == null)
@@ -28,16 +30,32 @@ namespace LCAToolAPI.API
 
             _lciaComputationV2 = lciaComputationV2;
 
+            if (fragmentLCIAComputation == null)
+            {
+                throw new ArgumentNullException("fragmentLCIAComputation is null");
+            }
+
+            _fragmentLCIAComputation = fragmentLCIAComputation;
+
         }
 
         //GET api/<controller>
          [Route("api/processes/{ProcessID}/scenarios/{scenarioID}/compute")]
         [System.Web.Http.AcceptVerbs("GET", "POST")]
         [System.Web.Http.HttpGet]
-        public double Compute(int processId, int scenarioId)
+        public double LCIACompute(int processId, int scenarioId)
         {
-            return _lciaComputationV2.Compute(processId, scenarioId);
+            return _lciaComputationV2.LCIACompute(processId, scenarioId);
         }
+
+         [Route("api/fragments/{FragmentID}/scenarios/{scenarioID}/compute")]
+         [System.Web.Http.AcceptVerbs("GET", "POST")]
+         [System.Web.Http.HttpGet]
+         public void LCIAFragmentCompute(int fragmentId, int scenarioId)
+         {
+            _fragmentLCIAComputation.FragmentLCIACompute(fragmentId, scenarioId);
+         }
+
 
        
     }

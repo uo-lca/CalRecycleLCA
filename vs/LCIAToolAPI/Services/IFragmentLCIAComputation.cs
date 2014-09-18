@@ -8,5 +8,6 @@ namespace Services
 {
     public interface IFragmentLCIAComputation
     {
+        void FragmentLCIACompute(int fragmentId, int scenarioId);
     }
 }

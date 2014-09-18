@@ -123,7 +123,7 @@ namespace Services
             _paramService = paramService;
         }
 
-        public double Compute(int processId, int scenarioId)
+        public double LCIACompute(int processId, int scenarioId)
         {
             var lciaMethods = _lciaMethodService.Query().Get();
             var result = ProcessLCIA(processId, lciaMethods, scenarioId);
@@ -140,7 +140,7 @@ namespace Services
             foreach (var lciaMethodItem in lciaMethods.ToList())
             {
                
-               lcias= ComputeProcessLCIA(inventory, lciaMethodItem, scenarioId);
+               lcias= ComputeProcessLCIA(inventory, lciaMethodItem, scenarioId).ToList();
 
                if (lcias.Count() != 0)
                {

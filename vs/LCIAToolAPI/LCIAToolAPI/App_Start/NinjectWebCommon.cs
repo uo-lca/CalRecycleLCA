@@ -81,6 +81,7 @@ namespace LCAToolAPI.App_Start
             kernel.Bind<IFragmentTraversalV2>().To<FragmentTraversalV2>();
             kernel.Bind<IFlowPropertyParamService>().To<FlowPropertyParamService>();
             kernel.Bind<ILCIAComputationV2>().To<LCIAComputationV2>();
+            kernel.Bind<IFragmentLCIAComputation>().To<FragmentLCIAComputation>();
             kernel.Bind<IResourceServiceFacade>().To<ResourceServiceFacade>();
 
             kernel.Bind(typeof(IService<>)).To(typeof(Service<>));
