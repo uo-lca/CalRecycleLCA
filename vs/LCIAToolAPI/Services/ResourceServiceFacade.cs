@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using LcaDataModel;
 using Entities.Models;
 using Ninject;
+using System.Runtime.CompilerServices;
 
 namespace Services {
     /// <summary>
@@ -17,6 +18,8 @@ namespace Services {
         //
         // LcaDataModel services
         //
+        [Inject]
+        private readonly IService<Category> _CategoryService;
         [Inject]
         private readonly IService<Fragment> _FragmentService;
         [Inject]
@@ -41,10 +44,21 @@ namespace Services {
         [Inject]
         private readonly ILCIAComputationV2 _LCIAComputation;
 
+        private T verifiedDependency<T>(T dependency) where T : class {
+            if (dependency == null) {
+                throw new ArgumentNullException("dependency", String.Format("Type: {0}", dependency.GetType().ToString()));
+            }
+            else {
+                return dependency;
+            }
+        }
+
         /// <summary>
         /// Constructor for use with Ninject dependency injection
         /// </summary>
-        public ResourceServiceFacade( IService<Fragment> fragmentService,
+        public ResourceServiceFacade( 
+                               IService<Category> categoryService,
+                               IService<Fragment> fragmentService,
                                IService<FragmentFlow> fragmentFlowService,
                                IFragmentTraversalV2 fragmentTraversalV2,
                                IService<Flow> flowService,
@@ -55,55 +69,17 @@ namespace Services {
                                IService<LCIAMethod> lciaMethodService,
                                IService<Process> processService) 
         {
-            if (fragmentService == null) {
-                throw new ArgumentNullException("fragmentService");
-            }
-            _FragmentService = fragmentService;
-
-            if (fragmentFlowService == null) {
-                throw new ArgumentNullException("fragmentFlowService");
-            }
-            _FragmentFlowService = fragmentFlowService;
-
-            if (fragmentTraversalV2 == null) {
-                throw new ArgumentNullException("fragmentTraversalV2");
-            }
-            _FragmentTraversalV2 = fragmentTraversalV2;
-
-            if (flowService == null) {
-                throw new ArgumentNullException("flowService");
-            }
-            _FlowService = flowService;
-
-            if (flowPropertyService == null) {
-                throw new ArgumentNullException("flowPropertyService");
-            }
-            _FlowPropertyService = flowPropertyService;
-
-            if (flowTypeService == null) {
-                throw new ArgumentNullException("flowTypeService");
-            }
-            _FlowTypeService = flowTypeService;
-
-            if (impactCategoryService == null) {
-                throw new ArgumentNullException("impactCategoryService");
-            }
-            _ImpactCategoryService = impactCategoryService;
-
-            if (lciaComputation == null) {
-                throw new ArgumentNullException("lciaComputation");
-            }
-            _LCIAComputation = lciaComputation;
-
-            if (lciaMethodService == null) {
-                throw new ArgumentNullException("lciaMethodService");
-            }
-            _LciaMethodService = lciaMethodService;
-
-            if (processService == null) {
-                throw new ArgumentNullException("processService");
-            }
-            _ProcessService = processService;
+            _CategoryService = verifiedDependency(categoryService);
+            _FragmentService = verifiedDependency(fragmentService);
+            _FragmentFlowService = verifiedDependency(fragmentFlowService);
+            _FragmentTraversalV2 = verifiedDependency(fragmentTraversalV2);         
+            _FlowService = verifiedDependency(flowService);
+            _FlowPropertyService = verifiedDependency(flowPropertyService);
+            _FlowTypeService = verifiedDependency(flowTypeService);
+            _ImpactCategoryService = verifiedDependency(impactCategoryService);
+            _LCIAComputation = verifiedDependency(lciaComputation);
+            _LciaMethodService = verifiedDependency(lciaMethodService);
+            _ProcessService = verifiedDependency(processService);
         }
 
         // TransformNullable methods are a workaround for imprecise relationship modeling
@@ -222,13 +198,30 @@ namespace Services {
             };
         }
 
-        public FlowResource Transform(Flow f) {
+        /// <summary>
+        /// Transform Flow to FlowResource by joining with Category data
+        /// </summary>
+        /// <param name="f">Instance of Flow</param>
+        /// <param name="categories">all categories</param>
+        /// <returns>Instance of FlowResource</returns>
+        public FlowResource Transform(Flow f, IEnumerable<Category> categories) {
+          
+            var joinResult = f.ILCDEntity.Classifications.Join(categories, cl => cl.CategoryID, cat => cat.CategoryID, 
+                (cl, cat) => new {
+                    ClassificationID = cl.ClassificationID,
+                    Name = cat.Name,
+                    HierarchyLevel = cat.HierarchyLevel
+                });
+            int? maxHL = joinResult.Max(j => j.HierarchyLevel);
+            string categoryName = joinResult.Where(j => j.HierarchyLevel == maxHL).Single().Name;
+
             return new FlowResource {
                 FlowID = f.FlowID,
                 Name = f.Name,
                 FlowTypeID = TransformNullable(f.FlowTypeID, "Flow.FlowTypeID"),
                 ReferenceFlowPropertyID = TransformNullable(f.ReferenceFlowProperty, "Flow.ReferenceFlowProperty"),
-                CASNumber = f.CASNumber
+                CASNumber = f.CASNumber,
+                Category = categoryName
             };
         }
 
@@ -314,25 +307,36 @@ namespace Services {
         }
 
         /// <summary>
+        /// Get list of flows related to a fragment or a process
+        /// </summary>
+        /// <param name="relType">Relationship class type (FragmentFlow or ProcessFlow)</param>
+        /// <param name="relID">ID of related fragment or process</param>
+        /// <returns>List of FlowResource objects</returns>
+        public IEnumerable<FlowResource> GetFlows(Type relType, int relID) {
+            Repository.RepositoryQuery<Flow> flowQuery = _FlowService.Query().Include(f => f.ILCDEntity.Classifications);
+            IEnumerable<Category> categories = _CategoryService.Query().Get();
+            if (relType == typeof(FragmentFlow)) { 
+                flowQuery = flowQuery.Filter(f => f.FragmentFlows.Any(ff => ff.FragmentID == relID));
+            } else if (relType == typeof(ProcessFlow)) {
+                flowQuery = flowQuery.Filter(f => f.ProcessFlows.Any(pf => pf.ProcessID == relID));
+            }
+            return flowQuery.Get().Select(f => Transform(f, categories)).ToList();
+        }
+
+        /// <summary>
         /// Get list of flows related to a fragment (via FragmentFlow)
         /// </summary>
         /// <param name="fragmentID">FragmentID filter</param>
         /// <returns>List of FlowResource objects</returns>
         public IEnumerable<FlowResource> GetFlowsByFragment(int fragmentID) {
-            IEnumerable<Flow> flows = _FlowService.Query()
-                                      .Filter(f => f.FragmentFlows.Any(ff => ff.FragmentID == fragmentID))
-                                      .Get();
-            return flows.Select(f => Transform(f)).ToList();
+            return GetFlows(typeof(FragmentFlow), fragmentID);
         }
 
         /// <summary>
         /// Get list of flows related to a process (via ProcessFlow)
         /// </summary>
         public IEnumerable<FlowResource> GetFlowsByProcess(int processID) {
-            IEnumerable<Flow> flows = _FlowService.Query()
-                                      .Filter(f => f.ProcessFlows.Any(pf => pf.ProcessID == processID))
-                                      .Get();
-            return flows.Select(f => Transform(f)).ToList();
+            return GetFlows(typeof(ProcessFlow), processID);
         }
 
         /// <summary>
