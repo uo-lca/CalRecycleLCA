@@ -26,6 +26,8 @@ namespace Services {
         [Inject]
         private readonly IService<FlowProperty> _FlowPropertyService;
         [Inject]
+        private readonly IService<FlowType> _FlowTypeService;
+        [Inject]
         private readonly IService<ImpactCategory> _ImpactCategoryService;
         [Inject]
         private readonly IService<LCIAMethod> _LciaMethodService;
@@ -42,18 +44,12 @@ namespace Services {
         /// <summary>
         /// Constructor for use with Ninject dependency injection
         /// </summary>
-        /// <param name="fragmentService"></param>
-        /// <param name="fragmentFlowService"></param>
-        /// <param name="fragmentTraversalV2"></param>
-        /// <param name="flowService"></param>
-        /// <param name="flowPropertyService"></param>
-        /// <param name="lciaMethodService"></param>
-        /// <param name="processService"></param>
         public ResourceServiceFacade( IService<Fragment> fragmentService,
                                IService<FragmentFlow> fragmentFlowService,
                                IFragmentTraversalV2 fragmentTraversalV2,
                                IService<Flow> flowService,
                                IService<FlowProperty> flowPropertyService,
+                               IService<FlowType> flowTypeService,
                                IService<ImpactCategory> impactCategoryService,
                                ILCIAComputationV2 lciaComputation,
                                IService<LCIAMethod> lciaMethodService,
@@ -63,34 +59,47 @@ namespace Services {
                 throw new ArgumentNullException("fragmentService");
             }
             _FragmentService = fragmentService;
+
             if (fragmentFlowService == null) {
                 throw new ArgumentNullException("fragmentFlowService");
             }
             _FragmentFlowService = fragmentFlowService;
+
             if (fragmentTraversalV2 == null) {
                 throw new ArgumentNullException("fragmentTraversalV2");
             }
             _FragmentTraversalV2 = fragmentTraversalV2;
+
             if (flowService == null) {
                 throw new ArgumentNullException("flowService");
             }
             _FlowService = flowService;
+
             if (flowPropertyService == null) {
                 throw new ArgumentNullException("flowPropertyService");
             }
-            _FlowPropertyService = flowPropertyService;           
+            _FlowPropertyService = flowPropertyService;
+
+            if (flowTypeService == null) {
+                throw new ArgumentNullException("flowTypeService");
+            }
+            _FlowTypeService = flowTypeService;
+
             if (impactCategoryService == null) {
                 throw new ArgumentNullException("impactCategoryService");
             }
             _ImpactCategoryService = impactCategoryService;
+
             if (lciaComputation == null) {
                 throw new ArgumentNullException("lciaComputation");
             }
             _LCIAComputation = lciaComputation;
+
             if (lciaMethodService == null) {
                 throw new ArgumentNullException("lciaMethodService");
             }
             _LciaMethodService = lciaMethodService;
+
             if (processService == null) {
                 throw new ArgumentNullException("processService");
             }
@@ -247,10 +256,12 @@ namespace Services {
              return new ProcessResource {
                  ProcessID = p.ProcessID,
                  Name = p.Name,
+                 Geography = p.Geography,
                  ProcessTypeID = TransformNullable(p.ProcessTypeID, "Process.ProcessTypeID"),
                  ReferenceTypeID = p.ReferenceTypeID,
                  ReferenceFlowID = p.ReferenceFlowID,
-                 ReferenceYear = p.ReferenceYear
+                 ReferenceYear = p.ReferenceYear,
+                 Version = p.ILCDEntity.Version
              };
          }
 
@@ -377,18 +388,26 @@ namespace Services {
         /// <summary>
         /// Get Process data and transform to API resource model
         /// </summary>
+        /// <param name="flowTypeID">Optional process flow type filter</param>
         /// <returns>List of ProcessResource objects</returns>
-        public IEnumerable<ProcessResource> GetProcesses() {
-            IEnumerable<Process> pData = _ProcessService.Query().Get();
+        public IEnumerable<ProcessResource> GetProcesses(int? flowTypeID=null) {
+            var query = _ProcessService.Query().Include(p => p.ILCDEntity);
+            if (flowTypeID != null) {
+                query = query.Filter(p => p.ProcessFlows.Any(pf => pf.Flow.FlowTypeID == flowTypeID));
+            }
+            IEnumerable<Process> pData = query.Get();
             return pData.Select(p => Transform(p)).ToList();
         }
 
         /// <summary>
         /// Get ImpactCategory data and transform to API resource model
+        /// Omit categories that are not related to any LCIAMethod
         /// </summary>
         /// <returns>List of ImpactCategoryResource objects</returns>
         public IEnumerable<ImpactCategoryResource> GetImpactCategories() {
-            IEnumerable<ImpactCategory> data = _ImpactCategoryService.Query().Get();
+            IEnumerable<ImpactCategory> data = _ImpactCategoryService.Query()
+                .Filter(i => i.LCIAMethods.Count() > 0)
+                .Get();
             return data.Select(d => new ImpactCategoryResource {
                 ImpactCategoryID = d.ID,
                 Name = d.Name
@@ -397,6 +416,7 @@ namespace Services {
 
         /// <summary>
         /// Execute Process LCIA and return computation results in LCIAResultResource objects
+        /// Work around problem in LCIA computation: should be filtering out LCIA with Geography 
         /// </summary>
         /// <returns>List of LCIAResultResource objects or null if lciaMethodID not found</returns> 
         public IEnumerable<LCIAResultResource> GetLCIAResultResources(int processID, int lciaMethodID, int? scenarioID = 1) {
@@ -407,9 +427,22 @@ namespace Services {
             }
             else {
                 IEnumerable<InventoryModel> inventory = _LCIAComputation.ComputeProcessLCI(processID, scenarioID);
-                IEnumerable<LCIAModel> lciaResults = _LCIAComputation.ComputeProcessLCIA(inventory, lciaMethod, scenarioID);
+                IEnumerable<LCIAModel> lciaResults = _LCIAComputation.ComputeProcessLCIA(inventory, lciaMethod, scenarioID)
+                    .Where(l => String.IsNullOrEmpty(l.Geography));
                 return lciaResults.Select(m => Transform(m)).ToList();
             }
+        }
+
+        /// <summary>
+        /// Get FlowType data and transform to API resource model
+        /// </summary>
+        /// <returns>List of FlowTypeResource objects</returns>
+        public IEnumerable<FlowTypeResource> GetFlowTypes() {
+            IEnumerable<FlowType> data = _FlowTypeService.Query().Get();
+            return data.Select(d => new FlowTypeResource {
+                FlowTypeID = d.ID,
+                Name = d.Name
+            }).ToList();
         }
 
     }

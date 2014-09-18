@@ -129,6 +129,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Models\FlowTypeResource.cs" />
     <Compile Include="Models\ImpactCategoryResource.cs" />
     <Compile Include="Models\LCIAResultResource.cs" />
     <Compile Include="Models\LCIAMethodResource.cs" />

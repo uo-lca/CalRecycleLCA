@@ -16,7 +16,8 @@ function lciaComputation() {
         selectedImpactCategoryID = 0,
         selectedMethodID = 0,
         // Score for current selection
-        impactScore = 0;
+        impactScore = 0,
+        startupProcessID = 116;
 
     /**
      * d3 variables
@@ -52,7 +53,7 @@ function lciaComputation() {
                        colorbrewer.Greens, colorbrewer.YlOrBr, colorbrewer.BuGn,
                        colorbrewer.PuBuGn, colorbrewer.Greys, colorbrewer.YlGnBu];
 
-    var svg;
+    var svg = null, msg = null;
 
     /**
      * Initial preparation of svg element.
@@ -72,13 +73,17 @@ function lciaComputation() {
             .attr("transform", "translate(" + margin.left + "," + (chartHeight + margin.top) + ")");
     }
 
+    function prepareMsg() {
+        msg = d3.select("#chartcontainer").append("p").append("i");
+    }
+
     /**
      * Change event handler for process selection list.
      * Triggers LCIA computation update.
      */
     function onProcessChange() {
-
         selectedProcessID = this.options[this.selectedIndex].value;
+        loadFlows();
         getLciaResults();
     }
 
@@ -97,6 +102,7 @@ function lciaComputation() {
      */
     function onImpactCategoryChange() {
         selectedImpactCategoryID = this.options[this.selectedIndex].value;
+        selectedMethodID = 0;
         loadMethods();
     }
 
@@ -104,7 +110,7 @@ function lciaComputation() {
      * Compare function used to sort LCIA results in descending order
      */
     function compareLciaResults(a, b) {
-        return d3.descending(a.LCIAResult, b.LCIAResult);
+        return d3.descending(a.result, b.result);
     }
 
     /**
@@ -164,7 +170,7 @@ function lciaComputation() {
         // Add rows, if necessary
         newRows = legend.enter().append("g").attr("class", "legend");
         newRows.filter(function (d) {
-            return d.LCIAResult > 0 && (x(d.x1) - x(d.x0) > 1);
+            return d.result > 0 && (x(d.x1) - x(d.x0) > 1);
         })
             .append("rect")
             .attr("x", colXs[0])
@@ -189,15 +195,17 @@ function lciaComputation() {
         });
         squares = legend.selectAll("rect")
             .style("fill", function (d) {
-                return color(d.Flow);
+                return color(d.flowID);
             });
         flows = legend.selectAll(".flowname")
             .text(function (d) {
-                return d.Flow;
+                return (d.flowID in LCA.indexedData.flows) ?
+                    LCA.indexedData.flows[d.flowID].name :
+                    "FlowID: " + d.flowID.toString;
             });
         legend.selectAll(".lciaresult")
             .text(function (d) {
-                return d.LCIAResult.toPrecision(4);
+                return d.result.toPrecision(4);
             });
     }
 
@@ -214,11 +222,12 @@ function lciaComputation() {
             colorIndex = 1, // Index to color scale (ImpactCategoryID - 1)
             reverseScale; // Clone of color scale in reverse order (dark to light)
 
+ 
         impactScore = 0;
         lciaResultData = results;
         lciaResultData.sort(compareLciaResults);
         flowList = lciaResultData.map(function (d) {
-            return d.Flow;
+            return d.flowID;
         });
         color.domain(flowList);
         if (flowList.length < 3) {
@@ -238,11 +247,11 @@ function lciaComputation() {
          * Add rect start and end points for each flow
          */
         lciaResultData.forEach(function (d) {
-            impactScore += +d.LCIAResult;
+            impactScore += +d.result;
             d.x0 = runningTotal;
             // ignore negative values in chart
-            if (+d.LCIAResult > 0) {
-                runningTotal += +d.LCIAResult;
+            if (+d.result > 0) {
+                runningTotal += +d.result;
             }
             d.x1 = runningTotal;
         });
@@ -267,29 +276,89 @@ function lciaComputation() {
             .attr("y", 10)
             .attr("height", 30)
             .style("fill", function (d) {
-                return color(d.Flow);
+                return color(d.flowID);
             });
         makeLegend(lciaResultData);
+        if (results.length > 0) {
+            resume("");
+        } else {
+            resume("No impact to display.");
+        }
     }
 
-    function onProcessesLoaded() {
-        if ("processes" in LCA.loadedData) {
-            if (LCA.loadedData.processes.length > 0) {
-                // If no default setting, select first process
-                selectedProcessID = LCA.loadedData.processes[0].processID;
-                loadFlowProperties();
-                loadFlows();
-                LCA.loadSelectionList(LCA.loadedData.processes,
-                        "#processSelect", "processID", onProcessChange, selectedProcessID);
-                getLciaResults();
+    /**
+     * Prepare process resources for selection list by appending property value to non-distinct
+     * names.
+     * @param {Array} processArray   Process resources from web API
+     */
+    function distinguishProcessNames(processArray) {
+        if (processArray.length > 1) {
+            var curName = processArray[0].name;
+            for (var i = 1; i < processArray.length; ++i) {
+                var curP = processArray[i],
+                    prevP = processArray[i - 1];
+                if (curP.name === curName) {
+                    if (curP.geography !== prevP.geography ) {
+                        curP.name = curP.name.concat(" [", curP.geography, "]");
+                        if (prevP.name === curName) {
+                            prevP.name = prevP.name.concat("  [", prevP.geography, "]");
+                        }
+                    } else if ( curP.version !== prevP.version) {
+                        curP.name = curP.name.concat(" [", curP.version, "]");
+                        if (prevP.name === curName) {
+                            prevP.name = prevP.name.concat("  [", prevP.version, "]");
+                        }
+                    } else {
+                        curP.name = curP.name.concat(" [id:", curP.processID, "]");
+                        if (prevP.name === curName) {
+                            prevP.name = prevP.name.concat("  [id:", prevP.processID, "]");
+                        }
+                    }
+                } else {
+                    curName = curP.name;
+                }
             }
         }
     }
 
+    /**
+     * After processes have been loaded, prepare process selection list,
+     * select first process (if none pre-selected),
+     * request resources depending on process filter, 
+     * and request LCIA results
+     */
+    function onProcessesLoaded() {
+        if ("processes" in LCA.loadedData) {
+            var processArray = LCA.loadedData.processes;
+            processArray.sort(LCA.compareNames);            
+            if (processArray.length > 0) {
+                // Set selectedProcessID to startupProcessID,
+                // if it exists. 
+                if (processArray.some(function (p) {
+                    return p.processID === startupProcessID;
+                })) {
+                    selectedProcessID = startupProcessID;
+                } else {
+                    selectedProcessID = processArray[0].processID;
+                }
+                loadFlowProperties();
+                loadFlows();
+                distinguishProcessNames(processArray);
+                LCA.loadSelectionList(processArray,
+                        "#processSelect", "processID", onProcessChange, selectedProcessID);
+            }
+        }
+    }
+
+    /**
+     * After impact categories have been loaded, 
+     * prepare selection list,
+     * select first one,
+     * request LCIA methods with selected impact category
+     */
     function onImpactCategoriesLoaded() {
         if ("impactcategories" in LCA.loadedData) {
             if (LCA.loadedData.impactcategories.length > 0) {
-                // If no default setting, select first category
                 selectedImpactCategoryID = LCA.loadedData.impactcategories[0].impactCategoryID;
                 loadMethods();
                 LCA.loadSelectionList(LCA.loadedData.impactcategories,
@@ -298,15 +367,23 @@ function lciaComputation() {
         }
     }
 
+    /**
+     * After LCIA methods have been loaded, 
+     * prepare selection list,
+     * select first one (if none pre-selected),
+     * request LCIA results
+     */
     function onMethodsLoaded() {
         if ("lciamethods" in LCA.loadedData) {
-            if (selectedMethodID === null && LCA.loadedData.lciamethods.length > 0) {
+            if (LCA.loadedData.lciamethods.length > 0) {
                 // If no default setting, select first LCIA method
                 selectedMethodID = LCA.loadedData.lciamethods[0].lciaMethodID;
-
                 LCA.loadSelectionList(LCA.loadedData.lciamethods,
                    "#lciaMethodSelect", "lciaMethodID", onMethodChange, selectedMethodID);
                 getLciaResults();
+            } else {
+                selectedMethodID = 0;
+                LCA.emptySelectionList("#lciaMethodSelect");
             }
         }
     }
@@ -320,6 +397,7 @@ function lciaComputation() {
     function onFlowsLoaded() {
         if ("flows" in LCA.loadedData) {
             LCA.indexedData.flows = LCA.indexData("flows", "flowID");
+            getLciaResults();
         }
     }
 
@@ -330,11 +408,10 @@ function lciaComputation() {
     }
 
     /**
-      * Get all processes from web API
+      * Get all processes with elementary flows from web API
       */
     function loadProcesses() {
-        selectedProcessID = 0;
-        LCA.loadData("processes", false, onProcessesLoaded);
+        LCA.loadData("processes", false, onProcessesLoaded, "flowtypes/2");
     }
 
     /**
@@ -355,7 +432,6 @@ function lciaComputation() {
       * Get all impact categories from web API
       */
     function loadImpactCategories() {
-        selectedImpactCategoryID = 0;
         LCA.loadData("impactcategories", false, onImpactCategoriesLoaded);
     }
 
@@ -363,7 +439,6 @@ function lciaComputation() {
      * Load LCIA methods having selected Impact Category
      */
     function loadMethods() {
-        selectedMethodID = 0;
         LCA.loadData("lciamethods", false, onMethodsLoaded, "impactcategories/" + selectedImpactCategoryID);
     }
 
@@ -372,10 +447,28 @@ function lciaComputation() {
       * get LCIA computation results from web API
       */
     function getLciaResults() {
-        if (selectedProcessID > 0 && selectedMethodID > 0) {
+        if ( selectedProcessID > 0 && selectedMethodID > 0) {
+            wait("Compute LCIA...");
             LCA.loadData("lciaresults", false, onResultsLoaded,
             "processes/" + selectedProcessID + "/lciamethods/" + selectedMethodID);
         }
+    }
+
+    function wait(message) {
+        d3.select("#impactScore").text("");
+        svg.style("opacity", 0.1);
+        msg.style("display", "block").text(message);
+        d3.select("#processSelect").property("disabled", true);
+        d3.select("#impactCategorySelect").property("disabled", true);
+        d3.select("#lciaMethodSelect").property("disabled", true);
+    }
+
+    function resume(message) {       
+        msg.text(message);
+        svg.style("opacity", 1);
+        d3.select("#processSelect").property("disabled", false);
+        d3.select("#impactCategorySelect").property("disabled", false);
+        d3.select("#lciaMethodSelect").property("disabled", false);
     }
 
     /**
@@ -383,8 +476,13 @@ function lciaComputation() {
      */
     function init() {
 
+        prepareMsg();
         prepareSvg();
-        LCA.startSpinner("chartcontainer");
+        LCA.createSpinner("chartcontainer");
+        wait("Load Data...");
+        if ("processid" in LCA.urlVars) {
+            startupProcessID = +LCA.urlVars.processid;
+        }
         loadProcesses();
         loadImpactCategories();
     }
