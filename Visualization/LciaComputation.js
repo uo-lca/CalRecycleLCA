@@ -84,7 +84,6 @@ function lciaComputation() {
     function onProcessChange() {
         selectedProcessID = this.options[this.selectedIndex].value;
         loadFlows();
-        getLciaResults();
     }
 
     /**
@@ -117,21 +116,28 @@ function lciaComputation() {
      * Create header for legend, if it does not already exist.
      * Make it invisible if there are no flows.
      *
-     * @param {number} flowX          X coordinate for flow header
+     * @param {number} catX          X coordinate for flow category
+     * @param {number} flowX          X coordinate for flow name
      * @param {number} resultX        X coordinate for result header
      * @param {number} headerY        Y coordinate for headers
      * @param {boolean} flowsExist    Flag if flows exist.
      */
-    function makeLegendHeader(flowX, resultX, headerY, flowsExist) {
+    function makeLegendHeader(catX, flowX, resultX, headerY, flowsExist) {
         var legendGroup = svg.select(".legendgroup"),
             header = legendGroup.selectAll(".legendheader");
         if (header.empty() && flowsExist) {
             legendGroup.append("text").attr({
                 class: "legendheader",
+                x: catX,
+                y: headerY
+            })
+                .text("Flow Category");
+            legendGroup.append("text").attr({
+                class: "legendheader",
                 x: flowX,
                 y: headerY
             })
-                .text("Flow");
+                .text("Name");
             header = legendGroup.append("text").attr({
                 class: "legendheader",
                 x: resultX,
@@ -155,14 +161,15 @@ function lciaComputation() {
         var rowHeight = 20,
             boxSize = 18,
             colPadding = 6,
-            textY = 9,
-            colXs = [0, boxSize + colPadding, width - 75],
+            textY = 9,            
+            fieldWidths = { category: 280, name: 160, result: 70 },
+            colXs = [0, boxSize + colPadding, width - 250, width - 75],
             legend,
             newRows,
             squares,
             flows;
 
-        makeLegendHeader(colXs[1], colXs[2], textY, flowData && flowData.length > 0);
+        makeLegendHeader(colXs[1], colXs[2], colXs[3], textY, flowData && flowData.length > 0);
         //TO DO: Make legend data update work, and only remove unused rows.
         svg.select(".legendgroup").selectAll(".legend").remove();
         // Update legend data
@@ -180,9 +187,14 @@ function lciaComputation() {
             .attr("x", colXs[1])
             .attr("y", textY)
             .attr("dy", ".35em")
-            .attr("class", "flowname");
+            .attr("class", "category");
         newRows.append("text")
             .attr("x", colXs[2])
+            .attr("y", textY)
+            .attr("dy", ".35em")
+            .attr("class", "flowname");
+        newRows.append("text")
+            .attr("x", colXs[3])
             .attr("y", textY)
             .attr("dy", ".35em")
             .attr("class", "lciaresult");
@@ -196,6 +208,12 @@ function lciaComputation() {
         squares = legend.selectAll("rect")
             .style("fill", function (d) {
                 return color(d.flowID);
+            });
+        legend.selectAll(".category")
+            .text(function (d) {
+                return (d.flowID in LCA.indexedData.flows) ?
+                    LCA.indexedData.flows[d.flowID].category :
+                    "";
             });
         flows = legend.selectAll(".flowname")
             .text(function (d) {
@@ -346,6 +364,7 @@ function lciaComputation() {
                 distinguishProcessNames(processArray);
                 LCA.loadSelectionList(processArray,
                         "#processSelect", "processID", onProcessChange, selectedProcessID);
+                getLciaResults();
             }
         }
     }
@@ -447,7 +466,7 @@ function lciaComputation() {
       * get LCIA computation results from web API
       */
     function getLciaResults() {
-        if ( selectedProcessID > 0 && selectedMethodID > 0) {
+        if ( selectedProcessID > 0 && selectedMethodID > 0 && "flows" in LCA.loadedData) {
             wait("Compute LCIA...");
             LCA.loadData("lciaresults", false, onResultsLoaded,
             "processes/" + selectedProcessID + "/lciamethods/" + selectedMethodID);
