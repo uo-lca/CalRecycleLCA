@@ -392,25 +392,26 @@ function lciaComputation() {
      * and request LCIA results
      */
     function onProcessesLoaded() {
-        if ("processes" in LCA.loadedData) {
+        if ("processes" in LCA.loadedData && LCA.loadedData.processes && 
+            LCA.loadedData.processes.length > 0) {
             var processArray = LCA.loadedData.processes;
             processArray.sort(LCA.compareNames);            
-            if (processArray.length > 0) {
-                // Set selectedProcessID to startupProcessID,
-                // if it exists. 
-                if (processArray.some(function (p) {
-                    return p.processID === startupProcessID;
-                })) {
-                    selectedProcessID = startupProcessID;
-                } else {
-                    selectedProcessID = processArray[0].processID;
-                }
-                loadFlows();
-                distinguishProcessNames(processArray);
-                LCA.loadSelectionList(processArray,
-                        "#processSelect", "processID", onProcessChange, selectedProcessID);
-                getLciaResults();
+            // Set selectedProcessID to startupProcessID,
+            // if it exists. 
+            if (processArray.some(function (p) {
+                return p.processID === startupProcessID;
+            })) {
+                selectedProcessID = startupProcessID;
+            } else {
+                selectedProcessID = processArray[0].processID;
             }
+            loadFlows();
+            distinguishProcessNames(processArray);
+            LCA.loadSelectionList(processArray,
+                    "#processSelect", "processID", onProcessChange, selectedProcessID);
+            getLciaResults();
+        } else {
+            resume("Unable to load processes.");
         }
     }
 
@@ -421,13 +422,14 @@ function lciaComputation() {
      * request LCIA methods with selected impact category
      */
     function onImpactCategoriesLoaded() {
-        if ("impactcategories" in LCA.loadedData) {
-            if (LCA.loadedData.impactcategories.length > 0) {
-                selectedImpactCategoryID = LCA.loadedData.impactcategories[0].impactCategoryID;
-                loadMethods();
-                LCA.loadSelectionList(LCA.loadedData.impactcategories,
-                        "#impactCategorySelect", "impactCategoryID", onImpactCategoryChange, selectedImpactCategoryID);
-            }
+        if ("impactcategories" in LCA.loadedData && LCA.loadedData.impactcategories &&
+            LCA.loadedData.impactcategories.length > 0) {
+            selectedImpactCategoryID = LCA.loadedData.impactcategories[0].impactCategoryID;
+            loadMethods();
+            LCA.loadSelectionList(LCA.loadedData.impactcategories,
+                    "#impactCategorySelect", "impactCategoryID", onImpactCategoryChange, selectedImpactCategoryID);
+        } else {
+            resume("Unable to load impact categories.");
         }
     }
 
@@ -438,7 +440,7 @@ function lciaComputation() {
      * request LCIA results
      */
     function onMethodsLoaded() {
-        if ("lciamethods" in LCA.loadedData) {
+        if ("lciamethods" in LCA.loadedData && LCA.loadedData.lciamethods) {
             if (LCA.loadedData.lciamethods.length > 0) {
                 // If no default setting, select first LCIA method
                 selectedMethodID = LCA.loadedData.lciamethods[0].lciaMethodID;
@@ -449,21 +451,26 @@ function lciaComputation() {
             } else {
                 selectedMethodID = 0;
                 LCA.emptySelectionList("#lciaMethodSelect");
+                visualizeResults([]);
             }
+        } else {
+            resume("Unable to load LCIA methods.");
         }
     }
 
     function onFlowsLoaded() {
-        if ("flows" in LCA.loadedData) {
+        if ("flows" in LCA.loadedData && LCA.loadedData.flows) {
             LCA.indexedData.flows = LCA.indexData("flows", "flowID");
             getLciaResults();
+        } else {
+            resume("Unable to load flows.");
         }
     }
 
     function onResultsLoaded() {
         if ("lciaresults" in LCA.loadedData) {
             visualizeResults(LCA.loadedData.lciaresults);
-        }
+        } 
     }
 
     /**
