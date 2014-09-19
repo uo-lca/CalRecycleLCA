@@ -21,10 +21,6 @@ fieldset label {
 fieldset p {
     display: table-row;
 }
-fieldset #impactScore {
-    display: table-cell;
-    padding: 5px;
-}
 
 
 text {
@@ -77,4 +73,5 @@ text {
 .end.line {
   stroke-width: 3;
 }
+
 

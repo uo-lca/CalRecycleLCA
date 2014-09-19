@@ -155,11 +155,11 @@ namespace Services {
                 ReferenceYear = lm.ReferenceYear,
                 Duration = lm.Duration,
                 ImpactLocation = lm.ImpactLocation,
-                IndicatorTypeID = TransformNullable(lm.IndicatorTypeID, "LCIAMethod.IndicatorTypeID"),
+                IndicatorType = lm.IndicatorType.Name,
                 Normalization = TransformNullable(lm.Normalization, "LCIAMethod.Normalization"),
                 Weighting = TransformNullable(lm.Weighting, "LCIAMethod.Weighting"),
                 UseAdvice = lm.UseAdvice,
-                ReferenceFlowPropertyID = TransformNullable(lm.ReferenceQuantity, "LCIAMethod.ReferenceQuantity")
+                ReferenceFlowProperty = Transform(lm.FlowProperty)
             };
         }
 
@@ -233,7 +233,7 @@ namespace Services {
             return new FlowPropertyResource {
                 FlowPropertyID = fp.FlowPropertyID,
                 Name = fp.Name,
-                ReferenceUnitName = unitName
+                ReferenceUnit = unitName
             };
         }
 
@@ -278,11 +278,16 @@ namespace Services {
          /// </summary>
          public IEnumerable<LCIAMethodResource> GetLCIAMethodResources(int? impactCategoryID = null) {
             IEnumerable<LCIAMethod> lciaMethods;
+            Repository.RepositoryQuery<LCIAMethod> query = 
+                _LciaMethodService.Query()
+                .Include(lm => lm.IndicatorType)
+                .Include(lm => lm.FlowProperty.UnitGroup.UnitConversion);
+
             if (impactCategoryID == null) {
-                lciaMethods = _LciaMethodService.Query().Get();
+                lciaMethods = query.Get();
             }
             else {
-                lciaMethods = _LciaMethodService.Query().
+                lciaMethods = query.
                               Filter(d => d.ImpactCategoryID == impactCategoryID).Get();
             }
             return lciaMethods.Select(lm => Transform(lm)).ToList();

@@ -142,8 +142,8 @@ function FragmentFlows() {
                     flowPropertyID = flow.referenceFlowPropertyID;
                     magnitude = formatNumber(getMagnitude(curFragment.fragmentflows[l.fragmentFlowID], flowPropertyID));
                 }
-                if ("referenceUnitName" in LCA.indexedData.flowProperties[flowPropertyID]) {
-                    unit = LCA.indexedData.flowProperties[flowPropertyID].referenceUnitName;
+                if ("referenceUnit" in LCA.indexedData.flowProperties[flowPropertyID]) {
+                    unit = LCA.indexedData.flowProperties[flowPropertyID].referenceUnit;
                 }
                 flowData.push({ Name: flow.name, Magnitude: magnitude, Unit: unit });
             }
@@ -493,7 +493,7 @@ function FragmentFlows() {
     function updateUnit() {
         var refUnitName = "";
         if (selectedFlowPropertyID in LCA.indexedData.flowProperties) {
-            refUnitName = LCA.indexedData.flowProperties[selectedFlowPropertyID].referenceUnitName;
+            refUnitName = LCA.indexedData.flowProperties[selectedFlowPropertyID].referenceUnit;
         }
         d3.select("#refUnitName").text(refUnitName);
     }

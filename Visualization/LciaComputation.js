@@ -24,13 +24,15 @@ function lciaComputation() {
      */
     var margin = {
         top: 10,
-        right: 20,
+        right: 200,
         bottom: 30,
         left: 20
     },
-        width = 600 - margin.left - margin.right,
+        width = 760 - margin.left - margin.right,
         svgHeight = 1000,
-        chartHeight = 100;
+        chartHeight = 100,
+        barHeight = 30,
+        textPadding = 6;
 
     var color = d3.scale.ordinal();
 
@@ -113,6 +115,51 @@ function lciaComputation() {
     }
 
     /**
+     * Display LCIA impact score with flow property name and reference unit
+     * @param {number} impactScore  Total impact score 
+     * @param {boolean} flowsExist  Indicates if there were any results 
+     */
+    function displayImpactScore(impactScore, flowsExist) {
+        var chartGroup = svg.select(".chartgroup"),
+            axisGroup = svg.select(".x.axis"),
+            impactSelection = chartGroup.select("#impactscore"),
+            fpSelection = axisGroup.select("#flowproperty"),
+            flowProperty = "",
+            referenceUnit = "",
+            impactText = "";
+                
+        if (impactSelection.empty()) {
+            impactSelection = chartGroup.append("text")
+                .style("font-weight", "bold")
+                .style("font-size", "12px")
+                .attr({
+                    id: "impactscore",
+                    x: width + textPadding,
+                    y: (barHeight / 2) + margin.top + textPadding
+                });
+        }
+        if (fpSelection.empty()) {
+            fpSelection = axisGroup.append("text")
+                .style("font-weight", "bold")
+                .attr({
+                    id: "flowproperty",
+                    x: width + textPadding,
+                    y: textPadding
+                });
+        }
+        if (flowsExist && ("lciaMethods" in LCA.indexedData)) {
+            var method = LCA.indexedData.lciaMethods[selectedMethodID];
+            if (method && ("referenceFlowProperty" in method)) {
+                flowProperty = method.referenceFlowProperty.name;
+                referenceUnit = method.referenceFlowProperty.referenceUnit;
+                impactText = impactScore.toPrecision(4).toString();
+            }
+        }
+        impactSelection.text(impactText + " " + referenceUnit);
+        fpSelection.text(flowProperty);
+    }
+
+    /**
      * Create header for legend, if it does not already exist.
      * Make it invisible if there are no flows.
      *
@@ -160,10 +207,9 @@ function lciaComputation() {
     function makeLegend(flowData) {
         var rowHeight = 20,
             boxSize = 18,
-            colPadding = 6,
+            colPadding = textPadding,
             textY = 9,            
-            fieldWidths = { category: 280, name: 160, result: 70 },
-            colXs = [0, boxSize + colPadding, width - 250, width - 75],
+            colXs = [0, boxSize + colPadding, width - 275, width - 75],
             legend,
             newRows,
             squares,
@@ -275,7 +321,6 @@ function lciaComputation() {
         });
 
         x.domain([0, runningTotal]);
-        d3.select("#impactScore").text(impactScore.toPrecision(4));
         svg.select(".x.axis")
             .call(xAxis)
             .style("visibility", lciaResultData.length > 0 ? "visible" : "hidden");
@@ -292,12 +337,13 @@ function lciaComputation() {
                 return x(d.x0);
             })
             .attr("y", 10)
-            .attr("height", 30)
+            .attr("height", barHeight)
             .style("fill", function (d) {
                 return color(d.flowID);
             });
         makeLegend(lciaResultData);
-        if (results.length > 0) {
+        displayImpactScore(impactScore, lciaResultData.length > 0);
+        if (lciaResultData.length > 0) {
             resume("");
         } else {
             resume("No impact to display.");
@@ -359,7 +405,6 @@ function lciaComputation() {
                 } else {
                     selectedProcessID = processArray[0].processID;
                 }
-                loadFlowProperties();
                 loadFlows();
                 distinguishProcessNames(processArray);
                 LCA.loadSelectionList(processArray,
@@ -399,17 +444,12 @@ function lciaComputation() {
                 selectedMethodID = LCA.loadedData.lciamethods[0].lciaMethodID;
                 LCA.loadSelectionList(LCA.loadedData.lciamethods,
                    "#lciaMethodSelect", "lciaMethodID", onMethodChange, selectedMethodID);
+                LCA.indexedData.lciaMethods = LCA.indexData("lciamethods", "lciaMethodID");
                 getLciaResults();
             } else {
                 selectedMethodID = 0;
                 LCA.emptySelectionList("#lciaMethodSelect");
             }
-        }
-    }
-
-    function onFlowPropertiesLoaded() {
-        if ("flowproperties" in LCA.loadedData) {
-            LCA.indexedData.flowProperties = LCA.indexData("flowproperties", "flowPropertyID");
         }
     }
 
@@ -438,13 +478,6 @@ function lciaComputation() {
       */
     function loadFlows() {
         LCA.loadData("flows", false, onFlowsLoaded, "processes/" + selectedProcessID);
-    }
-
-    /**
-      * Get all flow properties related to selected process
-      */
-    function loadFlowProperties() {
-        LCA.loadData("flowproperties", false, onFlowPropertiesLoaded, "processes/" + selectedProcessID);
     }
 
     /**

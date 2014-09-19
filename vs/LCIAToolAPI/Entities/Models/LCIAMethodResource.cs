@@ -7,10 +7,11 @@ using System.Threading.Tasks;
 namespace Entities.Models {
     /// <summary>
     /// Web API resource for LCIA methods.
-    /// Contains simple properties of LCIAMethod (no object references or collections).
-    /// Fixes some modeling problems in LCIAMethod:
-    ///     No property should be null, 
-    ///     and foreign key name should match referenced primary key name.
+    /// 
+    /// Contains simple properties of LCIAMethod, 
+    /// collapsed IndicatorType,
+    /// and reference to flow property for ease of use
+    /// 
     /// </summary>
     public class LCIAMethodResource {
         public int LCIAMethodID { get; set; }
@@ -21,10 +22,10 @@ namespace Entities.Models {
         public string ReferenceYear { get; set; }
         public string Duration { get; set; }
         public string ImpactLocation { get; set; }
-        public int IndicatorTypeID { get; set; }
+        public string IndicatorType { get; set; }   // IndicatorType.Name
         public bool Normalization { get; set; }
         public bool Weighting { get; set; }
         public string UseAdvice { get; set; }
-        public int ReferenceFlowPropertyID { get; set; }     // ILCD ReferenceQuantity
+        public FlowPropertyResource ReferenceFlowProperty { get; set; }     
     }
 }

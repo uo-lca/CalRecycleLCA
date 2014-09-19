@@ -16,6 +16,6 @@ namespace Entities.Models {
 
         public int FlowPropertyID { get; set; }
         public string Name { get; set; }
-        public string ReferenceUnitName { get; set; }  // FlowProperty.UnitGroup.UnitConversion.Unit 
+        public string ReferenceUnit { get; set; }  // FlowProperty.UnitGroup.UnitConversion.Unit 
     }
 }
