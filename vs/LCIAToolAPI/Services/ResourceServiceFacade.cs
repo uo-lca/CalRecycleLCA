@@ -299,7 +299,7 @@ namespace Services {
         /// <param name="fragmentID">FragmentID filter</param>
         /// <param name="scenarioID">ScenarioID filter for NodeCache</param>
         /// <returns>List of FragmentFlowResource objects</returns>
-        public IEnumerable<FragmentFlowResource> GetFragmentFlowResources(int fragmentID, int scenarioID) {
+        public IEnumerable<FragmentFlowResource> GetFragmentFlowResources(int fragmentID, int scenarioID = 0) {
             _FragmentTraversalV2.Traverse(fragmentID, scenarioID);
             IEnumerable<FragmentFlow> fragmentFlows = _FragmentFlowService.Query()
                                                         .Include(i => i.FragmentNodeFragments)
@@ -428,7 +428,7 @@ namespace Services {
         /// Work around problem in LCIA computation: should be filtering out LCIA with Geography 
         /// </summary>
         /// <returns>List of LCIAResultResource objects or null if lciaMethodID not found</returns> 
-        public IEnumerable<LCIAResultResource> GetLCIAResultResources(int processID, int lciaMethodID, int? scenarioID = 1) {
+        public IEnumerable<LCIAResultResource> GetLCIAResultResources(int processID, int lciaMethodID, int scenarioID = 0) {
             LCIAMethod lciaMethod = _LciaMethodService.FindById(lciaMethodID);
             if (lciaMethod == null) {
                 // TODO: figure how to handle this sort of error

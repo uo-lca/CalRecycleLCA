@@ -10,14 +10,14 @@ namespace Services {
         IEnumerable<LCIAMethodResource> GetLCIAMethodResources(int? impactCategoryID = null);
         IEnumerable<FragmentResource> GetFragmentResources();
         FragmentResource GetFragmentResource(int fragmentID);
-        IEnumerable<FragmentFlowResource> GetFragmentFlowResources(int fragmentID, int scenarioID);
+        IEnumerable<FragmentFlowResource> GetFragmentFlowResources(int fragmentID, int scenarioID = 0);
         IEnumerable<FlowResource> GetFlowsByFragment(int fragmentID);
         IEnumerable<FlowResource> GetFlowsByProcess(int processID);
         IEnumerable<FlowPropertyResource> GetFlowPropertiesByFragment(int fragmentID);
         IEnumerable<FlowPropertyResource> GetFlowPropertiesByProcess(int processID);
         IEnumerable<ProcessResource> GetProcesses(int? flowTypeID = null);
         IEnumerable<ImpactCategoryResource> GetImpactCategories();
-        IEnumerable<LCIAResultResource> GetLCIAResultResources(int processID, int lciaMethodID, int? scenarioID = 1);
+        IEnumerable<LCIAResultResource> GetLCIAResultResources(int processID, int lciaMethodID, int scenarioID = 0);
         IEnumerable<FlowTypeResource> GetFlowTypes();
     }
 }
