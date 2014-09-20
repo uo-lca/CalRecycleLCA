@@ -12,11 +12,10 @@
 function FragmentFlows() {
 
     // library globals - used to avoid jslint errors
-    /*global d3, colorbrewer, LCA, console */
+    /*global d3, colorbrewer, LCA */
 
     // Current selections
-    var selectedFragmentID = 8,
-        fragmentName = "";
+    var selectedFragmentID = 8;
 
     // SVG margins
     var margin = {
@@ -55,18 +54,30 @@ function FragmentFlows() {
         curFragment = null, // reference to selected fragment in LCA.indexedData
         minNodeHeight = 3,  // Minimum height of sankey node/link
         parentFragments = [], // Array of fragments traversed by clicking on sub-fragment
-        reverseIndex = [];      // Associates fragment fragmentflows with graph nodes
+        reverseIndex = [],      // Associates fragment fragmentflows with graph nodes
+        opacity = { node: 1, link: 0.2 }; // default opacity settings
+
+    function restoreView() {
+        svg.selectAll(".node")
+           .transition()
+           .style("opacity", opacity.node);
+        svg.selectAll(".link")
+            .transition()
+           .style("stroke-opacity", opacity.link);
+    }
 
     /**
      * Initial preparation of svg element.
      */
     function prepareSvg() {
+
         svg = d3.select("#chartcontainer")
             .append("svg")
             .attr("width", width + margin.left + margin.right)
             .attr("height", height + margin.top + margin.bottom)
+            .on("mouseleave", restoreView)
             .append("g")
-            .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+            .attr("transform", "translate(" + margin.left + "," + margin.top + ")");           
     }
 
     function prepareToolTip() {
@@ -231,7 +242,7 @@ function FragmentFlows() {
      * @param {Object}  node    Reference to graph node data
      */
     function onNodeClick(node) {
-        //window.alert("Clicked on " + node);
+        d3.event.stopPropagation();
         if ( "subFragmentID" in node) {
             breadCrumbFragment();
             displayFragment(node.subFragmentID);
@@ -247,10 +258,11 @@ function FragmentFlows() {
      * @param {Number}  index   D3 data index
      */
     function onMouseOverNode(node, index) {
+        d3.event.stopPropagation();
         svg.selectAll(".node")
            .transition()
            .style("opacity", function (d, i) {
-               return i === index ? 1 : 0.1;
+               return i === index ? opacity.node : 0.5;
            });
 //        if ( "nodeTypeID" in node) {
 //            nodeTypeName = nodeTypes[node.nodeTypeID];
@@ -260,7 +272,7 @@ function FragmentFlows() {
            .style("stroke-opacity", function (l) {
                return (
                (l.source.fragmentFlowID === node.fragmentFlowID || l.target.fragmentFlowID === node.fragmentFlowID) ?
-                   0.5 : 0.2);
+                   0.5 : opacity.link);
            });
 //        if ("nodeTypeID" in node) {
 //            nodeTypeName = nodeTypes[node.nodeTypeID];
