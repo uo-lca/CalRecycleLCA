@@ -20,9 +20,7 @@ Edit LCA.js - at the top of the file change baseURI setting to the base URI of t
 
 ### Current Status
 
-A new web page, **FragmentFlows**, has been developed. 
-It uses a new version of the web API. See description in ../vs/LCIAToolAPI/README
-The following pages currently depend on the old version of web API (published at CalRecycle).
+Two visualizations, listed below, get data from the latest version of the web API (under  [LCIAToolAPI](https://github.com/uo-lca/CalRecycleLCA/tree/master/vs/LCIAToolAPI)). A third visualization, for fragment LCIA, has been prototyped and will be completed after back end computation and caching has been completed.
 
 #### FragmentFlows
 Sankey diagram of fragment flows.
@@ -38,9 +36,6 @@ Navigate to another fragment by clicking on a node with fragment type (node type
 
 User selects LCIA Method, Impact Category and Process from drop down selection lists. LCIA computation is performed and the total impact score is displayed. A stacked bar chart displays the associated elementary flows, where the size of each flow is proportional to the flow's positive contribution to the total score.
 
-#### IntermediateFlows
+#### LciaWaterfall
 
-User selects Process from drop down selection list. Front end queries IntermediateFlows web API method with selected processid parameter. A sankey diagram is displayed. The center node represents the selected process. Each intermediate flow is represented by a node and a link to/from the process. Input flows are displayed to the left of the process, while output flows are displayed on the right.
-
-An old prototype of waterfall charts displaying **Contribution Analysis** is also included. It reads data from a json file. 
-A new version will be developed to display LCIA Computation results when that has been implemented server side. The dependency on bootstrap will also be eliminated.
+Prototype waterfall diagram. Fragment LCIA results will be visualized in a waterfall diagram.
