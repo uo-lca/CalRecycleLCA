@@ -16,33 +16,9 @@ Usage Instructions
 
 The URL for the web API is the publish URL + /api/ + resource
 
+Resource routes are defined in [ResourceController.cs](https://github.com/uo-lca/CalRecycleLCA/blob/master/vs/LCIAToolAPI/LCIAToolAPI/API/ResourceController.cs)
 
-HTTP Verb   | URI                   | Description
-----------  | -------------         | ------------
-GET         | api/fragments         | List all fragments 
-GET         | api/fragments/{id}    | Get fragment with FragmentID = {id}
-GET         | api/fragments/{id}/links    | List links for sankey diagram of fragment with FragmentID = {id}
-GET         | api/fragments/{id}/flows    | List flows used in fragment with FragmentID = {id}
-GET         | api/fragments/{id}/flowproperties    | List flow properties associated with fragment having FragmentID = {id}
-GET         | api/processes    | List all processes
-
-Prime fragment node cache by listing all fragment links.
-
-Example:
-<pre><code>
-http://kbcalr.isber.ucsb.edu/api/fragments/1/links
-http://kbcalr.isber.ucsb.edu/api/fragments/2/links
-http://kbcalr.isber.ucsb.edu/api/fragments/3/links
-http://kbcalr.isber.ucsb.edu/api/fragments/4/links
-http://kbcalr.isber.ucsb.edu/api/fragments/5/links
-http://kbcalr.isber.ucsb.edu/api/fragments/6/links
-http://kbcalr.isber.ucsb.edu/api/fragments/7/links
-http://kbcalr.isber.ucsb.edu/api/fragments/8/links
-http://kbcalr.isber.ucsb.edu/api/fragments/9/links
-http://kbcalr.isber.ucsb.edu/api/fragments/10/links
-http://kbcalr.isber.ucsb.edu/api/fragments/11/links
-http://kbcalr.isber.ucsb.edu/api/fragments/12/links
-</pre></code>
+Resources are defined in [Models](https://github.com/uo-lca/CalRecycleLCA/tree/master/vs/LCIAToolAPI/Entities/Models)/*Resource.cs
 
 ### Output
 
@@ -117,7 +93,7 @@ http://kbcalr.isber.ucsb.edu/api/fragments
 ]
 </pre></code>
 
-http://kbcalr.isber.ucsb.edu/api/fragments/8/links
+http://kbcalr.isber.ucsb.edu/api/fragments/8/fragmentflows
 
 <pre><code>
 [
