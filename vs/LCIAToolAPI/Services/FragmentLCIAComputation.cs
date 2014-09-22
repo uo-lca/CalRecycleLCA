@@ -268,7 +268,7 @@ namespace Services
       {
           FragmentFlowID = s.nodeCaches.ff.FragmentFlowID,
           NodeWeight = s.nodeCaches.nc.NodeWeight,
-          ImpactScore = scoreCaches.ImpactScore
+          ImpactScore = scoreCaches == null ? 0 : scoreCaches.ImpactScore
       });
 
             return lcia;
@@ -356,13 +356,31 @@ namespace Services
                             _characterizationParamService,
                             _paramService);
 
-                        var score = lciaComputation.ProcessLCIA(targetId, lciaMethods, scenarioId);
-                        
+                        var scores = lciaComputation.ProcessLCIA(targetId, lciaMethods, scenarioId);
+
                         IList<ScoreCache> scoreCaches = new List<ScoreCache>();
+
+                        //I think this is a mistake in pseudocode - should be scores - ask Brandon
                         foreach (var lciaMethodItem in lciaMethods.AsQueryable())
-                       {
-                           SetScoreCache(nodeCacheId, lciaMethodItem.LCIAMethodID, score);
-                         
+                        //foreach (var scoreItem in scores.AsQueryable())
+                        {
+                            double impactScore = 0;
+                            if (scores.Any(s => s.LCIAMethodID == lciaMethodItem.LCIAMethodID))
+                            {
+                                var score = scores
+                                    .Where(x => x.LCIAMethodID == lciaMethodItem.LCIAMethodID)
+                                    .Select(x => new ScoreCache
+                                        {
+                                            ImpactScore = x.Score
+                                            //== null ? 0 : x.Score
+                                        }).FirstOrDefault();
+
+                                impactScore = Convert.ToDouble(score.ImpactScore);
+                                SetScoreCache(item.nc.NodeCacheID, lciaMethodItem.LCIAMethodID, impactScore);
+                            }
+
+
+
                         }
                         _unitOfWork.Save();
 
@@ -383,17 +401,22 @@ namespace Services
       {
           fnpSubFragmentID = x.fragmentNodeFragments.SubFragmentID,
           psSubFragmentID = fragmentSubstitutions == null ? 0 : fragmentSubstitutions.SubFragmentID
-      });
+      }).ToList();
 
                         foreach (var target2Item in target2)
                         {
+
                             if (target2Item.psSubFragmentID == 0)
                             {
-                                target2Item.psSubFragmentID = target2Item.fnpSubFragmentID;
+                                targetId = target2Item.fnpSubFragmentID;
+                            }
+                            else
+                            {
+                                targetId = target2Item.psSubFragmentID;
                             }
                         }
 
-                        targetId = Convert.ToInt32(target2.Select(x => x.psSubFragmentID).FirstOrDefault());
+
 
                         //recursive LCIA computation, results to cache
                         FragmentFlowLCIA(targetId, scenarioId, lciaMethods);
@@ -401,18 +424,25 @@ namespace Services
                         foreach (var lciaMethodItem in lciaMethods)
                         {
                             var lcias = ComputeFragmentLCIA(targetId, scenarioId, lciaMethodItem.LCIAMethodID);
-                            var lciaScore = lcias.ToList()
-                        .GroupBy(t => new
-                        {
-                            t.ImpactScore
-                        })
-                     .Select(group => new LCIAModel
-                     {
-                         Result = group.Sum(a => a.ImpactScore)
-                     });
-                            SetScoreCache(nodeCacheId, lciaMethodItem.LCIAMethodID, lciaScore.Select(x => x.Result).FirstOrDefault());
+
+                            if (lcias != null)
+                            {
+                                var lciaScore = lcias.ToList()
+                            .GroupBy(t => new
+                            {
+                                t.ImpactScore
+                            })
+                         .Select(group => new LCIAModel
+                         {
+                             Result = group.Sum(a => a.ImpactScore)
+                         });
+
+                              
+                                SetScoreCache(nodeCacheId, lciaMethodItem.LCIAMethodID, lciaScore.Select(a => a.Result).FirstOrDefault());
+                            }
                         }
 
+                        _unitOfWork.Save();
 
                         break;
                     case 3:

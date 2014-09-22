@@ -123,7 +123,7 @@ namespace Services
             _paramService = paramService;
         }
 
-        public double LCIACompute(int processId, int scenarioId)
+        public IEnumerable<LCIAModel> LCIACompute(int processId, int scenarioId)
         {
             var lciaMethods = _lciaMethodService.Query().Get();
             var result = ProcessLCIA(processId, lciaMethods, scenarioId);
@@ -131,19 +131,22 @@ namespace Services
 
         }
 
-        public double ProcessLCIA(int? processId, IEnumerable<LCIAMethod> lciaMethods, int? scenarioId = 1)
+        public IEnumerable<LCIAModel> ProcessLCIA(int? processId, IEnumerable<LCIAMethod> lciaMethods, int? scenarioId = 1)
         {
             var inventory = ComputeProcessLCI(processId, scenarioId);
             IEnumerable<LCIAModel> lcias=null;
             IEnumerable<LCIAModel> scores = null;
-
+            List<LCIAModel> lciaMethodScores = new List<LCIAModel>();
+            double total;
+            int direction;
             foreach (var lciaMethodItem in lciaMethods.ToList())
             {
-               
+                
                lcias= ComputeProcessLCIA(inventory, lciaMethodItem, scenarioId).ToList();
 
                if (lcias.Count() != 0)
                {
+                   //get list of scores for each lcia in the lciamethoditem
                    scores = lcias.ToList()
                         .GroupBy(t => new
                      {
@@ -159,12 +162,23 @@ namespace Services
                          FlowID = group.Key.FlowID,
                          LCIAMethodID = group.Key.LCIAMethodID
                      });
+
+                   //get the sum of all the lcia scores in the lciamethoditem.
+                   total = Convert.ToDouble(scores.Sum(x => x.Result));
+                   direction = Convert.ToInt32(scores.Select(x => x.DirectionID).FirstOrDefault());
+
+                   //add the sum of the scores to a list for each lciamethoditem
+                   lciaMethodScores.Add(new LCIAModel()
+                   {
+                       LCIAMethodID = lciaMethodItem.LCIAMethodID,
+                       DirectionID = direction,
+                       Score = total
+                   });
+                   
                }
 
             }
-            double total = Convert.ToDouble(scores.Sum(x => x.Result));
-
-            return total;
+            return lciaMethodScores;
         }
 
         //inventory in pseudocode
