@@ -9,7 +9,6 @@ namespace LcaDataModel
     [Table("ScoreCache")]
     public partial class ScoreCache
     {
-        [DatabaseGenerated(DatabaseGeneratedOption.None)]
         public int ScoreCacheID { get; set; }
 
         public int? NodeCacheID { get; set; }

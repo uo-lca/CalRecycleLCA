@@ -84,10 +84,6 @@
     <Compile Include="IObjectState.cs" />
     <Compile Include="LCIA.cs" />
     <Compile Include="LCIAMethod.cs" />
-    <Compile Include="Migrations\201409082318231_Initial.cs" />
-    <Compile Include="Migrations\201409082318231_Initial.Designer.cs">
-      <DependentUpon>201409082318231_Initial.cs</DependentUpon>
-    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="NodeCache.cs" />
     <Compile Include="NodeDissipationParam.cs" />
@@ -125,11 +121,6 @@
     <None Include="packages.config">
       <SubType>Designer</SubType>
     </None>
-  </ItemGroup>
-  <ItemGroup>
-    <EmbeddedResource Include="Migrations\201409082318231_Initial.resx">
-      <DependentUpon>201409082318231_Initial.cs</DependentUpon>
-    </EmbeddedResource>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
