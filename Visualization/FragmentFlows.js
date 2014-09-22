@@ -24,9 +24,9 @@ function FragmentFlows() {
         bottom: 30,
         left: 20
     },
-        width = 700 - margin.left - margin.right,   // diagram width
-        height = 600 - margin.top - margin.bottom,  // diagram height
-        sankeyWidth = width - 100; // leave room for labels on right
+        width = 800 - margin.left - margin.right,   // diagram width
+        height = 650 - margin.top - margin.bottom,  // diagram height
+        sankeyWidth = width - 150; // leave room for labels on right
 
     var formatNumber = d3.format("^.2g"),   // Round numbers to 2 significant digits
                                             // TODO: make this user configurable
@@ -48,8 +48,6 @@ function FragmentFlows() {
         flowColumns = ["Name", "Magnitude", "Unit"],    // Flow table column names
         panelSelection,     // d3 selection of panel for node information
         nodeTip,            // tooltip for node
-        //nodeTypeSelection,  // d3 selection of element to display node type
-        //nodeNameSelection,  // d3 selection of element to display fragment/process name
         baseValue = 1E-14,  // sankey link base value (replaces 0).
         curFragment = null, // reference to selected fragment in LCA.indexedData
         minNodeHeight = 3,  // Minimum height of sankey node/link
@@ -64,6 +62,8 @@ function FragmentFlows() {
         svg.selectAll(".link")
             .transition()
            .style("stroke-opacity", opacity.link);
+        panelSelection.style("display", "none");
+        nodeTip.hide();
     }
 
     /**
@@ -330,7 +330,8 @@ function FragmentFlows() {
             .data(graph.links);
         if (rebuild) {
             link.enter().append("path")
-            .attr("class", "link");
+            .attr("class", "link")
+            .append("title");
         }
         link.transition().duration(transitionTime)
             .attr("d", path)
@@ -343,6 +344,16 @@ function FragmentFlows() {
             .style("stroke-opacity", 0.2)
             .sort(function (a, b) {
                 return b.dy - a.dy;
+            });
+        link.select("title")
+            .text(function (d) {
+                var flow = LCA.indexedData.flows[d.flowID],
+                unit = (selectedFlowPropertyID in LCA.indexedData.flowProperties) ?
+                    LCA.indexedData.flowProperties[selectedFlowPropertyID].referenceUnit :
+                    "" ;
+                if (flow) {
+                    return flow.name + " : " + formatNumber(d.magnitude) + " " + unit;
+                }                 
             });
 
         if (rebuild) {
