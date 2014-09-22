@@ -17,7 +17,10 @@ function lciaComputation() {
         selectedMethodID = 0,
         // Score for current selection
         impactScore = 0,
-        startupProcessID = 116;
+        startupProcessID = 116,
+        elementaryFlows = {},
+        inputFlows = [],
+        outputFlows = [];
 
     /**
      * d3 variables
@@ -55,7 +58,8 @@ function lciaComputation() {
                        colorbrewer.Greens, colorbrewer.YlOrBr, colorbrewer.BuGn,
                        colorbrewer.PuBuGn, colorbrewer.Greys, colorbrewer.YlGnBu];
 
-    var svg = null, msg = null;
+    var svg = null, msg = null, flowTables = [],
+        flowColumns = ["Name", "Magnitude", "Unit"];    // Flow table column names
 
     /**
      * Initial preparation of svg element.
@@ -80,12 +84,35 @@ function lciaComputation() {
     }
 
     /**
+      * Initial preparation of intermediate flow elements
+      */
+    function prepareFlowTables() {
+        var parentSelection = d3.select("#chartcontainer"),
+            panelSelection = parentSelection
+              .append("div")
+              .classed("vis-panel", true)
+              .style("display", "none");
+
+        panelSelection.append("h3")
+            .text("Input Flows");
+        flowTables[0] = LCA.createTable(panelSelection, flowColumns);
+
+        panelSelection = parentSelection
+              .append("div")
+              .classed("vis-panel", true)
+              .style("display", "none");
+        panelSelection.append("h3")
+            .text("Output Flows");
+        flowTables[1] = LCA.createTable(panelSelection, flowColumns);
+    }
+
+    /**
      * Change event handler for process selection list.
      * Triggers LCIA computation update.
      */
     function onProcessChange() {
         selectedProcessID = this.options[this.selectedIndex].value;
-        loadFlows();
+        loadFlowProperties();
     }
 
     /**
@@ -257,14 +284,14 @@ function lciaComputation() {
             });
         legend.selectAll(".category")
             .text(function (d) {
-                return (d.flowID in LCA.indexedData.flows) ?
-                    LCA.indexedData.flows[d.flowID].category :
+                return (d.flowID in elementaryFlows) ?
+                    elementaryFlows[d.flowID].category :
                     "";
             });
         flows = legend.selectAll(".flowname")
             .text(function (d) {
-                return (d.flowID in LCA.indexedData.flows) ?
-                    LCA.indexedData.flows[d.flowID].name :
+                return (d.flowID in elementaryFlows) ?
+                    elementaryFlows[d.flowID].name :
                     "FlowID: " + d.flowID.toString;
             });
         legend.selectAll(".lciaresult")
@@ -405,7 +432,7 @@ function lciaComputation() {
             } else {
                 selectedProcessID = processArray[0].processID;
             }
-            loadFlows();
+            loadFlowProperties();
             distinguishProcessNames(processArray);
             LCA.loadSelectionList(processArray,
                     "#processSelect", "processID", onProcessChange, selectedProcessID);
@@ -458,12 +485,35 @@ function lciaComputation() {
         }
     }
 
-    function onFlowsLoaded() {
-        if ("flows" in LCA.loadedData && LCA.loadedData.flows) {
-            LCA.indexedData.flows = LCA.indexData("flows", "flowID");
+    function onFlowsLoaded() {      
+        if ("processflows" in LCA.loadedData && LCA.loadedData.processflows) {
+            LCA.loadedData.processflows.forEach(function (pf) {
+                var rowObj;
+                switch (pf.flow.flowTypeID) {
+                    case 1:
+                        rowObj = {
+                            Name: pf.flow.name,
+                            Magnitude: LCA.formatNumber(pf.magnitude),
+                            Unit: LCA.indexedData.flowProperties[pf.flow.referenceFlowPropertyID].referenceUnit
+                        };
+                        if (pf.directionID === 1) {
+                            inputFlows.push(rowObj);
+                        } else if (pf.directionID === 2 ) {
+                            outputFlows.push(rowObj);
+                        }
+                        break;
+                    case 2:
+                        elementaryFlows[pf.flow.flowID] = pf.flow;
+                        break;
+                }
+            });
+            d3.selectAll(".vis-panel").style("display", "inline-block");
+            LCA.updateTable(flowTables[0], inputFlows, flowColumns);
+            LCA.updateTable(flowTables[1], outputFlows, flowColumns);
             getLciaResults();
         } else {
-            resume("Unable to load flows.");
+            d3.selectAll(".vis-panel").style("display", "none");
+            resume("Unable to load process flows.");
         }
     }
 
@@ -480,11 +530,30 @@ function lciaComputation() {
         LCA.loadData("processes", false, onProcessesLoaded, "flowtypes/2");
     }
 
+    function onFlowPropertiesLoaded() {
+        if ("flowproperties" in LCA.loadedData) {
+            LCA.indexedData.flowProperties = LCA.indexData("flowproperties", "flowPropertyID");
+            loadFlows();
+        } else {
+            resume("Unable to load flow properties.");
+        }
+    }
+
     /**
       * Get all flows related to selected process
       */
     function loadFlows() {
-        LCA.loadData("flows", false, onFlowsLoaded, "processes/" + selectedProcessID);
+        elementaryFlows = {};
+        inputFlows = [];
+        outputFlows = [];
+        LCA.loadData("processflows", false, onFlowsLoaded, "processes/" + selectedProcessID);
+    }
+
+    /**
+      * Get all flow properties related to selected process
+      */
+    function loadFlowProperties() {
+        LCA.loadData("flowproperties", false, onFlowPropertiesLoaded, "processes/" + selectedProcessID);
     }
 
     /**
@@ -506,7 +575,7 @@ function lciaComputation() {
       * get LCIA computation results from web API
       */
     function getLciaResults() {
-        if ( selectedProcessID > 0 && selectedMethodID > 0 && "flows" in LCA.loadedData) {
+        if ( selectedProcessID > 0 && selectedMethodID > 0 && "processflows" in LCA.loadedData) {
             wait("Compute LCIA...");
             LCA.loadData("lciaresults", false, onResultsLoaded,
             "processes/" + selectedProcessID + "/lciamethods/" + selectedMethodID);
@@ -536,6 +605,7 @@ function lciaComputation() {
     function init() {
 
         prepareMsg();
+        prepareFlowTables();
         prepareSvg();
         LCA.createSpinner("chartcontainer");
         wait("Load Data...");

@@ -26,10 +26,7 @@ function FragmentFlows() {
     },
         width = 800 - margin.left - margin.right,   // diagram width
         height = 650 - margin.top - margin.bottom,  // diagram height
-        sankeyWidth = width - 150; // leave room for labels on right
-
-    var formatNumber = d3.format("^.2g"),   // Round numbers to 2 significant digits
-                                            // TODO: make this user configurable
+        sankeyWidth = width - 150, // leave room for labels on right
         svg,
         color = d3.scale.ordinal();
     /**
@@ -146,12 +143,13 @@ function FragmentFlows() {
         nodeLinks.forEach( function (l) {
             if ("flowID" in l) {
                 var flowPropertyID = selectedFlowPropertyID,
-                    magnitude = formatNumber(l.magnitude),
+                    magnitude = LCA.formatNumber(l.magnitude),
                     unit = "";
                 flow = LCA.indexedData.flows[l.flowID];
                 if (l.magnitude === null && "referenceFlowPropertyID" in flow) {
                     flowPropertyID = flow.referenceFlowPropertyID;
-                    magnitude = formatNumber(getMagnitude(curFragment.fragmentflows[l.fragmentFlowID], flowPropertyID));
+                    magnitude = LCA.formatNumber(
+                        getMagnitude(curFragment.fragmentflows[l.fragmentFlowID], flowPropertyID));
                 }
                 if ("referenceUnit" in LCA.indexedData.flowProperties[flowPropertyID]) {
                     unit = LCA.indexedData.flowProperties[flowPropertyID].referenceUnit;
@@ -352,7 +350,7 @@ function FragmentFlows() {
                     LCA.indexedData.flowProperties[selectedFlowPropertyID].referenceUnit :
                     "" ;
                 if (flow) {
-                    return flow.name + " : " + formatNumber(d.magnitude) + " " + unit;
+                    return flow.name + " : " + LCA.formatNumber(d.magnitude) + " " + unit;
                 }                 
             });
 

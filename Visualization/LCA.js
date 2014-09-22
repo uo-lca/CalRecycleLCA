@@ -7,8 +7,9 @@
 /// <reference path="d3.min.js" />
 /// <reference path="spin.min.js" />
 var LCA = {
-    baseURI: "http://kbcalr.isber.ucsb.edu/api/",
-    //baseURI: "http://localhost:60393/api/",
+    //baseURI: "http://kbcalr.isber.ucsb.edu/api/",
+    baseURI: "http://localhost:60393/api/",
+    formatNumber: d3.format("^.2g"),
     testDataFolder: "",
     loadedData: {}, // Data loaded via web API (or from TestData)
     spinner: null,
