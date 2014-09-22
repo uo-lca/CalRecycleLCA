@@ -99,10 +99,10 @@ namespace LCAToolAPI.API
             return _ResourceService.GetProcesses(flowTypeID);
         }
 
-        [Route("api/processes/{processID:int}/flows")]
+        [Route("api/processes/{processID:int}/processflows")]
         [HttpGet]
-        public IEnumerable<FlowResource> GetFlowsByProcess(int processID) {
-            return _ResourceService.GetFlowsByProcess(processID);
+        public IEnumerable<ProcessFlowResource> GetProcessFlows(int processID) {
+            return _ResourceService.GetProcessFlows(processID);
         }
 
         [Route("api/processes/{processID:int}/flowproperties")]

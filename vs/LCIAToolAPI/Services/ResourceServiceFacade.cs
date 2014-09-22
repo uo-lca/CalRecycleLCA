@@ -36,6 +36,8 @@ namespace Services {
         private readonly IService<LCIAMethod> _LciaMethodService;
         [Inject]
         private readonly IService<Process> _ProcessService;
+        [Inject]
+        private readonly IService<ProcessFlow> _ProcessFlowService;
         //
         // Traversal and Computation components
         //
@@ -67,7 +69,8 @@ namespace Services {
                                IService<ImpactCategory> impactCategoryService,
                                ILCIAComputationV2 lciaComputation,
                                IService<LCIAMethod> lciaMethodService,
-                               IService<Process> processService) 
+                               IService<Process> processService,
+                               IService<ProcessFlow> processFlowService) 
         {
             _CategoryService = verifiedDependency(categoryService);
             _FragmentService = verifiedDependency(fragmentService);
@@ -80,6 +83,7 @@ namespace Services {
             _LCIAComputation = verifiedDependency(lciaComputation);
             _LciaMethodService = verifiedDependency(lciaMethodService);
             _ProcessService = verifiedDependency(processService);
+            _ProcessFlowService = verifiedDependency(processFlowService);
         }
 
         // TransformNullable methods are a workaround for imprecise relationship modeling
@@ -258,6 +262,18 @@ namespace Services {
              };
          }
 
+         public ProcessFlowResource Transform(ProcessFlow pf, IEnumerable<Category> categories) {
+             return new ProcessFlowResource {
+                 ProcessFlowID = pf.ProcessFlowID,
+                 Flow = Transform( pf.Flow, categories),
+                 DirectionID = TransformNullable( pf.DirectionID, "ProcessFlow.DirectionID"),
+                 VarName = pf.VarName,
+                 Magnitude = TransformNullable(pf.Magnitude, "ProcessFlow.Magnitude"),
+                 Result = TransformNullable(pf.Result, "ProcessFlow.Result"),
+                 STDev = TransformNullable(pf.STDev, "ProcessFlow.STDev")
+             };
+         }
+
          public LCIAResultResource Transform(LCIAModel m) {
              return new LCIAResultResource {
                 LCIAMethodID = TransformNullable(m.LCIAMethodID, "LCIAModel.LCIAMethodID"),
@@ -338,10 +354,16 @@ namespace Services {
         }
 
         /// <summary>
-        /// Get list of flows related to a process (via ProcessFlow)
+        /// Get list of processflow resources
         /// </summary>
-        public IEnumerable<FlowResource> GetFlowsByProcess(int processID) {
-            return GetFlows(typeof(ProcessFlow), processID);
+        public IEnumerable<ProcessFlowResource> GetProcessFlows(int processID) {
+            IEnumerable<ProcessFlow> processFlows = _ProcessFlowService.Query()
+                .Include(pf => pf.Flow.ILCDEntity.Classifications)
+                .Filter(pf => pf.ProcessID == processID)
+                .Get();
+            IEnumerable<Category> categories = _CategoryService.Query().Get();
+            return processFlows.Select(pf => Transform(pf, categories)).ToList();
+
         }
 
         /// <summary>
