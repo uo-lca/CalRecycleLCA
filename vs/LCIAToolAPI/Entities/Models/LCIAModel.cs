@@ -20,5 +20,6 @@ namespace Entities.Models
         public double? LCParamValue { get; set; }
         public double? LCIAFactor { get; set; }
         public double? ComputationResult { get; set; }
+        public double? Score { get; set; }
     }
 }
