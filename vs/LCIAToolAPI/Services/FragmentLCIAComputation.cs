@@ -372,7 +372,6 @@ namespace Services
                                     .Select(x => new ScoreCache
                                         {
                                             ImpactScore = x.Score
-                                            //== null ? 0 : x.Score
                                         }).FirstOrDefault();
 
                                 impactScore = Convert.ToDouble(score.ImpactScore);
