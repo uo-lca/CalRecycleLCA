@@ -164,7 +164,7 @@ namespace Services
                      });
 
                    //get the sum of all the lcia scores in the lciamethoditem.
-                   total = Convert.ToDouble(scores.Sum(x => x.Result));
+                   total = Convert.ToDouble(scores.Sum(x => x.ComputationResult));
                    direction = Convert.ToInt32(scores.Select(x => x.DirectionID).FirstOrDefault());
 
                    //add the sum of the scores to a list for each lciamethoditem
