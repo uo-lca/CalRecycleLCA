@@ -70,13 +70,15 @@ function lciaComputation() {
             .attr("height", svgHeight);
         svg.append("g")
             .attr("class", "chartgroup")
-            .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+            .attr("transform", "translate(" + margin.left + "," + margin.top + ")")
+            .append("text").attr("id", "chartheader").style("font-weight", "bold").text("Lifecycle Impact Assessment");
         svg.append("g")
             .attr("class", "x axis")
             .attr("transform", "translate(" + margin.left + "," + (chartHeight - margin.bottom) + ")");
         svg.append("g")
             .attr("class", "legendgroup")
             .attr("transform", "translate(" + margin.left + "," + (chartHeight + margin.top) + ")");
+        
     }
 
     function prepareMsg() {
@@ -91,6 +93,8 @@ function lciaComputation() {
             panelSelection = parentSelection
               .append("div")
               .classed("vis-panel", true)
+              .style("margin-left", "20px")
+              .style("margin-bottom", "20px")
               .style("display", "none");
 
         panelSelection.append("h3")
@@ -100,6 +104,7 @@ function lciaComputation() {
         panelSelection = parentSelection
               .append("div")
               .classed("vis-panel", true)
+              .style("margin-bottom", "20px")
               .style("display", "none");
         panelSelection.append("h3")
             .text("Output Flows");
@@ -316,6 +321,7 @@ function lciaComputation() {
  
         impactScore = 0;
         lciaResultData = results;
+        svg.select("#chartheader").style("visibility", lciaResultData.length > 0 ? "visible" : "hidden");
         lciaResultData.sort(compareLciaResults);
         flowList = lciaResultData.map(function (d) {
             return d.flowID;
