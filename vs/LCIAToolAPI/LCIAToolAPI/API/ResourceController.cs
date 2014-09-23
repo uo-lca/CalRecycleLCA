@@ -50,25 +50,69 @@ namespace LCAToolAPI.API
             return fr;
         }
 
+        // // Scenarios //////////////////////////////////////////////////////////////
+        // [Route("api/scenarios")]
+        // [HttpGet]
+        // public IEnumerable<ScenarioResource> GetScenarios(int userID) {
+        //     // need to get userID or scenarioGroupID from server auth
+        //     return _ResourceService.GetScenarios(userID);
+        // }
+
+        // [Route("api/scenarios/{scenarioID:int}/params")]
+        // [HttpGet]
+        // public IEnumerable<ScenarioResource> GetScenarioParams(int scenarioID) {
+        //     // need to get userID or scenarioGroupID from server auth
+        //     return _ResourceService.GetScenarioParams(scenarioID);
+        // }
+
+        // [Route("api/scenarios/{scenarioID:int}/substitutions")]
+        // [HttpGet]
+        // public IEnumerable<ScenarioSubstitutionResource> GetScenarioSubs(int scenarioID) {
+        //     // need to get userID or scenarioGroupID from server auth
+        //     return _ResourceService.GetScenarioSubs(scenarioID);
+        // }
+
+        // Fragments //////////////////////////////////////////////////////////////
         [Route("api/fragments/{fragmentID:int}/fragmentflows")]
         [HttpGet]
         public IEnumerable<FragmentFlowResource> GetFragmentFlowResources(int fragmentID) {
             // Use default scenario
-            return _ResourceService.GetFragmentFlowResources(fragmentID, 1);
+            return _ResourceService.GetFragmentFlowResources(fragmentID, 0);
+        }
+        [Route("api/scenarios/{scenarioID:int}/fragments/{fragmentID:int}/fragmentflows")]
+        [HttpGet]
+        public IEnumerable<FragmentFlowResource> GetFragmentFlowResources(int fragmentID, int scenarioID) {
+            return _ResourceService.GetFragmentFlowResources(fragmentID, scenarioID);
         }
 
+        // lists indefinite flows associated with a fragment
         [Route("api/fragments/{fragmentID:int}/flows")]
         [HttpGet]
         public IEnumerable<FlowResource> GetFlowsByFragment(int fragmentID) {
             return _ResourceService.GetFlowsByFragment(fragmentID);
         }
 
+        // lists all flow properties associated with fragment flows
         [Route("api/fragments/{fragmentID:int}/flowproperties")]
         [HttpGet]
         public IEnumerable<FlowPropertyResource> GetFlowPropertiesByFragment(int fragmentID) {
             return _ResourceService.GetFlowPropertiesByFragment(fragmentID);
         }
 
+        // reports lcia results
+        //[Route("api/fragments/{fragmentID:int}/lciamethods/{lciaMethodID:int}")]
+        //[HttpGet]
+        // public IEnumerable<FragmentLCIAResource> GetFragmentLCIAResults(int fragmentID) {
+        //     return _ResourceService.GetFragmentLCIAResults(fragmentID, lciaMethodID, 0);
+        // }
+        //[Route("api/scenarios/{scenarioID:int}/fragments/{fragmentID:int}/lciamethods/{lciaMethodID:int}")]
+        //[HttpGet]
+        // public IEnumerable<FragmentLCIAResource> GetFragmentLCIAResults(int fragmentID) {
+        //     return _ResourceService.GetFragmentLCIAResults(fragmentID, lciaMethodID, scenarioID);
+        // }
+         
+
+        // LCIA Metadata ////////////////////////////////////////////////////////////
         [Route("api/impactcategories")]
         [HttpGet]
         public IEnumerable<ImpactCategoryResource> ImpactCategories() {
@@ -87,54 +131,58 @@ namespace LCAToolAPI.API
             return _ResourceService.GetLCIAMethodResources();
         }
 
+        // Process metadata /////////////////////////////////////////////////////////
         [Route("api/processes")]
         [HttpGet]
         public IEnumerable<ProcessResource> GetProcesses() {
             return _ResourceService.GetProcesses();
         }
 
+        // list processes having any of the specified flowtypeID 
+        // 1=elementary, for identifying flows with emissions
         [Route("api/flowtypes/{flowTypeID:int}/processes")]
         [HttpGet]
         public IEnumerable<ProcessResource> GetProcesses(int flowTypeID) {
             return _ResourceService.GetProcesses(flowTypeID);
         }
 
+        // list definite (i.e. quantity-bearing) flows associated with a process
+        // access control needed here
         [Route("api/processes/{processID:int}/processflows")]
         [HttpGet]
         public IEnumerable<ProcessFlowResource> GetProcessFlows(int processID) {
             return _ResourceService.GetProcessFlows(processID);
         }
 
+        // ???
         [Route("api/processes/{processID:int}/flowproperties")]
         [HttpGet]
         public IEnumerable<FlowPropertyResource> GetFlowPropertiesByProcess(int processID) {
             return _ResourceService.GetFlowPropertiesByProcess(processID);
         }
 
+        // report LCIA results as a table 
+        // access control needed here
         [Route("api/processes/{processID:int}/lciamethods/{lciaMethodID:int}/lciaresults")]
         [HttpGet]
         public IEnumerable<LCIAResultResource> GetLCIAResultResources(int processID, int lciaMethodID) {
             return _ResourceService.GetLCIAResultResources(processID, lciaMethodID);
         }
 
+        // as above w/ scenario
         [Route("api/scenarios/{scenarioID:int}/processes/{processID:int}/lciamethods/{lciaMethodID:int}/lciaresults")]
         [HttpGet]
         public IEnumerable<LCIAResultResource> GetLCIAResultResources(int processID, int lciaMethodID, int scenarioID) {
             return _ResourceService.GetLCIAResultResources(processID, lciaMethodID, scenarioID);
         }
 
-        [Route("api/scenarios/{scenarioID:int}/fragments/{fragmentID:int}/fragmentflows")]
-        [HttpGet]
-        public IEnumerable<FragmentFlowResource> GetFragmentFlowResources(int fragmentID, int scenarioID) {
-            return _ResourceService.GetFragmentFlowResources(fragmentID, scenarioID);
-        }
 
         /* TODO:
          * 
-         * [Route("api/processes/{processID:int}")]
-         * [Route("api/fragments/{fragmentID:int}/lciaresults")]    
-         * [Route("api/scenarios/{scenarioID:int}/fragments/{fragmentID:int}/lciaresults")]    
-         * [Route("api/scenariogroups/{scenarioID:int}/scenarios")]    
+         * [Route("api/processes/{processID:int}")] // to report what?
+         X [Route("api/fragments/{fragmentID:int}/lciaresults")]    
+         X [Route("api/scenarios/{scenarioID:int}/fragments/{fragmentID:int}/lciaresults")]    
+         X [Route("api/scenariogroups/{scenarioID:int}/scenarios")]    
          * 
          */
     }
