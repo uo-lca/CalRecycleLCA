@@ -165,20 +165,21 @@ namespace LCAToolAPI.API
         // access control needed here
         [Route("api/processes/{processID:int}/lciamethods/{lciaMethodID:int}/lciaresults")]
         [HttpGet]
-        public IEnumerable<LCIAResultResource> GetLCIAResultResources(int processID, int lciaMethodID) {
-            return _ResourceService.GetLCIAResultResources(processID, lciaMethodID);
+        public LCIAResultResource GetLCIAResultResources(int processID, int lciaMethodID) {
+            return _ResourceService.GetLCIAResultResource(processID, lciaMethodID);
         }
 
         // as above w/ scenario
         [Route("api/scenarios/{scenarioID:int}/processes/{processID:int}/lciamethods/{lciaMethodID:int}/lciaresults")]
         [HttpGet]
-        public IEnumerable<LCIAResultResource> GetLCIAResultResources(int processID, int lciaMethodID, int scenarioID) {
-            return _ResourceService.GetLCIAResultResources(processID, lciaMethodID, scenarioID);
+        public LCIAResultResource GetLCIAResultResource(int processID, int lciaMethodID, int scenarioID) {
+            return _ResourceService.GetLCIAResultResource(processID, lciaMethodID, scenarioID);
         }
 
 
         /* TODO:
          * 
+         * Add route to get Process LCIA results for all methods
          * [Route("api/processes/{processID:int}")] // to report what?
          X [Route("api/fragments/{fragmentID:int}/lciaresults")]    
          X [Route("api/scenarios/{scenarioID:int}/fragments/{fragmentID:int}/lciaresults")]    

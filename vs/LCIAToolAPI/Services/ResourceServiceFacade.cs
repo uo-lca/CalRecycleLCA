@@ -274,9 +274,9 @@ namespace Services {
              };
          }
 
-         public LCIAResultResource Transform(LCIAModel m) {
-             return new LCIAResultResource {
-                LCIAMethodID = TransformNullable(m.LCIAMethodID, "LCIAModel.LCIAMethodID"),
+         public ProcessLCIAResultResource Transform(LCIAModel m) {
+             return new ProcessLCIAResultResource {
+                //LCIAMethodID = TransformNullable(m.LCIAMethodID, "LCIAModel.LCIAMethodID"),
                 FlowID = TransformNullable(m.FlowID, "LCIAModel.FlowID"),
                 DirectionID = TransformNullable(m.DirectionID, "LCIAModel.DirectionID"),
                 Quantity = Convert.ToDouble(m.Result),
@@ -449,8 +449,8 @@ namespace Services {
         /// Execute Process LCIA and return computation results in LCIAResultResource objects
         /// Work around problem in LCIA computation: should be filtering out LCIA with Geography 
         /// </summary>
-        /// <returns>List of LCIAResultResource objects or null if lciaMethodID not found</returns> 
-        public IEnumerable<LCIAResultResource> GetLCIAResultResources(int processID, int lciaMethodID, int scenarioID = 0) {
+        /// <returns>LCIAResultResource or null if lciaMethodID not found</returns> 
+        public LCIAResultResource GetLCIAResultResource(int processID, int lciaMethodID, int scenarioID = 0) {
             LCIAMethod lciaMethod = _LciaMethodService.FindById(lciaMethodID);
             if (lciaMethod == null) {
                 // TODO: figure how to handle this sort of error
@@ -460,7 +460,11 @@ namespace Services {
                 IEnumerable<InventoryModel> inventory = _LCIAComputation.ComputeProcessLCI(processID, scenarioID);
                 IEnumerable<LCIAModel> lciaResults = _LCIAComputation.ComputeProcessLCIA(inventory, lciaMethod, scenarioID)
                     .Where(l => String.IsNullOrEmpty(l.Geography));
-                return lciaResults.Select(m => Transform(m)).ToList();
+                LCIAResultResource lciaResult = new LCIAResultResource {
+                    LCIAMethodID = lciaMethodID,
+                    ProcessLCIAResults = lciaResults.Select(m => Transform(m)).ToList()
+                };
+                return lciaResult;
             }
         }
 
