@@ -19,7 +19,6 @@ function LciaWaterfall() {
     var selectedFragmentID = 8,
         selectedImpactCategoryID = 0,
         selectedMethodID = 0,
-        unit = "kg CO2-Equiv.",
         curFragment = null;
 
     // SVG margins
@@ -32,19 +31,20 @@ function LciaWaterfall() {
         width = 600 - margin.left - margin.right,   // diagram width
         height = 1000 - margin.top - margin.bottom;  // diagram height
 
-    var stageColors = colorbrewer.Spectral[7].slice(1, 6);       
+    var stageColors = colorbrewer.Spectral[11];       
 
     var waterfall = d3.waterfall()
         .width(width)
         .colors(stageColors);
 
     var formatNumber = d3.format("^.2g"),   // Round numbers to 2 significant digits
-        xAxis = d3.svg.axis().orient("bottom").tickFormat(formatNumber),                                    
+        xAxis = d3.svg.axis().orient("bottom").tickFormat(formatNumber),
         svg,
         transitionTime = 250,   // d3 transition time in ms
         updateOnly = false,     // Flag when diagram should be updated, as opposed to drawn from scratch
-        waterfallData = {};
-    var legendSvg;
+        legendSvg,
+        // temp. standin for web api resource
+        scenarios = { 0: { name: "Model Base Case" }, 1: { name: "Default Scenario" } };  
 
     /**
      * Initial preparation of svg element.
@@ -86,11 +86,12 @@ function LciaWaterfall() {
             chartGroup = svg.select("#" + chartID).select(".chart");
         } else {
             chartGroup = svg.append("g").attr("id", chartID)
+                .attr("class", "scenariogroup")
                 .attr("transform", "translate(" + margin.left + "," + top + ")");
             chartGroup.append("text").attr("x", 0)
                 .attr("y", 0)
                 .style("text-anchor", "left")
-                .text(scenario);
+                .text(scenarios[+scenario].name);
             chartGroup = chartGroup.append("g")
                 .attr("class", "chart")
                 .attr("transform", "translate(" + padding + "," + padding + ")");
@@ -104,6 +105,9 @@ function LciaWaterfall() {
             maxVal = d3.max(scenarioSegments, function (d) {
                 return d.endVal;
             });
+            if (minVal > 0) {
+                minVal = 0;
+            }
             xAxis.tickValues([minVal, maxVal]);
         }
         if (updateOnly) {
@@ -188,39 +192,64 @@ function LciaWaterfall() {
             return top + chartHeight + margin.bottom + 2*padding; 
     }
 
-    function setWaterfallData() {
-        waterfallData = LCA.loadedData.waterfall;
-        waterfall.scenarios(waterfallData.scenarios)
-        .stages(waterfallData.stages)
-        .values(waterfallData.values);
-    }
+    function buildWaterFall() {
+        var stages = [],
+            scenarioKeys = d3.keys(scenarios),
+            values = [], stageValues,
+            i = 0, j = 0;
 
-    function visualizeResults() {
-        if ( "lciaMethods" in LCA.indexedData) {
-            var method = LCA.indexedData.lciaMethods[selectedMethodID];
-            if (method && ("referenceFlowProperty" in method)) {
-                flowProperty = method.referenceFlowProperty.name;
-                referenceUnit = method.referenceFlowProperty.referenceUnit;
-                d3.select("#unitName").text(referenceUnit);
-                //d3.select("#fpName").text(flowProperty);
+        if ("fragmentFlows" in LCA.indexedData) {
+            stages = d3.keys(LCA.indexedData.fragmentFlows);
+            values = [];
+            for (i = 0; i < scenarioKeys.length; ++i) {
+                stageValues = [];
+                for (j = 0; j < stages.length; ++j) {
+                    stageValues.push(scenarios[i].lciaResults[+stages[j]]);
+                }
+                values.push(stageValues);
             }
         }
+        waterfall = waterfall.scenarios(scenarioKeys)
+                .stages(stages)
+                .values(values);
+        displayResults();
+    }
+
+    function displayUnit(method) {
+        d3.select("#unitName").text(method.referenceFlowProperty.referenceUnit);
+    }
+
+    function hasResult(stage) {
+        return waterfall.segments.some(function (scen) {
+            return scen.some(function (s) {
+                return s.stage === stage;
+            });
+        });
     }
 
     /**
      * Display LCIA results
      */
     function displayResults() {
-        var bottom = 0;
-
+        var bottom = 0,
+            legendStages;
         
+        svg.selectAll(".scenariogroup").remove();
         waterfall.layout();
-        LCA.makeLegend(legendSvg, waterfall.stages(), waterfall.colorScale);
+        legendStages = waterfall.stages().filter(hasResult);
+        LCA.makeLegend(legendSvg, legendStages, waterfall.colorScale);
+        legendSvg.selectAll(".legendtext").text(function (d) {
+            return (d in LCA.indexedData.fragmentFlows) ?
+                LCA.indexedData.fragmentFlows[+d].shortName :
+                "Stage " + d;
+        });
         xAxis.scale(waterfall.xScale);
-        waterfallData.scenarios.forEach(function (scenario, index) {
-            bottom = displayScenario(scenario, index, bottom);
+        waterfall.scenarios().forEach(function (scenario, index) {
+            bottom = displayScenario( scenario, index, bottom);
         });
     }
+
+   
 
     function wait(message) {
         console.log(message);
@@ -237,6 +266,8 @@ function LciaWaterfall() {
     */
     function onMethodChange() {
         selectedMethodID = this.options[this.selectedIndex].value;
+        displayUnit(LCA.indexedData.lciaMethods[selectedMethodID]);
+        //updateOnly = true;
         getLciaResults();
     }
 
@@ -247,6 +278,7 @@ function LciaWaterfall() {
     function onImpactCategoryChange() {
         selectedImpactCategoryID = this.options[this.selectedIndex].value;
         selectedMethodID = 0;
+        //updateOnly = true;
         loadMethods();
     }
 
@@ -276,9 +308,25 @@ function LciaWaterfall() {
         }
     }
 
+    function onFragmentFlowsLoaded() {
+        if ("fragmentflows" in LCA.loadedData && LCA.loadedData.fragmentflows) {
+            LCA.indexedData.fragmentFlows = LCA.indexData("fragmentflows", "fragmentFlowID");
+            getLciaResults();
+        }
+    }
+
     function onResultsLoaded() {
         if ("lciaresults" in LCA.loadedData) {
-            visualizeResults(LCA.loadedData.lciaresults.fragmentFlowLCIAResults);
+            LCA.loadedData.lciaresults.forEach(function (s) {
+                if (("scenarioID" in s) && (s.scenarioID in scenarios) && ("fragmentFlowLCIAResults" in s)) {
+                    var indexedResults = {};
+                    s.fragmentFlowLCIAResults.forEach(function (r) {
+                        indexedResults[r.fragmentFlowID] = +r.result;
+                    });
+                    scenarios[s.scenarioID].lciaResults = indexedResults;
+                }
+            });
+            buildWaterFall();
         } 
     }
 
@@ -287,7 +335,7 @@ function LciaWaterfall() {
       * get LCIA computation results from web API
       */
     function getLciaResults() {
-        if ( selectedMethodID > 0 ) {
+        if ( selectedMethodID > 0 && "fragmentflows" in LCA.loadedData) {
             wait("Get LCIA results...");
             LCA.loadData("lciaresults", false, onResultsLoaded,
             "fragments/" + selectedFragmentID + "/lciamethods/" + selectedMethodID);
@@ -308,11 +356,12 @@ function LciaWaterfall() {
                 LCA.loadSelectionList(LCA.loadedData.lciamethods,
                    "#lciaMethodSelect", "lciaMethodID", onMethodChange, selectedMethodID);
                 LCA.indexedData.lciaMethods = LCA.indexData("lciamethods", "lciaMethodID");
+                displayUnit(LCA.loadedData.lciamethods[0]);
                 getLciaResults();
             } else {
                 selectedMethodID = 0;
                 LCA.emptySelectionList("#lciaMethodSelect");
-                visualizeResults([]);
+                buildWaterFall();
             }
         } else {
             resume("Unable to load LCIA methods.");
@@ -337,7 +386,9 @@ function LciaWaterfall() {
     * Load fragment
     */
     function loadFragment() {
-        LCA.loadData("fragments/" + selectedFragmentID, false, onFragmentLoaded);
+        var fragResource = "fragments/" + selectedFragmentID;
+        LCA.loadData(fragResource, false, onFragmentLoaded);
+        LCA.loadData("fragmentflows", false, onFragmentFlowsLoaded, fragResource);
     }
 
     /**

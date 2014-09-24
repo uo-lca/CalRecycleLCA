@@ -83,7 +83,8 @@ d3.waterfall = function () {
             for (j = 0; j < stages.length; j++) {
                 // NULL value means this stage is not relevant in this scenario,
                 // no segment created
-                if (values[i][j] !== null) {
+                // Also do not add segment for 0 value
+                if (values[i][j] !== null && values[i][j] !== 0) {
                     var segment = {};
                     segment.scenario = scenarios[i];
                     segment.stage = stages[j];

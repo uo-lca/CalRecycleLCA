@@ -300,7 +300,6 @@ LCA.loadUrlVars = function() {
  * @param {Object} svg          d3 selection to contain legend
  * @param {Array} data          Chart data
  * @param {Object} scale        d3 scale mapping data to colors
- * // TODO : Add optional property for legend text
  */
 LCA.makeLegend = function (svg, data, scale) {
     var rowHeight = 20,
@@ -330,10 +329,7 @@ LCA.makeLegend = function (svg, data, scale) {
         .attr("x", colXs[1])
         .attr("y", textY)
         .attr("dy", ".35em")
-        .attr("class", "legend text")
-        .text(function (d) {
-            return d;
-        });
+        .attr("class", "legendtext");
 
     // Remove unused rows
     legend.exit().remove();
