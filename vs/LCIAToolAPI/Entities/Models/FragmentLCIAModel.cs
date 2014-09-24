@@ -11,6 +11,7 @@ namespace Entities.Models
         public int? FragmentFlowID { get; set; }
         public double? NodeWeight { get; set; }
         public double? ImpactScore { get; set; }
+	public double? Result { get; set; }
         public int? fnpProcessID { get; set; }
         public int? psProcessID { get; set; }
         public int? fnpSubFragmentID { get; set; }

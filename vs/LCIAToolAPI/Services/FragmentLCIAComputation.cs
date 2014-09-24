@@ -268,9 +268,7 @@ namespace Services
                 .Join(_nodeCacheService.Query().Get(), ff => ff.FragmentFlowID, nc => nc.FragmentFlowID, (ff, nc) => new { ff, nc })
                 .Where(x => x.nc.ScenarioID == scenarioId)
                 .GroupJoin(_scoreCacheService.Query().Get()
-                // leave this out for now, as you obviously can't add a
-                // where clause for a table that has no data.
-                //.Where(x => x.LCIAMethodID == lciaMethodId)
+                .Where(x => x.LCIAMethodID == lciaMethodId)
       , l => l.nc.NodeCacheID
       , sc => sc.NodeCacheID
       , (nc, sc) => new { nodeCaches = nc, scoreCaches = sc })
@@ -279,7 +277,8 @@ namespace Services
       {
           FragmentFlowID = s.nodeCaches.ff.FragmentFlowID,
           NodeWeight = s.nodeCaches.nc.NodeWeight,
-          ImpactScore = scoreCaches == null ? 0 : scoreCaches.ImpactScore
+          ImpactScore = scoreCaches == null ? 0 : scoreCaches.ImpactScore,
+	      Result = s.nodeCaches.nc.NodeWeight * (scoreCaches == null ? 0 : scoreCaches.ImpactScore)
       });
 
             return lcia;

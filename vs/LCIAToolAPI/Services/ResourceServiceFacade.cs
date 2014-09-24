@@ -298,7 +298,7 @@ namespace Services {
          public FragmentFlowLCIAResource Transform(FragmentLCIAModel m) {
              return new FragmentFlowLCIAResource {
                  FragmentFlowID = TransformNullable(m.FragmentFlowID, "FragmentLCIAModel.FragmentFlowID"),
-                 Result = Convert.ToDouble(m.ImpactScore)
+                 Result = Convert.ToDouble(m.Result)
              };
          }
 
@@ -497,7 +497,7 @@ namespace Services {
                 .Select(group => new FragmentLCIAModel
                 {
                     FragmentFlowID = group.Key,
-                    ImpactScore = group.Sum(a => a.ImpactScore)
+                    Result = group.Sum(a => a.Result)
                 });
             FragmentLCIAResource lciaResult = new FragmentLCIAResource {
                 ScenarioID = scenarioID,
