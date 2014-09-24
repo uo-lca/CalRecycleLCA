@@ -233,19 +233,30 @@ namespace Services
                 throw new ArgumentNullException("unitOfWork is null");
             }
             _unitOfWork = unitOfWork;
-
-            if (unitOfWork1 == null)
-            {
-                throw new ArgumentNullException("unitOfWork1 is null");
-            }
-            _unitOfWork1 = unitOfWork1;
         }
 
         public void FragmentLCIACompute(int fragmentId, int scenarioId)
         {
+
             var lciaMethods = _lciaMethodService.Query().Get().ToList();
-            var c = FragmentFlowLCIA(fragmentId, scenarioId, lciaMethods).ToList();
-            //return c.ToList();
+
+//select distinct f.FragmentID, n.ScenarioID from NodeCache n inner join ScoreCache s
+//on n.NodeCacheID = s.NodeCacheID
+//inner join FragmentFlow f on f.FragmentFlowID =n.FragmentFlowID
+//where FragmentID=3 and ScenarioID=0
+
+            var scoreCache = _scoreCacheService.Query().Get()
+                .Join(_nodeCacheService.Query().Get(), sc => sc.NodeCacheID, nc => nc.NodeCacheID, (sc, nc) => new { sc, nc })
+                .Join(_fragmentFlowService.Query().Get(), nc => nc.nc.FragmentFlowID, ff => ff.FragmentFlowID, (nc, ff) => new { nc, ff })
+                .Where(x => x.ff.FragmentID == fragmentId)
+                .Where(x => x.nc.nc.ScenarioID == scenarioId);
+
+
+            if (scoreCache.Count() == 0)
+            {
+                FragmentFlowLCIA(fragmentId, scenarioId, lciaMethods).ToList();
+            }
+          
 
         }
 
@@ -387,8 +398,11 @@ namespace Services
                         break;
 
                     case 4:
-                        targetId = ResolveBackground(item.ff.FlowID, item.ff.DirectionID, scenarioId, nodeTypeId);
-                        SetScoreCache(targetId, nodeTypeId, lciaMethods, scenarioId, nodeCacheId);
+                        //needed to get an object containing NodetypeId and targetId - not just the integer targetid
+                        var resolveBackground = ResolveBackground(item.ff.FlowID, item.ff.DirectionID, scenarioId, nodeTypeId);
+                        int? resolveBackgroundTargetId = resolveBackground.TargetID;
+                        int? resolveBackgroundNodeTypeId = resolveBackground.NodeTypeID;
+                        SetScoreCache(resolveBackgroundTargetId, resolveBackgroundNodeTypeId, lciaMethods, scenarioId, nodeCacheId);
                         break;
                 }
 
@@ -405,7 +419,7 @@ namespace Services
         }
 
 
-        public int ResolveBackground(int? flowId, int? directionId, int? scenarioId, int? nodeTypeId)
+        public ResolveBackgroundModel ResolveBackground(int? flowId, int? directionId, int? scenarioId, int? nodeTypeId)
         {
             IEnumerable<ResolveBackgroundModel> background = null;
             int targetId;
@@ -447,11 +461,16 @@ namespace Services
                 targetId = Convert.ToInt32(background.Select(x => x.TargetID).FirstOrDefault());
             }
 
-            return targetId;
+            //return targetId;
+
+            ResolveBackgroundModel resolveBackground = new ResolveBackgroundModel();
+            resolveBackground.NodeTypeID = nodeTypeId;
+            resolveBackground.TargetID = targetId;
+            return resolveBackground;
 
         }
 
-        public void SetScoreCache(int? targetId, int nodeTypeId, IEnumerable<LCIAMethod> lciaMethods, int scenarioId, int nodeCacheId)
+        public void SetScoreCache(int? targetId, int? nodeTypeId, IEnumerable<LCIAMethod> lciaMethods, int scenarioId, int nodeCacheId)
         {
             switch (nodeTypeId)
             {
