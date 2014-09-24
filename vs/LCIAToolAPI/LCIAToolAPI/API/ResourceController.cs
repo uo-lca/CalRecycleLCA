@@ -99,18 +99,19 @@ namespace LCAToolAPI.API
             return _ResourceService.GetFlowPropertiesByFragment(fragmentID);
         }
 
-        // reports lcia results
-        //[Route("api/fragments/{fragmentID:int}/lciamethods/{lciaMethodID:int}")]
-        //[HttpGet]
-        // public IEnumerable<FragmentLCIAResource> GetFragmentLCIAResults(int fragmentID) {
-        //     return _ResourceService.GetFragmentLCIAResults(fragmentID, lciaMethodID, 0);
-        // }
-        //[Route("api/scenarios/{scenarioID:int}/fragments/{fragmentID:int}/lciamethods/{lciaMethodID:int}")]
-        //[HttpGet]
-        // public IEnumerable<FragmentLCIAResource> GetFragmentLCIAResults(int fragmentID) {
-        //     return _ResourceService.GetFragmentLCIAResults(fragmentID, lciaMethodID, scenarioID);
-        // }
-         
+        // reports lcia results for all scenarios in a scenario group 
+        // TODO: Add scenario group filter
+        [Route("api/fragments/{fragmentID:int}/lciamethods/{lciaMethodID:int}/lciaresults")]
+        [HttpGet]
+        public IEnumerable<FragmentLCIAResource> GetFragmentLCIAResultsAllScenarios(int fragmentID, int lciaMethodID) {
+             return _ResourceService.GetFragmentLCIAResultsAllScenarios(fragmentID, lciaMethodID);
+        }
+
+        [Route("api/scenarios/{scenarioID:int}/fragments/{fragmentID:int}/lciamethods/{lciaMethodID:int}/lciaresults")]
+        [HttpGet]
+        public FragmentLCIAResource GetFragmentLCIAResults(int fragmentID, int lciaMethodID, int scenarioID) {
+            return _ResourceService.GetFragmentLCIAResults(fragmentID, lciaMethodID, scenarioID);
+        }
 
         // LCIA Metadata ////////////////////////////////////////////////////////////
         [Route("api/impactcategories")]

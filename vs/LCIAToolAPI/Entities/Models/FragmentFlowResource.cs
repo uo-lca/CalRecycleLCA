@@ -40,17 +40,4 @@ namespace Entities.Models {
         public ICollection<FlowPropertyMagnitude> FlowPropertyMagnitudes { get; set; }
     }
     
-    /// <summary>
-    /// output from ComputeFragmentLCIA. just FragmentFlowID + Result, with some metadata
-    /// in the future, report FragmentStageID instead
-    /// </summary>
-    public class FragmentLCIAResource {
-        
-        // Outputs from ComputeFragmentLCIA
-        public int FragmentFlowID { get; set; }
-        public double Result { get; set; }
-
-        // metadata from FragmentFlow (or FragmentStage later)
-        public string Name { get; set; }
-    }
 }
