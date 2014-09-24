@@ -38,11 +38,15 @@ namespace Services {
         private readonly IService<Process> _ProcessService;
         [Inject]
         private readonly IService<ProcessFlow> _ProcessFlowService;
+        [Inject]
+        private readonly IService<Scenario> _ScenarioService;
         //
         // Traversal and Computation components
         //
         [Inject]
         private readonly IFragmentTraversalV2 _FragmentTraversalV2;
+        [Inject]
+        private readonly IFragmentLCIAComputation _FragmentLCIAComputation;
         [Inject]
         private readonly ILCIAComputationV2 _LCIAComputation;
 
@@ -63,6 +67,7 @@ namespace Services {
                                IService<Fragment> fragmentService,
                                IService<FragmentFlow> fragmentFlowService,
                                IFragmentTraversalV2 fragmentTraversalV2,
+                               IFragmentLCIAComputation fragmentLCIAComputation,
                                IService<Flow> flowService,
                                IService<FlowProperty> flowPropertyService,
                                IService<FlowType> flowTypeService,
@@ -70,11 +75,13 @@ namespace Services {
                                ILCIAComputationV2 lciaComputation,
                                IService<LCIAMethod> lciaMethodService,
                                IService<Process> processService,
-                               IService<ProcessFlow> processFlowService) 
+                               IService<ProcessFlow> processFlowService,
+                               IService<Scenario> scenarioService) 
         {
             _CategoryService = verifiedDependency(categoryService);
             _FragmentService = verifiedDependency(fragmentService);
             _FragmentFlowService = verifiedDependency(fragmentFlowService);
+            _FragmentLCIAComputation = verifiedDependency(fragmentLCIAComputation);
             _FragmentTraversalV2 = verifiedDependency(fragmentTraversalV2);         
             _FlowService = verifiedDependency(flowService);
             _FlowPropertyService = verifiedDependency(flowPropertyService);
@@ -84,6 +91,7 @@ namespace Services {
             _LciaMethodService = verifiedDependency(lciaMethodService);
             _ProcessService = verifiedDependency(processService);
             _ProcessFlowService = verifiedDependency(processFlowService);
+            _ScenarioService = verifiedDependency(scenarioService);
         }
 
         // TransformNullable methods are a workaround for imprecise relationship modeling
@@ -274,9 +282,9 @@ namespace Services {
              };
          }
 
-         public LCIAResultResource Transform(LCIAModel m) {
-             return new LCIAResultResource {
-                LCIAMethodID = TransformNullable(m.LCIAMethodID, "LCIAModel.LCIAMethodID"),
+         public ProcessLCIAResultResource Transform(LCIAModel m) {
+             return new ProcessLCIAResultResource {
+                //LCIAMethodID = TransformNullable(m.LCIAMethodID, "LCIAModel.LCIAMethodID"),
                 FlowID = TransformNullable(m.FlowID, "LCIAModel.FlowID"),
                 DirectionID = TransformNullable(m.DirectionID, "LCIAModel.DirectionID"),
                 Quantity = Convert.ToDouble(m.Result),
@@ -284,6 +292,13 @@ namespace Services {
                         Convert.ToDouble(m.LCIAFactor) : 
                         Convert.ToDouble(m.LCParamValue),
                 Result = Convert.ToDouble(m.ComputationResult)
+             };
+         }
+
+         public FragmentFlowLCIAResource Transform(FragmentLCIAModel m) {
+             return new FragmentFlowLCIAResource {
+                 FragmentFlowID = TransformNullable(m.FragmentFlowID, "FragmentLCIAModel.FragmentFlowID"),
+                 Result = Convert.ToDouble(m.ImpactScore)
              };
          }
 
@@ -449,8 +464,8 @@ namespace Services {
         /// Execute Process LCIA and return computation results in LCIAResultResource objects
         /// Work around problem in LCIA computation: should be filtering out LCIA with Geography 
         /// </summary>
-        /// <returns>List of LCIAResultResource objects or null if lciaMethodID not found</returns> 
-        public IEnumerable<LCIAResultResource> GetLCIAResultResources(int processID, int lciaMethodID, int scenarioID = 0) {
+        /// <returns>LCIAResultResource or null if lciaMethodID not found</returns> 
+        public LCIAResultResource GetLCIAResultResource(int processID, int lciaMethodID, int scenarioID = 0) {
             LCIAMethod lciaMethod = _LciaMethodService.FindById(lciaMethodID);
             if (lciaMethod == null) {
                 // TODO: figure how to handle this sort of error
@@ -460,8 +475,47 @@ namespace Services {
                 IEnumerable<InventoryModel> inventory = _LCIAComputation.ComputeProcessLCI(processID, scenarioID);
                 IEnumerable<LCIAModel> lciaResults = _LCIAComputation.ComputeProcessLCIA(inventory, lciaMethod, scenarioID)
                     .Where(l => String.IsNullOrEmpty(l.Geography));
-                return lciaResults.Select(m => Transform(m)).ToList();
+                LCIAResultResource lciaResult = new LCIAResultResource {
+                    LCIAMethodID = lciaMethodID,
+                    ProcessLCIAResults = lciaResults.Select(m => Transform(m)).ToList()
+                };
+                return lciaResult;
             }
+        }
+
+        /// <summary>
+        /// Execute Fragment LCIA and return computation result as FragmentLCIAResource object
+        /// </summary>
+        /// <param name="fragmentID"></param>
+        /// <param name="lciaMethodID"></param>
+        /// <param name="scenarioID">Defaults to base scenario</param>
+        /// <returns>Fragment LCIA results for given parameters</returns> 
+        public FragmentLCIAResource GetFragmentLCIAResults(int fragmentID, int lciaMethodID, int scenarioID = 0) {
+            IEnumerable<FragmentLCIAModel> results = _FragmentLCIAComputation.ComputeFragmentLCIA(fragmentID, scenarioID, lciaMethodID);
+            IEnumerable<FragmentLCIAModel> aggResults = results
+                .GroupBy(r => r.FragmentFlowID)
+                .Select(group => new FragmentLCIAModel
+                {
+                    FragmentFlowID = group.First().FragmentFlowID,
+                    ImpactScore = group.Sum(a => a.ImpactScore)
+                });
+            FragmentLCIAResource lciaResult = new FragmentLCIAResource {
+                ScenarioID = scenarioID,
+                FragmentFlowLCIAResults = aggResults.Select(r => Transform(r)).ToList()
+            };
+            return lciaResult;
+        }
+
+        /// <summary>
+        /// Execute Fragment LCIA and return computation results in FragmentLCIAResource objects
+        /// </summary>
+        /// <param name="fragmentID"></param>
+        /// <param name="lciaMethodID"></param>
+        /// <param name="scenarioGroupID">Scenario group of the user making request</param>
+        /// <returns>List of LCIAResultResource objects</returns> 
+        public IEnumerable<FragmentLCIAResource> GetFragmentLCIAResultsAllScenarios(int fragmentID, int lciaMethodID, int scenarioGroupID = 1) {
+            IEnumerable<Scenario> scenarios = _ScenarioService.Query().Filter(s => s.ScenarioGroupID == scenarioGroupID).Get();
+            return scenarios.Select(s => GetFragmentLCIAResults(fragmentID, lciaMethodID, s.ScenarioID)).ToList();
         }
 
         /// <summary>

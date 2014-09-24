@@ -99,18 +99,19 @@ namespace LCAToolAPI.API
             return _ResourceService.GetFlowPropertiesByFragment(fragmentID);
         }
 
-        // reports lcia results
-        //[Route("api/fragments/{fragmentID:int}/lciamethods/{lciaMethodID:int}")]
-        //[HttpGet]
-        // public IEnumerable<FragmentLCIAResource> GetFragmentLCIAResults(int fragmentID) {
-        //     return _ResourceService.GetFragmentLCIAResults(fragmentID, lciaMethodID, 0);
-        // }
-        //[Route("api/scenarios/{scenarioID:int}/fragments/{fragmentID:int}/lciamethods/{lciaMethodID:int}")]
-        //[HttpGet]
-        // public IEnumerable<FragmentLCIAResource> GetFragmentLCIAResults(int fragmentID) {
-        //     return _ResourceService.GetFragmentLCIAResults(fragmentID, lciaMethodID, scenarioID);
-        // }
-         
+        // reports lcia results for all scenarios in a scenario group 
+        // TODO: Add scenario group filter
+        [Route("api/fragments/{fragmentID:int}/lciamethods/{lciaMethodID:int}/lciaresults")]
+        [HttpGet]
+        public IEnumerable<FragmentLCIAResource> GetFragmentLCIAResultsAllScenarios(int fragmentID, int lciaMethodID) {
+             return _ResourceService.GetFragmentLCIAResultsAllScenarios(fragmentID, lciaMethodID);
+        }
+
+        [Route("api/scenarios/{scenarioID:int}/fragments/{fragmentID:int}/lciamethods/{lciaMethodID:int}/lciaresults")]
+        [HttpGet]
+        public FragmentLCIAResource GetFragmentLCIAResults(int fragmentID, int lciaMethodID, int scenarioID) {
+            return _ResourceService.GetFragmentLCIAResults(fragmentID, lciaMethodID, scenarioID);
+        }
 
         // LCIA Metadata ////////////////////////////////////////////////////////////
         [Route("api/impactcategories")]
@@ -165,20 +166,21 @@ namespace LCAToolAPI.API
         // access control needed here
         [Route("api/processes/{processID:int}/lciamethods/{lciaMethodID:int}/lciaresults")]
         [HttpGet]
-        public IEnumerable<LCIAResultResource> GetLCIAResultResources(int processID, int lciaMethodID) {
-            return _ResourceService.GetLCIAResultResources(processID, lciaMethodID);
+        public LCIAResultResource GetLCIAResultResources(int processID, int lciaMethodID) {
+            return _ResourceService.GetLCIAResultResource(processID, lciaMethodID);
         }
 
         // as above w/ scenario
         [Route("api/scenarios/{scenarioID:int}/processes/{processID:int}/lciamethods/{lciaMethodID:int}/lciaresults")]
         [HttpGet]
-        public IEnumerable<LCIAResultResource> GetLCIAResultResources(int processID, int lciaMethodID, int scenarioID) {
-            return _ResourceService.GetLCIAResultResources(processID, lciaMethodID, scenarioID);
+        public LCIAResultResource GetLCIAResultResource(int processID, int lciaMethodID, int scenarioID) {
+            return _ResourceService.GetLCIAResultResource(processID, lciaMethodID, scenarioID);
         }
 
 
         /* TODO:
          * 
+         * Add route to get Process LCIA results for all methods
          * [Route("api/processes/{processID:int}")] // to report what?
          X [Route("api/fragments/{fragmentID:int}/lciaresults")]    
          X [Route("api/scenarios/{scenarioID:int}/fragments/{fragmentID:int}/lciaresults")]    

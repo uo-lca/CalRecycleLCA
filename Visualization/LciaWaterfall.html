@@ -18,6 +18,7 @@
     <!-- JavaScript -->
     <script type="text/javascript" src="http://ajax.aspnetcdn.com/ajax/jQuery/jquery-2.1.1.min.js"></script>
     <script type="text/javascript" src="d3.min.js"></script>
+    <script type="text/javascript" src="spin.min.js"></script>
     <script type="text/javascript" src="colorbrewer.js"></script>
     <script type="text/javascript" src="waterfall.js"></script>
     <script type="text/javascript" src="LCA.js"></script>
@@ -49,12 +50,20 @@
                         <span id="fragmentName"></span>
                     </p>
                     <p>
+                        <label for="impactCategorySelect">Impact Category</label>
+                        <select name="impactCategorySelect" id="impactCategorySelect"></select>
+                    </p>
+                    <p>
                         <label for="lciaMethodSelect">LCIA Method</label>
                         <select name="lciaMethodSelect" id="lciaMethodSelect"></select>
                     </p>
                     <p>
                         <label id="unitLabel">Unit:</label>
                         <span id="unitName"></span>
+                    </p>
+                    <p>
+                        <label id="fpLabel"></label>
+                        <span id="fpName"></span>
                     </p>
                 </fieldset>
             </div>
