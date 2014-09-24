@@ -496,7 +496,7 @@ namespace Services {
                 .GroupBy(r => r.FragmentFlowID)
                 .Select(group => new FragmentLCIAModel
                 {
-                    FragmentFlowID = group.First().FragmentFlowID,
+                    FragmentFlowID = group.Key,
                     ImpactScore = group.Sum(a => a.ImpactScore)
                 });
             FragmentLCIAResource lciaResult = new FragmentLCIAResource {
