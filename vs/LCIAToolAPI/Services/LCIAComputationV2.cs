@@ -187,8 +187,7 @@ namespace Services
             // returns a list of flows: FlowID, DirectionID, Result
             // Param types: ProcessEmissionParam
             // FlowPropertyParam + ProcessDissipationParam
-            var inventory = _processFlowService.Query().Get()
-                .Where(x => x.ProcessID == processId)
+            var inventory = _processFlowService.Query().Filter(x => x.ProcessID == processId).Get()
           .GroupJoin(_processEmissionParamService.Query().Get() // Target table
       , pf => pf.ProcessFlowID
       , pep => pep.ProcessFlowID
@@ -252,9 +251,9 @@ namespace Services
         public IEnumerable<LCIAModel> ComputeProcessLCIA(IEnumerable<InventoryModel> inventory, LCIAMethod lciaMethodItem, int? scenarioId)
         {
             var lcias = inventory
-                .Join(_lciaService.Query().Get(), i => i.FlowID, l => l.FlowID, (i, l) => new { i, l })
+                .Join(_lciaService.Query().Filter(l => l.LCIAMethodID == lciaMethodItem.LCIAMethodID).Get(), i => i.FlowID, l => l.FlowID, (i, l) => new { i, l })
                 .Where(x => x.l.FlowID != null)
-                .Join(_lciaMethodService.Query().Get(), l => l.l.LCIAMethodID, lm => lm.LCIAMethodID, (l, lm) => new { l, lm })
+                .Join(_lciaMethodService.Query().Filter(lm => lm.LCIAMethodID == lciaMethodItem.LCIAMethodID).Get(), l => l.l.LCIAMethodID, lm => lm.LCIAMethodID, (l, lm) => new { l, lm })
                  .Where(x => x.l.l.LCIAMethodID == lciaMethodItem.LCIAMethodID)
                  .GroupJoin(_characterizationParamService.Query().Get() // Target table
       , l => l.l.l.LCIAID
