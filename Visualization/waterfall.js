@@ -17,7 +17,8 @@ d3.waterfall = function () {
         // Output   
         segments = [],    // 2D array of waterfall segments, one for each non-null value
         xScale = d3.scale.linear(),             // d3 scale maps aggregate value to chart's x axis
-        colorScale = d3.scale.ordinal(); // d3 scale maps stages to colors
+        colorScale = d3.scale.ordinal(), // d3 scale maps stages to colors
+        resultStages = [];          // Stages that actually have a value in at least one scenario
 
     waterfall.colors = function (_) {
         if (!arguments.length) { return colors; }
@@ -61,6 +62,14 @@ d3.waterfall = function () {
         return waterfall;
     };
 
+    function hasResult(stage) {
+        return waterfall.segments.some(function (scen) {
+            return scen.some(function (s) {
+                return s.stage === stage;
+            });
+        });
+    }
+
     function setGraphicAttributes(seg, index) {
         seg.x = xScale(Math.min(seg.startVal, seg.endVal));
         seg.y = (segmentPadding + segmentHeight) * index;
@@ -71,9 +80,10 @@ d3.waterfall = function () {
 
     waterfall.layout = function () {
         var i = 0, j = 0, minVal = 0.0, maxVal = 0.0;
+
         xScale.range([0, width]).nice();
         colorScale.range(colors);
-        colorScale.domain(stages);
+        //colorScale.domain(stages);
         segments = [];
         for (i = 0; i < scenarios.length; i++) {
             //first calculate the left edge for each stage
@@ -108,9 +118,13 @@ d3.waterfall = function () {
             segments[i].forEach(setGraphicAttributes);
         }       
 
+        waterfall.segments = segments;
+
+        waterfall.resultStages = waterfall.stages().filter(hasResult);
+        colorScale.domain(waterfall.resultStages);
+
         waterfall.xScale = xScale;
         waterfall.colorScale = colorScale;
-        waterfall.segments = segments;  
 
         return waterfall;
     };

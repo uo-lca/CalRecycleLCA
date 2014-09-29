@@ -16,7 +16,7 @@ function LciaWaterfall() {
     /*global d3, colorbrewer, LCA */
 
     // Current selections
-    var selectedFragmentID = 8,
+    var selectedFragmentID = 5,
         selectedImpactCategoryID = 0,
         selectedMethodID = 0,
         curFragment = null;
@@ -29,7 +29,8 @@ function LciaWaterfall() {
         left: 20
     },
         width = 600 - margin.left - margin.right,   // diagram width
-        height = 1000 - margin.top - margin.bottom;  // diagram height
+        height = 1000 - margin.top - margin.bottom,  // diagram height
+        legendWidth = 250;
 
     var stageColors = colorbrewer.Spectral[11];       
 
@@ -42,26 +43,33 @@ function LciaWaterfall() {
         svg,
         transitionTime = 250,   // d3 transition time in ms
         updateOnly = false,     // Flag when diagram should be updated, as opposed to drawn from scratch
-        legendSvg,
         // temp. standin for web api resource
-        scenarios = { 0: { name: "Model Base Case" }, 1: { name: "Default Scenario" } };  
+        scenarios = { 0: { name: "Model Base Case" }, 1: { name: "Default Scenario" } },
+        msg;
 
     /**
      * Initial preparation of svg element.
      */
     function prepareSvg() {
-        legendSvg = d3.select("#legend")
-                    .append("svg")
-                    .attr("width", 150 )
-                    .attr("height", 150)
-                    .append("g")
-                    .attr("transform", "translate(" + 5 + "," + 5 + ")");
+        var legendOffset = width + 2 * margin.left + margin.right;
+
         svg = d3.select("#chartcontainer")
             .append("svg")
-            .attr("width", width + margin.left + margin.right)
-            .attr("height", height + margin.top + margin.bottom)
+            .attr("width", width + margin.left + margin.right + legendWidth)
+            .attr("height", height + margin.top + margin.bottom);
+
+        svg.append("g")
+            .attr("id", "chartgroup")
             .append("g")
             .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+        svg.append("g")
+            .attr("id", "legendgroup")
+            .attr("transform", "translate(" + legendOffset + "," + margin.top + ")");
+    }
+
+    function prepareMsg() {
+        msg = d3.select("#chartcontainer").append("p").append("i");
     }
      
     /**
@@ -81,11 +89,12 @@ function LciaWaterfall() {
             chartHeight = 0,
             minVal = 0.0, maxVal = 0.0;
 
+        chartGroup = svg.select("#chartgroup");
         if (updateOnly) {
             transitionTime = 250;
-            chartGroup = svg.select("#" + chartID).select(".chart");
+            chartGroup = chartGroup.select("#" + chartID).select(".chart");
         } else {
-            chartGroup = svg.append("g").attr("id", chartID)
+            chartGroup = chartGroup.append("g").attr("id", chartID)
                 .attr("class", "scenariogroup")
                 .attr("transform", "translate(" + margin.left + "," + top + ")");
             chartGroup.append("text").attr("x", 0)
@@ -192,6 +201,9 @@ function LciaWaterfall() {
             return top + chartHeight + margin.bottom + 2*padding; 
     }
 
+    /**
+     * Build waterfall data from LCIA results and display
+     */
     function buildWaterFall() {
         var stages = [],
             scenarioKeys = d3.keys(scenarios),
@@ -204,7 +216,12 @@ function LciaWaterfall() {
             for (i = 0; i < scenarioKeys.length; ++i) {
                 stageValues = [];
                 for (j = 0; j < stages.length; ++j) {
-                    stageValues.push(scenarios[i].lciaResults[+stages[j]]);
+                    var stageID = +stages[j];
+                    if (stageID in scenarios[i].lciaResults) {
+                        stageValues.push(scenarios[i].lciaResults[stageID]);
+                    } else {
+                        stageValues.push(null);
+                    }
                 }
                 values.push(stageValues);
             }
@@ -219,37 +236,58 @@ function LciaWaterfall() {
         d3.select("#unitName").text(method.referenceFlowProperty.referenceUnit);
     }
 
-    function hasResult(stage) {
-        return waterfall.segments.some(function (scen) {
-            return scen.some(function (s) {
-                return s.stage === stage;
-            });
-        });
+    function makeLegendHeader() {
+        var legendGroup = svg.select("#legendgroup"),
+            header = legendGroup.selectAll(".legendheader");
+        if (header.empty()) {
+            legendGroup.append("text")
+                .attr("class", "legendheader")
+                .text("Stages");
+        }
     }
+
 
     /**
      * Display LCIA results
      */
     function displayResults() {
         var bottom = 0,
-            legendStages;
+            legendGroup = d3.select("#legendgroup");
         
         svg.selectAll(".scenariogroup").remove();
         waterfall.layout();
-        legendStages = waterfall.stages().filter(hasResult);
-        LCA.makeLegend(legendSvg, legendStages, waterfall.colorScale);
-        legendSvg.selectAll(".legendtext").text(function (d) {
-            return (d in LCA.indexedData.fragmentFlows) ?
-                LCA.indexedData.fragmentFlows[+d].shortName :
-                "Stage " + d;
-        });
-        xAxis.scale(waterfall.xScale);
-        waterfall.scenarios().forEach(function (scenario, index) {
-            bottom = displayScenario( scenario, index, bottom);
-        });
+
+        if (waterfall.resultStages.length > 0) {
+            displayMessage(null);
+            
+            makeLegendHeader();
+            LCA.makeLegend(legendGroup, waterfall.colorScale.domain(), waterfall.colorScale);
+
+            legendGroup.selectAll(".legendtext").text(function (d) {
+                return (d in LCA.indexedData.fragmentFlows) ?
+                    LCA.indexedData.fragmentFlows[+d].shortName :
+                    "Stage " + d;
+            });
+            xAxis.scale(waterfall.xScale);
+            waterfall.scenarios().forEach(function (scenario, index) {
+                bottom = displayScenario(scenario, index, bottom);
+            });
+            svg.style("visibility", "visible");
+        } else {
+            displayMessage("No LCIA results to display.");
+            svg.style("visibility", "hidden");
+        }
+        
+        
     }
 
-   
+    function displayMessage(message) {
+        if (message === null) {
+            msg.style("display", "none");
+        } else {
+            msg.style("display", "block").text(message);
+        }
+    }
 
     function wait(message) {
         console.log(message);
@@ -397,6 +435,7 @@ function LciaWaterfall() {
     function init() {
         
         LCA.createSpinner("chartcontainer");
+        prepareMsg();
         prepareSvg();
         if ("fragmentid" in LCA.urlVars) {
             selectedFragmentID = +LCA.urlVars.fragmentid;
