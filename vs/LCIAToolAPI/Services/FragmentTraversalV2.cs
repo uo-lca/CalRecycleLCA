@@ -309,6 +309,7 @@ namespace Services
                     NodeWeight = nodeWeight
                 };
 
+                nodeCache.ObjectState = ObjectState.Added;
                 _nodeCacheService.InsertGraph(nodeCache);
                 _unitOfWork.Save();
             }

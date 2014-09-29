@@ -1,5 +1,6 @@
 namespace LcaDataModel
 {
+    using Repository;
     using System;
     using System.Collections.Generic;
     using System.ComponentModel.DataAnnotations;
@@ -7,7 +8,7 @@ namespace LcaDataModel
     using System.Data.Entity.Spatial;
 
     [Table("DataProvider")]
-    public partial class DataProvider
+    public partial class DataProvider : Entity
     {
         public DataProvider()
         {

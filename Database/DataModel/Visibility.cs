@@ -1,12 +1,13 @@
 namespace LcaDataModel
 {
+    using Repository;
     using System;
     using System.Collections.Generic;
     using System.ComponentModel.DataAnnotations;
     using System.ComponentModel.DataAnnotations.Schema;
 
     [Table("Visibility")]
-    public partial class Visibility
+    public partial class Visibility : Entity
     {
         public Visibility()
         {

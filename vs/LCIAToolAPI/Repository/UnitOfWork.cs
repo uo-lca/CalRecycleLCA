@@ -5,9 +5,6 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Data.Entity;
-using LcaDataModel;
-
-
 
 namespace Repository
 {
@@ -23,10 +20,10 @@ namespace Repository
             _context = context;
         }
 
-        public UnitOfWork()
-        {
-            _context = new UsedOilLCAContext();
-        }
+        //public UnitOfWork()
+        //{
+        //    _context = new UsedOilLCAContext();
+        //}
 
         public void Dispose()
         {

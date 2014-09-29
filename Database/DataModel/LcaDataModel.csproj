@@ -76,12 +76,10 @@
     <Compile Include="FragmentNodeFragment.cs" />
     <Compile Include="FragmentNodeProcess.cs" />
     <Compile Include="FragmentStage.cs" />
-    <Compile Include="IDbContext.cs" />
     <Compile Include="ILCDEntity.cs" />
     <Compile Include="ImpactCategory.cs" />
     <Compile Include="IndicatorType.cs" />
     <Compile Include="Interface.cs" />
-    <Compile Include="IObjectState.cs" />
     <Compile Include="LCIA.cs" />
     <Compile Include="LCIAMethod.cs" />
     <Compile Include="Migrations\Configuration.cs" />
@@ -89,7 +87,6 @@
     <Compile Include="NodeDissipationParam.cs" />
     <Compile Include="NodeEmissionParam.cs" />
     <Compile Include="NodeType.cs" />
-    <Compile Include="ObjectState.cs" />
     <Compile Include="Param.cs" />
     <Compile Include="ParamType.cs" />
     <Compile Include="Process.cs" />
@@ -118,9 +115,16 @@
     <None Include="App.config">
       <SubType>Designer</SubType>
     </None>
+    <None Include="ClassDiagram1.cd" />
     <None Include="packages.config">
       <SubType>Designer</SubType>
     </None>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\vs\LCIAToolAPI\Repository\Repository.csproj">
+      <Project>{76486074-e3ca-413f-b68e-f2c8c8fcbe68}</Project>
+      <Name>Repository</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

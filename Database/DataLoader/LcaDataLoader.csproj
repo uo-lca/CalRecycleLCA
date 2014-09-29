@@ -106,6 +106,10 @@
     </None>
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\vs\LCIAToolAPI\Repository\Repository.csproj">
+      <Project>{76486074-e3ca-413f-b68e-f2c8c8fcbe68}</Project>
+      <Name>Repository</Name>
+    </ProjectReference>
     <ProjectReference Include="..\DataModel\LcaDataModel.csproj">
       <Project>{b7f4d17f-6156-457c-8425-8ce5f683cac5}</Project>
       <Name>LcaDataModel</Name>

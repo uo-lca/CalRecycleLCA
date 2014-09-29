@@ -9,7 +9,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LcaDataLoader", "Database\D
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Repository", "vs\LCIAToolAPI\Repository\Repository.csproj", "{76486074-E3CA-413F-B68E-F2C8C8FCBE68}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Services", "vs\LCIAToolAPI\Services\Services.csproj", "{A093BCD0-8869-447C-B0E9-8E77B18598C9}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CalRecycleLCA.Services", "vs\LCIAToolAPI\Services\CalRecycleLCA.Services.csproj", "{A093BCD0-8869-447C-B0E9-8E77B18598C9}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LCIAToolAPI", "vs\LCIAToolAPI\LCIAToolAPI\LCIAToolAPI.csproj", "{263DFEDF-495E-4B95-96A3-02C8E6DE3DC1}"
 EndProject
@@ -27,6 +27,12 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Documentation", "Documentat
 	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Entities", "vs\LCIAToolAPI\Entities\Entities.csproj", "{BC864533-A57F-4EFE-B967-EF8CAFC2B2F1}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CalRecycleLCA.Repository", "CalRecycleLCA.Repository\CalRecycleLCA.Repository.csproj", "{DD4F5844-F2AD-4465-9723-383A38B5CA32}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Frameworks", "Frameworks", "{D05BF935-3C5D-415D-8020-B069C5C105BE}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Service", "Service\Service.csproj", "{A73A555B-0A41-475C-9FAC-63C161F142A6}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -62,8 +68,20 @@ Global
 		{BC864533-A57F-4EFE-B967-EF8CAFC2B2F1}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{BC864533-A57F-4EFE-B967-EF8CAFC2B2F1}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{BC864533-A57F-4EFE-B967-EF8CAFC2B2F1}.Release|Any CPU.Build.0 = Release|Any CPU
+		{DD4F5844-F2AD-4465-9723-383A38B5CA32}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DD4F5844-F2AD-4465-9723-383A38B5CA32}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DD4F5844-F2AD-4465-9723-383A38B5CA32}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DD4F5844-F2AD-4465-9723-383A38B5CA32}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A73A555B-0A41-475C-9FAC-63C161F142A6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A73A555B-0A41-475C-9FAC-63C161F142A6}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A73A555B-0A41-475C-9FAC-63C161F142A6}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A73A555B-0A41-475C-9FAC-63C161F142A6}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{76486074-E3CA-413F-B68E-F2C8C8FCBE68} = {D05BF935-3C5D-415D-8020-B069C5C105BE}
+		{A73A555B-0A41-475C-9FAC-63C161F142A6} = {D05BF935-3C5D-415D-8020-B069C5C105BE}
 	EndGlobalSection
 EndGlobal

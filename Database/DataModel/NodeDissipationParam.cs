@@ -1,5 +1,6 @@
 namespace LcaDataModel
 {
+    using Repository;
     using System;
     using System.Collections.Generic;
     using System.ComponentModel.DataAnnotations;
@@ -7,7 +8,7 @@ namespace LcaDataModel
     using System.Data.Entity.Spatial;
 
     [Table("NodeDissipationParam")]
-    public partial class NodeDissipationParam
+    public partial class NodeDissipationParam : Entity
     {
         public int NodeDissipationParamID { get; set; }
 

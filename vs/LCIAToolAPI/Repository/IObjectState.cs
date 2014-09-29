@@ -4,10 +4,10 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace LcaDataModel
+namespace Repository
 {
     public interface IObjectState
     {
-        ObjectState State { get; set; }
+        ObjectState ObjectState { get; set; }
     }
 }

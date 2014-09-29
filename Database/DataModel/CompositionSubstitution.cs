@@ -5,10 +5,12 @@ using System.Text;
 using System.Threading.Tasks;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using Repository;
 
 namespace LcaDataModel {
     [Table("CompositionSubstitution")]
-    public partial class CompositionSubstitution {
+    public partial class CompositionSubstitution : Entity
+    {
         [Key]
         [Column(Order = 1)]
         public int ProcessCompositionID { get; set; }

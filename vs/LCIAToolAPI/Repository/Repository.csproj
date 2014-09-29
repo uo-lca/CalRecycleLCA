@@ -135,16 +135,18 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="FlowPropertyParamRepository.cs" />
+    <Compile Include="Entity.cs" />
     <Compile Include="IDataContext.cs" />
+    <Compile Include="IDbContext.cs" />
+    <Compile Include="IObjectState.cs" />
     <Compile Include="IRepository.cs" />
     <Compile Include="IUnitOfWork.cs" />
+    <Compile Include="ObjectState.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Repository.cs" />
     <Compile Include="RepositoryQuery.cs">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="DependencyParamRepository.cs" />
     <Compile Include="UnitOfWork.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -152,12 +154,6 @@
       <SubType>Designer</SubType>
     </None>
     <None Include="packages.config" />
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\..\..\Database\DataModel\LcaDataModel.csproj">
-      <Project>{b7f4d17f-6156-457c-8425-8ce5f683cac5}</Project>
-      <Name>LcaDataModel</Name>
-    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>

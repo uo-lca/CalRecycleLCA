@@ -5,6 +5,7 @@ namespace LcaDataModel
     using System.ComponentModel.DataAnnotations.Schema;
     using System.Linq;
     using System.Data.Entity.Validation;
+    using Repository;
 
     /// <summary>
     /// Entity Framework database context used by LCIAToolAPI.
@@ -36,7 +37,7 @@ namespace LcaDataModel
         {
             try
             {
-                //this.ApplyStateChanges();
+                this.ApplyStateChanges();
                 return base.SaveChanges();
             }
             catch (DbEntityValidationException ex)

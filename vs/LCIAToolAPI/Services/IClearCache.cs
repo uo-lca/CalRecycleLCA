@@ -4,13 +4,10 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace LcaDataModel
+namespace Services
 {
-    public enum ObjectState
+    public interface IClearCache
     {
-        Unchanged,
-        Added,
-        Modified,
-        Deleted
+        void Clear(int fragmentId, int scenarioId);
     }
 }

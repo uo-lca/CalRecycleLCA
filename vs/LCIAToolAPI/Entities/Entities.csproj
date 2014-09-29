@@ -145,7 +145,6 @@
     <Compile Include="Models\FlowPropertyResource.cs" />
     <Compile Include="Models\FlowResource.cs" />
     <Compile Include="Models\FlowPropertyParamModel.cs" />
-    <Compile Include="Models\FragmentLCIAResource.cs" />
     <Compile Include="Models\ProcessResource.cs" />
     <Compile Include="Models\ResolveBackgroundModel.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

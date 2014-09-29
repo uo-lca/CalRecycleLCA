@@ -60,8 +60,7 @@ namespace Services
         private readonly IService<Fragment> _fragmentService;
         [Inject]
         private readonly IUnitOfWork _unitOfWork;
-        [Inject]
-        private readonly IUnitOfWork _unitOfWork1;
+     
 
         public FragmentLCIAComputation(IService<FragmentFlow> fragmentFlowService,
             IService<ScoreCache> scoreCacheService,
@@ -239,11 +238,6 @@ namespace Services
         {
 
             var lciaMethods = _lciaMethodService.Query().Get().ToList();
-
-//select distinct f.FragmentID, n.ScenarioID from NodeCache n inner join ScoreCache s
-//on n.NodeCacheID = s.NodeCacheID
-//inner join FragmentFlow f on f.FragmentFlowID =n.FragmentFlowID
-//where FragmentID=3 and ScenarioID=0
 
             var scoreCache = _scoreCacheService.Query().Get()
                 .Join(_nodeCacheService.Query().Get(), sc => sc.NodeCacheID, nc => nc.NodeCacheID, (sc, nc) => new { sc, nc })
@@ -511,11 +505,13 @@ namespace Services
                                 scoreCache.NodeCacheID = nodeCacheId;
                                 scoreCache.LCIAMethodID = lciaMethodItem.LCIAMethodID;
                                 scoreCache.ImpactScore = impactScore;
+                                scoreCache.ObjectState = ObjectState.Added;
                                 _scoreCacheService.InsertGraph(scoreCache);
 
                             }
 
                         }
+                        
                         _unitOfWork.Save();
                     break;
                 case 2:
@@ -539,6 +535,7 @@ namespace Services
                                 scoreCache.NodeCacheID = nodeCacheId;
                                 scoreCache.LCIAMethodID = lciaMethodItem.LCIAMethodID;
                                 scoreCache.ImpactScore = lciaScore.Select(a => a.Result).FirstOrDefault();
+                                scoreCache.ObjectState = ObjectState.Added;
                                 _scoreCacheService.InsertGraph(scoreCache);
                             }
                         }
