@@ -251,10 +251,8 @@ namespace Services
         public IEnumerable<LCIAModel> ComputeProcessLCIA(IEnumerable<InventoryModel> inventory, LCIAMethod lciaMethodItem, int? scenarioId)
         {
             var lcias = inventory
-                .Join(_lciaService.Query().Filter(l => l.LCIAMethodID == lciaMethodItem.LCIAMethodID).Get(), i => i.FlowID, l => l.FlowID, (i, l) => new { i, l })
-                .Where(x => x.l.FlowID != null)
+                .Join(_lciaService.Query().Filter(l => l.LCIAMethodID == lciaMethodItem.LCIAMethodID && l.FlowID != null).Get(), i => i.FlowID, l => l.FlowID, (i, l) => new { i, l })
                 .Join(_lciaMethodService.Query().Filter(lm => lm.LCIAMethodID == lciaMethodItem.LCIAMethodID).Get(), l => l.l.LCIAMethodID, lm => lm.LCIAMethodID, (l, lm) => new { l, lm })
-                 .Where(x => x.l.l.LCIAMethodID == lciaMethodItem.LCIAMethodID)
                  .GroupJoin(_characterizationParamService.Query().Get() // Target table
       , l => l.l.l.LCIAID
       , cp => cp.LCAID

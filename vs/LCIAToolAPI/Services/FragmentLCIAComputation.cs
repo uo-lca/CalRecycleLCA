@@ -60,9 +60,7 @@ namespace Services
         private readonly IService<Fragment> _fragmentService;
         [Inject]
         private readonly IUnitOfWork _unitOfWork;
-        [Inject]
-        private readonly IUnitOfWork _unitOfWork1;
-
+     
         public FragmentLCIAComputation(IService<FragmentFlow> fragmentFlowService,
             IService<ScoreCache> scoreCacheService,
             IService<NodeCache> nodeCacheService,
@@ -246,10 +244,8 @@ namespace Services
 //where FragmentID=3 and ScenarioID=0
 
             var scoreCache = _scoreCacheService.Query().Get()
-                .Join(_nodeCacheService.Query().Get(), sc => sc.NodeCacheID, nc => nc.NodeCacheID, (sc, nc) => new { sc, nc })
-                .Join(_fragmentFlowService.Query().Get(), nc => nc.nc.FragmentFlowID, ff => ff.FragmentFlowID, (nc, ff) => new { nc, ff })
-                .Where(x => x.ff.FragmentID == fragmentId)
-                .Where(x => x.nc.nc.ScenarioID == scenarioId);
+                .Join(_nodeCacheService.Query().Filter(x => x.ScenarioID == scenarioId).Get(), sc => sc.NodeCacheID, nc => nc.NodeCacheID, (sc, nc) => new { sc, nc })
+                .Join(_fragmentFlowService.Query().Filter(x => x.FragmentID == fragmentId).Get(), nc => nc.nc.FragmentFlowID, ff => ff.FragmentFlowID, (nc, ff) => new { nc, ff });
 
 
             if (scoreCache.Count() == 0)
@@ -263,12 +259,9 @@ namespace Services
         public IEnumerable<FragmentLCIAModel> ComputeFragmentLCIA(int? fragmentId, int? scenarioId, int? lciaMethodId)
         {
             // for now: return one record per FragmentFlow
-            var lcia = _fragmentFlowService.Query().Get()
-                .Where(x => x.FragmentID == fragmentId)
-                .Join(_nodeCacheService.Query().Get(), ff => ff.FragmentFlowID, nc => nc.FragmentFlowID, (ff, nc) => new { ff, nc })
-                .Where(x => x.nc.ScenarioID == scenarioId)
-                .GroupJoin(_scoreCacheService.Query().Get()
-                .Where(x => x.LCIAMethodID == lciaMethodId)
+            var lcia = _fragmentFlowService.Query().Filter(x => x.FragmentID == fragmentId).Get()
+                .Join(_nodeCacheService.Query().Filter(x => x.ScenarioID == scenarioId).Get(), ff => ff.FragmentFlowID, nc => nc.FragmentFlowID, (ff, nc) => new { ff, nc })
+                .GroupJoin(_scoreCacheService.Query().Filter(x => x.LCIAMethodID == lciaMethodId).Get()
       , l => l.nc.NodeCacheID
       , sc => sc.NodeCacheID
       , (nc, sc) => new { nodeCaches = nc, scoreCaches = sc })
@@ -306,16 +299,13 @@ namespace Services
 
             fragmentTraversalV2.Traverse(fragmentId, scenarioId);
 
-            var fragmentFlows = _nodeCacheService.Query().Get()
-                .Where(x => x.ScenarioID == scenarioId)
-                .Join(_fragmentFlowService.Query().Get(), nc => nc.FragmentFlowID, ff => ff.FragmentFlowID, (nc, ff) => new { nc, ff })
-                .Where(x => x.ff.FragmentID == fragmentId).ToList();
+            var fragmentFlows = _nodeCacheService.Query().Filter(x => x.ScenarioID == scenarioId).Get()
+                .Join(_fragmentFlowService.Query().Filter(x => x.FragmentID == fragmentId).Get(), nc => nc.FragmentFlowID, ff => ff.FragmentFlowID, (nc, ff) => new { nc, ff })
+                .ToList();
 
             foreach (var item in fragmentFlows)
             {
-                var nodeCache = _nodeCacheService.Query().Get()
-                    .Where(x => x.FragmentFlowID == Convert.ToInt32(item.ff.FragmentFlowID))
-                    .Where(x => x.ScenarioID == scenarioId);
+                var nodeCache = _nodeCacheService.Query().Filter(x => x.FragmentFlowID == item.ff.FragmentFlowID && x.ScenarioID == scenarioId).Get();
 
                 int nodeCacheId = Convert.ToInt32(nodeCache.Select(x => x.NodeCacheID).FirstOrDefault());
 
@@ -324,8 +314,7 @@ namespace Services
                 switch (nodeTypeId)
                 {
                     case 1:
-                        var target1 = _fragmentNodeProcessService.Query().Get()
-                            .Where(x => x.FragmentFlowID == item.ff.FragmentFlowID)
+                        var target1 = _fragmentNodeProcessService.Query().Filter(x => x.FragmentFlowID == item.ff.FragmentFlowID).Get()
                                   .GroupJoin(_processSubstitutionService.Query().Get()
                             //leave this out for now, as you obviously can't add a
                             //where clause for a table that has no data.
@@ -356,8 +345,7 @@ namespace Services
                         break;
                     case 2:
 
-                        var target2 = _fragmentNodeFragmentService.Query().Get()
-                            .Where(x => x.FragmentFlowID == item.ff.FragmentFlowID)
+                        var target2 = _fragmentNodeFragmentService.Query().Filter(x => x.FragmentFlowID == item.ff.FragmentFlowID).Get()
                                   .GroupJoin(_fragmentSubstitutionService.Query().Get()
                             //leave this out for now, as you obviously can't add a
                             //where clause for a table that has no data.
@@ -422,10 +410,7 @@ namespace Services
         {
             IEnumerable<ResolveBackgroundModel> background = null;
             int targetId;
-            background = _scenarioBackgroundService.Query().Get()
-                .Where(x => x.ScenarioID == scenarioId)
-                .Where(x => x.FlowID == flowId)
-                .Where(x => x.DirectionID == directionId)
+            background = _scenarioBackgroundService.Query().Filter(x => x.ScenarioID == scenarioId && x.FlowID == flowId && x.DirectionID == directionId).Get()
                .Select(bg => new ResolveBackgroundModel
                {
                    NodeTypeID = bg.NodeTypeID,
