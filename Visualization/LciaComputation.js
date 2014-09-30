@@ -499,7 +499,7 @@ function lciaComputation() {
                     case 1:
                         rowObj = {
                             Name: pf.flow.name,
-                            Magnitude: LCA.formatNumber(pf.magnitude),
+                            Magnitude: LCA.formatNumber(pf.result),
                             Unit: LCA.indexedData.flowProperties[pf.flow.referenceFlowPropertyID].referenceUnit
                         };
                         if (pf.directionID === 1) {
