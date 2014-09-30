@@ -52,11 +52,15 @@ Database Design
     - LCIA
     - Process
     - ProcessFlow
+    * ProcessComposition
     * ProcessDissipation
 
     - CategorySystem
     - Class
     - Classification
+
+    - CompositionModel
+    - CompositionData
 
    and the following Type Enumeration tables:
     - DataType
@@ -91,19 +95,21 @@ Database Design
    A scenario group belongs to a single user; however, that scenario group
    can also be marked as publicly viewable.
 
-   Scenarios and Parameters are encoded in the following Data Tables:
+   Scenarios include Parameters and Substitutiuons, encoded in the
+   following Data Tables: 
     - User
     - ScenarioGroup
     - Scenario
 
-    - NodeDissipation
-    - NodeEmission
+    - ScenarioBackground (rename to BackgroundSubstitution?)
+    - ProcessSubstitution
+    - FragmentSubstitution
+    - CompositionSubstitution
 
     - Param
-    - ScenarioParam
     
     - DependencyParam
-    - DistributionParam
+    - ConservationParam
     - FlowPropertyParam
     - CompositionParam
     - ProcessDissipationParam
@@ -111,10 +117,8 @@ Database Design
     - ProcessEmissionParam
     - NodeEmissionParam
     - CharacterizationParam
-    
-    - CompositionModel
-    - CompositionData
 
+    
    and the following Type Enumeration table:
     - ParamType
 
@@ -190,7 +194,8 @@ Database Design
 
    The 'NodeType' property of a node determines how node activity levels
    are resolved to LCIA scores.  A node in a fragment can have four
-   different types.
+   different types, with a distinction of a special subtype for the
+   "Background" type.
 
    1. Process - This indicates that the node is modeled as an ILCD unit
       process stored in the database.  Computation of impacts simply
@@ -216,8 +221,9 @@ Database Design
       co-dependence of background processes could be handled with a matrix
       inversion step, a la traditional LCA).
 
-      If a background dependency cannot be resolved, it is treated as an
-      InputOutput.
+   5. If a background dependency cannot be resolved, it is treated as a 
+      Cutoff, which becomes basically equivalent to an InputOutput- having
+      no impacts. 
 
  * Fragment LCIA Computation
 
@@ -238,93 +244,26 @@ Database Design
    modifies an existing emission to be determined from a FlowFlowProperty
    record rather than the originating ProcessFlow record.
 
-   The first step is to determine the correct reference input FlowID.
-   Current design ASSUMES that dissipation processes have ONLY ONE
-   INTERMEDIATE INPUT with units measured in mass.  
+   In order for dissipation to be computed, a process must be associated
+   with a CompositionModel (table ProcessComposition).  Entries in
+   CompositionData join FlowProperties to a particular FlowID (must be
+   intermediate, must be massive, must be an input to the linked process).
+   The FlowProperties are joined to Flows (must be elementary, must be
+   outputs from the linked process), and the emission factors for those
+   flows are calculated as the product of 
+   	 CompositionData.Value * FlowPropertyEmission.Scale * ProcessDissipation.EmissionFactor 
+   with EmissionFactor (and possibly in the future, CompositionData.Value)
+   subject to parameterization.
 
-   If LCIA computation is performed directly on a process, the input flow
-   can be determined as:
-
-   SELECT pf.FlowID FROM ProcessFlow pf
-   INNER JOIN Direction d ON pf.DirectionID = d.DirectionID
-   INNER JOIN Flow f ON pf.FlowID = f.FlowID
-   INNER JOIN FlowType ft ON f.FlowTypeID = ft.FlowTypeID
-   INNER JOIN FlowFlowProperty ffp on pf.FlowID = ffp.FlowID
-   INNER JOIN FlowProperty fp on ffp.FlowPropertyID = fp.FlowPropertyID
-   WHERE d.Direction = "Input"
-     AND ft.Name = "Intermediate Flow"
-     AND fp.Name = "Mass"
-
-   If the above query has multiple records, the first (arbitrarily) is
-   used.  If the above query has zero records, no dissipation can be
-   performed. 
-
-   If LCIA computation is performed on a node-as-process, the following
-   algorithm can be used to determine the input flow:
-
-   {
-     // flows = table of fragment flows
-     // current_node = FragmentFlowID
-
-     // direction is w.r.t. origin node- so current_node's input is parent
-     // node's output
-     upstream_input = SELECT FlowID 
-	FROM flows
-     	INNER JOIN Direction d on flows.DirectionID = d.DirectionID
-   	INNER JOIN FlowFlowProperty ffp on flows.FlowID = ffp.FlowID
-   	INNER JOIN FlowProperty fp on ffp.FlowPropertyID = fp.FlowPropertyID
-     	WHERE flows.FragmentFlowID = current_node
-	  AND d.Direction = "Output"
-	  AND fp.Name = "Mass"
-
-     if is_null(upstream_input)
-     {
-	// or, if node is added in reverse as a dependency-satisfier, then
-	// we need an input w.r.t. the current node
-	downstream_input = SELECT FlowID
-	FROM flows
-     	INNER JOIN Direction d on edges.DirectionID = d.DirectionID
-   	INNER JOIN FlowFlowProperty ffp on flows.FlowID = ffp.FlowID
-   	INNER JOIN FlowProperty fp on ffp.FlowPropertyID = fp.FlowPropertyID
-     	WHERE flows.ParentFlowID = current_node
-	  AND d.Direction = "Input"
-	  AND fp.Name = "Mass"
-
-	if is_null(downstream_input)
-	  FlowInputID = null;
-	else
-	  FlowInputID = downstream_input(1);
-     }
-     else FlowInputID = upstream_input(1);
-      
-   }
-
-   Once the FlowID with the relevant FlowProperties is known, dissipation
-   is handled with the following query, which generates a list of
-   alternate emission quantities.
-
-   SELECT pf.ProcessFlowID,
-     ffp.MeanValue * fpe.Scale * pd.EmissionFactor AS DissipationQuantity
-   FROM ProcessFlow pf
-   INNER JOIN FlowPropertyEmission fpe ON pf.FlowID = fpe.EmissionID
-   INNER JOIN FlowFlowProperty ffp 
-     ON fpe.FlowPropertyID = ffp.FlowPropertyID
-   INNER JOIN ProcessDissipation pd ON pf.ProcessFlowID = pd.ProcessFlowID 
-   WHERE ffp.FlowID = @FlowID
-     AND pf.ProcessID = @ProcessID
-
-   Note that ffp.MeanValue can be modified by type 5 params, and
-   pd.EmissionFactor can be modified by type 6 and 7 params.
-
-   This list can then be outer-joined with the original ProcessFlow list
-   for the current process, with DissipationQuantity used in place of
-   pf.Result whenever it is non-null.
+   This value can then be merged with the original ProcessFlow list for the
+   current process, with the emitted quantity used in place of pf.Result
+   whenever it is non-null.
 
    ProcessDissipation records can override existing ProcessFlow emissions;
    they can't generate new emissions.  Emission factors can be modified on
    a process-specific basis (type 6 params- will affect all instances of
    the process) or a node-specific basis (type 7 params- will only affect
-   the designated nodes).
+   the designated nodes). (note: type 7 and 9 params not implemented).
 
  * Fragment Sensitivity Computation
 
@@ -334,6 +273,24 @@ Database Design
    score computation, the sensitivity of a fragment is equal to the
    weighted sum of the sensitivity of each node in the fragment, and so
    requires recursion into sub-fragments.  
+
+   There are two types of parameters: those that affect traversal
+   (i.e. the node cache), and those that affect LCIA computation (i.e. the
+   score cache).  The sensitivity to a parameter holds one constant and
+   varies the other.  
+
+   For traversal params, i.e. dependency params, the tree must be traversed
+   recursively only until a parameter instance is found-- parameterization
+   of cascading dependency relationships is not supported.
+
+   For impact params, recursive traversal is only necessary to identify
+   affected nodes- which could almost as easily be done using a join to
+   FragmentFlow.  The problem is fragments- anytime a node in a fragment is
+   adjusted, all the instances of that fragment must also be adjusted- and
+   all instances of any containing fragments- so it just becomes another
+   recursive traversal from the other direction.
+
+   Best to stick with the straight recursion.
 
    Under the current plan, the user will specify which parameters for which
    he/she wishes to know the sensitivity.  Then upon each fragment view,
@@ -351,109 +308,11 @@ Database Design
 
 # Fragment Computation Specification
 
-A fragment should be implemented as a class.  Computing a fragment
-requires:
+See the pseudocode files:
 
-   1. generating a fragment object in the application space with an internal
-   set of nodes and edges.
+ fragment-traversal-pseudocode.txt
 
-   2. traversing the fragment with respect to a given scenario, to determine
-   NodeWeight values.
+ lcia-computation-pseudocode.txt
 
-      2a. This requires the first stage of recursion, recursive traversal
-      of sub-fragments, to determine inputs and outputs.  This computation
-      is affected by ParamTypeIDs 1, 2, 3, and 4. The results of this
-      computation are cached in NodeCache.NodeWeight.
-
-   3. computing and caching ImpactScore values for each node in the fragment,
-   with respect to the current scenario, for all selected LCIA methods.
-
-      3a. This requires recursion into sub-fragments to determine their
-      ScoreCache.ImpactScore values.  This computation is affected by
-      ParamTypeIDs 5, 6, 7, 8, 9, 10.
-
-   4. Computing the sum of LCIA scores, weighted by node weights, from cached
-   ImpactScore and NodeWeight values.
- 
-   There are two choices over how to proceed.  In the simpler case, LCIA
-   computation is now complete; the algorithm returns with a list of
-   fragment inputs and outputs; and the frontend can request LCIA scores
-   using a separate REST API call- that call can be answered immediately
-   because Scores and Weights are cached.  Under this simpler case, a
-   sensitivity computation would require a separate API call, meaning the
-   whole recursive traversal process must be repeated for some sensitivity
-   computations because it is not always easy to tell which nodes are
-   affected by a parameter.
-
-   In the more complex case, the API call specifies parameters of interest
-   as well as the scenario and LCIA methods.  This allows sensitivities to
-   be computed without necessitating another [redundant] recursive
-   traversal.
-
-   At present, we will assume the recursive traversal is quick enough (and
-   that the user will not require too many sensitivity values at once) that
-   it is not too costly to repeat it.
-
-   5. In either case, after the computation is finished and the result is
-   returned, the fragment objects are removed from memory and the API call
-   terminates, remaining fully RESTful.
-
-What follows is (will be) a precise (though pseudocode) specification of
-the fragment computation process.
-
-Please forgive the notation.  Ultimately it should reflect the C#
-implementation, so feel free to edit.
-
-
-## Fragment Constructor
-
-   F = new Fragment(FragmentID)
-
-
-## Fragment Properties
-
-   // DB data specific to the fragment
-
-   string Name = Fragment.Name WHERE FragmentID = @FragmentID
-   FragmentNode RootNode = Fragment.RootNode WHERE FragmentID = @FragmentID
-
-   StageList Stages = FragmentStage.* WHERE FragmentID = @FragmentID
-
-   FragmentFlow flows = SELECT * FROM FragmentFlow
-   		      	WHERE FragmentID = @FragmentID
-
-   FragmentFlow ReferenceFlow = SELECT * FROM flows 
-   	WHERE FragmentFlowID = Fragment.ReferenceFragmentFlowID
-
-## Fragment Methods
-
-  (public) Traverse(ScenarioID)
-   Traverse the fragment and compute NodeWeight values.  If cached values
-   exist, do not recompute.
-
-  (private) flows = applyDependencyParam(flows,ScenarioID)
-   decorates flow table with dependency (type 1-3) params
-
-  (private) flows = applyFlowPropertyParam(flows,ScenarioID)
-   decorates flow table with flow property (type 4) params
-
-  (private) node_recurse(ScenarioID)
-   recursively follows node / edge tables to traverse the fragment
-
-  (private) ActivityLevels(ScenarioID)
-
-   reports the cached NodeWeight values for the given 
-   FragmentID / ScenarioID pair
-
-  (public) IOFlows = InputOutput(ScenarioID)
-
-   returns a table with fields FragmentNodeID, FlowID, Direction, and
-   Quantity, reporting all nodes of type InputOutput for the Fragment under
-   the given ScenarioID.  Draws data from the cache table.
-
-   This must be returned to the parent fragment during traversal
-
-### Fragment Traversal with Parameters
-
-See fragment-traversal-pseudocode.txt
+ fragment-lcia-pseudocode.txt
 

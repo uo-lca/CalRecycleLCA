@@ -704,8 +704,10 @@ The following tables are required:
     Size of NodeCache table = # of nodes x # of scenarios 
 
    ScoreCache - New Table
-    X ScoreCacheID
-    * NodeCacheID (was FragmentScoreID) (FK)
+    * ScoreCacheID
+    X NodeCacheID (was FragmentScoreID) (FK)
+    + FragmentFlowID (FK)
+    + ScenarioID (FK)
     * LCIAMethodID (FK)
     * ImpactScore - for a unit activity (computed during LCIA)
 
