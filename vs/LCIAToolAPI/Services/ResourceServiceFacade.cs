@@ -21,6 +21,8 @@ namespace Services {
         [Inject]
         private readonly IService<Category> _CategoryService;
         [Inject]
+        private readonly IService<Classification> _ClassificationService;
+        [Inject]
         private readonly IService<Fragment> _FragmentService;
         [Inject]
         private readonly IService<FragmentFlow> _FragmentFlowService;
@@ -62,8 +64,9 @@ namespace Services {
         /// <summary>
         /// Constructor for use with Ninject dependency injection
         /// </summary>
-        public ResourceServiceFacade( 
+        public ResourceServiceFacade(
                                IService<Category> categoryService,
+                               IService<Classification> classificationService,
                                IService<Fragment> fragmentService,
                                IService<FragmentFlow> fragmentFlowService,
                                IFragmentTraversalV2 fragmentTraversalV2,
@@ -79,6 +82,7 @@ namespace Services {
                                IService<Scenario> scenarioService) 
         {
             _CategoryService = verifiedDependency(categoryService);
+            _ClassificationService = verifiedDependency(classificationService);
             _FragmentService = verifiedDependency(fragmentService);
             _FragmentFlowService = verifiedDependency(fragmentFlowService);
             _FragmentLCIAComputation = verifiedDependency(fragmentLCIAComputation);
@@ -214,18 +218,19 @@ namespace Services {
         /// Transform Flow to FlowResource by joining with Category data
         /// </summary>
         /// <param name="f">Instance of Flow</param>
-        /// <param name="categories">all categories</param>
         /// <returns>Instance of FlowResource</returns>
-        public FlowResource Transform(Flow f, IEnumerable<Category> categories) {
-          
-            var joinResult = f.ILCDEntity.Classifications.Join(categories, cl => cl.CategoryID, cat => cat.CategoryID, 
-                (cl, cat) => new {
-                    ClassificationID = cl.ClassificationID,
-                    Name = cat.Name,
-                    HierarchyLevel = cat.HierarchyLevel
-                });
-            int? maxHL = joinResult.Max(j => j.HierarchyLevel);
-            string categoryName = joinResult.Where(j => j.HierarchyLevel == maxHL).Single().Name;
+        public FlowResource Transform(Flow f) {
+
+            int? maxHL;
+            string categoryName;
+
+            IEnumerable<Classification> classes = _ClassificationService.Query()
+                .Include(c => c.Category)
+                .Filter(c => c.ILCDEntityID == f.ILCDEntityID)
+                .Get();
+
+            maxHL = classes.Max(c => Convert.ToInt32(c.Category.HierarchyLevel));
+            categoryName = classes.Where(c => c.Category.HierarchyLevel == maxHL).Single().Category.Name;
 
             return new FlowResource {
                 FlowID = f.FlowID,
@@ -270,10 +275,10 @@ namespace Services {
              };
          }
 
-         public ProcessFlowResource Transform(ProcessFlow pf, IEnumerable<Category> categories) {
+         public ProcessFlowResource Transform(ProcessFlow pf) {
              return new ProcessFlowResource {
                  ProcessFlowID = pf.ProcessFlowID,
-                 Flow = Transform( pf.Flow, categories),
+                 Flow = Transform( pf.Flow),
                  DirectionID = TransformNullable( pf.DirectionID, "ProcessFlow.DirectionID"),
                  VarName = pf.VarName,
                  Magnitude = TransformNullable(pf.Magnitude, "ProcessFlow.Magnitude"),
@@ -349,14 +354,13 @@ namespace Services {
         /// <param name="relID">ID of related fragment or process</param>
         /// <returns>List of FlowResource objects</returns>
         public IEnumerable<FlowResource> GetFlows(Type relType, int relID) {
-            Repository.RepositoryQuery<Flow> flowQuery = _FlowService.Query().Include(f => f.ILCDEntity.Classifications);
-            IEnumerable<Category> categories = _CategoryService.Query().Get();
+            Repository.RepositoryQuery<Flow> flowQuery = _FlowService.Query();
             if (relType == typeof(FragmentFlow)) { 
                 flowQuery = flowQuery.Filter(f => f.FragmentFlows.Any(ff => ff.FragmentID == relID));
             } else if (relType == typeof(ProcessFlow)) {
                 flowQuery = flowQuery.Filter(f => f.ProcessFlows.Any(pf => pf.ProcessID == relID));
             }
-            return flowQuery.Get().Select(f => Transform(f, categories)).ToList();
+            return flowQuery.Get().Select(f => Transform(f)).ToList();
         }
 
         /// <summary>
@@ -373,11 +377,10 @@ namespace Services {
         /// </summary>
         public IEnumerable<ProcessFlowResource> GetProcessFlows(int processID) {
             IEnumerable<ProcessFlow> processFlows = _ProcessFlowService.Query()
-                .Include(pf => pf.Flow.ILCDEntity.Classifications)
+                .Include(pf => pf.Flow)
                 .Filter(pf => pf.ProcessID == processID)
                 .Get();
-            IEnumerable<Category> categories = _CategoryService.Query().Get();
-            return processFlows.Select(pf => Transform(pf, categories)).ToList();
+            return processFlows.Select(pf => Transform(pf)).ToList();
 
         }
 
