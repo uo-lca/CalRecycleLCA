@@ -1,11 +1,10 @@
 CalRecycleLCA - Visualization
 =============================
 
-Front end for CalRecycle Used Oil LCA Online Tool.
-
-Interactive web application implemented in HTML, CSS, and JavaScript. 
+Visualizations for the CalRecycle Used Oil LCA Online Tool implemented in HTML, CSS, and JavaScript. 
 
 Visualization is implemented with the help of D3.js and uses SVG. SVG requires a "modern" browser (see [Can I use SVG](http://caniuse.com/svg)). 
+
 
 ### LCA
 
@@ -20,7 +19,7 @@ Edit LCA.js - at the top of the file change baseURI setting to the base URI of t
 
 ### Current Status
 
-Two visualizations, listed below, get data from the latest version of the web API (under  [LCIAToolAPI](https://github.com/uo-lca/CalRecycleLCA/tree/master/vs/LCIAToolAPI)). A third visualization, for fragment LCIA, has been prototyped and will be completed after back end computation and caching has been completed.
+A new single page application is being developed in ```../FrontEnd``` to facilitate navigation and code sharing. 
 
 #### FragmentFlows
 Sankey diagram of fragment flows.
@@ -38,4 +37,4 @@ User selects LCIA Method, Impact Category and Process from drop down selection l
 
 #### LciaWaterfall
 
-Prototype waterfall diagram. Fragment LCIA results will be visualized in a waterfall diagram.
+Fragment LCIA results are visualized in a waterfall diagram.
