@@ -4,8 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using LcaDataModel;
+using Repository;
 
-namespace Repository
+namespace CalRecycleLCA.Repository
 {
     public static class DependencyParamRepository
     {

@@ -9,8 +9,9 @@ using System.Data.Entity.Infrastructure;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Services;
 
-namespace Services
+namespace CalRecycleLCA.Services
 {
     public class ClearCache : IClearCache
     {

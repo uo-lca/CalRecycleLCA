@@ -10,11 +10,12 @@ namespace LCAToolAPI.App_Start
 
     using Ninject;
     using Ninject.Web.Common;
-    using Services;
+    using CalRecycleLCA.Services;
     using LCAToolAPI.Infrastructure;
     using System.Web.Http;
     using Repository;
     using LcaDataModel;
+    using Services;
 
     public static class NinjectWebCommon 
     {

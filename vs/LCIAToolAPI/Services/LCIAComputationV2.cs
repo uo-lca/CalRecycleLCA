@@ -6,8 +6,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Services;
 
-namespace Services
+namespace CalRecycleLCA.Services
 {
     public class LCIAComputationV2 : ILCIAComputationV2
     {
