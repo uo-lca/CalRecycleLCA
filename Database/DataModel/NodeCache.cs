@@ -9,10 +9,6 @@ namespace LcaDataModel
     [Table("NodeCache")]
     public partial class NodeCache
     {
-        public NodeCache()
-        {
-            ScoreCaches = new HashSet<ScoreCache>();
-        }
 
         public int NodeCacheID { get; set; }
 
@@ -28,6 +24,5 @@ namespace LcaDataModel
 
         public virtual Scenario Scenario { get; set; }
 
-        public virtual ICollection<ScoreCache> ScoreCaches { get; set; }
     }
 }

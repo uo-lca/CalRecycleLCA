@@ -15,6 +15,7 @@ namespace LcaDataModel
             FragmentNodeFragments = new HashSet<FragmentNodeFragment>();
             FragmentStages = new HashSet<FragmentStage>();
             FragmentSubstitutions = new HashSet<FragmentSubstitution>();
+            Scenarios = new HashSet<Scenario>();
         }
 
         [DatabaseGenerated(DatabaseGeneratedOption.None)]
@@ -38,5 +39,7 @@ namespace LcaDataModel
         public virtual ICollection<FragmentStage> FragmentStages { get; set; }
 
         public virtual ICollection<FragmentSubstitution> FragmentSubstitutions { get; set; }
+
+        public virtual ICollection<Scenario> Scenarios { get; set; }
     }
 }
