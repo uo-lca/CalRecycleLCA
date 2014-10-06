@@ -181,32 +181,39 @@ The following tables are required:
 
    generated from auto-load of ILCD archives
 
-   DataProvider
-    * DataProviderID
+   DataSource -- RENAME from DataProvider
+    % DataSourceID
     * Name
     * DirName
     * DocID
+    + VisibilityID
 
-    A list of ILCD archives accessed by the tool.  One DataProvider is
+    A list of ILCD archives accessed by the tool.  One DataSource is
     created for each source directory in the data folder (excepting the
     'fragments' directory and the 'scenarios' directory). Each archive is
     assumed to represent a different inventory data provider.
 
-    DataProviderID 1 should correspond to the 'append' directory- which can
+    DataSourceID 1 should correspond to the 'append' directory- which can
     be used to load additional ILCD data sets.
 
     Do we want the non-ILCD folders to be included? 
 
-    (DataProviderID 2 should correspond to the 'fragments' directory.
-     DataProviderID 3 should correspond to the 'scenarios' directory.)
+    (DataSourceID 2 should correspond to the 'fragments' directory.
+     DataSourceID 3 should correspond to the 'scenarios' directory.)
 
     Generated prior to ILCD import.
+
+    VisibilityID is 1=public, 2=private.  Need some way of setting this,
+    since the list of data sources is generated automatically.
+
+    PROPOSE: if file '<DirName>/private' exists-- set to private; others
+    will be set to public.
 
    ILCDEntity
     * ILCDEntityID
     * UUID
     * Version - ILCD version of source data file
-    * DataProviderID
+    * DataSourceID
     * DataTypeID
     
     Lookup table mapping UUIDs to sources in the file system.  Generated
@@ -531,6 +538,8 @@ The following tables are required:
     * Name
     + TopLevelFragmentID (FK to Fragment) - shown in initial view
     + ActivityLevel (float) - scaling of initial view
+    + RefFlowID
+    + RefDirectionID
 
     * DocID
 
