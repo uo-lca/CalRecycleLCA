@@ -1,5 +1,7 @@
 namespace LcaDataModel
 {
+    using Repository;
+    using Repository.Pattern.Ef6;
     using System;
     using System.Collections.Generic;
     using System.ComponentModel.DataAnnotations;
@@ -7,7 +9,7 @@ namespace LcaDataModel
     using System.Data.Entity.Spatial;
 
     [Table("CompositionData")]
-    public partial class CompositionData
+    public partial class CompositionData : Entity
     {
         public int CompositionDataID { get; set; }
 

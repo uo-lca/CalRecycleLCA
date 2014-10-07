@@ -1,4 +1,6 @@
-﻿using System;
+﻿using Repository;
+using Repository.Pattern.Infrastructure;
+using System;
 using System.Collections.Generic;
 using System.Data.Entity;
 using System.Linq;
@@ -16,12 +18,12 @@ namespace LcaDataModel
                 var entityState = dbEntityEntry.Entity as IObjectState;
                 if (entityState == null)
                     throw new InvalidCastException(
-                        "All entites must implement " +
-                        "the IObjectState interface, this interface " +
-                        "must be implemented so each entites state " +
-                        "can explicitely determined when updating graphs.");
+                       "All entites must implement " +
+                       "the IObjectState interface, this interface " +
+                       "must be implemented so each entites state " +
+                       "can explicitely determined when updating graphs.");
 
-                dbEntityEntry.State = ConvertState(entityState.State);
+                dbEntityEntry.State = ConvertState(entityState.ObjectState);
             }
         }
 

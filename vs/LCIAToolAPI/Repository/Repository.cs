@@ -6,7 +6,6 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Data;
 using System.Data.Entity;
-using LcaDataModel;
 
 
 namespace Repository
@@ -52,6 +51,7 @@ namespace Repository
         {
             DbSet.Attach(entity);
             DbSet.Remove(entity);
+            ((IObjectState)entity).ObjectState = ObjectState.Deleted;
         }
 
         public virtual void Insert(TEntity entity)

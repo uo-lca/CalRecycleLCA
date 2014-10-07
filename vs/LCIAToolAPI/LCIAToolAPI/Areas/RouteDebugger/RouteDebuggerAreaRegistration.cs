@@ -22,7 +22,9 @@ namespace LCIAToolAPI.Areas.RouteDebugger
 
             // Replace some of the default routing implementations with our custom debug
             // implementations.
-            RouteDebuggerConfig.Register(GlobalConfiguration.Configuration);
+
+            //TODO: Rachel review what this is, causing issues.
+            //RouteDebuggerConfig.Register(GlobalConfiguration.Configuration);
         }
     }
 }

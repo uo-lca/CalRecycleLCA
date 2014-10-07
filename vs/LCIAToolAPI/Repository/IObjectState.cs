@@ -4,13 +4,10 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace LcaDataModel
+namespace Repository
 {
-    public enum ObjectState
+    public interface IObjectState
     {
-        Unchanged,
-        Added,
-        Modified,
-        Deleted
+        ObjectState ObjectState { get; set; }
     }
 }

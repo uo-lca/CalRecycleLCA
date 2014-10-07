@@ -5,8 +5,10 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Services;
+using CalRecycleLCA.Repository;
 
-namespace Services
+namespace CalRecycleLCA.Services
 {
 
     public class FlowPropertyParamService : Service<FlowPropertyParam>, IFlowPropertyParamService

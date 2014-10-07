@@ -2,7 +2,7 @@
 using Entities.Models;
 using LcaDataModel;
 using Ninject;
-using Services;
+using CalRecycleLCA.Services;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -18,9 +18,11 @@ namespace LCAToolAPI.API
         private readonly ILCIAComputationV2 _lciaComputationV2;
         [Inject]
         private readonly IFragmentLCIAComputation _fragmentLCIAComputation;
+        [Inject]
+        private readonly IClearCache _clearCache;
 
 
-        public LCIAComputationController(ILCIAComputationV2 lciaComputationV2, IFragmentLCIAComputation fragmentLCIAComputation)
+        public LCIAComputationController(ILCIAComputationV2 lciaComputationV2, IFragmentLCIAComputation fragmentLCIAComputation, IClearCache clearCache)
         {
 
             if (lciaComputationV2 == null)
@@ -37,6 +39,13 @@ namespace LCAToolAPI.API
 
             _fragmentLCIAComputation = fragmentLCIAComputation;
 
+            if (clearCache == null)
+            {
+                throw new ArgumentNullException("clearCache is null");
+            }
+
+            _clearCache = clearCache;
+
         }
 
         //GET api/<controller>
@@ -48,12 +57,22 @@ namespace LCAToolAPI.API
             return _lciaComputationV2.LCIACompute(processId, scenarioId);
         }
 
+         //GET api/<controller>
          [Route("api/fragments/{FragmentID}/scenarios/{scenarioID}/compute")]
          [System.Web.Http.AcceptVerbs("GET", "POST")]
          [System.Web.Http.HttpGet]
          public void LCIAFragmentCompute(int fragmentId, int scenarioId)
          {
             _fragmentLCIAComputation.FragmentLCIACompute(fragmentId, scenarioId);
+         }
+
+         //GET api/<controller>
+         [Route("api/fragments/{FragmentID}/scenarios/{scenarioID}/clear")]
+         [System.Web.Http.AcceptVerbs("GET", "POST")]
+         [System.Web.Http.HttpGet]
+         public void ClearCache(int fragmentId, int scenarioId)
+         {
+             _clearCache.Clear(fragmentId, scenarioId);
          }
 
 

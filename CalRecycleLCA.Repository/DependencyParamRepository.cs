@@ -4,8 +4,10 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using LcaDataModel;
+using Repository;
+using Repository.Pattern.Repositories;
 
-namespace Repository
+namespace CalRecycleLCA.Repository
 {
     public static class DependencyParamRepository
     {
@@ -13,7 +15,7 @@ namespace Repository
         {
             //var scenarioParams = scenarioParamRepository.GetRepository<ScenarioParam>().Queryable().Where(sp => sp.ScenarioID == scenarioId);
             //var param = scenarioParamRepository.GetRepository<Param>().Queryable();
-            var dependencyParams = scenarioParamRepository.GetRepository<DependencyParam>().Queryable();
+            var dependencyParams = scenarioParamRepository.Queryable();
 
             //var query = from sp in scenarioParams
             //            join p in param on sp.ParamID equals p.ParamID

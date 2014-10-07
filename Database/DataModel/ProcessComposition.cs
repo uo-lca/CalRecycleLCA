@@ -5,10 +5,13 @@ using System.Text;
 using System.Threading.Tasks;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using Repository;
+using Repository.Pattern.Ef6;
 
 namespace LcaDataModel {
     [Table("ProcessComposition")]
-    public partial class ProcessComposition {
+    public partial class ProcessComposition : Entity
+    {
 
         public ProcessComposition()
         {

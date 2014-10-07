@@ -1,5 +1,7 @@
 namespace LcaDataModel
 {
+    using Repository;
+    using Repository.Pattern.Ef6;
     using System;
     using System.Collections.Generic;
     using System.ComponentModel.DataAnnotations;
@@ -7,7 +9,7 @@ namespace LcaDataModel
     using System.Data.Entity.Spatial;
 
     [Table("UnitConversion")]
-    public partial class UnitConversion
+    public partial class UnitConversion : Entity
     {
         public UnitConversion()
         {

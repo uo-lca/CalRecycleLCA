@@ -37,9 +37,6 @@
     <Reference Include="dotless.Core">
       <HintPath>..\packages\dotless.1.4.0.0\lib\dotless.Core.dll</HintPath>
     </Reference>
-    <Reference Include="Entities">
-      <HintPath>..\Entities\bin\Debug\Entities.dll</HintPath>
-    </Reference>
     <Reference Include="EntityFramework, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\packages\EntityFramework.6.1.1\lib\net45\EntityFramework.dll</HintPath>
@@ -132,28 +129,38 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="ClearCache.cs" />
     <Compile Include="DependencyParamService.cs" />
     <Compile Include="FlowPropertyParamService.cs" />
     <Compile Include="FragmentLCIAComputation.cs" />
     <Compile Include="FragmentTraversalV2.cs" />
+    <Compile Include="IClearCache.cs" />
     <Compile Include="IFragmentLCIAComputation.cs" />
     <Compile Include="IFragmentTraversalV2.cs" />
     <Compile Include="ILCIAComputationV2.cs" />
-    <Compile Include="IResourceServiceFacade.cs" />
     <Compile Include="ITestGenericService.cs" />
     <Compile Include="LCIAComputationV2.cs" />
     <Compile Include="IDependencyParamService.cs" />
     <Compile Include="IFlowPropertyParamService.cs" />
-    <Compile Include="IService.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="ResourceServiceFacade.cs" />
-    <Compile Include="Service.cs" />
     <Compile Include="TestGenericService.cs" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\..\CalRecycleLCA.Repository\CalRecycleLCA.Repository.csproj">
+      <Project>{dd4f5844-f2ad-4465-9723-383a38b5ca32}</Project>
+      <Name>CalRecycleLCA.Repository</Name>
+    </ProjectReference>
     <ProjectReference Include="..\..\..\Database\DataModel\LcaDataModel.csproj">
       <Project>{b7f4d17f-6156-457c-8425-8ce5f683cac5}</Project>
       <Name>LcaDataModel</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\Service\Services.csproj">
+      <Project>{a73a555b-0a41-475c-9fac-63c161f142a6}</Project>
+      <Name>Services</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Entities\Entities.csproj">
+      <Project>{bc864533-a57f-4efe-b967-ef8cafc2b2f1}</Project>
+      <Name>Entities</Name>
     </ProjectReference>
     <ProjectReference Include="..\Repository\Repository.csproj">
       <Project>{76486074-e3ca-413f-b68e-f2c8c8fcbe68}</Project>

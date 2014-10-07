@@ -7,8 +7,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Services;
 
-namespace Services
+namespace CalRecycleLCA.Services
 {
     public class TestGenericService : ITestGenericService//<T> : ITestGenericService<T> where T : class
     {

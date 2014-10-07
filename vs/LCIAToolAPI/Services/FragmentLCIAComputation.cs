@@ -7,8 +7,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Services;
 
-namespace Services
+namespace CalRecycleLCA.Services
 {
     public class FragmentLCIAComputation : IFragmentLCIAComputation
     {
@@ -61,6 +62,7 @@ namespace Services
         [Inject]
         private readonly IUnitOfWork _unitOfWork;
      
+
         public FragmentLCIAComputation(IService<FragmentFlow> fragmentFlowService,
             IService<ScoreCache> scoreCacheService,
             IService<NodeCache> nodeCacheService,
@@ -238,21 +240,17 @@ namespace Services
 
             var lciaMethods = _lciaMethodService.Query().Get().ToList();
 
-//select distinct f.FragmentID, n.ScenarioID from NodeCache n inner join ScoreCache s
-//on n.NodeCacheID = s.NodeCacheID
-//inner join FragmentFlow f on f.FragmentFlowID =n.FragmentFlowID
-//where FragmentID=3 and ScenarioID=0
+            var scoreCache = _scoreCacheService.Query().Get()
+                .Join(_nodeCacheService.Query().Get(), sc => sc.NodeCacheID, nc => nc.NodeCacheID, (sc, nc) => new { sc, nc })
+                .Join(_fragmentFlowService.Query().Get(), nc => nc.nc.FragmentFlowID, ff => ff.FragmentFlowID, (nc, ff) => new { nc, ff })
+                .Where(x => x.ff.FragmentID == fragmentId)
+                .Where(x => x.nc.nc.ScenarioID == scenarioId);
 
-            // //// [BK] Moving cache checking into SetScoreCache
-            //var scoreCache = _scoreCacheService.Query().Get()
-            //    .Join(_nodeCacheService.Query().Filter(x => x.ScenarioID == scenarioId).Get(), sc => sc.NodeCacheID, nc => nc.NodeCacheID, (sc, nc) => new { sc, nc })
-            //    .Join(_fragmentFlowService.Query().Filter(x => x.FragmentID == fragmentId).Get(), nc => nc.nc.FragmentFlowID, ff => ff.FragmentFlowID, (nc, ff) => new { nc, ff });
 
-            
-            //if (scoreCache.Count() == 0)
-            //{
+            if (scoreCache.Count() == 0)
+            {
                 FragmentFlowLCIA(fragmentId, scenarioId, lciaMethods).ToList();
-            //}
+            }
           
 
         }
@@ -260,21 +258,24 @@ namespace Services
         public IEnumerable<FragmentLCIAModel> ComputeFragmentLCIA(int? fragmentId, int? scenarioId, int? lciaMethodId)
         {
             // for now: return one record per FragmentFlow
-            var lcia = _fragmentFlowService.Query().Filter(x => x.FragmentID == fragmentId).Get()
-                .Join(_nodeCacheService.Query().Filter(x => x.ScenarioID == scenarioId).Get()
-      , ff => ff.FragmentFlowID
-      , nc => nc.FragmentFlowID
-      , (ff, nc) => new { ff, nc })
-                .Join(_scoreCacheService.Query().Filter(x => x.ScenarioID == scenarioId && x.LCIAMethodID == lciaMethodId).Get()
-      , l => l.nc.FragmentFlowID
-      , sc => sc.FragmentFlowID
-      , (nc, sc) => new { nodeCaches = nc, scoreCaches = sc }).Select( s => new FragmentLCIAModel
-            {
-                FragmentFlowID = s.nodeCaches.ff.FragmentFlowID,
-                NodeWeight = s.nodeCaches.nc.NodeWeight,
-                ImpactScore = s.scoreCaches == null ? 0 : s.scoreCaches.ImpactScore,
-	            Result = s.nodeCaches.nc.NodeWeight * (s.scoreCaches == null ? 0 : s.scoreCaches.ImpactScore)
-            });
+            var lcia = _fragmentFlowService.Query().Get()
+                .Where(x => x.FragmentID == fragmentId)
+                .Join(_nodeCacheService.Query().Get(), ff => ff.FragmentFlowID, nc => nc.FragmentFlowID, (ff, nc) => new { ff, nc })
+                .Where(x => x.nc.ScenarioID == scenarioId)
+                .GroupJoin(_scoreCacheService.Query().Get()
+                // leave this out for now, as you obviously can't add a
+                // where clause for a table that has no data.
+                //.Where(x => x.LCIAMethodID == lciaMethodId)
+      , l => l.nc.NodeCacheID
+      , sc => sc.NodeCacheID
+      , (nc, sc) => new { nodeCaches = nc, scoreCaches = sc })
+      .SelectMany(s => s.scoreCaches.DefaultIfEmpty()
+      , (s, scoreCaches) => new FragmentLCIAModel
+      {
+          FragmentFlowID = s.nodeCaches.ff.FragmentFlowID,
+          NodeWeight = s.nodeCaches.nc.NodeWeight,
+          ImpactScore = scoreCaches == null ? 0 : scoreCaches.ImpactScore
+      });
 
             return lcia;
         }
@@ -301,22 +302,26 @@ namespace Services
 
             fragmentTraversalV2.Traverse(fragmentId, scenarioId);
 
-            var fragmentFlows = _nodeCacheService.Query().Filter(x => x.ScenarioID == scenarioId).Get()
-                .Join(_fragmentFlowService.Query().Filter(x => x.FragmentID == fragmentId).Get(), nc => nc.FragmentFlowID, ff => ff.FragmentFlowID, (nc, ff) => new { nc, ff })
-                .ToList();
+            var fragmentFlows = _nodeCacheService.Query().Get()
+                .Where(x => x.ScenarioID == scenarioId)
+                .Join(_fragmentFlowService.Query().Get(), nc => nc.FragmentFlowID, ff => ff.FragmentFlowID, (nc, ff) => new { nc, ff })
+                .Where(x => x.ff.FragmentID == fragmentId).ToList();
 
             foreach (var item in fragmentFlows)
             {
-                // var nodeCache = _nodeCacheService.Query().Filter(x => x.FragmentFlowID == item.ff.FragmentFlowID && x.ScenarioID == scenarioId).Get();
+                var nodeCache = _nodeCacheService.Query().Get()
+                    .Where(x => x.FragmentFlowID == Convert.ToInt32(item.ff.FragmentFlowID))
+                    .Where(x => x.ScenarioID == scenarioId);
 
-                // int nodeCacheId = Convert.ToInt32(nodeCache.Select(x => x.NodeCacheID).FirstOrDefault());
+                int nodeCacheId = Convert.ToInt32(nodeCache.Select(x => x.NodeCacheID).FirstOrDefault());
 
                 int nodeTypeId = Convert.ToInt32(item.ff.NodeTypeID);
                 int? targetId = 0;
                 switch (nodeTypeId)
                 {
                     case 1:
-                        var target1 = _fragmentNodeProcessService.Query().Filter(x => x.FragmentFlowID == item.ff.FragmentFlowID).Get()
+                        var target1 = _fragmentNodeProcessService.Query().Get()
+                            .Where(x => x.FragmentFlowID == item.ff.FragmentFlowID)
                                   .GroupJoin(_processSubstitutionService.Query().Get()
                             //leave this out for now, as you obviously can't add a
                             //where clause for a table that has no data.
@@ -342,12 +347,13 @@ namespace Services
                             }
                         }
 
-                        SetScoreCache(targetId, nodeTypeId, lciaMethods, scenarioId, item.ff.FragmentFlowID);
+                        SetScoreCache(targetId, nodeTypeId, lciaMethods, scenarioId, nodeCacheId);
 
                         break;
                     case 2:
 
-                        var target2 = _fragmentNodeFragmentService.Query().Filter(x => x.FragmentFlowID == item.ff.FragmentFlowID).Get()
+                        var target2 = _fragmentNodeFragmentService.Query().Get()
+                            .Where(x => x.FragmentFlowID == item.ff.FragmentFlowID)
                                   .GroupJoin(_fragmentSubstitutionService.Query().Get()
                             //leave this out for now, as you obviously can't add a
                             //where clause for a table that has no data.
@@ -379,7 +385,7 @@ namespace Services
 
                         //recursive LCIA computation, results to cache
                         FragmentFlowLCIA(targetId, scenarioId, lciaMethods);
-                        SetScoreCache(targetId, nodeTypeId, lciaMethods, scenarioId, item.ff.FragmentFlowID);
+                        SetScoreCache(targetId, nodeTypeId, lciaMethods, scenarioId, nodeCacheId);
                        
                         break;
                     case 3:
@@ -391,7 +397,7 @@ namespace Services
                         var resolveBackground = ResolveBackground(item.ff.FlowID, item.ff.DirectionID, scenarioId, nodeTypeId);
                         int? resolveBackgroundTargetId = resolveBackground.TargetID;
                         int? resolveBackgroundNodeTypeId = resolveBackground.NodeTypeID;
-                        SetScoreCache(resolveBackgroundTargetId, resolveBackgroundNodeTypeId, lciaMethods, scenarioId, item.ff.FragmentFlowID);
+                        SetScoreCache(resolveBackgroundTargetId, resolveBackgroundNodeTypeId, lciaMethods, scenarioId, nodeCacheId);
                         break;
                 }
 
@@ -412,7 +418,10 @@ namespace Services
         {
             IEnumerable<ResolveBackgroundModel> background = null;
             int targetId;
-            background = _scenarioBackgroundService.Query().Filter(x => x.ScenarioID == scenarioId && x.FlowID == flowId && x.DirectionID == directionId).Get()
+            background = _scenarioBackgroundService.Query().Get()
+                .Where(x => x.ScenarioID == scenarioId)
+                .Where(x => x.FlowID == flowId)
+                .Where(x => x.DirectionID == directionId)
                .Select(bg => new ResolveBackgroundModel
                {
                    NodeTypeID = bg.NodeTypeID,
@@ -456,16 +465,8 @@ namespace Services
 
         }
 
-
-        public void SetScoreCache(int? targetId, int? nodeTypeId, IEnumerable<LCIAMethod> lciaMethods, int scenarioId, int fragmentFlowId)
+        public void SetScoreCache(int? targetId, int? nodeTypeId, IEnumerable<LCIAMethod> lciaMethods, int scenarioId, int nodeCacheId)
         {
-            IEnumerable<LCIAMethod> haveLciaMethods = _scoreCacheService.Query().Filter(x => x.ScenarioID == scenarioId
-                                                                                          && x.FragmentFlowID == fragmentFlowId).Get()
-                                                                                             .Select(y => new LCIAMethod { 
-                                                                                             LCIAMethodID = y.LCIAMethodID });
-            
-            IEnumerable<LCIAMethod> needLciaMethods = lciaMethods.Except(haveLciaMethods);
-            
             switch (nodeTypeId)
             {
                 case 1:
@@ -496,21 +497,22 @@ namespace Services
                                     .Where(x => x.LCIAMethodID == lciaMethodItem.LCIAMethodID)
                                     .Select(x => new ScoreCache
                                         {
-                                            ImpactScore = Convert.ToDouble(x.Score)
+                                            ImpactScore = x.Score
                                         }).FirstOrDefault();
 
                                 impactScore = Convert.ToDouble(score.ImpactScore);
 
                                 ScoreCache scoreCache = new ScoreCache();
-                                scoreCache.ScenarioID = scenarioId;
-                                scoreCache.FragmentFlowID = fragmentFlowId;
+                                scoreCache.NodeCacheID = nodeCacheId;
                                 scoreCache.LCIAMethodID = lciaMethodItem.LCIAMethodID;
                                 scoreCache.ImpactScore = impactScore;
+                                scoreCache.ObjectState = ObjectState.Added;
                                 _scoreCacheService.InsertGraph(scoreCache);
 
                             }
 
                         }
+                        
                         _unitOfWork.Save();
                     break;
                 case 2:
@@ -523,18 +525,18 @@ namespace Services
                                 var lciaScore = lcias.ToList()
                             .GroupBy(t => new
                             {
-                                t.Result
+                                t.ImpactScore
                             })
                          .Select(group => new LCIAModel
                          {
-                             Result = group.Sum(a => a.Result)
+                             Result = group.Sum(a => a.ImpactScore)
                          });
 
                                 ScoreCache scoreCache = new ScoreCache();
-                                scoreCache.ScenarioID = scenarioId;
-                                scoreCache.FragmentFlowID = fragmentFlowId;
+                                scoreCache.NodeCacheID = nodeCacheId;
                                 scoreCache.LCIAMethodID = lciaMethodItem.LCIAMethodID;
-                                scoreCache.ImpactScore = Convert.ToDouble(lciaScore.Select(a => a.Result).FirstOrDefault());
+                                scoreCache.ImpactScore = lciaScore.Select(a => a.Result).FirstOrDefault();
+                                scoreCache.ObjectState = ObjectState.Added;
                                 _scoreCacheService.InsertGraph(scoreCache);
                             }
                         }
@@ -544,5 +546,6 @@ namespace Services
                     break;
             }
         }
+
     }
 }
