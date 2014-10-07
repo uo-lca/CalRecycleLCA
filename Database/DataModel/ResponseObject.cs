@@ -1,4 +1,4 @@
-﻿using Repository;
+﻿using Repository.Pattern.Ef6;
 using System;
 using System.Collections.Generic;
 using System.Linq;

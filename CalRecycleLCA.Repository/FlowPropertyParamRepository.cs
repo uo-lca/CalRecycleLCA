@@ -5,14 +5,15 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Repository;
+using Repository.Pattern.Repositories;
 
 namespace CalRecycleLCA.Repository
 {
     public static class FlowPropertyParamRepository
     {
-        public static IEnumerable<FlowPropertyParam> GetFlowPropertyParams(this IRepository<FlowPropertyParam> flowPropertyParamRepository, int scenarioId)
+        public static IEnumerable<FlowPropertyParam> GetFlowPropertyParams(this IRepositoryAsync<FlowPropertyParam> flowPropertyParamRepository, int scenarioId)
         {
-            var flowPropertyParams = flowPropertyParamRepository.GetRepository<FlowPropertyParam>().Queryable();
+            var flowPropertyParams = flowPropertyParamRepository.Queryable();
             return flowPropertyParams;
 
         }

@@ -44,8 +44,8 @@
     <Compile Include="Service.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\vs\LCIAToolAPI\Repository\Repository.csproj">
-      <Project>{76486074-e3ca-413f-b68e-f2c8c8fcbe68}</Project>
+    <ProjectReference Include="..\Repository\Repository.csproj">
+      <Project>{b4908bb9-7cdf-4ae5-8c8e-ea1bedf58f4f}</Project>
       <Name>Repository</Name>
     </ProjectReference>
   </ItemGroup>

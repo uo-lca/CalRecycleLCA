@@ -1,4 +1,5 @@
 ﻿using Repository;
+using Repository.Pattern.Infrastructure;
 using System;
 using System.Collections.Generic;
 using System.Data.Entity;
@@ -16,11 +17,11 @@ namespace LcaDataModel
             {
                 var entityState = dbEntityEntry.Entity as IObjectState;
                 if (entityState == null)
-                     throw new InvalidCastException(
-                        "All entites must implement " +
-                        "the IObjectState interface, this interface " +
-                        "must be implemented so each entites state " +
-                        "can explicitely determined when updating graphs.");
+                    throw new InvalidCastException(
+                       "All entites must implement " +
+                       "the IObjectState interface, this interface " +
+                       "must be implemented so each entites state " +
+                       "can explicitely determined when updating graphs.");
 
                 dbEntityEntry.State = ConvertState(entityState.ObjectState);
             }
