@@ -57,6 +57,7 @@ namespace LCAToolAPI.API
             return _lciaComputationV2.LCIACompute(processId, scenarioId);
         }
 
+         //GET api/<controller>
          [Route("api/fragments/{FragmentID}/scenarios/{scenarioID}/compute")]
          [System.Web.Http.AcceptVerbs("GET", "POST")]
          [System.Web.Http.HttpGet]
@@ -65,6 +66,7 @@ namespace LCAToolAPI.API
             _fragmentLCIAComputation.FragmentLCIACompute(fragmentId, scenarioId);
          }
 
+         //GET api/<controller>
          [Route("api/fragments/{FragmentID}/scenarios/{scenarioID}/clear")]
          [System.Web.Http.AcceptVerbs("GET", "POST")]
          [System.Web.Http.HttpGet]
