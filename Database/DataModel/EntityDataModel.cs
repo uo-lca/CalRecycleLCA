@@ -177,6 +177,11 @@ namespace LcaDataModel {
                .WithRequired(e => e.SubFragment)
                .HasForeignKey(e => e.SubFragmentID);
 
+            modelBuilder.Entity<Fragment>()
+               .HasMany(e => e.Scenarios)
+               .WithRequired(e => e.TopLevelFragment)
+               .HasForeignKey(e => e.TopLevelFragmentID);
+
             modelBuilder.Entity<FragmentFlow>()
                 .Property(e => e.Name)
                 .IsUnicode(false);
@@ -187,8 +192,8 @@ namespace LcaDataModel {
                 .HasForeignKey(e => e.ReferenceFragmentFlowID);
 
             modelBuilder.Entity<FragmentFlow>()
-                .HasMany(e => e.FragmentFlow1)
-                .WithOptional(e => e.FragmentFlow2)
+                .HasMany(e => e.ChildFragmentFlows)
+                .WithOptional(e => e.ParentFragmentFlow)
                 .HasForeignKey(e => e.ParentFragmentFlowID);
 
             modelBuilder.Entity<FragmentStage>()

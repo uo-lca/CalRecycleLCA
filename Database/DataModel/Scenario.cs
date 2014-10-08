@@ -17,12 +17,17 @@ namespace LcaDataModel
             Params = new HashSet<Param>();
             FragmentSubstitutions = new HashSet<FragmentSubstitution>();
             ProcessSubstitutions = new HashSet<ProcessSubstitution>();
+            ScoreCaches = new HashSet<ScoreCache>();
         }
 
         [DatabaseGenerated(DatabaseGeneratedOption.None)]
         public int ScenarioID { get; set; }
 
-        public int? ScenarioGroupID { get; set; }
+        public int ScenarioGroupID { get; set; }
+
+        public int TopLevelFragmentID { get; set; }
+
+        public double ActivityLevel { get; set; }
 
         [StringLength(50)]
         public string Name { get; set; }
@@ -33,6 +38,8 @@ namespace LcaDataModel
 
         public virtual ScenarioGroup ScenarioGroup { get; set; }
 
+        public virtual Fragment TopLevelFragment { get; set; }
+
         public virtual ICollection<ScenarioBackground> ScenarioBackgrounds { get; set; }
 
         public virtual ICollection<Param> Params { get; set; }
@@ -40,5 +47,8 @@ namespace LcaDataModel
         public virtual ICollection<FragmentSubstitution> FragmentSubstitutions { get; set; }
 
         public virtual ICollection<ProcessSubstitution> ProcessSubstitutions { get; set; }
+
+        public virtual ICollection<ScoreCache> ScoreCaches { get; set; }
+
     }
 }

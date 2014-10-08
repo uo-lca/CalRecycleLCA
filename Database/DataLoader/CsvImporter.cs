@@ -417,6 +417,8 @@ namespace LcaDataLoader {
             if (ent != null) {
                 ent.Name = row["Name"];
                 ent.ScenarioGroupID = Convert.ToInt32(row["ScenarioGroupID"]);
+                ent.TopLevelFragmentID = Convert.ToInt32(row["TopLevelFragmentID"]);
+                ent.ActivityLevel = Convert.ToDouble(row["ActivityLevel"]);
                 isImported = (dbContext.SaveChanges() > 0);
             }
             return isImported;
@@ -453,6 +455,36 @@ namespace LcaDataLoader {
             return isImported;
         }
 
+        /// <summary>
+        /// Import a row from ProcessSubstitution.csv.
+        /// If the ProcessSubstitution table already contains a record with the key values in the row,
+        /// this function will attempt to update that record. Otherwise, it will create a new record.
+        /// </summary>
+        /// <param name="row">Current csv row</param>
+        /// <param name="dbContext">Current instance of DbContextWrapper</param>
+        /// <returns>true if a ProcessSubstitution record was created or updated, ow false</returns>
+        private static bool ImportProcessSubstitution(Row row, DbContextWrapper dbContext) {
+            bool isImported = false, isNew = true;
+            DbSet<ProcessSubstitution> processSubstitutions = dbContext.GetDbSet<ProcessSubstitution>();
+            int refID;
+            int [] ids = new int [2];
+            ids[0] = Convert.ToInt32(row["FragmentNodeProcessID"]);
+            ids[1] = Convert.ToInt32(row["ScenarioID"]);
+
+            ProcessSubstitution ent = processSubstitutions.Find(ids[0], ids[1]);
+            if (ent == null) {
+                ent = new ProcessSubstitution { FragmentNodeProcessID = ids[0], ScenarioID = ids[1] };
+            }
+            else {
+                isNew = false;
+                Program.Logger.WarnFormat("Found ProcessSubstitution with FragmentNodeProcessID = {0}, ScenarioID = {1}.", ids[0], ids[1]);
+            }
+            if (dbContext.FindRefIlcdEntityID<LcaDataModel.Process>(row["ProcessUUID"], out refID, row["ProcessVersion"]))
+                ent.ProcessID = refID;
+            isImported = isNew ? dbContext.AddEntity(ent) : (dbContext.SaveChanges() > 0);
+            return isImported;
+        }
+
         private static IEnumerable<Row> ImportCSV(string fileName, Func<Row, DbContextWrapper, bool> importRow, DbContextWrapper dbContext) {
             int importCounter = 0;
             var table = DataAccess.DataTable.New.ReadCsv(fileName);
@@ -476,6 +508,7 @@ namespace LcaDataLoader {
             return importCounter;
         }
 
+        /* No need to rename append files
         private static IEnumerable<Row> ImportAppendCSV(string dirName, string typeName, Func<Row, DbContextWrapper, bool> importRow, DbContextWrapper dbContext) {
             string fileName = Path.Combine(dirName, typeName + ".csv");
             IEnumerable<Row> rows = null;
@@ -490,6 +523,7 @@ namespace LcaDataLoader {
             }
             return rows;
         }
+         */
 
         /// <summary>
         /// Load CSV files in append directory
@@ -500,18 +534,18 @@ namespace LcaDataLoader {
                 IEnumerable<Row> rows;
                 Program.Logger.InfoFormat("Load append files in {0}...", dirName);
                 UpdateDataProvider(DataProviderEnum.append, dirName, dbContext);
-                ImportAppendCSV(dirName, "CategorySystem", ImportCategorySystem, dbContext);
-                rows = ImportAppendCSV(dirName, "Category", CreateCategory, dbContext);
+                ImportCSV(Path.Combine(dirName, "CategorySystem.csv"), ImportCategorySystem, dbContext);
+                rows = ImportCSV(Path.Combine(dirName, "Category.csv"), CreateCategory, dbContext);
                 if (rows != null) UpdateEntities(rows, UpdateCategory, dbContext);
-                ImportAppendCSV(dirName, "FlowPropertyEmission", ImportFlowPropertyEmission, dbContext);
-                ImportAppendCSV(dirName, "ProcessDissipation", ImportProcessDissipation, dbContext);
-                ImportAppendCSV(dirName, "CompositionModel", ImportCompositionModel, dbContext);
-                ImportAppendCSV(dirName, "CompositionData", ImportCompositionData, dbContext);
-                ImportAppendCSV(dirName, "ProcessComposition", ImportProcessComposition, dbContext);
+                ImportCSV(Path.Combine(dirName, "FlowPropertyEmission.csv"), ImportFlowPropertyEmission, dbContext);
+                ImportCSV(Path.Combine(dirName, "ProcessDissipation.csv"), ImportProcessDissipation, dbContext);
+                ImportCSV(Path.Combine(dirName, "CompositionModel.csv"), ImportCompositionModel, dbContext);
+                ImportCSV(Path.Combine(dirName, "CompositionData.csv"), ImportCompositionData, dbContext);
+                ImportCSV(Path.Combine(dirName, "ProcessComposition.csv"), ImportProcessComposition, dbContext);
                 // Import Classification last because it references UUIDs in other files
                 // Improve performance by disabling AutoDetectChanges and only executing Adds (no updates).
                 dbContext.SetAutoDetectChanges(false);
-                ImportAppendCSV(dirName, "Classification", ImportClassification, dbContext);
+                ImportCSV(Path.Combine(dirName, "Classification.csv"), ImportClassification, dbContext);
                 dbContext.SetAutoDetectChanges(true);
             }
             else {
@@ -555,7 +589,7 @@ namespace LcaDataLoader {
                 ImportCSV(Path.Combine(dirName, "ScenarioGroup.csv"), ImportScenarioGroup, dbContext);
                 ImportCSV(Path.Combine(dirName, "Scenario.csv"), ImportScenario, dbContext);
                 ImportCSV(Path.Combine(dirName, "Param.csv"), ImportParam, dbContext);
-                //ImportCSV(Path.Combine(dirName, "ScenarioParam.csv"), ImportScenarioParam, dbContext);
+                ImportCSV(Path.Combine(dirName, "ProcessSubstitution.csv"), ImportProcessSubstitution, dbContext);
                 ImportCSV(Path.Combine(dirName, "DependencyParam.csv"), ImportDependencyParam, dbContext);
                 ImportCSV(Path.Combine(dirName, "DistributionParam.csv"), ImportDistributionParam, dbContext);
             }
