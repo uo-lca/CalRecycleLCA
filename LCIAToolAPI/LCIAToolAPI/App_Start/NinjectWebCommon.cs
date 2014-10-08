@@ -77,9 +77,9 @@ namespace LCAToolAPI.App_Start
             kernel.Bind(typeof(IRepository<Param>)).To(typeof(Repository<Param>));
             kernel.Bind<IDbContext>().To<UsedOilLCAContext>();
             kernel.Bind<IUnitOfWork>().To<UnitOfWork>();
-            kernel.Bind<IDependencyParamService>().To<DependencyParamService>();
+            //kernel.Bind<IDependencyParamService>().To<DependencyParamService>();
             kernel.Bind<IFragmentTraversalV2>().To<FragmentTraversalV2>();
-            kernel.Bind<IFlowPropertyParamService>().To<FlowPropertyParamService>();
+            //kernel.Bind<IFlowPropertyParamService>().To<FlowPropertyParamService>();
             kernel.Bind<ILCIAComputationV2>().To<LCIAComputationV2>();
             kernel.Bind<IFragmentLCIAComputation>().To<FragmentLCIAComputation>();
             kernel.Bind<IResourceServiceFacade>().To<ResourceServiceFacade>();

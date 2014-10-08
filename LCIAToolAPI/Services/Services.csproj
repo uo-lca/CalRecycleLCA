@@ -129,8 +129,6 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="DependencyParamService.cs" />
-    <Compile Include="FlowPropertyParamService.cs" />
     <Compile Include="FragmentLCIAComputation.cs" />
     <Compile Include="FragmentTraversalV2.cs" />
     <Compile Include="IFragmentLCIAComputation.cs" />
@@ -139,8 +137,6 @@
     <Compile Include="IResourceServiceFacade.cs" />
     <Compile Include="ITestGenericService.cs" />
     <Compile Include="LCIAComputationV2.cs" />
-    <Compile Include="IDependencyParamService.cs" />
-    <Compile Include="IFlowPropertyParamService.cs" />
     <Compile Include="IService.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="ResourceServiceFacade.cs" />
