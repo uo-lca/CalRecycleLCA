@@ -5,7 +5,8 @@ using System.Text;
 using System.Threading.Tasks;
 using Entities.Models;
 
-namespace Services {
+namespace CalRecycleLCA.Services
+{
     public interface IResourceServiceFacade {
         IEnumerable<LCIAMethodResource> GetLCIAMethodResources(int? impactCategoryID = null);
         IEnumerable<FragmentResource> GetFragmentResources();

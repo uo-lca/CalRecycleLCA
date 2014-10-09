@@ -1,5 +1,6 @@
 namespace LcaDataModel
 {
+    using Repository.Pattern.Ef6;
     using System;
     using System.Collections.Generic;
     using System.ComponentModel.DataAnnotations;
@@ -7,7 +8,7 @@ namespace LcaDataModel
     using System.Data.Entity.Spatial;
 
     [Table("FlowPropertyEmission")]
-    public partial class FlowPropertyEmission
+    public partial class FlowPropertyEmission : Entity
     {
         public int FlowPropertyEmissionID { get; set; }
 

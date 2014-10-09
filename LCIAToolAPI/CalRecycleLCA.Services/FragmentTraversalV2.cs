@@ -5,10 +5,12 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Repository;
+using Repository.Pattern.Infrastructure;
+using Repository.Pattern.UnitOfWork;
+using Service.Pattern;
 using Entities.Models;
 
-namespace Services
+namespace CalRecycleLCA.Services
 {
 
     //Version 2 of fragment traversal - rewritten to reflect the pseudocode dated Mon Jul 28 00:32:01 -0700 2014
@@ -71,20 +73,18 @@ namespace Services
 
         public bool Traverse(int? fragmentId = 0, int scenarioId = 0)
         {
-            int refFlow = _fragmentFlowService.Query()
-                .Filter(q => q.FragmentID == fragmentId)
-                .Get()
-                .Where(q => q.ParentFragmentFlowID == null)
+            int refFlow = _fragmentFlowService
+                .Query(q => q.FragmentID == fragmentId && q.ParentFragmentFlowID == null)
+                .Select()
                 .FirstOrDefault()
                 .FragmentFlowID;
 
             float? activity = 1;
 
-            var chk = _nodeCacheService.Query()
-                .Filter(q => q.FragmentFlowID == refFlow)
-                .GetPage()
-                .Where(q => q.ScenarioID == scenarioId).Count();
-
+            var chk = _nodeCacheService
+                .Query(q => q.FragmentFlowID == refFlow && q.ScenarioID == scenarioId)
+                .Select()
+                .Count();
 
 
             if (chk == 0)
@@ -102,9 +102,10 @@ namespace Services
 
         public void NodeRecurse(int fragmentFlowId, int scenarioId, double? flowMagnitude)
         {
-            var theFlow = _fragmentFlowService.Query()
-                .Filter(q => q.FragmentFlowID == fragmentFlowId)
-                .Get().AsEnumerable<FragmentFlow>();
+            var theFlow = _fragmentFlowService
+                .Query(q => q.FragmentFlowID == fragmentFlowId)
+                .Select()
+                .AsEnumerable<FragmentFlow>();
 
             var nodeFlows = GetScenarioProductFlows(theFlow, scenarioId).ToList();
 
@@ -148,10 +149,10 @@ namespace Services
             }
             else
             {
-                var termFlow = _flowService.Query().Filter(x => x.FlowID == termFlowId).Get().FirstOrDefault();
-
-                var conv = _flowFlowPropertyService.Query().Filter(x => x.FlowID == theFlowId && x.FlowPropertyID == termFlow.ReferenceFlowProperty).Get()
-                    .GroupJoin(_flowPropertyParamService.Query().Get() // Target table
+                var termFlow = _flowService.Query(x => x.FlowID == termFlowId).Select().FirstOrDefault();
+                
+                var conv = _flowFlowPropertyService.Queryable()
+                    .GroupJoin(_flowPropertyParamService.Queryable() // Target table
                 , ffp => ffp.FlowFlowPropertyID
                 , fpp => fpp.FlowFlowPropertyID
                 , (ffp, fpp) => new { flowFlowProperties = ffp, flowPropertyParams = fpp })
@@ -165,7 +166,7 @@ namespace Services
                     MeanValue = s.flowFlowProperties.MeanValue,
                     Value = flowPropertyParams == null ? 0 : flowPropertyParams.Value,
                 })
-                .GroupJoin(_paramService.Query().Get() // Target table
+                .GroupJoin(_paramService.Queryable() // Target table
                 , fpp => fpp.ParamID
                 , p => p.ParamID
                 , (fpp, p) => new { flowPropertyParams = fpp, parameters = p })
@@ -220,7 +221,9 @@ namespace Services
             {
 
 
-                var outFlows = _fragmentFlowService.Query().Filter(x => x.ParentFragmentFlowID == fragmentFlowId).Get()
+                var outFlows = _fragmentFlowService.Queryable()
+                    .Where(x => x.ParentFragmentFlowID == fragmentFlowId).ToList()
+
                     .GroupJoin(nodeFlows // Target table
     , ff => ff.FlowID
     , nf => nf.FlowID
@@ -236,7 +239,7 @@ namespace Services
         ParentFragmentFlowID = s.fragmentflows.ParentFragmentFlowID
     })
 
-    .GroupJoin(_dependencyParamService.Query().Get() // Target table
+    .GroupJoin(_dependencyParamService.Queryable().ToList() // Target table
                     , ff => ff.FragmentFlowID
                     , dp => dp.FragmentFlowID
                     , (ff, dp) => new { fragmentflows = ff, dependencyparams = dp })
@@ -253,7 +256,8 @@ namespace Services
                         ParentFragmentFlowID = s.fragmentflows.ParentFragmentFlowID
                     })
 
-    .GroupJoin(_paramService.Query().Filter(x => x.ScenarioID == scenarioId).Get()
+    .GroupJoin(_paramService.Queryable()
+   .Where(x => x.ScenarioID == scenarioId).ToList()
                     , dp => dp.ParamID
                     , sp => sp.ParamID
                     , (dp, sp) => new { dependencyParams = dp, scenarioParams = sp })
@@ -303,8 +307,9 @@ namespace Services
                     NodeWeight = nodeWeight
                 };
 
-                _nodeCacheService.InsertGraph(nodeCache);
-                _unitOfWork.Save();
+                nodeCache.ObjectState = ObjectState.Added;
+                _nodeCacheService.InsertOrUpdateGraph(nodeCache);
+                _unitOfWork.SaveChanges();
             }
 
         }
@@ -320,7 +325,7 @@ namespace Services
                 case 1: //process
 
                     int? processId = theFragmentFlow
-                        .Join(_fragmentNodeProcessService.Query().Get(), p => p.FragmentFlowID, pc => pc.FragmentFlowID, (p, pc) => new { p, pc })
+                        .Join(_fragmentNodeProcessService.Queryable(), p => p.FragmentFlowID, pc => pc.FragmentFlowID, (p, pc) => new { p, pc })
                         .FirstOrDefault()
                         .pc.ProcessID;
                     //also needs left outer join on substitution but we don't have those tables yet.
@@ -330,8 +335,10 @@ namespace Services
                     //else
                     //    process_id = Default;
 
-                    nodeFlowModel = _processFlowService.Query().Filter(x => x.ProcessID == processId).Get()
-                        .Join(_flowService.Query().Filter(x => x.FlowTypeID == 1).Get(), p => p.FlowID, pc => pc.FlowID, (p, pc) => new { p, pc })
+                    nodeFlowModel = _processFlowService.Queryable()
+                        .Join(_flowService.Queryable(), p => p.FlowID, pc => pc.FlowID, (p, pc) => new { p, pc })
+                        .Where(x => x.p.ProcessID == processId)
+                        .Where(x => x.pc.FlowTypeID == 1)
                           .Select(nfm => new NodeFlowModel
                           {
                               FlowID = nfm.p.FlowID,
@@ -368,7 +375,7 @@ namespace Services
 
                     //get the sub fragment
                     int? subFragmentId = theFragmentFlow
-                        .Join(_fragmentNodeFragmentService.Query().Get(), p => p.FragmentFlowID, pc => pc.FragmentFlowID, (p, pc) => new { p, pc })
+                        .Join(_fragmentNodeFragmentService.Queryable(), p => p.FragmentFlowID, pc => pc.FragmentFlowID, (p, pc) => new { p, pc })
                         .FirstOrDefault()
                         .pc.SubFragmentID;
                     //also needs left outer join on substitution but we don't have those tables yet.
@@ -387,11 +394,12 @@ namespace Services
                     Traverse(subFragmentId, scenarioId);
 
 
-                    var fragmentNodeFlows = _fragmentFlowService.Query()
-                        .Filter(x => x.FragmentFlowID == theFragmentFlow.Select(y => y.FragmentFlowID).FirstOrDefault()).Get()
-                        .Join(_fragmentNodeFragmentService.Query().Get(), p => p.FragmentFlowID, pc => pc.FragmentFlowID, (p, pc) => new { p, pc })
+                    var fragmentNodeFlows = _fragmentFlowService.Queryable().ToList()
+                         .Where(x => x.FragmentFlowID == theFragmentFlow.Select(y => y.FragmentFlowID).FirstOrDefault())
+                        //.Where(x => x.FragmentID == fragmentId)
+                        .Join(_fragmentNodeFragmentService.Queryable(), p => p.FragmentFlowID, pc => pc.FragmentFlowID, (p, pc) => new { p, pc })
 
-                        .Join(_fragmentService.Query().Get(), p => p.pc.SubFragmentID, pc => pc.FragmentID, (p, pc) => new { p, pc })
+                        .Join(_fragmentService.Queryable(), p => p.pc.SubFragmentID, pc => pc.FragmentID, (p, pc) => new { p, pc })
                          .Select(a => new NodeFlowModel
                     {
                         FragmentFlowID = a.pc.ReferenceFragmentFlowID,
@@ -401,7 +409,7 @@ namespace Services
                         NodeTypeID = a.p.p.NodeTypeID
                     })
 
-                    .Union(_fragmentFlowService.Query().Filter(x => x.FragmentID == subFragmentId && x.NodeTypeID == 3).Get().Select(
+                    .Union(_fragmentFlowService.Queryable().Select(
                     b => new NodeFlowModel
                     {
                         FragmentFlowID = b.FragmentFlowID,
@@ -409,7 +417,9 @@ namespace Services
                         DirectionID = b.DirectionID,
                         FragmentID = b.FragmentID,
                         NodeTypeID = b.NodeTypeID
-                    }));
+                    })
+                    .Where(x => x.FragmentID == subFragmentId && x.NodeTypeID == 3))
+                    .ToList();
 
 
                     // next we need to modify the table to fix the reference flow (FlowID = null) and
@@ -432,7 +442,8 @@ namespace Services
                     }
 
                     nodeFlowModel = fragmentNodeFlows
-                        .Join(_nodeCacheService.Query().Filter(x => x.ScenarioID == scenarioId).Get(), p => p.FragmentFlowID, pc => pc.FragmentFlowID, (p, pc) => new { p, pc })
+                        .Join(_nodeCacheService.Queryable(), p => p.FragmentFlowID, pc => pc.FragmentFlowID, (p, pc) => new { p, pc })
+                        .Where(x => x.pc.ScenarioID == scenarioId)
              .GroupBy(t => new
              {
                  t.p.FlowID,
@@ -469,13 +480,13 @@ namespace Services
                     break;
 
                 case 1:
-                    var termFlowProcess = theFragmentFlow.Join(_fragmentNodeProcessService.Query().Get(), p => p.FragmentFlowID, pc => pc.FragmentFlowID, (p, pc) => new { p, pc })
+                    var termFlowProcess = theFragmentFlow.Join(_fragmentNodeProcessService.Queryable(), p => p.FragmentFlowID, pc => pc.FragmentFlowID, (p, pc) => new { p, pc })
                     .Select(x => x.pc.FlowID).FirstOrDefault();
                     termFlowId = Convert.ToInt32(termFlowProcess.Value);
                     break;
 
                 case 2:
-                    var termFlowFragment = theFragmentFlow.Join(_fragmentNodeFragmentService.Query().Get(), p => p.FragmentFlowID, pc => pc.FragmentFlowID, (p, pc) => new { p, pc })
+                    var termFlowFragment = theFragmentFlow.Join(_fragmentNodeFragmentService.Queryable(), p => p.FragmentFlowID, pc => pc.FragmentFlowID, (p, pc) => new { p, pc })
                     .Select(x => x.pc.FlowID).FirstOrDefault();
                     termFlowId = Convert.ToInt32(termFlowFragment.Value);
                     break;

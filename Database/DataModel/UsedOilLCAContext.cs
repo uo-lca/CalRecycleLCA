@@ -5,15 +5,16 @@ namespace LcaDataModel
     using System.ComponentModel.DataAnnotations.Schema;
     using System.Linq;
     using System.Data.Entity.Validation;
-
+    //using Repository;
+	using Repository.Pattern.DataContext;
+	using Repository.Pattern.Ef6;
+	
     /// <summary>
     /// Entity Framework database context used by LCIAToolAPI.
     /// Inherits data model from EntityDataModel.
     /// </summary>
-    public partial class UsedOilLCAContext : EntityDataModel, IDbContext
+    public partial class UsedOilLCAContext : EntityDataModel, IDataContext
     {
-
-
         static UsedOilLCAContext()
         {
             Database.SetInitializer<UsedOilLCAContext>(null);
@@ -36,7 +37,7 @@ namespace LcaDataModel
         {
             try
             {
-                //this.ApplyStateChanges();
+                this.ApplyStateChanges();
                 return base.SaveChanges();
             }
             catch (DbEntityValidationException ex)

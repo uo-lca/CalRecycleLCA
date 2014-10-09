@@ -10,11 +10,16 @@ namespace LCAToolAPI.App_Start
 
     using Ninject;
     using Ninject.Web.Common;
-    using Services;
+    using CalRecycleLCA.Services;
     using LCAToolAPI.Infrastructure;
     using System.Web.Http;
-    using Repository;
     using LcaDataModel;
+    using Repository.Pattern.UnitOfWork;
+	using Repository.Pattern.Repositories;
+	using Repository.Pattern.Ef6;
+	using Service.Pattern;
+	using Repository.Pattern.DataContext;
+	using Repository.Pattern.Ef6.Factories;
 
     public static class NinjectWebCommon 
     {
@@ -75,7 +80,7 @@ namespace LCAToolAPI.App_Start
         {
             kernel.Bind(typeof(IRepository<>)).To(typeof(Repository<>));
             kernel.Bind(typeof(IRepository<Param>)).To(typeof(Repository<Param>));
-            kernel.Bind<IDbContext>().To<UsedOilLCAContext>();
+            kernel.Bind<IDataContext>().To<UsedOilLCAContext>();
             kernel.Bind<IUnitOfWork>().To<UnitOfWork>();
             //kernel.Bind<IDependencyParamService>().To<DependencyParamService>();
             kernel.Bind<IFragmentTraversalV2>().To<FragmentTraversalV2>();

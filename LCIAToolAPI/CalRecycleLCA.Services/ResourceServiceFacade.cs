@@ -6,9 +6,13 @@ using System.Threading.Tasks;
 using LcaDataModel;
 using Entities.Models;
 using Ninject;
+using Repository.Pattern.Infrastructure;
+using Repository.Pattern.UnitOfWork;
+using Service.Pattern;
 using System.Runtime.CompilerServices;
 
-namespace Services {
+namespace CalRecycleLCA.Services
+{
     /// <summary>
     /// Web API Services Facade
     /// Gets LcaDataModel entities and transforms them to web API resources.

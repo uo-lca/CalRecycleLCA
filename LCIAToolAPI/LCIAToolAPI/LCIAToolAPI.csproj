@@ -277,9 +277,7 @@
     </Compile>
     <Compile Include="Infrastructure\NinjectDependencyResolver.cs" />
     <Compile Include="Infrastructure\NinjectDependencyScope.cs" />
-    <Compile Include="IService.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Service.cs" />
     <Compile Include="Timer.aspx.cs">
       <DependentUpon>Timer.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
@@ -296,17 +294,25 @@
       <Project>{b7f4d17f-6156-457c-8425-8ce5f683cac5}</Project>
       <Name>LcaDataModel</Name>
     </ProjectReference>
+    <ProjectReference Include="..\CalRecycleLCA.Services\CalRecycleLCA.Services.csproj">
+      <Project>{a093bcd0-8869-447c-b0e9-8e77b18598c9}</Project>
+      <Name>CalRecycleLCA.Services</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Entities\Entities.csproj">
       <Project>{bc864533-a57f-4efe-b967-ef8cafc2b2f1}</Project>
       <Name>Entities</Name>
     </ProjectReference>
-    <ProjectReference Include="..\Repository\Repository.csproj">
-      <Project>{76486074-e3ca-413f-b68e-f2c8c8fcbe68}</Project>
-      <Name>Repository</Name>
+    <ProjectReference Include="..\Frameworks\Repository.Pattern.Ef6\Repository.Pattern.Ef6.csproj">
+      <Project>{f68a1d19-93fb-47c1-a22b-42bea3e4fd8c}</Project>
+      <Name>Repository.Pattern.Ef6</Name>
     </ProjectReference>
-    <ProjectReference Include="..\Services\Services.csproj">
-      <Project>{a093bcd0-8869-447c-b0e9-8e77b18598c9}</Project>
-      <Name>Services</Name>
+    <ProjectReference Include="..\Frameworks\Repository.Pattern\Repository.Pattern.csproj">
+      <Project>{6e682a14-c872-4813-b620-76e108dea683}</Project>
+      <Name>Repository.Pattern</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Frameworks\Service.Pattern\Service.Pattern.csproj">
+      <Project>{86f86650-ee3c-4372-8fec-40c2fe015022}</Project>
+      <Name>Service.Pattern</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>

@@ -1,14 +1,16 @@
 ﻿using Entities.Models;
 using LcaDataModel;
 using Ninject;
-using Repository;
+using Repository.Pattern.Infrastructure;
+using Repository.Pattern.UnitOfWork;
+using Service.Pattern;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Services
+namespace CalRecycleLCA.Services
 {
     public class FragmentLCIAComputation : IFragmentLCIAComputation
     {
@@ -236,7 +238,7 @@ namespace Services
         public void FragmentLCIACompute(int fragmentId, int scenarioId)
         {
 
-            var lciaMethods = _lciaMethodService.Query().Get().ToList();
+            var lciaMethods = _lciaMethodService.Queryable().ToList();
 
 //select distinct f.FragmentID, n.ScenarioID from NodeCache n inner join ScoreCache s
 //on n.NodeCacheID = s.NodeCacheID
@@ -260,12 +262,13 @@ namespace Services
         public IEnumerable<FragmentLCIAModel> ComputeFragmentLCIA(int? fragmentId, int? scenarioId, int? lciaMethodId)
         {
             // for now: return one record per FragmentFlow
-            var lcia = _fragmentFlowService.Query().Filter(x => x.FragmentID == fragmentId).Get()
-                .Join(_nodeCacheService.Query().Filter(x => x.ScenarioID == scenarioId).Get()
+            var lcia = _fragmentFlowService.Queryable()
+                .Where(x => x.FragmentID == fragmentId)
+                 .Join(_nodeCacheService.Queryable().Where(x => x.ScenarioID == scenarioId)
       , ff => ff.FragmentFlowID
       , nc => nc.FragmentFlowID
       , (ff, nc) => new { ff, nc })
-                .Join(_scoreCacheService.Query().Filter(x => x.ScenarioID == scenarioId && x.LCIAMethodID == lciaMethodId).Get()
+                .Join(_scoreCacheService.Queryable().Where(x => x.ScenarioID == scenarioId && x.LCIAMethodID == lciaMethodId)
       , l => l.nc.FragmentFlowID
       , sc => sc.FragmentFlowID
       , (nc, sc) => new { nodeCaches = nc, scoreCaches = sc }).Select( s => new FragmentLCIAModel
@@ -301,10 +304,10 @@ namespace Services
 
             fragmentTraversalV2.Traverse(fragmentId, scenarioId);
 
-            var fragmentFlows = _nodeCacheService.Query().Filter(x => x.ScenarioID == scenarioId).Get()
-                .Join(_fragmentFlowService.Query().Filter(x => x.FragmentID == fragmentId).Get(), nc => nc.FragmentFlowID, ff => ff.FragmentFlowID, (nc, ff) => new { nc, ff })
-                .ToList();
-
+            var fragmentFlows = _nodeCacheService.Queryable()
+                .Where(x => x.ScenarioID == scenarioId)
+                .Join(_fragmentFlowService.Queryable().Where(x => x.FragmentID == fragmentId), nc => nc.FragmentFlowID, ff => ff.FragmentFlowID, (nc, ff) => new { nc, ff }).ToList();
+            
             foreach (var item in fragmentFlows)
             {
                 // var nodeCache = _nodeCacheService.Query().Filter(x => x.FragmentFlowID == item.ff.FragmentFlowID && x.ScenarioID == scenarioId).Get();
@@ -316,8 +319,9 @@ namespace Services
                 switch (nodeTypeId)
                 {
                     case 1:
-                        var target1 = _fragmentNodeProcessService.Query().Filter(x => x.FragmentFlowID == item.ff.FragmentFlowID).Get()
-                                  .GroupJoin(_processSubstitutionService.Query().Get()
+                        var target1 = _fragmentNodeProcessService.Queryable()
+                            .Where(x => x.FragmentFlowID == item.ff.FragmentFlowID)
+                                  .GroupJoin(_processSubstitutionService.Queryable()
                             //leave this out for now, as you obviously can't add a
                             //where clause for a table that has no data.
                             //.Where(x => x.ScenarioID == scenarioId)
@@ -347,8 +351,9 @@ namespace Services
                         break;
                     case 2:
 
-                        var target2 = _fragmentNodeFragmentService.Query().Filter(x => x.FragmentFlowID == item.ff.FragmentFlowID).Get()
-                                  .GroupJoin(_fragmentSubstitutionService.Query().Get()
+                        var target2 = _fragmentNodeFragmentService.Queryable()
+                            .Where(x => x.FragmentFlowID == item.ff.FragmentFlowID)
+                                  .GroupJoin(_fragmentSubstitutionService.Queryable()
                             //leave this out for now, as you obviously can't add a
                             //where clause for a table that has no data.
                             //.Where(x => x.ScenarioID == scenarioId)
@@ -412,7 +417,10 @@ namespace Services
         {
             IEnumerable<ResolveBackgroundModel> background = null;
             int targetId;
-            background = _scenarioBackgroundService.Query().Filter(x => x.ScenarioID == scenarioId && x.FlowID == flowId && x.DirectionID == directionId).Get()
+            background = _scenarioBackgroundService.Queryable()
+                .Where(x => x.ScenarioID == scenarioId)
+                .Where(x => x.FlowID == flowId)
+                .Where(x => x.DirectionID == directionId)
                .Select(bg => new ResolveBackgroundModel
                {
                    NodeTypeID = bg.NodeTypeID,
@@ -421,7 +429,7 @@ namespace Services
 
             if (background.Count() == 0)
             {
-                background = _backgroundService.Query().Get()
+                background = _backgroundService.Queryable()
                 .Where(x => x.FlowID == flowId)
                 .Where(x => x.DirectionID == directionId)
                .Select(bg => new ResolveBackgroundModel
@@ -459,8 +467,8 @@ namespace Services
 
         public void SetScoreCache(int? targetId, int? nodeTypeId, IEnumerable<LCIAMethod> lciaMethods, int scenarioId, int fragmentFlowId)
         {
-            IEnumerable<LCIAMethod> haveLciaMethods = _scoreCacheService.Query().Filter(x => x.ScenarioID == scenarioId
-                                                                                          && x.FragmentFlowID == fragmentFlowId).Get()
+            IEnumerable<LCIAMethod> haveLciaMethods = _scoreCacheService.Queryable().Where(x => x.ScenarioID == scenarioId
+                                                                                        && x.FragmentFlowID == fragmentFlowId)
                                                                                              .Select(y => new LCIAMethod { 
                                                                                              LCIAMethodID = y.LCIAMethodID });
             
@@ -506,12 +514,13 @@ namespace Services
                                 scoreCache.FragmentFlowID = fragmentFlowId;
                                 scoreCache.LCIAMethodID = lciaMethodItem.LCIAMethodID;
                                 scoreCache.ImpactScore = impactScore;
-                                _scoreCacheService.InsertGraph(scoreCache);
-
+                                scoreCache.ObjectState = ObjectState.Added;
+                                _scoreCacheService.InsertOrUpdateGraph(scoreCache);
+                                
                             }
 
                         }
-                        _unitOfWork.Save();
+                        _unitOfWork.SaveChanges();
                     break;
                 case 2:
                      foreach (var lciaMethodItem in lciaMethods)
@@ -535,11 +544,12 @@ namespace Services
                                 scoreCache.FragmentFlowID = fragmentFlowId;
                                 scoreCache.LCIAMethodID = lciaMethodItem.LCIAMethodID;
                                 scoreCache.ImpactScore = Convert.ToDouble(lciaScore.Select(a => a.Result).FirstOrDefault());
-                                _scoreCacheService.InsertGraph(scoreCache);
+                                scoreCache.ObjectState = ObjectState.Added;
+                                _scoreCacheService.InsertOrUpdateGraph(scoreCache);
                             }
                         }
 
-                        _unitOfWork.Save();
+                        _unitOfWork.SaveChanges();
 
                     break;
             }

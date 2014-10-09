@@ -1,13 +1,16 @@
 ﻿using Entities.Models;
 using LcaDataModel;
 using Ninject;
+using Repository.Pattern.Repositories;
+using Repository.Pattern.UnitOfWork;
+using Service.Pattern;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Services
+namespace CalRecycleLCA.Services
 {
     public class LCIAComputationV2 : ILCIAComputationV2
     {
@@ -125,7 +128,7 @@ namespace Services
 
         public IEnumerable<LCIAModel> LCIACompute(int processId, int scenarioId)
         {
-            var lciaMethods = _lciaMethodService.Query().Get();
+            var lciaMethods = _lciaMethodService.Queryable();
             var result = ProcessLCIA(processId, lciaMethods, scenarioId);
             return result;
 
@@ -187,8 +190,9 @@ namespace Services
             // returns a list of flows: FlowID, DirectionID, Result
             // Param types: ProcessEmissionParam
             // FlowPropertyParam + ProcessDissipationParam
-            var inventory = _processFlowService.Query().Filter(x => x.ProcessID == processId).Get()
-          .GroupJoin(_processEmissionParamService.Query().Get() // Target table
+            var inventory = _processFlowService.Queryable()
+                .Where(x => x.ProcessID == processId)
+          .GroupJoin(_processEmissionParamService.Queryable() // Target table
       , pf => pf.ProcessFlowID
       , pep => pep.ProcessFlowID
       , (pf, pep) => new { processFlows = pf, processEmmissionParams = pep })
@@ -202,7 +206,7 @@ namespace Services
           Result = s.processFlows.Result,
           ParamValue = processEmmissionParams == null ? 0 : processEmmissionParams.Value
       })
-        .GroupJoin(_paramService.Query().Get() // Target table
+        .GroupJoin(_paramService.Queryable() // Target table
       , pep => pep.ParamID
       , p => p.ParamID
       , (pep, p) => new { processEmmissionParams = pep, parameters = p })
@@ -251,9 +255,9 @@ namespace Services
         public IEnumerable<LCIAModel> ComputeProcessLCIA(IEnumerable<InventoryModel> inventory, LCIAMethod lciaMethodItem, int? scenarioId)
         {
             var lcias = inventory
-                .Join(_lciaService.Query().Filter(l => l.LCIAMethodID == lciaMethodItem.LCIAMethodID && l.FlowID != null).Get(), i => i.FlowID, l => l.FlowID, (i, l) => new { i, l })
-                .Join(_lciaMethodService.Query().Filter(lm => lm.LCIAMethodID == lciaMethodItem.LCIAMethodID).Get(), l => l.l.LCIAMethodID, lm => lm.LCIAMethodID, (l, lm) => new { l, lm })
-                 .GroupJoin(_characterizationParamService.Query().Get() // Target table
+                .Join(_lciaService.Queryable().Where(x => x.FlowID != null && x.Geography == null), i => i.FlowID, l => l.FlowID, (i, l) => new { i, l })
+                .Join(_lciaMethodService.Queryable().Where(x => x.LCIAMethodID == lciaMethodItem.LCIAMethodID), l => l.l.LCIAMethodID, lm => lm.LCIAMethodID, (l, lm) => new { l, lm })
+                 .GroupJoin(_characterizationParamService.Queryable() // Target table
       , l => l.l.l.LCIAID
       , cp => cp.LCAID
       , (l, cp) => new { lcias = l, characterizationParams = cp })
@@ -270,7 +274,7 @@ namespace Services
           Geography = s.lcias.l.l.Geography,
           Factor = s.lcias.l.l.Factor
       })
-      .GroupJoin(_paramService.Query().Get() // Target table
+      .GroupJoin(_paramService.Queryable() // Target table
       , cp => cp.ParamID
       , p => p.ParamID
       , (cp, p) => new { characterizationParams = cp, parameters = p })

@@ -1,5 +1,6 @@
 namespace LcaDataModel
 {
+    using Repository.Pattern.Ef6;
     using System;
     using System.Collections.Generic;
     using System.ComponentModel.DataAnnotations;
@@ -7,7 +8,7 @@ namespace LcaDataModel
     using System.Data.Entity.Spatial;
 
     [Table("FragmentSubstitution")]
-    public partial class FragmentSubstitution
+    public partial class FragmentSubstitution : Entity
     {
         [Key]
         [Column(Order = 1)]
