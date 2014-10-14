@@ -1,5 +1,6 @@
 namespace LcaDataModel
 {
+    using Repository.Pattern.Ef6;
     using System;
     using System.Collections.Generic;
     using System.ComponentModel.DataAnnotations;
@@ -7,7 +8,7 @@ namespace LcaDataModel
     using System.Data.Entity.Spatial;
 
     [Table("NodeEmissionParam")]
-    public partial class NodeEmissionParam
+    public partial class NodeEmissionParam : Entity
     {
         public int NodeEmissionParamID { get; set; }
 

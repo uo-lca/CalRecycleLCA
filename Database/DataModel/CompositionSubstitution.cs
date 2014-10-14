@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Repository.Pattern.Ef6;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -8,7 +9,8 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace LcaDataModel {
     [Table("CompositionSubstitution")]
-    public partial class CompositionSubstitution {
+    public partial class CompositionSubstitution : Entity 
+    {
         [Key]
         [Column(Order = 1)]
         public int ProcessCompositionID { get; set; }

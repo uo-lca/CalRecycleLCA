@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.ComponentModel.DataAnnotations.Schema;
+using Repository.Pattern.Ef6;
 
 namespace LcaDataModel {
     /// <summary>
@@ -16,7 +17,7 @@ namespace LcaDataModel {
         int ID { get; set; }
     }
 
-    public partial class Background : IEntity {
+    public partial class Background : Entity, IEntity {
         [NotMapped]
         public int ID {
             get { return BackgroundID; }
@@ -24,7 +25,8 @@ namespace LcaDataModel {
         }
     }
 
-    public partial class Category : IEntity {
+    public partial class Category : Entity, IEntity
+    {
         [NotMapped]
         public int ID {
             get { return CategoryID; }
@@ -32,7 +34,8 @@ namespace LcaDataModel {
         }
     }
 
-    public partial class CategorySystem : IEntity {
+    public partial class CategorySystem : Entity, IEntity
+    {
         [NotMapped]
         public int ID {
             get { return CategorySystemID; }
@@ -40,7 +43,8 @@ namespace LcaDataModel {
         }
     }
 
-    public partial class CompositionModel : IEntity {
+    public partial class CompositionModel : Entity, IEntity
+    {
         [NotMapped]
         public int ID {
             get { return CompositionModelID; }
@@ -48,7 +52,8 @@ namespace LcaDataModel {
         }
     }
 
-    public partial class CompositionData : IEntity {
+    public partial class CompositionData : Entity, IEntity
+    {
         [NotMapped]
         public int ID {
             get { return CompositionDataID; }
@@ -56,7 +61,8 @@ namespace LcaDataModel {
         }
     }
 
-    public partial class DependencyParam : IEntity {
+    public partial class DependencyParam : Entity, IEntity
+    {
         [NotMapped]
         public int ID {
             get { return DependencyParamID; }
@@ -65,7 +71,8 @@ namespace LcaDataModel {
     }
 
     // Weak entity - related to DependencyParam
-    public partial class DistributionParam : IEntity {
+    public partial class DistributionParam : Entity, IEntity
+    {
         [NotMapped]
         public int ID {
             get { return DependencyParamID; }
@@ -73,7 +80,8 @@ namespace LcaDataModel {
         }
     }
 
-    public partial class FlowFlowProperty : IEntity {
+    public partial class FlowFlowProperty : Entity, IEntity
+    {
         [NotMapped]
         public int ID {
             get { return FlowFlowPropertyID; }
@@ -81,7 +89,8 @@ namespace LcaDataModel {
         }
     }
 
-    public partial class FragmentFlow : IEntity {
+    public partial class FragmentFlow : Entity, IEntity
+    {
         [NotMapped]
         public int ID {
             get { return FragmentFlowID; }
@@ -89,7 +98,8 @@ namespace LcaDataModel {
         }
     }
 
-    public partial class FragmentNodeProcess : IEntity {
+    public partial class FragmentNodeProcess : Entity, IEntity
+    {
         [NotMapped]
         public int ID {
             get { return FragmentNodeProcessID; }
@@ -97,7 +107,8 @@ namespace LcaDataModel {
         }
     }
 
-    public partial class FragmentNodeFragment : IEntity {
+    public partial class FragmentNodeFragment : Entity, IEntity
+    {
         [NotMapped]
         public int ID {
             get { return FragmentNodeFragmentID; }
@@ -105,7 +116,8 @@ namespace LcaDataModel {
         }
     }
 
-    public partial class LCIA : IEntity {
+    public partial class LCIA : Entity, IEntity
+    {
         [NotMapped]
         public int ID {
             get { return LCIAID; }
@@ -113,7 +125,8 @@ namespace LcaDataModel {
         }
     }
 
-    public partial class Param : IEntity {
+    public partial class Param : Entity, IEntity
+    {
         [NotMapped]
         public int ID {
             get { return ParamID; }
@@ -121,7 +134,8 @@ namespace LcaDataModel {
         }
     }
 
-    public partial class ProcessComposition : IEntity {
+    public partial class ProcessComposition : Entity, IEntity
+    {
         [NotMapped]
         public int ID {
             get { return ProcessCompositionID; }
@@ -129,7 +143,8 @@ namespace LcaDataModel {
         }
     }
 
-    public partial class ProcessFlow : IEntity {
+    public partial class ProcessFlow : Entity, IEntity
+    {
         [NotMapped]
         public int ID {
             get { return ProcessFlowID; }
@@ -137,7 +152,8 @@ namespace LcaDataModel {
         }
     }
 
-    public partial class Scenario : IEntity {
+    public partial class Scenario : Entity, IEntity
+    {
         [NotMapped]
         public int ID {
             get { return ScenarioID; }
@@ -145,7 +161,8 @@ namespace LcaDataModel {
         }
     }
 
-    public partial class ScenarioGroup : IEntity {
+    public partial class ScenarioGroup : Entity, IEntity
+    {
         [NotMapped]
         public int ID {
             get { return ScenarioGroupID; }
@@ -153,7 +170,8 @@ namespace LcaDataModel {
         }
     }
 
-    public partial class UnitConversion : IEntity {
+    public partial class UnitConversion : Entity, IEntity
+    {
         [NotMapped]
         public int ID {
             get { return UnitConversionID; }
@@ -161,7 +179,8 @@ namespace LcaDataModel {
         }
     }
 
-    public partial class User : IEntity {
+    public partial class User : Entity, IEntity
+    {
         [NotMapped]
         public int ID {
             get { return UserID; }
@@ -174,7 +193,8 @@ namespace LcaDataModel {
     /// All ILCD entities have have a reference to ILCDEntity, the table where UUIDs 
     /// and metadata are stored.
     /// </summary>
-    public interface IIlcdEntity : IEntity {
+    public interface IIlcdEntity : IEntity
+    {
         // UUID accessor signature  
         [NotMapped]
         //string UUID { get; set; }

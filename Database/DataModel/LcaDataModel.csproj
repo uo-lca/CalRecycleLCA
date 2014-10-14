@@ -81,7 +81,6 @@
     <Compile Include="ImpactCategory.cs" />
     <Compile Include="IndicatorType.cs" />
     <Compile Include="Interface.cs" />
-    <Compile Include="IObjectState.cs" />
     <Compile Include="LCIA.cs" />
     <Compile Include="LCIAMethod.cs" />
     <Compile Include="Migrations\Configuration.cs" />
@@ -89,7 +88,6 @@
     <Compile Include="NodeDissipationParam.cs" />
     <Compile Include="NodeEmissionParam.cs" />
     <Compile Include="NodeType.cs" />
-    <Compile Include="ObjectState.cs" />
     <Compile Include="Param.cs" />
     <Compile Include="ParamType.cs" />
     <Compile Include="Process.cs" />
@@ -121,6 +119,16 @@
     <None Include="packages.config">
       <SubType>Designer</SubType>
     </None>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\LCIAToolAPI\Frameworks\Repository.Pattern.Ef6\Repository.Pattern.Ef6.csproj">
+      <Project>{f68a1d19-93fb-47c1-a22b-42bea3e4fd8c}</Project>
+      <Name>Repository.Pattern.Ef6</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\LCIAToolAPI\Frameworks\Repository.Pattern\Repository.Pattern.csproj">
+      <Project>{6e682a14-c872-4813-b620-76e108dea683}</Project>
+      <Name>Repository.Pattern</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
