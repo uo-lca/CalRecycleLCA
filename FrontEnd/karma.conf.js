@@ -8,10 +8,10 @@ module.exports = function(config){
       'app/bower_components/angular-route/angular-route.js',
       'app/bower_components/angular-resource/angular-resource.js',
       'app/bower_components/angular-mocks/angular-mocks.js',
+      'app/bower_components/d3/d3.js',
+      'app/bower_components/ngprogress/build/ngProgress.js',
       'app/components/**/*.js',
-      'app/view*/**/*.js',
-      'app/directives/*.js',
-      'app/services/*.js',
+      'app/fragment-sankey/**/*.js',
       'app/scenarios/**/*.js'
     ],
 
@@ -19,14 +19,15 @@ module.exports = function(config){
 
     frameworks: ['jasmine'],
 
-    browsers : ['Chrome'],
-
     plugins : [
-            'karma-chrome-launcher',
-            'karma-firefox-launcher',
-            'karma-jasmine',
-            'karma-junit-reporter'
-            ],
+          'karma-chrome-launcher',
+          'karma-firefox-launcher',
+          'karma-ie-launcher',
+          'karma-jasmine',
+          'karma-junit-reporter'
+      ],
+
+    browsers : ['Chrome', 'Firefox', 'IE'],
 
     junitReporter : {
       outputFile: 'test_out/unit.xml',
