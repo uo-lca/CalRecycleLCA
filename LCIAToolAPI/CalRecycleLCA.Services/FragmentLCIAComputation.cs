@@ -472,7 +472,10 @@ namespace CalRecycleLCA.Services
                                                                                              LCIAMethodID = y.LCIAMethodID });
             
             IEnumerable<LCIAMethod> needLciaMethods = lciaMethods.Except(haveLciaMethods);
-            
+
+            if (needLciaMethods == null)
+                return;
+
             switch (nodeTypeId)
             {
                 case 1:
@@ -490,11 +493,11 @@ namespace CalRecycleLCA.Services
                             _characterizationParamService,
                             _paramService);
 
-                        var scores = lciaComputation.ProcessLCIA(targetId, lciaMethods, scenarioId);
+                        var scores = lciaComputation.ProcessLCIA(targetId, needLciaMethods, scenarioId);
 
                         IList<ScoreCache> scoreCaches = new List<ScoreCache>();
 
-                        foreach (var lciaMethodItem in lciaMethods.AsQueryable())
+                        foreach (var lciaMethodItem in needLciaMethods.AsQueryable())
                         {
                             double impactScore = 0;
                             if (scores.Any(s => s.LCIAMethodID == lciaMethodItem.LCIAMethodID))
