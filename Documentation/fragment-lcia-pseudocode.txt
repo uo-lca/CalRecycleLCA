@@ -136,14 +136,14 @@ target_id = ResolveBackground ( flow_id, direction_id, scenario_id, &node_type_i
 {
   // resolve a given flow to a particular background system
   // first: check to see if there is a scenario-specific value
-  B = SELECT NodeTypeID, TargetID FROM ScenarioBackground
+  B = SELECT NodeTypeID, ILCDEntityID FROM ScenarioBackground
       WHERE ScenarioID = scenario_id
         AND FlowID = flow_id
 	AND DirectionID = direction_id;
 
   if isempty(B)
   {
-    B = SELECT NodeTypeID, TargetID FROM Background
+    B = SELECT NodeTypeID, ILCDEntityID FROM Background
       	WHERE FlowID = flow_id
 	  AND DirectionID = direction_id;
 
@@ -157,12 +157,12 @@ target_id = ResolveBackground ( flow_id, direction_id, scenario_id, &node_type_i
   switch node_type_id
     case 1 // process
     {
-      target_id = _processService.Queryable().Where(x => x.ILCDEntityID == B.TargetID)
+      target_id = _processService.Queryable().Where(x => x.ILCDEntityID == B.ILCDEntityID)
 		  .Select( x.ProcessID )
     }
     case 2 // fragment
     {
-      target_id = _fragmentService.Queryable().Where(x => x.ILCDEntityID == B.TargetID)
+      target_id = _fragmentService.Queryable().Where(x => x.ILCDEntityID == B.ILCDEntityID)
 		  .Select( x.FragmentID )
     }
     otherwise
