@@ -154,9 +154,19 @@ target_id = ResolveBackground ( flow_id, direction_id, scenario_id, &node_type_i
   // this is supposed to update the value of the reference
   node_type_id = B.NodeTypeID;
 
-  if node_type_id == 5
-    target_id = 0;
-  else
-    target_id = B.TargetID;
+  switch node_type_id
+    case 1 // process
+    {
+      target_id = _processService.Queryable().Where(x => x.ILCDEntityID == B.TargetID)
+		  .Select( x.ProcessID )
+    }
+    case 2 // fragment
+    {
+      target_id = _fragmentService.Queryable().Where(x => x.ILCDEntityID == B.TargetID)
+		  .Select( x.FragmentID )
+    }
+    otherwise
+     target_id = 0;
+  end
 }
 
