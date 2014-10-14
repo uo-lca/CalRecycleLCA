@@ -10,6 +10,7 @@ using Repository.Pattern.Infrastructure;
 using Repository.Pattern.UnitOfWork;
 using Service.Pattern;
 using System.Runtime.CompilerServices;
+using System.Collections;
 
 namespace CalRecycleLCA.Services
 {
@@ -23,29 +24,29 @@ namespace CalRecycleLCA.Services
         // LcaDataModel services
         //
         [Inject]
-        private readonly IService<Category> _CategoryService;
+        private readonly ICategoryService _CategoryService;
         [Inject]
-        private readonly IService<Classification> _ClassificationService;
+        private readonly IClassificationService _ClassificationService;
         [Inject]
-        private readonly IService<Fragment> _FragmentService;
+        private readonly IFragmentService _FragmentService;
         [Inject]
-        private readonly IService<FragmentFlow> _FragmentFlowService;
+        private readonly IFragmentFlowService _FragmentFlowService;
         [Inject]
-        private readonly IService<Flow> _FlowService;
+        private readonly IFlowService _FlowService;
         [Inject]
-        private readonly IService<FlowProperty> _FlowPropertyService;
+        private readonly IFlowPropertyService _FlowPropertyService;
         [Inject]
-        private readonly IService<FlowType> _FlowTypeService;
+        private readonly IFlowTypeService _FlowTypeService;
         [Inject]
-        private readonly IService<ImpactCategory> _ImpactCategoryService;
+        private readonly IImpactCategoryService _ImpactCategoryService;
         [Inject]
-        private readonly IService<LCIAMethod> _LciaMethodService;
+        private readonly ILCIAMethodService _LciaMethodService;
         [Inject]
-        private readonly IService<Process> _ProcessService;
+        private readonly IProcessService _ProcessService;
         [Inject]
-        private readonly IService<ProcessFlow> _ProcessFlowService;
+        private readonly IProcessFlowService _ProcessFlowService;
         [Inject]
-        private readonly IService<Scenario> _ScenarioService;
+        private readonly IScenarioService _ScenarioService;
         //
         // Traversal and Computation components
         //
@@ -69,21 +70,21 @@ namespace CalRecycleLCA.Services
         /// Constructor for use with Ninject dependency injection
         /// </summary>
         public ResourceServiceFacade(
-                               IService<Category> categoryService,
-                               IService<Classification> classificationService,
-                               IService<Fragment> fragmentService,
-                               IService<FragmentFlow> fragmentFlowService,
+                               ICategoryService categoryService,
+                               IClassificationService classificationService,
+                               IFragmentService fragmentService,
+                               IFragmentFlowService fragmentFlowService,
                                IFragmentTraversalV2 fragmentTraversalV2,
                                IFragmentLCIAComputation fragmentLCIAComputation,
-                               IService<Flow> flowService,
-                               IService<FlowProperty> flowPropertyService,
-                               IService<FlowType> flowTypeService,
-                               IService<ImpactCategory> impactCategoryService,
+                               IFlowService flowService,
+                               IFlowPropertyService flowPropertyService,
+                               IFlowTypeService flowTypeService,
+                               IImpactCategoryService impactCategoryService,
                                ILCIAComputationV2 lciaComputation,
-                               IService<LCIAMethod> lciaMethodService,
-                               IService<Process> processService,
-                               IService<ProcessFlow> processFlowService,
-                               IService<Scenario> scenarioService) 
+                               ILCIAMethodService lciaMethodService,
+                               IProcessService processService,
+                               IProcessFlowService processFlowService,
+                               IScenarioService scenarioService) 
         {
             _CategoryService = verifiedDependency(categoryService);
             _ClassificationService = verifiedDependency(classificationService);
@@ -228,10 +229,15 @@ namespace CalRecycleLCA.Services
             int? maxHL;
             string categoryName;
 
+            //IEnumerable<Classification> classes = _ClassificationService.Query()
+            //    .Include(c => c.Category)
+            //    .Filter(c => c.ILCDEntityID == f.ILCDEntityID);
+
+
             IEnumerable<Classification> classes = _ClassificationService.Query()
-                .Include(c => c.Category)
-                .Filter(c => c.ILCDEntityID == f.ILCDEntityID)
-                .Get();
+                                               .Include(c => c.Category)
+                                               .Select().Where(c => c.ILCDEntityID == f.ILCDEntityID);
+            
 
             maxHL = classes.Max(c => Convert.ToInt32(c.Category.HierarchyLevel));
             categoryName = classes.Where(c => c.Category.HierarchyLevel == maxHL).Single().Category.Name;
@@ -318,17 +324,17 @@ namespace CalRecycleLCA.Services
          /// </summary>
          public IEnumerable<LCIAMethodResource> GetLCIAMethodResources(int? impactCategoryID = null) {
             IEnumerable<LCIAMethod> lciaMethods;
-            Repository.RepositoryQuery<LCIAMethod> query = 
-                _LciaMethodService.Query()
-                .Include(lm => lm.IndicatorType)
-                .Include(lm => lm.FlowProperty.UnitGroup.UnitConversion);
+            var query = _LciaMethodService.Query()
+                                                .Include(x => x.IndicatorType)
+                                                .Include(x => x.FlowProperty.UnitGroup.UnitConversion)
+                                                .Select()
+                                                .ToList();
 
             if (impactCategoryID == null) {
-                lciaMethods = query.Get();
+                lciaMethods = ((IEnumerable)query).Cast<LCIAMethod>();
             }
             else {
-                lciaMethods = query.
-                              Filter(d => d.ImpactCategoryID == impactCategoryID).Get();
+                lciaMethods = ((IEnumerable)query).Cast<LCIAMethod>().Where(d => d.ImpactCategoryID == impactCategoryID);
             }
             return lciaMethods.Select(lm => Transform(lm)).ToList();
         }
@@ -341,13 +347,13 @@ namespace CalRecycleLCA.Services
         /// <returns>List of FragmentFlowResource objects</returns>
         public IEnumerable<FragmentFlowResource> GetFragmentFlowResources(int fragmentID, int scenarioID = 0) {
             _FragmentTraversalV2.Traverse(fragmentID, scenarioID);
-            IEnumerable<FragmentFlow> fragmentFlows = _FragmentFlowService.Query()
-                                                        .Include(i => i.FragmentNodeFragments)
-                                                        .Include(i => i.FragmentNodeProcesses)
-                                                        .Include(i => i.NodeCaches)
-                                                        .Include(i => i.Flow.FlowFlowProperties)
-                                                        .Filter(q => q.FragmentID == fragmentID)
-                                                        .Get();
+            var fragmentFlows = _FragmentFlowService.Query()
+                                                .Include(x => x.FragmentNodeFragments)
+                                                .Include(x => x.FragmentNodeProcesses)
+                                                .Include(x => x.NodeCaches)
+                                                .Include(x => x.Flow.FlowFlowProperties)
+                                                .Select().Where(q => q.FragmentID == fragmentID)
+                                                .ToList();
             return fragmentFlows.Select(ff => Transform(ff, scenarioID)).ToList();
         }
 
@@ -357,15 +363,22 @@ namespace CalRecycleLCA.Services
         /// <param name="relType">Relationship class type (FragmentFlow or ProcessFlow)</param>
         /// <param name="relID">ID of related fragment or process</param>
         /// <returns>List of FlowResource objects</returns>
-        public IEnumerable<FlowResource> GetFlows(Type relType, int relID) {
-            Repository.RepositoryQuery<Flow> flowQuery = _FlowService.Query();
-            if (relType == typeof(FragmentFlow)) { 
-                flowQuery = flowQuery.Filter(f => f.FragmentFlows.Any(ff => ff.FragmentID == relID));
-            } else if (relType == typeof(ProcessFlow)) {
-                flowQuery = flowQuery.Filter(f => f.ProcessFlows.Any(pf => pf.ProcessID == relID));
+        public IEnumerable<FlowResource> GetFlows(Type relType, int relID)
+        {
+            var flowQuery = _FlowService.Query()
+                 .Include(x => x.FragmentFlows)
+                 .Include(x => x.ProcessFlows).Select();
+            if (relType == typeof(FragmentFlow))
+            {
+                flowQuery = flowQuery.Where(f => f.FragmentFlows.Any(ff => ff.FragmentID == relID)).ToList();
             }
-            return flowQuery.Get().Select(f => Transform(f)).ToList();
+            else if (relType == typeof(ProcessFlow))
+            {
+                flowQuery = flowQuery.Where(f => f.ProcessFlows.Any(pf => pf.ProcessID == relID)).ToList();
+            }
+            return flowQuery.Select(f => Transform(f)).ToList();
         }
+
 
         /// <summary>
         /// Get list of flows related to a fragment (via FragmentFlow)
@@ -380,23 +393,25 @@ namespace CalRecycleLCA.Services
         /// Get list of processflow resources
         /// </summary>
         public IEnumerable<ProcessFlowResource> GetProcessFlows(int processID) {
-            IEnumerable<ProcessFlow> processFlows = _ProcessFlowService.Query()
-                .Include(pf => pf.Flow)
-                .Filter(pf => pf.ProcessID == processID)
-                .Get();
+            var processFlows = _ProcessFlowService.Query()
+                                                .Include(x => x.Flow)
+                                                .Select()
+                                                .Where(pf => pf.ProcessID == processID).ToList();
             return processFlows.Select(pf => Transform(pf)).ToList();
-
         }
 
         /// <summary>
         /// Get list of flow properties related to a process (via FlowFlowProperty and ProcessFlow)
         /// </summary>
         public IEnumerable<FlowPropertyResource> GetFlowPropertiesByProcess(int processID) {
-            IEnumerable<FlowProperty> flowProperties = _FlowPropertyService.Query()
-                .Include(fp => fp.UnitGroup.UnitConversion)
-                .Filter(fp => fp.Flows.Any(f => f.ProcessFlows.Any(pf => pf.ProcessID == processID)))
-                .Get();
-            return flowProperties.Select(fp => Transform(fp)).ToList();
+            //IEnumerable<FlowProperty> flowProperties = _FlowPropertyService.Query()
+            //    .Include(fp => fp.UnitGroup.UnitConversion)
+            //    .Filter(fp => fp.Flows.Any(f => f.ProcessFlows.Any(pf => pf.ProcessID == processID)))
+            //    .Get();
+            var flowProperties = _FlowPropertyService.Queryable()
+                .Where((fp => fp.Flows.Any(f => f.ProcessFlows.Any(pf => pf.ProcessID == processID))))
+                .Select(x => new { x, x.UnitGroup.UnitConversion }).AsEnumerable();  //Emulates .Include
+            return flowProperties.Select(fp => Transform(fp.x)).ToList();
         }
 
         /// <summary>
@@ -405,11 +420,10 @@ namespace CalRecycleLCA.Services
         /// <param name="fragmentID">FragmentID filter</param>
         /// <returns>List of FlowPropertyResource objects</returns>
         public IEnumerable<FlowPropertyResource> GetFlowPropertiesByFragment(int fragmentID) {
-            IEnumerable<FlowProperty> flowProperties = _FlowPropertyService.Query()
-                .Include(fp => fp.UnitGroup.UnitConversion)
-                .Filter(fp => fp.Flows.Any(f => f.FragmentFlows.Any(ff => ff.FragmentID == fragmentID)))
-                .Get();
-            return flowProperties.Select(fp => Transform(fp)).ToList();
+            var flowProperties = _FlowPropertyService.Queryable()
+                .Where(fp => fp.Flows.Any(f => f.FragmentFlows.Any(ff => ff.FragmentID == fragmentID)))
+               .Select(x => new { x, x.UnitGroup.UnitConversion }).AsEnumerable();  //Emulates .Include
+            return flowProperties.Select(fp => Transform(fp.x)).ToList();
         }
 
          /// <summary>
@@ -418,7 +432,7 @@ namespace CalRecycleLCA.Services
         /// <returns>List of FragmentResource objects</returns>
         public IEnumerable<FragmentResource> GetFragmentResources()
         {
-            IEnumerable<Fragment> fragments = _FragmentService.Query().Get();
+            IEnumerable<Fragment> fragments = _FragmentService.Queryable();
             return fragments.Select(f => Transform(f)).ToList();
         }
 
@@ -428,7 +442,7 @@ namespace CalRecycleLCA.Services
         /// <param name="fragmentID">FragmentID</param>
         /// <returns>FragmentResource</returns>
         public FragmentResource GetFragmentResource(int fragmentID) {
-            Fragment fragment = _FragmentService.FindById(fragmentID);
+            Fragment fragment = _FragmentService.Find(fragmentID);
             if (fragment == null) {
                 // error handling deferred to controller
                 return null;
@@ -444,13 +458,29 @@ namespace CalRecycleLCA.Services
         /// <param name="flowTypeID">Optional process flow type filter</param>
         /// <returns>List of ProcessResource objects</returns>
         public IEnumerable<ProcessResource> GetProcesses(int? flowTypeID=null) {
-            var query = _ProcessService.Query().Include(p => p.ILCDEntity);
+            var query = _ProcessService.Query()
+                .Include(x => x.ILCDEntity)
+                .Include(x => x.ProcessFlows.Select(p => p.Flow))
+
+                .Select().ToList();
             if (flowTypeID != null) {
-                query = query.Filter(p => p.ProcessFlows.Any(pf => pf.Flow.FlowTypeID == flowTypeID));
+                query = query.Where(p => p.ProcessFlows.Any(pf => pf.Flow.FlowTypeID == flowTypeID)).ToList();
             }
-            IEnumerable<Process> pData = query.Get();
+            var pData = query;
             return pData.Select(p => Transform(p)).ToList();
         }
+
+        //public IEnumerable<ProcessResource> GetProcesses(int? flowTypeID = null)
+        //{
+        //    var query = _ProcessService.Query().Include(p => p.ILCDEntity);
+        //    if (flowTypeID != null)
+        //    {
+        //        query = query.Filter(p => p.ProcessFlows.Any(pf => pf.Flow.FlowTypeID == flowTypeID));
+        //    }
+        //    IEnumerable<Process> pData = query.Get();
+        //    return pData.Select(p => Transform(p)).ToList();
+        //}
+
 
         /// <summary>
         /// Get ImpactCategory data and transform to API resource model
@@ -458,9 +488,8 @@ namespace CalRecycleLCA.Services
         /// </summary>
         /// <returns>List of ImpactCategoryResource objects</returns>
         public IEnumerable<ImpactCategoryResource> GetImpactCategories() {
-            IEnumerable<ImpactCategory> data = _ImpactCategoryService.Query()
-                .Filter(i => i.LCIAMethods.Count() > 0)
-                .Get();
+            IEnumerable<ImpactCategory> data = _ImpactCategoryService.Queryable()
+                .Where(i => i.LCIAMethods.Count() > 0);
             return data.Select(d => new ImpactCategoryResource {
                 ImpactCategoryID = d.ID,
                 Name = d.Name
@@ -473,7 +502,7 @@ namespace CalRecycleLCA.Services
         /// </summary>
         /// <returns>LCIAResultResource or null if lciaMethodID not found</returns> 
         public LCIAResultResource GetLCIAResultResource(int processID, int lciaMethodID, int scenarioID = 0) {
-            LCIAMethod lciaMethod = _LciaMethodService.FindById(lciaMethodID);
+            LCIAMethod lciaMethod = _LciaMethodService.Find(lciaMethodID);
             if (lciaMethod == null) {
                 // TODO: figure how to handle this sort of error
                 return null;
@@ -521,7 +550,7 @@ namespace CalRecycleLCA.Services
         /// <param name="scenarioGroupID">Scenario group of the user making request</param>
         /// <returns>List of LCIAResultResource objects</returns> 
         public IEnumerable<FragmentLCIAResource> GetFragmentLCIAResultsAllScenarios(int fragmentID, int lciaMethodID, int scenarioGroupID = 1) {
-            IEnumerable<Scenario> scenarios = _ScenarioService.Query().Filter(s => s.ScenarioGroupID == scenarioGroupID).Get();
+            IEnumerable<Scenario> scenarios = _ScenarioService.Queryable().Where(s => s.ScenarioGroupID == scenarioGroupID);
             return scenarios.Select(s => GetFragmentLCIAResults(fragmentID, lciaMethodID, s.ScenarioID)).ToList();
         }
 
@@ -530,7 +559,7 @@ namespace CalRecycleLCA.Services
         /// </summary>
         /// <returns>List of FlowTypeResource objects</returns>
         public IEnumerable<FlowTypeResource> GetFlowTypes() {
-            IEnumerable<FlowType> data = _FlowTypeService.Query().Get();
+            IEnumerable<FlowType> data = _FlowTypeService.Queryable();
             return data.Select(d => new FlowTypeResource {
                 FlowTypeID = d.ID,
                 Name = d.Name

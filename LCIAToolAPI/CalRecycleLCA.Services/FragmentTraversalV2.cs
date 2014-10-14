@@ -17,42 +17,42 @@ namespace CalRecycleLCA.Services
     public class FragmentTraversalV2 : IFragmentTraversalV2
     {
         [Inject]
-        private readonly IService<Flow> _flowService;
+        private readonly IFlowService _flowService;
         [Inject]
-        private readonly IService<FragmentFlow> _fragmentFlowService;
+        private readonly IFragmentFlowService _fragmentFlowService;
         [Inject]
-        private readonly IService<NodeCache> _nodeCacheService;
+        private readonly INodeCacheService _nodeCacheService;
         [Inject]
-        private readonly IService<FragmentNodeProcess> _fragmentNodeProcessService;
+        private readonly IFragmentNodeProcessService _fragmentNodeProcessService;
         [Inject]
-        private readonly IService<ProcessFlow> _processFlowService;
+        private readonly IProcessFlowService _processFlowService;
         [Inject]
-        private readonly IService<FragmentNodeFragment> _fragmentNodeFragmentService;
+        private readonly IFragmentNodeFragmentService _fragmentNodeFragmentService;
         [Inject]
-        private readonly IService<FlowFlowProperty> _flowFlowPropertyService;
+        private readonly IFlowFlowPropertyService _flowFlowPropertyService;
         [Inject]
-        private readonly IService<DependencyParam> _dependencyParamService;
+        private readonly IDependencyParamService _dependencyParamService;
         [Inject]
-        private readonly IService<Param> _paramService;
+        private readonly IParamService _paramService;
         [Inject]
-        private readonly IService<FlowPropertyParam> _flowPropertyParamService;
+        private readonly IFlowPropertyParamService _flowPropertyParamService;
         [Inject]
-        private readonly IService<Fragment> _fragmentService;
+        private readonly IFragmentService _fragmentService;
         [Inject]
         private readonly IUnitOfWork _unitOfWork;
 
 
-        public FragmentTraversalV2(IService<Flow> flowService,
-            IService<FragmentFlow> fragmentFlowService,
-            IService<NodeCache> nodeCacheService,
-            IService<FragmentNodeProcess> fragmentNodeProcessService,
-            IService<ProcessFlow> processFlowService,
-            IService<FragmentNodeFragment> fragmentNodeFragmentService,
-            IService<FlowFlowProperty> flowFlowPropertyService,
-            IService<DependencyParam> dependencyParamService,
-            IService<FlowPropertyParam> flowPropertyParamService,
-            IService<Fragment> fragmentService,
-            IService<Param> paramService,
+        public FragmentTraversalV2(IFlowService flowService,
+            IFragmentFlowService fragmentFlowService,
+            INodeCacheService nodeCacheService,
+            IFragmentNodeProcessService fragmentNodeProcessService,
+            IProcessFlowService processFlowService,
+            IFragmentNodeFragmentService fragmentNodeFragmentService,
+            IFlowFlowPropertyService flowFlowPropertyService,
+            IDependencyParamService dependencyParamService,
+            IFlowPropertyParamService flowPropertyParamService,
+            IFragmentService fragmentService,
+            IParamService paramService,
             IUnitOfWork unitOfWork)
         {
             _flowService = flowService;

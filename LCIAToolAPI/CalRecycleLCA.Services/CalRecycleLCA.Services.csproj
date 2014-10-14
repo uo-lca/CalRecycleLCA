@@ -129,16 +129,46 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="BackgroundService.cs" />
+    <Compile Include="CategoryService.cs" />
+    <Compile Include="CharacterizationParamService.cs" />
+    <Compile Include="ClassificationService.cs" />
+    <Compile Include="DependencyParamService.cs" />
+    <Compile Include="FlowFlowPropertyService.cs" />
+    <Compile Include="FlowPropertyEmissionService.cs" />
+    <Compile Include="FlowPropertyParamService.cs" />
+    <Compile Include="FlowPropertyService.cs" />
+    <Compile Include="FlowService.cs" />
+    <Compile Include="FlowTypeService.cs" />
+    <Compile Include="FragmentFlowService.cs" />
     <Compile Include="FragmentLCIAComputation.cs" />
+    <Compile Include="FragmentNodeFragmentService.cs" />
+    <Compile Include="FragmentNodeProcessService.cs" />
+    <Compile Include="FragmentService.cs" />
+    <Compile Include="FragmentSubstitutionService.cs" />
     <Compile Include="FragmentTraversalV2.cs" />
     <Compile Include="IFragmentLCIAComputation.cs" />
     <Compile Include="IFragmentTraversalV2.cs" />
     <Compile Include="ILCIAComputationV2.cs" />
+    <Compile Include="ImpactCategoryService.cs" />
     <Compile Include="IResourceServiceFacade.cs" />
     <Compile Include="ITestGenericService.cs" />
     <Compile Include="LCIAComputationV2.cs" />
+    <Compile Include="LCIAMethodService.cs" />
+    <Compile Include="LCIAService.cs" />
+    <Compile Include="NodeCacheService.cs" />
+    <Compile Include="ParamService.cs" />
+    <Compile Include="ProcessDissipationParamService.cs" />
+    <Compile Include="ProcessDissipationService.cs" />
+    <Compile Include="ProcessEmissionParamService.cs" />
+    <Compile Include="ProcessFlowService.cs" />
+    <Compile Include="ProcessService.cs" />
+    <Compile Include="ProcessSubstitutionService.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="ResourceServiceFacade.cs" />
+    <Compile Include="ScenarioBackgroundService.cs" />
+    <Compile Include="ScenarioService.cs" />
+    <Compile Include="ScoreCacheService.cs" />
     <Compile Include="TestGenericService.cs" />
   </ItemGroup>
   <ItemGroup>

@@ -1,6 +1,4 @@
 ﻿using LcaDataModel;
-using Ninject;
-using Repository;
 using Repository.Pattern.Repositories;
 using Service.Pattern;
 using System;
@@ -9,19 +7,20 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
+
 namespace CalRecycleLCA.Services
 {
-    public interface IProcessFlowService : IService<ProcessFlow>
+    public interface IClassificationService : IService<Classification>
     {
     }
 
-    public class ProcessFlowService : Service<ProcessFlow>, IProcessFlowService
+    public class ClassificationService : Service<Classification>, IClassificationService
     {
-
-         public ProcessFlowService(IRepositoryAsync<ProcessFlow> repository)
+        public ClassificationService(IRepositoryAsync<Classification> repository)
             : base(repository)
         {
-           
+
         }
     }
 }
+

@@ -1,6 +1,4 @@
 ﻿using LcaDataModel;
-using Ninject;
-using Repository;
 using Repository.Pattern.Repositories;
 using Service.Pattern;
 using System;
@@ -11,17 +9,17 @@ using System.Threading.Tasks;
 
 namespace CalRecycleLCA.Services
 {
-    public interface IProcessFlowService : IService<ProcessFlow>
+    public interface IScenarioBackgroundService : IService<ScenarioBackground>
     {
     }
 
-    public class ProcessFlowService : Service<ProcessFlow>, IProcessFlowService
+    public class ScenarioBackgroundService : Service<ScenarioBackground>, IScenarioBackgroundService
     {
-
-         public ProcessFlowService(IRepositoryAsync<ProcessFlow> repository)
+        public ScenarioBackgroundService(IRepositoryAsync<ScenarioBackground> repository)
             : base(repository)
         {
-           
+
         }
     }
+
 }

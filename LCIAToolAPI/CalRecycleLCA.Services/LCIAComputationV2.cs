@@ -15,42 +15,42 @@ namespace CalRecycleLCA.Services
     public class LCIAComputationV2 : ILCIAComputationV2
     {
         [Inject]
-        private readonly IService<ProcessFlow> _processFlowService;
+        private readonly IProcessFlowService _processFlowService;
         [Inject]
-        private readonly IService<ProcessEmissionParam> _processEmissionParamService;
+        private readonly IProcessEmissionParamService _processEmissionParamService;
         [Inject]
-        private readonly IService<LCIAMethod> _lciaMethodService;
+        private readonly ILCIAMethodService _lciaMethodService;
         [Inject]
-        private readonly IService<Flow> _flowService;
+        private readonly IFlowService _flowService;
         [Inject]
-        private readonly IService<FlowFlowProperty> _flowFlowPropertyService;
+        private readonly IFlowFlowPropertyService _flowFlowPropertyService;
         [Inject]
-        private readonly IService<FlowPropertyParam> _flowPropertyParamService;
+        private readonly IFlowPropertyParamService _flowPropertyParamService;
         [Inject]
-        private readonly IService<FlowPropertyEmission> _flowPropertyEmissionService;
+        private readonly IFlowPropertyEmissionService _flowPropertyEmissionService;
         [Inject]
-        private readonly IService<ProcessDissipation> _processDissipationService;
+        private readonly IProcessDissipationService _processDissipationService;
         [Inject]
-        private readonly IService<ProcessDissipationParam> _processDissipationParamService;
+        private readonly IProcessDissipationParamService _processDissipationParamService;
         [Inject]
-        private readonly IService<LCIA> _lciaService;
+        private readonly ILCIAService _lciaService;
         [Inject]
-        private readonly IService<CharacterizationParam> _characterizationParamService;
+        private readonly ICharacterizationParamService _characterizationParamService;
         [Inject]
-        private readonly IService<Param> _paramService;
+        private readonly IParamService _paramService;
 
-        public LCIAComputationV2(IService<ProcessFlow> processFlowService,
-            IService<ProcessEmissionParam> processEmissionParamService,
-            IService<LCIAMethod> lciaMethodService,
-            IService<Flow> flowService,
-            IService<FlowFlowProperty> flowFlowPropertyService,
-            IService<FlowPropertyParam> flowPropertyParamService,
-            IService<FlowPropertyEmission> flowPropertyEmissionService,
-            IService<ProcessDissipation> processDissipationService,
-            IService<ProcessDissipationParam> processDissipationParamService,
-            IService<LCIA> lciaService,
-            IService<CharacterizationParam> characterizationParamService,
-            IService<Param> paramService)
+        public LCIAComputationV2(IProcessFlowService processFlowService,
+            IProcessEmissionParamService processEmissionParamService,
+            ILCIAMethodService lciaMethodService,
+            IFlowService flowService,
+            IFlowFlowPropertyService flowFlowPropertyService,
+            IFlowPropertyParamService flowPropertyParamService,
+            IFlowPropertyEmissionService flowPropertyEmissionService,
+            IProcessDissipationService processDissipationService,
+            IProcessDissipationParamService processDissipationParamService,
+            ILCIAService lciaService,
+            ICharacterizationParamService characterizationParamService,
+            IParamService paramService)
         {
             if (processFlowService == null)
             {

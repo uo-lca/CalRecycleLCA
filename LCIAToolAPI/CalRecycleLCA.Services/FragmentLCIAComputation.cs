@@ -15,79 +15,78 @@ namespace CalRecycleLCA.Services
     public class FragmentLCIAComputation : IFragmentLCIAComputation
     {
         [Inject]
-        private readonly IService<FragmentFlow> _fragmentFlowService;
+        private readonly IFragmentFlowService _fragmentFlowService;
         [Inject]
-        private readonly IService<NodeCache> _nodeCacheService;
+        private readonly INodeCacheService _nodeCacheService;
         [Inject]
         private readonly IService<ScoreCache> _scoreCacheService;
         [Inject]
-        private readonly IService<FragmentNodeProcess> _fragmentNodeProcessService;
+        private readonly IFragmentNodeProcessService _fragmentNodeProcessService;
         [Inject]
-        private readonly IService<ProcessSubstitution> _processSubstitutionService;
+        private readonly IProcessSubstitutionService _processSubstitutionService;
         [Inject]
-        private readonly IService<FragmentNodeFragment> _fragmentNodeFragmentService;
+        private readonly IFragmentNodeFragmentService _fragmentNodeFragmentService;
         [Inject]
-        private readonly IService<FragmentSubstitution> _fragmentSubstitutionService;
+        private readonly IFragmentSubstitutionService _fragmentSubstitutionService;
         [Inject]
-        private readonly IService<LCIAMethod> _lciaMethodService;
+        private readonly ILCIAMethodService _lciaMethodService;
         [Inject]
-        private readonly IService<ScenarioBackground> _scenarioBackgroundService;
+        private readonly IScenarioBackgroundService _scenarioBackgroundService;
         [Inject]
-        private readonly IService<Background> _backgroundService;
+        private readonly IBackgroundService _backgroundService;
         [Inject]
-        private readonly IService<ProcessFlow> _processFlowService;
+        private readonly IProcessFlowService _processFlowService;
         [Inject]
-        private readonly IService<ProcessEmissionParam> _processEmissionParamService;
+        private readonly IProcessEmissionParamService _processEmissionParamService;
         [Inject]
-        private readonly IService<Flow> _flowService;
+        private readonly IFlowService _flowService;
         [Inject]
-        private readonly IService<FlowFlowProperty> _flowFlowPropertyService;
+        private readonly IFlowFlowPropertyService _flowFlowPropertyService;
         [Inject]
-        private readonly IService<FlowPropertyParam> _flowPropertyParamService;
+        private readonly IFlowPropertyParamService _flowPropertyParamService;
         [Inject]
-        private readonly IService<FlowPropertyEmission> _flowPropertyEmissionService;
+        private readonly IFlowPropertyEmissionService _flowPropertyEmissionService;
         [Inject]
-        private readonly IService<ProcessDissipation> _processDissipationService;
+        private readonly IProcessDissipationService _processDissipationService;
         [Inject]
-        private readonly IService<ProcessDissipationParam> _processDissipationParamService;
+        private readonly IProcessDissipationParamService _processDissipationParamService;
         [Inject]
-        private readonly IService<LCIA> _lciaService;
+        private readonly ILCIAService _lciaService;
         [Inject]
-        private readonly IService<CharacterizationParam> _characterizationParamService;
+        private readonly ICharacterizationParamService _characterizationParamService;
         [Inject]
-        private readonly IService<Param> _paramService;
+        private readonly IParamService _paramService;
         [Inject]
-        private readonly IService<DependencyParam> _dependencyParamService;
+        private readonly IDependencyParamService _dependencyParamService;
         [Inject]
-        private readonly IService<Fragment> _fragmentService;
+        private readonly IFragmentService _fragmentService;
         [Inject]
         private readonly IUnitOfWork _unitOfWork;
      
-        public FragmentLCIAComputation(IService<FragmentFlow> fragmentFlowService,
-            IService<ScoreCache> scoreCacheService,
-            IService<NodeCache> nodeCacheService,
-            IService<FragmentNodeProcess> fragmentNodeProcessService,
-            IService<ProcessSubstitution> processSubstitutionService,
-            IService<FragmentNodeFragment> fragmentNodeFragmentService,
-            IService<FragmentSubstitution> fragmentSubstitutionService,
-            IService<LCIAMethod> lciaMethodService,
-            IService<ScenarioBackground> scenarioBackgroundService,
-            IService<Background> backgroundService,
-            IService<ProcessFlow> processFlowService,
-            IService<ProcessEmissionParam> processEmissionParamService,
-            IService<Flow> flowService,
-            IService<FlowFlowProperty> flowFlowPropertyService,
-            IService<FlowPropertyParam> flowPropertyParamService,
-            IService<FlowPropertyEmission> flowPropertyEmissionService,
-            IService<ProcessDissipation> processDissipationService,
-            IService<ProcessDissipationParam> processDissipationParamService,
-            IService<LCIA> lciaService,
-            IService<CharacterizationParam> characterizationParamService,
-            IService<Param> paramService,
-            IService<DependencyParam> dependencyParamService,
-            IService<Fragment> fragmentService,
-            IUnitOfWork unitOfWork,
-            IUnitOfWork unitOfWork1)
+        public FragmentLCIAComputation(IFragmentFlowService fragmentFlowService,
+            IScoreCacheService scoreCacheService,
+            INodeCacheService nodeCacheService,
+            IFragmentNodeProcessService fragmentNodeProcessService,
+            IProcessSubstitutionService processSubstitutionService,
+            IFragmentNodeFragmentService fragmentNodeFragmentService,
+            IFragmentSubstitutionService fragmentSubstitutionService,
+            ILCIAMethodService lciaMethodService,
+            IScenarioBackgroundService scenarioBackgroundService,
+            IBackgroundService backgroundService,
+            IProcessFlowService processFlowService,
+            IProcessEmissionParamService processEmissionParamService,
+            IFlowService flowService,
+            IFlowFlowPropertyService flowFlowPropertyService,
+            IFlowPropertyParamService flowPropertyParamService,
+            IFlowPropertyEmissionService flowPropertyEmissionService,
+            IProcessDissipationService processDissipationService,
+            IProcessDissipationParamService processDissipationParamService,
+            ILCIAService lciaService,
+            ICharacterizationParamService characterizationParamService,
+            IParamService paramService,
+            IDependencyParamService dependencyParamService,
+            IFragmentService fragmentService,
+            IUnitOfWork unitOfWork)
         {
             if (fragmentFlowService == null)
             {
