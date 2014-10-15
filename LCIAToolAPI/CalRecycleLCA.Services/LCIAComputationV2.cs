@@ -128,7 +128,16 @@ namespace CalRecycleLCA.Services
 
         public IEnumerable<LCIAModel> LCIACompute(int processId, int scenarioId)
         {
-            var lciaMethods = _lciaMethodService.Queryable();
+            //var lciaMethods = from u in _lciaService.Queryable().AsEnumerable()
+            //            select new LCIAModel
+            //            {
+            //                LCIAMethodID=u.LCIAMethodID
+            //            };
+
+            //return lciaMethods;
+
+            var lciaMethods = _lciaMethodService.Queryable().ToList();
+
             var result = ProcessLCIA(processId, lciaMethods, scenarioId);
             return result;
 

@@ -467,9 +467,14 @@ namespace CalRecycleLCA.Services
         public void SetScoreCache(int? targetId, int? nodeTypeId, IEnumerable<LCIAMethod> lciaMethods, int scenarioId, int fragmentFlowId)
         {
             IEnumerable<LCIAMethod> haveLciaMethods = _scoreCacheService.Queryable().Where(x => x.ScenarioID == scenarioId
-                                                                                        && x.FragmentFlowID == fragmentFlowId)
-                                                                                             .Select(y => new LCIAMethod { 
-                                                                                             LCIAMethodID = y.LCIAMethodID });
+                                                                                        && x.FragmentFlowID == fragmentFlowId).AsEnumerable()
+                                                                                             .Select(y => new LCIAMethodResource
+                                                                                             { 
+                                                                                             LCIAMethodID = y.LCIAMethodID })
+                                                                                              .Select(y => new LCIAMethod
+                                                                                              {
+                                                                                                  LCIAMethodID = y.LCIAMethodID
+                                                                                              });
             
             IEnumerable<LCIAMethod> needLciaMethods = lciaMethods.Except(haveLciaMethods);
 
