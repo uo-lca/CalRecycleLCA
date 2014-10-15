@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Repository.Pattern.Infrastructure;
+using System;
 using System.Collections.Generic;
 using System.Data.Entity;
 using System.Linq;
@@ -21,7 +22,7 @@ namespace LcaDataModel
                         "must be implemented so each entites state " +
                         "can explicitely determined when updating graphs.");
 
-                dbEntityEntry.State = ConvertState(entityState.State);
+                dbEntityEntry.State = ConvertState(entityState.ObjectState);
             }
         }
 

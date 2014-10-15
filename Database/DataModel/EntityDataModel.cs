@@ -4,10 +4,11 @@ namespace LcaDataModel {
     using System.ComponentModel.DataAnnotations.Schema;
     using System.Linq;
     using System.Data.Entity.ModelConfiguration.Conventions;
+    using Repository.Pattern.Ef6;
 
-    public partial class EntityDataModel : DbContext {
+    public partial class EntityDataModel : DataContext {
         public EntityDataModel()
-            : base() {
+            : base("UsedOilLCAContext") {
         }
 
         public EntityDataModel(String connName)
