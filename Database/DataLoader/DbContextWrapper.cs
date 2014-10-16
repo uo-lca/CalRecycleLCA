@@ -98,13 +98,14 @@ namespace LcaDataLoader {
         /// <param name="dirName">DataSource.DirName</param>
         /// <param name="name">DataSource.Name</param>
         /// <returns>DataSource object created or found.</returns>
-        public DataSource CreateDataSource(string dirName, string name) {
+        public DataSource CreateDataSource(string dirName, string name, bool isPrivate) {
             DataSource dataSource;
+            int visID = isPrivate ? Convert.ToInt32(VisibilityEnum.Private) : Convert.ToInt32(VisibilityEnum.Public);
             dataSource = (from dp in _DbContext.DataSources 
                             where dp.Name.ToLower() == name.ToLower() && dp.DirName.ToLower() == dirName.ToLower() 
                             select dp).FirstOrDefault();
             if (dataSource == null) {
-                dataSource = new DataSource { Name = name, DirName = dirName };
+                dataSource = new DataSource { Name = name, DirName = dirName, VisibilityID = visID };
                 _DbContext.DataSources.Add(dataSource);
                 SaveChanges();
             }

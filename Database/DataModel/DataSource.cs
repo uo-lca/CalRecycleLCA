@@ -23,6 +23,8 @@ namespace LcaDataModel
         [StringLength(100)]
         public string DirName { get; set; }
 
+        public int VisibilityID { get; set; }
+
         public virtual ICollection<ILCDEntity> ILCDEntities { get; set; }
     }
 }
