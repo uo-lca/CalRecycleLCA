@@ -142,7 +142,10 @@ namespace LcaDataLoader {
                 }
             }
             catch (Exception e) {
-                Logger.FatalFormat("Unexpected Exception. Message = {0}", e.Message);
+                Logger.FatalFormat("Unexpected Exception: {0}", e.Message);
+                for (var ie = e.InnerException; ie != null; ie = ie.InnerException) {
+                    Program.Logger.FatalFormat("Inner exception: {0}", ie.Message);
+                }
                 Console.Write(e.ToString());
                 exitCode = 1;
             }

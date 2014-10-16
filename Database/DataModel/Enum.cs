@@ -2,7 +2,7 @@
 namespace LcaDataModel {
     using System;
 
-    public enum DataProviderEnum {
+    public enum DataSourceEnum {
         append=1,
         fragments,
         scenarios

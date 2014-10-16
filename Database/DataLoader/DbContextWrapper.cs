@@ -16,7 +16,7 @@ namespace LcaDataLoader {
     class DbContextWrapper : IDisposable {
         // Data Model DbContext object
         EntityDataModel _DbContext;
-        int _CurrentIlcdDataProviderID;
+        int _CurrentIlcdDataSourceID;
 
         // Punctuation characters used to determine where to truncate name
         static char[] _NameDelimiters = new char[] { '(', '.', ',', ':', ';' };
@@ -88,31 +88,31 @@ namespace LcaDataLoader {
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public int GetCurrentIlcdDataProviderID() {
-            return _CurrentIlcdDataProviderID;
+        public int GetCurrentIlcdDataSourceID() {
+            return _CurrentIlcdDataSourceID;
         }
 
         /// <summary>
-        /// Create DataProvider record if a record with the same attribute values does not already exist.
+        /// Create DataSource record if a record with the same attribute values does not already exist.
         /// </summary>
-        /// <param name="dirName">DataProvider.DirName</param>
-        /// <param name="name">DataProvider.Name</param>
-        /// <returns>DataProvider object created or found.</returns>
-        public DataProvider CreateDataProvider(string dirName, string name) {
-            DataProvider dataProvider;
-            dataProvider = (from dp in _DbContext.DataProviders 
+        /// <param name="dirName">DataSource.DirName</param>
+        /// <param name="name">DataSource.Name</param>
+        /// <returns>DataSource object created or found.</returns>
+        public DataSource CreateDataSource(string dirName, string name) {
+            DataSource dataSource;
+            dataSource = (from dp in _DbContext.DataSources 
                             where dp.Name.ToLower() == name.ToLower() && dp.DirName.ToLower() == dirName.ToLower() 
                             select dp).FirstOrDefault();
-            if (dataProvider == null) {
-                dataProvider = new DataProvider { Name = name, DirName = dirName };
-                _DbContext.DataProviders.Add(dataProvider);
+            if (dataSource == null) {
+                dataSource = new DataSource { Name = name, DirName = dirName };
+                _DbContext.DataSources.Add(dataSource);
                 SaveChanges();
             }
             else {
-                Program.Logger.InfoFormat("Data Provider with Name = {0} and Directory = {1} already exists.", name, dirName);
+                Program.Logger.InfoFormat("Data Source with Name = {0} and Directory = {1} already exists.", name, dirName);
             }
-            _CurrentIlcdDataProviderID = dataProvider.DataProviderID;
-            return dataProvider;
+            _CurrentIlcdDataSourceID = dataSource.DataSourceID;
+            return dataSource;
         }
 
         /// <summary>
@@ -126,7 +126,7 @@ namespace LcaDataLoader {
             catch (DbUpdateException e) {
                 Program.Logger.ErrorFormat("Database update exception: {0}", e.Message);
                 for (var ie = e.InnerException; ie != null; ie = ie.InnerException) {
-                    Program.Logger.ErrorFormat("Inner exception: {0}", ie.InnerException.Message);
+                    Program.Logger.ErrorFormat("Inner exception: {0}", ie.Message);
                 }
 
                 return 0;
@@ -348,7 +348,7 @@ namespace LcaDataLoader {
         /// </summary>
         /// <param name="dbContext">Entity Framework database context</param>
         public static void Seed(EntityDataModel dbContext) {
-            SeedLUT<DataProvider>(dbContext.DataProviders, typeof(DataProviderEnum));
+            SeedLUT<DataSource>(dbContext.DataSources, typeof(DataSourceEnum));
             SeedLUT<DataType>(dbContext.DataTypes, typeof(DataTypeEnum));
             SeedLUT<FlowType>(dbContext.FlowTypes, typeof(FlowTypeEnum)); 
             SeedLUT<ImpactCategory>(dbContext.ImpactCategories,

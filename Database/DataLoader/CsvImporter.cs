@@ -137,9 +137,9 @@ namespace LcaDataLoader {
             return isImported;
         }
 
-        private static bool UpdateDataProvider(DataProviderEnum dpEnum, string dirName, DbContextWrapper dbContext) {
+        private static bool UpdateDataSource(DataSourceEnum dpEnum, string dirName, DbContextWrapper dbContext) {
             bool updated = false;
-            DataProvider dp = dbContext.Find<DataProvider>(Convert.ToInt32(dpEnum));
+            DataSource dp = dbContext.Find<DataSource>(Convert.ToInt32(dpEnum));
             if (dp == null) {
                 Program.Logger.ErrorFormat("Data provider for {0} not found.", dpEnum.ToString());
             }
@@ -168,7 +168,7 @@ namespace LcaDataLoader {
                 if (!dbContext.IlcdEntityAlreadyExists<Fragment>(uuid)) {
                     ILCDEntity ilcdEntity = new ILCDEntity {
                         UUID = uuid,
-                        DataProviderID = Convert.ToInt32(DataProviderEnum.fragments),
+                        DataSourceID = Convert.ToInt32(DataSourceEnum.fragments),
                         DataTypeID = Convert.ToInt32(DataTypeEnum.Fragment)
                     };
                     dbContext.GetDbSet<ILCDEntity>().Add(ilcdEntity);
@@ -533,7 +533,7 @@ namespace LcaDataLoader {
             if (Directory.Exists(dirName)) {
                 IEnumerable<Row> rows;
                 Program.Logger.InfoFormat("Load append files in {0}...", dirName);
-                UpdateDataProvider(DataProviderEnum.append, dirName, dbContext);
+                UpdateDataSource(DataSourceEnum.append, dirName, dbContext);
                 ImportCSV(Path.Combine(dirName, "CategorySystem.csv"), ImportCategorySystem, dbContext);
                 rows = ImportCSV(Path.Combine(dirName, "Category.csv"), CreateCategory, dbContext);
                 if (rows != null) UpdateEntities(rows, UpdateCategory, dbContext);
@@ -562,7 +562,7 @@ namespace LcaDataLoader {
             if (Directory.Exists(dirName)) {
                 IEnumerable<Row> fRows, ffRows;
                 Program.Logger.InfoFormat("Load fragment files in {0}...", dirName);
-                UpdateDataProvider(DataProviderEnum.fragments, dirName, dbContext);
+                UpdateDataSource(DataSourceEnum.fragments, dirName, dbContext);
                 fRows = ImportCSV(Path.Combine(dirName, "Fragment.csv"), CreateFragment, dbContext);
                 ffRows = ImportCSV(Path.Combine(dirName, "FragmentFlow.csv"), CreateFragmentFlow, dbContext);
                 UpdateEntities(ffRows, UpdateFragmentFlow, dbContext);
@@ -584,7 +584,7 @@ namespace LcaDataLoader {
         public static void LoadScenarios(string dirName, DbContextWrapper dbContext) {
             if (Directory.Exists(dirName)) {
                 Program.Logger.InfoFormat("Load scenario files in {0}...", dirName);
-                UpdateDataProvider(DataProviderEnum.scenarios, dirName, dbContext);
+                UpdateDataSource(DataSourceEnum.scenarios, dirName, dbContext);
                 ImportCSV(Path.Combine(dirName, "User.csv"), ImportUser, dbContext);
                 ImportCSV(Path.Combine(dirName, "ScenarioGroup.csv"), ImportScenarioGroup, dbContext);
                 ImportCSV(Path.Combine(dirName, "Scenario.csv"), ImportScenario, dbContext);

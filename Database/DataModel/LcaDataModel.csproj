@@ -57,7 +57,7 @@
     <Compile Include="CompositionData.cs" />
     <Compile Include="CompositionSubstitution.cs" />
     <Compile Include="CompositionModel.cs" />
-    <Compile Include="DataProvider.cs" />
+    <Compile Include="DataSource.cs" />
     <Compile Include="DataType.cs" />
     <Compile Include="DbContextExtension.cs" />
     <Compile Include="DependencyParam.cs" />

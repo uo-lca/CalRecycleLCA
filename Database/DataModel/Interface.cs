@@ -267,11 +267,11 @@ namespace LcaDataModel {
         string Name { get; set; }
     }
 
-    public partial class DataProvider : ILookupEntity {
+    public partial class DataSource : ILookupEntity {
         [NotMapped]
         public int ID {
-            get { return DataProviderID; }
-            set { DataProviderID = ID; }
+            get { return DataSourceID; }
+            set { DataSourceID = ID; }
         }
     }
 

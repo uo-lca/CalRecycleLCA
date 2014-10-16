@@ -7,15 +7,15 @@ namespace LcaDataModel
     using System.ComponentModel.DataAnnotations.Schema;
     using System.Data.Entity.Spatial;
 
-    [Table("DataProvider")]
-    public partial class DataProvider : Entity
+    [Table("DataSource")]
+    public partial class DataSource : Entity
     {
-        public DataProvider()
+        public DataSource()
         {
             ILCDEntities = new HashSet<ILCDEntity>();
         }
 
-        public int DataProviderID { get; set; }
+        public int DataSourceID { get; set; }
 
         [StringLength(100)]
         public string Name { get; set; }
