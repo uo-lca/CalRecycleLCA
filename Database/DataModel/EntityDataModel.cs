@@ -8,7 +8,8 @@ namespace LcaDataModel {
 
     public partial class EntityDataModel : DataContext {
         public EntityDataModel()
-            : base("UsedOilLCAContext") {
+            : base("EntityDataModel") {
+                SyncObjectStateEnabled = false;
         }
 
         public EntityDataModel(String connName)
