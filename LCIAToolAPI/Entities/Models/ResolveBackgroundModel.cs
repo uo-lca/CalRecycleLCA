@@ -10,5 +10,6 @@ namespace Entities.Models
     {
         public int? NodeTypeID { get; set; }
         public int? TargetID { get; set; }
+        public int? ILCDEntityID { get; set; }
     }
 }
