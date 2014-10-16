@@ -26,6 +26,7 @@ namespace LcaDataModel
             //turned off these because caused infinite loop and interfere with Json serialization.  Grrrr.
             this.Configuration.LazyLoadingEnabled = false;
             this.Configuration.ProxyCreationEnabled = false;
+            this.SyncObjectStateEnabled = true;
         }
 
         public new IDbSet<T> Set<T>() where T : class

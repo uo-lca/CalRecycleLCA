@@ -15,11 +15,22 @@ namespace Repository.Pattern.Ef6
         bool _disposed;
         #endregion Private Fields
 
+        /// <summary>
+        ///  Use to enable/disable  SyncObjectState behaviour.
+        ///  SyncObjectState behaviour depends on the DataContext user managing Entity::ObjectState
+        ///      Whenever an Entity is added, ObjectState must be set to Added
+        ///      Whenever an Entity is modified, ObjectState must be set to Modified.
+        /// If SyncObjectState is disabled, DbContext will be responsible for detecting changes in the usual way
+        ///     (does not depend on Entity::ObjectState).
+        /// </summary>
+        public bool SyncObjectStateEnabled { get; set; }
+
         public DataContext(string nameOrConnectionString) : base(nameOrConnectionString)
         {
             _instanceId = Guid.NewGuid();
             Configuration.LazyLoadingEnabled = false;
             Configuration.ProxyCreationEnabled = false;
+            SyncObjectStateEnabled = true;
         }
 
         public Guid InstanceId { get { return _instanceId; } }
@@ -47,9 +58,9 @@ namespace Repository.Pattern.Ef6
         /// <returns>The number of objects written to the underlying database.</returns>
         public override int SaveChanges()
         {
-            SyncObjectsStatePreCommit();
+            if (SyncObjectStateEnabled) SyncObjectsStatePreCommit();
             var changes = base.SaveChanges();
-            SyncObjectsStatePostCommit();
+            if (SyncObjectStateEnabled) SyncObjectsStatePostCommit();
             return changes;
         }
 
@@ -105,9 +116,9 @@ namespace Repository.Pattern.Ef6
         ///     objects written to the underlying database.</returns>
         public override async Task<int> SaveChangesAsync(CancellationToken cancellationToken)
         {
-            SyncObjectsStatePreCommit();
+            if (SyncObjectStateEnabled) SyncObjectsStatePreCommit();
             var changesAsync = await base.SaveChangesAsync(cancellationToken);
-            SyncObjectsStatePostCommit();
+            if (SyncObjectStateEnabled) SyncObjectsStatePostCommit();
             return changesAsync;
         }
 

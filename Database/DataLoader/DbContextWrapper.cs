@@ -73,6 +73,7 @@ namespace LcaDataLoader {
         /// </summary>
         public DbContextWrapper() {
             _DbContext = new EntityDataModel("name=EntityDataModel");
+            _DbContext.SyncObjectStateEnabled = false;
             _DbContext.Database.Initialize(false);
         }
 
