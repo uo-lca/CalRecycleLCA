@@ -20,9 +20,13 @@ namespace LcaDataLoader {
         /// <param name="dirName">Full path name of the root directory</param>
         /// <param name="dbContext">Shared instance of DbContextWrapper</param>
         public static void LoadAll(string dirName, DbContextWrapper dbContext) {
-            LoadAppend(Path.Combine(dirName, "append"), dbContext);
+            string appendDir = Path.Combine(dirName, "append");
+            bool appendDirExists = LoadAppend(appendDir, dbContext);
             LoadFragments(Path.Combine(dirName, "fragments"), dbContext);
             LoadScenarios(Path.Combine(dirName, "scenarios"), dbContext);
+            if (appendDirExists) {
+                LoadClassification(appendDir, dbContext);
+            }
         }
 
         private static bool ImportCategorySystem(Row row, DbContextWrapper dbContext) {
@@ -532,8 +536,9 @@ namespace LcaDataLoader {
         /// Load CSV files in append directory
         /// </summary>
         /// <param name="dirName">Full path name of append directory</param>
-        public static void LoadAppend(string dirName, DbContextWrapper dbContext) {
-            if (Directory.Exists(dirName)) {
+        public static bool LoadAppend(string dirName, DbContextWrapper dbContext) {
+            bool appendExists = Directory.Exists(dirName);
+            if (appendExists) {
                 IEnumerable<Row> rows;
                 Program.Logger.InfoFormat("Load append files in {0}...", dirName);
                 UpdateDataSource(DataSourceEnum.append, dirName, dbContext);
@@ -545,15 +550,24 @@ namespace LcaDataLoader {
                 ImportCSV(Path.Combine(dirName, "CompositionModel.csv"), ImportCompositionModel, dbContext);
                 ImportCSV(Path.Combine(dirName, "CompositionData.csv"), ImportCompositionData, dbContext);
                 ImportCSV(Path.Combine(dirName, "ProcessComposition.csv"), ImportProcessComposition, dbContext);
-                // Import Classification last because it references UUIDs in other files
-                // Improve performance by disabling AutoDetectChanges and only executing Adds (no updates).
-                dbContext.SetAutoDetectChanges(false);
-                ImportCSV(Path.Combine(dirName, "Classification.csv"), ImportClassification, dbContext);
-                dbContext.SetAutoDetectChanges(true);
+                // Defer loading Classification until the end.
             }
             else {
                 Program.Logger.WarnFormat("Append folder, {0}, does not exist.", dirName);
             }
+            return appendExists;
+        }
+
+        /// <summary>
+        /// Import Classification last because it references UUIDs in other files and will end with large DbSet.
+        ///  Improve performance by disabling AutoDetectChanges and only executing Adds (no updates).
+        /// </summary>
+        /// <param name="dirName"></param>
+        /// <param name="dbContext"></param>
+        public static void LoadClassification(string dirName, DbContextWrapper dbContext) {
+            dbContext.SetAutoDetectChanges(false);
+            ImportCSV(Path.Combine(dirName, "Classification.csv"), ImportClassification, dbContext);
+            dbContext.SetAutoDetectChanges(true);
         }
 
         /// <summary>
