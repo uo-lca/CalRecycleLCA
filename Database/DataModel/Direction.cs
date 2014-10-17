@@ -13,6 +13,8 @@ namespace LcaDataModel
         public Direction()
         {
             Backgrounds = new HashSet<Background>();
+            Scenarios = new HashSet<Scenario>();
+            ScenarioBackgrounds = new HashSet<ScenarioBackground>();
             FragmentFlows = new HashSet<FragmentFlow>();
             LCIAs = new HashSet<LCIA>();
             ProcessFlows = new HashSet<ProcessFlow>();
@@ -24,6 +26,10 @@ namespace LcaDataModel
         public string Name { get; set; }
 
         public virtual ICollection<Background> Backgrounds { get; set; }
+
+        public virtual ICollection<Scenario> Scenarios { get; set; }
+
+        public virtual ICollection<ScenarioBackground> ScenarioBackgrounds { get; set; }
 
         public virtual ICollection<FragmentFlow> FragmentFlows { get; set; }
 

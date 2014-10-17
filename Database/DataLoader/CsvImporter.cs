@@ -411,15 +411,18 @@ namespace LcaDataLoader {
         }
 
         private static bool ImportScenario(Row row, DbContextWrapper dbContext) {
-            bool isImported = false;
+            bool isImported = false, isNew = true;
             int id = Convert.ToInt32(row["ScenarioID"]);
-            Scenario ent = dbContext.CreateEntityWithID<Scenario>(id);
-            if (ent != null) {
+            int refID;
+            if (dbContext.FindRefIlcdEntityID<Flow>(row["RefFlowUUID"], out refID)) {
+                Scenario ent = dbContext.ProduceEntityWithID<Scenario>(id, out isNew);
                 ent.Name = row["Name"];
                 ent.ScenarioGroupID = Convert.ToInt32(row["ScenarioGroupID"]);
                 ent.TopLevelFragmentID = Convert.ToInt32(row["TopLevelFragmentID"]);
                 ent.ActivityLevel = Convert.ToDouble(row["ActivityLevel"]);
-                isImported = (dbContext.SaveChanges() > 0);
+                ent.FlowID = refID;
+                ent.DirectionID = Convert.ToInt32(row["RefDirectionID"]);
+                isImported = isNew ? dbContext.AddEntity(ent) : (dbContext.SaveChanges() > 0);
             }
             return isImported;
         }

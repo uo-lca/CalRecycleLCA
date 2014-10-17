@@ -12,6 +12,7 @@ namespace LcaDataModel
     {
         public DataSource()
         {
+            VisibilityID = Convert.ToInt32(VisibilityEnum.Public);  // Default value needed for seeding the table
             ILCDEntities = new HashSet<ILCDEntity>();
         }
 

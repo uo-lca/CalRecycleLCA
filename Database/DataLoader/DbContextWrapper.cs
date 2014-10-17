@@ -349,6 +349,8 @@ namespace LcaDataLoader {
         /// </summary>
         /// <param name="dbContext">Entity Framework database context</param>
         public static void Seed(EntityDataModel dbContext) {
+            SeedLUT<Visibility>(dbContext.Visibilities, typeof(VisibilityEnum));
+            dbContext.SaveChanges();
             SeedLUT<DataSource>(dbContext.DataSources, typeof(DataSourceEnum));
             SeedLUT<DataType>(dbContext.DataTypes, typeof(DataTypeEnum));
             SeedLUT<FlowType>(dbContext.FlowTypes, typeof(FlowTypeEnum)); 
@@ -393,7 +395,6 @@ namespace LcaDataLoader {
                     "Unit process, black box",
                     "Unit process, single operation"
              }));
-            SeedLUT<Visibility>(dbContext.Visibilities, typeof(VisibilityEnum));
 
             dbContext.SaveChanges();
         }
