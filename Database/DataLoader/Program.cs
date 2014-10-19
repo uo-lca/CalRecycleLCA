@@ -22,6 +22,7 @@ namespace LcaDataLoader {
         static string _DataRoot = null;
         static string _IlcdDirName = null;
         static string _IlcdSourceName = null;
+        static string _PrivateFileName = null;
         static bool _DeleteFlag;
         static bool _CsvFlag;
         static bool _InitFlag;
@@ -36,6 +37,7 @@ namespace LcaDataLoader {
         static bool ParseArguments(string[] args) {
             bool helpFlag = false;
             bool commandMode = false;
+            string ilcdSourcePath = null;
 
             _DataRoot = ".";
             _DeleteFlag = false;
@@ -59,7 +61,9 @@ namespace LcaDataLoader {
                     if (String.IsNullOrEmpty(_DataRoot)) {
                         throw new OptionException ("Missing root path.", "-r");
                     }
-                    _IlcdDirName = Path.Combine(_DataRoot, _IlcdSourceName, "ILCD");
+                    ilcdSourcePath = Path.Combine(_DataRoot, _IlcdSourceName);
+                    _IlcdDirName = Path.Combine(ilcdSourcePath, "ILCD");
+                    _PrivateFileName = Path.Combine(ilcdSourcePath, "private");
                 }
                 if (_CsvFlag) {
                     if (String.IsNullOrEmpty(_DataRoot)) {
@@ -115,7 +119,7 @@ namespace LcaDataLoader {
                     if (!String.IsNullOrEmpty(_IlcdDirName)) {
                         if (Directory.Exists(_IlcdDirName)) {
                             IlcdImporter ilcdImporter = new IlcdImporter();
-                            ilcdImporter.LoadAll(_IlcdDirName, _IlcdSourceName, dbContext);
+                            ilcdImporter.LoadAll(_IlcdDirName, _IlcdSourceName, dbContext, File.Exists(_PrivateFileName));
                             Logger.InfoFormat("Loaded ILCD archive from {0}.", _IlcdDirName);
                             loadedFiles = true;
                         }
@@ -142,7 +146,10 @@ namespace LcaDataLoader {
                 }
             }
             catch (Exception e) {
-                Logger.FatalFormat("Unexpected Exception. Message = {0}", e.Message);
+                Logger.FatalFormat("Unexpected Exception: {0}", e.Message);
+                for (var ie = e.InnerException; ie != null; ie = ie.InnerException) {
+                    Program.Logger.FatalFormat("Inner exception: {0}", ie.Message);
+                }
                 Console.Write(e.ToString());
                 exitCode = 1;
             }

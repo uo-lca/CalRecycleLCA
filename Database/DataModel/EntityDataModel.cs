@@ -25,7 +25,7 @@ namespace LcaDataModel {
         public virtual DbSet<CompositionData> CompositionDataSet { get; set; }
         public virtual DbSet<CompositionModel> CompositionModels { get; set; }
         public virtual DbSet<CompositionSubstitution> CompositionSubstitutions { get; set; }
-        public virtual DbSet<DataProvider> DataProviders { get; set; }
+        public virtual DbSet<DataSource> DataSources { get; set; }
         public virtual DbSet<DataType> DataTypes { get; set; }
         public virtual DbSet<DependencyParam> DependencyParams { get; set; }
         public virtual DbSet<Direction> Directions { get; set; }
@@ -100,11 +100,11 @@ namespace LcaDataModel {
                 .Property(e => e.Name)
                 .IsUnicode(false);
 
-            modelBuilder.Entity<DataProvider>()
+            modelBuilder.Entity<DataSource>()
                 .Property(e => e.Name)
                 .IsUnicode(false);
 
-            modelBuilder.Entity<DataProvider>()
+            modelBuilder.Entity<DataSource>()
                 .Property(e => e.DirName)
                 .IsUnicode(false);
 

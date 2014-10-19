@@ -7,21 +7,24 @@ namespace LcaDataModel
     using System.ComponentModel.DataAnnotations.Schema;
     using System.Data.Entity.Spatial;
 
-    [Table("DataProvider")]
-    public partial class DataProvider : Entity
+    [Table("DataSource")]
+    public partial class DataSource : Entity
     {
-        public DataProvider()
+        public DataSource()
         {
+            VisibilityID = Convert.ToInt32(VisibilityEnum.Public);  // Default value needed for seeding the table
             ILCDEntities = new HashSet<ILCDEntity>();
         }
 
-        public int DataProviderID { get; set; }
+        public int DataSourceID { get; set; }
 
         [StringLength(100)]
         public string Name { get; set; }
 
         [StringLength(100)]
         public string DirName { get; set; }
+
+        public int VisibilityID { get; set; }
 
         public virtual ICollection<ILCDEntity> ILCDEntities { get; set; }
     }

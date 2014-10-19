@@ -23,6 +23,7 @@ namespace LcaDataModel
             Processes = new HashSet<Process>();
             ProcessFlows = new HashSet<ProcessFlow>();
             ScenarioBackgrounds = new HashSet<ScenarioBackground>();
+            Scenarios = new HashSet<Scenario>();
         }
 
         public int FlowID { get; set; }
@@ -66,5 +67,7 @@ namespace LcaDataModel
         public virtual ICollection<ProcessFlow> ProcessFlows { get; set; }
 
         public virtual ICollection<ScenarioBackground> ScenarioBackgrounds { get; set; }
+
+        public virtual ICollection<Scenario> Scenarios { get; set; }
     }
 }

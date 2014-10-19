@@ -12,6 +12,7 @@ namespace LcaDataModel
         public Visibility()
         {
             ScenarioGroups = new HashSet<ScenarioGroup>();
+            DataSources = new HashSet<DataSource>();
         }
 
         public int VisibilityID { get; set; }
@@ -20,5 +21,6 @@ namespace LcaDataModel
         public string Name { get; set; }
 
         public virtual ICollection<ScenarioGroup> ScenarioGroups { get; set; }
+        public virtual ICollection<DataSource> DataSources { get; set; }
     }
 }

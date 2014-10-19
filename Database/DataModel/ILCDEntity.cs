@@ -34,7 +34,7 @@ namespace LcaDataModel
         [Index("IX_UUID_Version", 2, IsUnique = true)]
         public string Version { get; set; }
 
-        public int? DataProviderID { get; set; }
+        public int? DataSourceID { get; set; }
 
         public int? DataTypeID { get; set; }
 
@@ -45,7 +45,7 @@ namespace LcaDataModel
 
         public virtual ICollection<Classification> Classifications { get; set; }
 
-        public virtual DataProvider DataProvider { get; set; }
+        public virtual DataSource DataSource { get; set; }
 
         public virtual DataType DataType { get; set; }
 

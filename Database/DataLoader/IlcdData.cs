@@ -240,7 +240,7 @@ namespace LcaDataLoader {
             ilcdEntity.UUID = GetCommonUUID();
             ilcdEntity.Version = GetCommonVersion();
             ilcdEntity.DataTypeID = Convert.ToInt32(dtEnum);
-            ilcdEntity.DataProviderID = ilcdDb.GetCurrentIlcdDataProviderID();
+            ilcdEntity.DataSourceID = ilcdDb.GetCurrentIlcdDataSourceID();
             //entity.UUID = GetCommonUUID();
             entity.ILCDEntity = ilcdEntity;
             return ilcdEntity;

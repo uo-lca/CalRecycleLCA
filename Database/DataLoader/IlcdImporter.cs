@@ -24,8 +24,8 @@ namespace LcaDataLoader {
         /// <param name="dirName">Full path name of directory</param>
         /// <param name="ilcdSourceName">Name of ILCD data source</param>
         /// <param name="dbContext">Shared instance of DbContextWrapper</param>
-        public void LoadAll(string dirName, string ilcdSourceName, DbContextWrapper dbContext) {
-            if (dbContext.CreateDataProvider(dirName, ilcdSourceName) != null) {
+        public void LoadAll(string dirName, string ilcdSourceName, DbContextWrapper dbContext, bool isPrivate) {
+            if (dbContext.CreateDataSource(dirName, ilcdSourceName, isPrivate) != null) {
                 // Improve load performance by disabling AutoDetectChanges.
                 dbContext.SetAutoDetectChanges(false);
                 LoadDataType(Path.Combine(dirName, "unitgroups"), dbContext);
