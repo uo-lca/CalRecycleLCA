@@ -408,10 +408,12 @@ namespace CalRecycleLCA.Services
             //    .Include(fp => fp.UnitGroup.UnitConversion)
             //    .Filter(fp => fp.Flows.Any(f => f.ProcessFlows.Any(pf => pf.ProcessID == processID)))
             //    .Get();
-            var flowProperties = _FlowPropertyService.Queryable()
-                .Where((fp => fp.Flows.Any(f => f.ProcessFlows.Any(pf => pf.ProcessID == processID))))
-                .Select(x => new { x, x.UnitGroup.UnitConversion }).AsEnumerable();  //Emulates .Include
-            return flowProperties.Select(fp => Transform(fp.x)).ToList();
+            var flowProperties = _FlowPropertyService.Query()
+                .Include(fp => fp.UnitGroup.UnitConversion)
+                .Include(fp => fp.Flows.Select(p => p.ProcessFlows)) 
+                .Select()
+                .Where((fp => fp.Flows.Any(f => f.ProcessFlows.Any(pf => pf.ProcessID == processID)))).ToList();
+            return flowProperties.Select(fp => Transform(fp)).ToList();
         }
 
         /// <summary>
@@ -420,10 +422,12 @@ namespace CalRecycleLCA.Services
         /// <param name="fragmentID">FragmentID filter</param>
         /// <returns>List of FlowPropertyResource objects</returns>
         public IEnumerable<FlowPropertyResource> GetFlowPropertiesByFragment(int fragmentID) {
-            var flowProperties = _FlowPropertyService.Queryable()
-                .Where(fp => fp.Flows.Any(f => f.FragmentFlows.Any(ff => ff.FragmentID == fragmentID)))
-               .Select(x => new { x, x.UnitGroup.UnitConversion }).AsEnumerable();  //Emulates .Include
-            return flowProperties.Select(fp => Transform(fp.x)).ToList();
+            var flowProperties = _FlowPropertyService.Query()
+                 .Include(fp => fp.UnitGroup.UnitConversion)
+                .Include(fp => fp.Flows.Select(f => f.FragmentFlows))
+                .Select()
+                .Where(fp => fp.Flows.Any(f => f.FragmentFlows.Any(ff => ff.FragmentID == fragmentID))).ToList();
+            return flowProperties.Select(fp => Transform(fp)).ToList();
         }
 
          /// <summary>
@@ -461,7 +465,6 @@ namespace CalRecycleLCA.Services
             var query = _ProcessService.Query()
                 .Include(x => x.ILCDEntity)
                 .Include(x => x.ProcessFlows.Select(p => p.Flow))
-
                 .Select().ToList();
             if (flowTypeID != null) {
                 query = query.Where(p => p.ProcessFlows.Any(pf => pf.Flow.FlowTypeID == flowTypeID)).ToList();
@@ -469,17 +472,6 @@ namespace CalRecycleLCA.Services
             var pData = query;
             return pData.Select(p => Transform(p)).ToList();
         }
-
-        //public IEnumerable<ProcessResource> GetProcesses(int? flowTypeID = null)
-        //{
-        //    var query = _ProcessService.Query().Include(p => p.ILCDEntity);
-        //    if (flowTypeID != null)
-        //    {
-        //        query = query.Filter(p => p.ProcessFlows.Any(pf => pf.Flow.FlowTypeID == flowTypeID));
-        //    }
-        //    IEnumerable<Process> pData = query.Get();
-        //    return pData.Select(p => Transform(p)).ToList();
-        //}
 
 
         /// <summary>

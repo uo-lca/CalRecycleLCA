@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 2013
-VisualStudioVersion = 12.0.21005.1
+VisualStudioVersion = 12.0.30501.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LcaDataModel", "Database\DataModel\LcaDataModel.csproj", "{B7F4D17F-6156-457C-8425-8CE5F683CAC5}"
 EndProject
@@ -11,6 +11,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Documentation", "Documentat
 	ProjectSection(SolutionItems) = preProject
 		Documentation\background-pseudocode.txt = Documentation\background-pseudocode.txt
 		Documentation\fragment-design.txt = Documentation\fragment-design.txt
+		Documentation\fragment-flow-extension.txt = Documentation\fragment-flow-extension.txt
 		Documentation\fragment-lcia-pseudocode.txt = Documentation\fragment-lcia-pseudocode.txt
 		Documentation\fragment-schema.txt = Documentation\fragment-schema.txt
 		Documentation\fragment-traversal-pseudocode.txt = Documentation\fragment-traversal-pseudocode.txt
