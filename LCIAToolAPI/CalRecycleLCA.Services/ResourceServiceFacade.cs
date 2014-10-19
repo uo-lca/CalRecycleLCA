@@ -393,10 +393,10 @@ namespace CalRecycleLCA.Services
         /// Get list of processflow resources
         /// </summary>
         public IEnumerable<ProcessFlowResource> GetProcessFlows(int processID) {
-            var processFlows = _ProcessFlowService.Query()
+            var processFlows = _ProcessFlowService.Query(x => x.ProcessID == processID)
                                                 .Include(x => x.Flow)
-                                                .Select()
-                                                .Where(pf => pf.ProcessID == processID).ToList();
+                                                .Select().ToList();
+                                                //.Where(pf => pf.ProcessID == processID).ToList();
             return processFlows.Select(pf => Transform(pf)).ToList();
         }
 
