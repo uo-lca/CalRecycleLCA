@@ -234,9 +234,10 @@ namespace CalRecycleLCA.Services
             //    .Filter(c => c.ILCDEntityID == f.ILCDEntityID);
 
 
-            IEnumerable<Classification> classes = _ClassificationService.Query()
-                                               .Include(c => c.Category)
-                                               .Select().Where(c => c.ILCDEntityID == f.ILCDEntityID);
+            IEnumerable<Classification> classes = _ClassificationService
+                                                .Query(c => c.ILCDEntityID == f.ILCDEntityID)
+                                                .Include(c => c.Category)
+                                                .Select();
             
 
             maxHL = classes.Max(c => Convert.ToInt32(c.Category.HierarchyLevel));
@@ -347,13 +348,12 @@ namespace CalRecycleLCA.Services
         /// <returns>List of FragmentFlowResource objects</returns>
         public IEnumerable<FragmentFlowResource> GetFragmentFlowResources(int fragmentID, int scenarioID = 0) {
             _FragmentTraversalV2.Traverse(fragmentID, scenarioID);
-            var fragmentFlows = _FragmentFlowService.Query()
+            var fragmentFlows = _FragmentFlowService.Query(q => q.FragmentID == fragmentID)
                                                 .Include(x => x.FragmentNodeFragments)
                                                 .Include(x => x.FragmentNodeProcesses)
                                                 .Include(x => x.NodeCaches)
                                                 .Include(x => x.Flow.FlowFlowProperties)
-                                                .Select().Where(q => q.FragmentID == fragmentID)
-                                                .ToList();
+                                                .Select().ToList();
             return fragmentFlows.Select(ff => Transform(ff, scenarioID)).ToList();
         }
 
@@ -408,11 +408,16 @@ namespace CalRecycleLCA.Services
             //    .Include(fp => fp.UnitGroup.UnitConversion)
             //    .Filter(fp => fp.Flows.Any(f => f.ProcessFlows.Any(pf => pf.ProcessID == processID)))
             //    .Get();
-            var flowProperties = _FlowPropertyService.Query()
+            /*var pf_flowproperties = _ProcessFlowService.Query(pf => pf.ProcessID == processID)
+                .Include(pf => pf.Flow.FlowFlowProperties)
+                .GroupBy(x => x.Flow.FlowFlowProperties.Select(f => f.FlowPropertyID))
+                .Select(x => x.Flow.FlowFlowProperties.Select(f => f.FlowPropertyID));
+              */  
+            var flowProperties = _FlowPropertyService
+                .Query(fp => fp.Flows.Any(f => f.ProcessFlows.Any(pf => pf.ProcessID == processID)))
                 .Include(fp => fp.UnitGroup.UnitConversion)
-                .Include(fp => fp.Flows.Select(p => p.ProcessFlows)) 
-                .Select()
-                .Where((fp => fp.Flows.Any(f => f.ProcessFlows.Any(pf => pf.ProcessID == processID)))).ToList();
+                //.Include(fp => fp.Flows.Select(p => p.ProcessFlows)) 
+                .Select().ToList();
             return flowProperties.Select(fp => Transform(fp)).ToList();
         }
 
@@ -422,11 +427,11 @@ namespace CalRecycleLCA.Services
         /// <param name="fragmentID">FragmentID filter</param>
         /// <returns>List of FlowPropertyResource objects</returns>
         public IEnumerable<FlowPropertyResource> GetFlowPropertiesByFragment(int fragmentID) {
-            var flowProperties = _FlowPropertyService.Query()
-                 .Include(fp => fp.UnitGroup.UnitConversion)
-                .Include(fp => fp.Flows.Select(f => f.FragmentFlows))
-                .Select()
-                .Where(fp => fp.Flows.Any(f => f.FragmentFlows.Any(ff => ff.FragmentID == fragmentID))).ToList();
+            var flowProperties = _FlowPropertyService
+                .Query(fp => fp.Flows.Any(f => f.FragmentFlows.Any(ff => ff.FragmentID == fragmentID)))
+                .Include(fp => fp.UnitGroup.UnitConversion)
+                //.Include(fp => fp.Flows.Select(f => f.FragmentFlows))
+                .Select().ToList();
             return flowProperties.Select(fp => Transform(fp)).ToList();
         }
 
