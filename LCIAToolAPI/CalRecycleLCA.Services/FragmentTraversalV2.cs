@@ -316,7 +316,9 @@ namespace CalRecycleLCA.Services
 
         public IEnumerable<NodeFlowModel> GetScenarioProductFlows(IEnumerable<FragmentFlow> theFragmentFlow, int scenarioId)
         {
-            int? nodeTypeID = theFragmentFlow.Select(x => x.NodeTypeID).FirstOrDefault();
+            int nodeTypeID = Convert.ToInt32(theFragmentFlow.Select(x => x.NodeTypeID).FirstOrDefault());
+            int theFragmentFlowId = theFragmentFlow.Select(x => x.FragmentFlowID).FirstOrDefault();
+            int? fragmentId = theFragmentFlow.FirstOrDefault().FragmentID;
 
             IEnumerable<NodeFlowModel> nodeFlowModel = null;
 
@@ -324,16 +326,20 @@ namespace CalRecycleLCA.Services
             {
                 case 1: //process
 
-                    int? processId = theFragmentFlow
-                        .Join(_fragmentNodeProcessService.Queryable(), p => p.FragmentFlowID, pc => pc.FragmentFlowID, (p, pc) => new { p, pc })
-                        .FirstOrDefault()
-                        .pc.ProcessID;
-                    //also needs left outer join on substitution but we don't have those tables yet.
-                    //add this later when the substitution tables have been added
-                    //if Subs is not null
-                    //    process_id = Subs;
-                    //else
-                    //    process_id = Default;
+                    //get the process id
+                    int? processId = _fragmentNodeProcessService.GetFragmentNodeProcessId(theFragmentFlowId).ProcessID;
+
+                    //old query for processId before I implemented extension method to query for ProcessID, SubFragmentID and TermFlowID
+                    //int? processId = theFragmentFlow
+                    //    .Join(_fragmentNodeProcessService.Queryable(), p => p.FragmentFlowID, pc => pc.FragmentFlowID, (p, pc) => new { p, pc })
+                    //    .FirstOrDefault()
+                    //    .pc.ProcessID;
+                    ////also needs left outer join on substitution but we don't have those tables yet.
+                    ////add this later when the substitution tables have been added
+                    ////if Subs is not null
+                    ////    process_id = Subs;
+                    ////else
+                    ////    process_id = Default;
 
                     nodeFlowModel = _processFlowService.Queryable()
                         .Join(_flowService.Queryable(), p => p.FlowID, pc => pc.FlowID, (p, pc) => new { p, pc })
@@ -373,21 +379,21 @@ namespace CalRecycleLCA.Services
                     break;
                 case 2: //fragment
 
-                    //get the sub fragment
-                    int? subFragmentId = theFragmentFlow
-                        .Join(_fragmentNodeFragmentService.Queryable(), p => p.FragmentFlowID, pc => pc.FragmentFlowID, (p, pc) => new { p, pc })
-                        .FirstOrDefault()
-                        .pc.SubFragmentID;
-                    //also needs left outer join on substitution but we don't have those tables yet.
-                    //add this later when the substitution tables have been added
-                    //if Subs is not null
-                    //fragment_id = Subs;
-                    //else
-                    //fragment_id = Default;
+                    //get the sub fragment id
+                    int? subFragmentId = _fragmentNodeFragmentService.GetFragmentNodeSubFragmentId(theFragmentFlowId).SubFragmentID;
 
-                    int? fragmentId = theFragmentFlow
-                       .FirstOrDefault()
-                       .FragmentID;
+                    ////old query for subFragmentId before I implemented extension method to query for ProcessID, SubFragmentID and TermFlowID
+                    //int? subFragmentId = theFragmentFlow
+                    //    .Join(_fragmentNodeFragmentService.Queryable(), p => p.FragmentFlowID, pc => pc.FragmentFlowID, (p, pc) => new { p, pc })
+                    //    .FirstOrDefault()
+                    //    .pc.SubFragmentID;
+                    ////also needs left outer join on substitution but we don't have those tables yet.
+                    ////add this later when the substitution tables have been added
+                    ////if Subs is not null
+                    ////fragment_id = Subs;
+                    ////else
+                    ////fragment_id = Default;
+
 
 
 
@@ -408,7 +414,6 @@ namespace CalRecycleLCA.Services
                         FragmentID = a.p.p.FragmentID,
                         NodeTypeID = a.p.p.NodeTypeID
                     })
-
                     .Union(_fragmentFlowService.Queryable().Select(
                     b => new NodeFlowModel
                     {
@@ -421,6 +426,8 @@ namespace CalRecycleLCA.Services
                     .Where(x => x.FragmentID == subFragmentId && x.NodeTypeID == 3))
                     .ToList();
 
+
+                   
 
                     // next we need to modify the table to fix the reference flow (FlowID = null) and
                     // make it appear like an InputOutput flow
@@ -469,7 +476,8 @@ namespace CalRecycleLCA.Services
 
         public int? GetTermFlow(IEnumerable<FragmentFlow> theFragmentFlow)
         {
-            int? nodeTypeID = theFragmentFlow.Select(x => x.NodeTypeID).FirstOrDefault();
+            int nodeTypeID = Convert.ToInt32(theFragmentFlow.Select(x => x.NodeTypeID).FirstOrDefault());
+            int theFragmentFlowId = theFragmentFlow.Select(x => x.FragmentFlowID).FirstOrDefault();
 
             int? termFlowId = 0;
             switch (nodeTypeID)
@@ -480,15 +488,21 @@ namespace CalRecycleLCA.Services
                     break;
 
                 case 1:
-                    var termFlowProcess = theFragmentFlow.Join(_fragmentNodeProcessService.Queryable(), p => p.FragmentFlowID, pc => pc.FragmentFlowID, (p, pc) => new { p, pc })
-                    .Select(x => x.pc.FlowID).FirstOrDefault();
-                    termFlowId = Convert.ToInt32(termFlowProcess.Value);
+                    termFlowId = _fragmentNodeProcessService.GetFragmentNodeProcessId(theFragmentFlowId).TermFlowID;
+
+                    ////old query for termFlowId before I implemented extension method to query for ProcessID, SubFragmentID and TermFlowID
+                    //var termFlowProcess = theFragmentFlow.Join(_fragmentNodeProcessService.Queryable(), p => p.FragmentFlowID, pc => pc.FragmentFlowID, (p, pc) => new { p, pc })
+                    //.Select(x => x.pc.FlowID).FirstOrDefault();
+                    //termFlowId = Convert.ToInt32(termFlowProcess.Value);
                     break;
 
                 case 2:
-                    var termFlowFragment = theFragmentFlow.Join(_fragmentNodeFragmentService.Queryable(), p => p.FragmentFlowID, pc => pc.FragmentFlowID, (p, pc) => new { p, pc })
-                    .Select(x => x.pc.FlowID).FirstOrDefault();
-                    termFlowId = Convert.ToInt32(termFlowFragment.Value);
+                    termFlowId = _fragmentNodeFragmentService.GetFragmentNodeSubFragmentId(theFragmentFlowId).TermFlowID;
+
+                    //old query for termFlowId before I implemented extension method to query for ProcessID, SubFragmentID and TermFlowID
+                    //var termFlowFragment = theFragmentFlow.Join(_fragmentNodeFragmentService.Queryable(), p => p.FragmentFlowID, pc => pc.FragmentFlowID, (p, pc) => new { p, pc })
+                    //.Select(x => x.pc.FlowID).FirstOrDefault();
+                    //termFlowId = Convert.ToInt32(termFlowFragment.Value);
                     break;
             }
 

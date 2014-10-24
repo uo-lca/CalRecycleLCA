@@ -148,6 +148,8 @@
     <Compile Include="FragmentSubstitutionService.cs" />
     <Compile Include="FragmentTraversalV2.cs" />
     <Compile Include="IFragmentLCIAComputation.cs" />
+    <Compile Include="IFragmentNodeFragmentService.cs" />
+    <Compile Include="IFragmentNodeProcessService.cs" />
     <Compile Include="IFragmentTraversalV2.cs" />
     <Compile Include="ILCIAComputationV2.cs" />
     <Compile Include="ImpactCategoryService.cs" />
@@ -175,6 +177,10 @@
     <ProjectReference Include="..\..\Database\DataModel\LcaDataModel.csproj">
       <Project>{b7f4d17f-6156-457c-8425-8ce5f683cac5}</Project>
       <Name>LcaDataModel</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\CalRecycleLCA.Repositories\CalRecycleLCA.Repositories.csproj">
+      <Project>{ad2c818e-d8d6-4067-a830-4e85498cf98b}</Project>
+      <Name>CalRecycleLCA.Repositories</Name>
     </ProjectReference>
     <ProjectReference Include="..\Entities\Entities.csproj">
       <Project>{bc864533-a57f-4efe-b967-ef8cafc2b2f1}</Project>
