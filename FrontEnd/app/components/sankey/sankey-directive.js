@@ -1,8 +1,8 @@
 /**
  * Directive for reusable d3 sankey diagram
  */
-angular.module('lcaApp.sankey.directive', ['d3.sankey'])
-.directive('sankeyDiagram', ['SankeyService', function(SankeyService) {
+angular.module('lcaApp.sankey.directive', ['d3.sankey', 'd3.tip'])
+.directive('sankeyDiagram', ['SankeyService', 'TipService', function( SankeyService, TipService) {
 
     function link(scope, element, attrs) {
 
@@ -29,8 +29,7 @@ angular.module('lcaApp.sankey.directive', ['d3.sankey'])
             graph = {},
             baseValue = 1E-14,  // sankey link base value (replaces 0).
             minNodeHeight = 3,  // Minimum height of sankey node/link
-            opacity = { node: 1, link: 0.2 }, // default opacity settings
-            unit = "kg";
+            opacity = { node: 1, link: 0.2 }; // default opacity settings
 
         /**
          * Initial preparation of svg element.
@@ -55,17 +54,8 @@ angular.module('lcaApp.sankey.directive', ['d3.sankey'])
             return n.nodeName;
         }
 
-        /**
-         * Display link tool tip
-         * @param l     A graph link
-         * @return string for link tool tip
-         */
-        function getLinkTip(l) {
-            return scope.linkDisplayValue({d: l});
-        }
-
-
         function onGraphChanged(newVal, oldVal) {
+            TipService.hide();
             if (newVal) {
                 graph = scope.graph;
                 drawSankey(graph["isNew"]);
@@ -103,7 +93,7 @@ angular.module('lcaApp.sankey.directive', ['d3.sankey'])
                         (l.source.nodeID === node.nodeID || l.target.nodeID === node.nodeID) ?
                             0.5 : opacity.link);
                 });
-
+            TipService.show(node, index);
         }
 
 
@@ -148,7 +138,8 @@ angular.module('lcaApp.sankey.directive', ['d3.sankey'])
                 });
             link.select("title")
                 .text(function (d) {
-                    return getLinkTip(d);
+                    if ("toolTip" in d)
+                        return d["toolTip"];
                 });
 
             if (rebuild) {
@@ -210,16 +201,36 @@ angular.module('lcaApp.sankey.directive', ['d3.sankey'])
 
         }
 
+        function prepareToolTip() {
+            // Initialize tooltip plugin
+            TipService
+                .offset([-10, -10])
+                .direction('ne')
+                .html(function (d) {
+                    if ("toolTip" in d) {
+                        return d["toolTip"];
+                    }
+                })
+                .style("background", function (d) {
+                    if (d && scope.color.property in d) {
+                        return color(d[scope.color.property]);
+                    }
+                });
+            svg.call(TipService);
+            TipService.hide();
+        }
+
         prepareSvg(element[0]);
         color.domain(scope.color.domain);
         color.range(scope.color.range);
         scope.$watch('graph.links', onGraphChanged);
+        prepareToolTip();
 
     }
 
     return {
         restrict: 'E',
-        scope: { linkDisplayValue: '&', graph: '=', color: '='},
+        scope: { graph: '=', color: '='},
         link: link
     }
 }]);
