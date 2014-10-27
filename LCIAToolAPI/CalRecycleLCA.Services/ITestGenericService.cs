@@ -1,4 +1,5 @@
 ﻿using LcaDataModel;
+using Entities.Models;
 using Repository;
 using System;
 using System.Collections.Generic;
@@ -10,7 +11,7 @@ namespace CalRecycleLCA.Services
 {
     public interface ITestGenericService
     {
-        IEnumerable<LCIAMethod> GetLCIAMethods();    
-          
+        IEnumerable<LCIAMethod> GetLCIAMethods();
+        FragmentNodeResource FindTerminus(int fragmentFlowID, int scenarioID);
     }
 }
