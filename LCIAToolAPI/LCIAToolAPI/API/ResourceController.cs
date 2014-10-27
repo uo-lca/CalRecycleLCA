@@ -7,6 +7,7 @@ using System.Web.Http;
 using Ninject;
 using Entities.Models;
 using CalRecycleLCA.Services;
+using LcaDataModel;
 
 namespace LCAToolAPI.API
 {
@@ -32,6 +33,17 @@ namespace LCAToolAPI.API
         [HttpGet]
         public IEnumerable<FlowTypeResource> GetFlowTypes() {
             return _ResourceService.GetFlowTypes();
+        }
+
+        [Route("api/scenarios")]
+        [HttpGet]
+        public IEnumerable<ScenarioResource> GetScenarios()
+        {
+            // need auth here to determine remote user's scenario group.  
+            // if unprivileged:
+            //return _ResourceService.GetScenarios(userGroupID);
+            // else:
+            return _ResourceService.GetScenarios();
         }
 
         [Route("api/fragments")]

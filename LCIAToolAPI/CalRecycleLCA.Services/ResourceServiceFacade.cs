@@ -19,7 +19,9 @@ namespace CalRecycleLCA.Services
     /// Gets LcaDataModel entities and transforms them to web API resources.
     /// Executes Traversal and Computation as needed.
     /// </summary>
-    public class ResourceServiceFacade : IResourceServiceFacade {
+    public class ResourceServiceFacade : IResourceServiceFacade
+    {
+        #region Dependency Injection
         //
         // LcaDataModel services
         //
@@ -102,7 +104,9 @@ namespace CalRecycleLCA.Services
             _ProcessFlowService = verifiedDependency(processFlowService);
             _ScenarioService = verifiedDependency(scenarioService);
         }
+        #endregion
 
+        #region Model-Resource Transforms
         // TransformNullable methods are a workaround for imprecise relationship modeling
         // in the Database EF model, LcaDataModel.
         // TODO: Define cardinality of all relationships in class diagrams, implement changes in 
@@ -273,33 +277,33 @@ namespace CalRecycleLCA.Services
             };
         }
 
-         public ProcessResource Transform(Process p) {
-             return new ProcessResource {
-                 ProcessID = p.ProcessID,
-                 Name = p.Name,
-                 Geography = p.Geography,
-                 ProcessTypeID = TransformNullable(p.ProcessTypeID, "Process.ProcessTypeID"),
-                 ReferenceTypeID = p.ReferenceTypeID,
-                 ReferenceFlowID = p.ReferenceFlowID,
-                 ReferenceYear = p.ReferenceYear,
-                 Version = p.ILCDEntity.Version
-             };
-         }
+        public ProcessResource Transform(Process p) {
+            return new ProcessResource {
+                ProcessID = p.ProcessID,
+                Name = p.Name,
+                Geography = p.Geography,
+                ProcessTypeID = TransformNullable(p.ProcessTypeID, "Process.ProcessTypeID"),
+                ReferenceTypeID = p.ReferenceTypeID,
+                ReferenceFlowID = p.ReferenceFlowID,
+                ReferenceYear = p.ReferenceYear,
+                Version = p.ILCDEntity.Version
+            };
+        }
 
-         public ProcessFlowResource Transform(ProcessFlow pf) {
-             return new ProcessFlowResource {
-                 ProcessFlowID = pf.ProcessFlowID,
-                 Flow = Transform( pf.Flow),
-                 DirectionID = TransformNullable( pf.DirectionID, "ProcessFlow.DirectionID"),
-                 VarName = pf.VarName,
-                 Magnitude = TransformNullable(pf.Magnitude, "ProcessFlow.Magnitude"),
-                 Result = TransformNullable(pf.Result, "ProcessFlow.Result"),
-                 STDev = TransformNullable(pf.STDev, "ProcessFlow.STDev")
-             };
-         }
+        public ProcessFlowResource Transform(ProcessFlow pf) {
+            return new ProcessFlowResource {
+                ProcessFlowID = pf.ProcessFlowID,
+                Flow = Transform( pf.Flow),
+                DirectionID = TransformNullable( pf.DirectionID, "ProcessFlow.DirectionID"),
+                VarName = pf.VarName,
+                Magnitude = TransformNullable(pf.Magnitude, "ProcessFlow.Magnitude"),
+                Result = TransformNullable(pf.Result, "ProcessFlow.Result"),
+                STDev = TransformNullable(pf.STDev, "ProcessFlow.STDev")
+            };
+        }
 
-         public ProcessLCIAResultResource Transform(LCIAModel m) {
-             return new ProcessLCIAResultResource {
+        public ProcessLCIAResultResource Transform(LCIAModel m) {
+            return new ProcessLCIAResultResource {
                 //LCIAMethodID = TransformNullable(m.LCIAMethodID, "LCIAModel.LCIAMethodID"),
                 FlowID = TransformNullable(m.FlowID, "LCIAModel.FlowID"),
                 DirectionID = TransformNullable(m.DirectionID, "LCIAModel.DirectionID"),
@@ -308,22 +312,38 @@ namespace CalRecycleLCA.Services
                         Convert.ToDouble(m.LCIAFactor) : 
                         Convert.ToDouble(m.LCParamValue),
                 Result = Convert.ToDouble(m.ComputationResult)
-             };
-         }
+            };
+        }
 
-         public FragmentFlowLCIAResource Transform(FragmentLCIAModel m) {
-             return new FragmentFlowLCIAResource {
-                 FragmentFlowID = TransformNullable(m.FragmentFlowID, "FragmentLCIAModel.FragmentFlowID"),
-                 Result = Convert.ToDouble(m.Result)
-             };
-         }
+        public FragmentFlowLCIAResource Transform(FragmentLCIAModel m) {
+            return new FragmentFlowLCIAResource {
+                FragmentFlowID = TransformNullable(m.FragmentFlowID, "FragmentLCIAModel.FragmentFlowID"),
+                Result = Convert.ToDouble(m.Result)
+            };
+        }
 
+        public ScenarioResource Transform(Scenario s)
+        {
+            return new ScenarioResource
+            {
+                ScenarioID = s.ScenarioID,
+                ScenarioGroupID = s.ScenarioGroupID,
+                Name = s.Name,
+                TopLevelFragmentID = s.TopLevelFragmentID,
+                ActivityLevel = Convert.ToDouble(s.ActivityLevel),
+                ReferenceFlowID = s.FlowID,
+                ReferenceDirectionID = s.DirectionID
+            };
+        }
+        #endregion
+
+        #region Service Providers
         // Get list methods 
 
-         /// <summary>
-         /// Get LCIAMethodResource list with optional filter by ImpactCategory
-         /// </summary>
-         public IEnumerable<LCIAMethodResource> GetLCIAMethodResources(int? impactCategoryID = null) {
+        /// <summary>
+        /// Get LCIAMethodResource list with optional filter by ImpactCategory
+        /// </summary>
+        public IEnumerable<LCIAMethodResource> GetLCIAMethodResources(int? impactCategoryID = null) {
             IEnumerable<LCIAMethod> lciaMethods;
             var query = _LciaMethodService.Query()
                                                 .Include(x => x.IndicatorType)
@@ -559,6 +579,24 @@ namespace CalRecycleLCA.Services
             return scenarios.Select(s => GetFragmentLCIAResults(fragmentID, lciaMethodID, s.ScenarioID)).ToList();
         }
 
+
+        /// <summary>
+        /// Get scenario types, with optional ScenarioGroup argument to constrain the ScenarioIDs returned
+        /// </summary>
+        /// <returns>List of ScenarioResource objects</returns>
+        public IEnumerable<ScenarioResource> GetScenarios()
+        {
+            IEnumerable<Scenario> scenarios = _ScenarioService.Queryable();
+            return scenarios.Select(c => Transform(c)).ToList();
+        }
+
+        public IEnumerable<ScenarioResource> GetScenarios(int userGroupID)
+        {
+            IEnumerable<Scenario> scenarios = _ScenarioService.Queryable()
+                .Where(c => ( c.ScenarioGroupID == 1 || c.ScenarioGroupID == userGroupID));
+            return scenarios.Select(c => Transform(c)).ToList();
+        }
+
         /// <summary>
         /// Get FlowType data and transform to API resource model
         /// </summary>
@@ -570,6 +608,6 @@ namespace CalRecycleLCA.Services
                 Name = d.Name
             }).ToList();
         }
-
+        #endregion
     }
 }
