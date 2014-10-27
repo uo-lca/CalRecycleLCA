@@ -9,6 +9,8 @@ namespace CalRecycleLCA.Services
 {
     public interface IResourceServiceFacade {
         IEnumerable<LCIAMethodResource> GetLCIAMethodResources(int? impactCategoryID = null);
+        IEnumerable<ScenarioResource> GetScenarios();
+        IEnumerable<ScenarioResource> GetScenarios(int ScenarioGroupID);
         IEnumerable<FragmentResource> GetFragmentResources();
         FragmentResource GetFragmentResource(int fragmentID);
         IEnumerable<FragmentFlowResource> GetFragmentFlowResources(int fragmentID, int scenarioID = 0);

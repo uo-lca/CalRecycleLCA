@@ -149,6 +149,7 @@
     <Compile Include="Models\FragmentLCIAResource.cs" />
     <Compile Include="Models\ProcessResource.cs" />
     <Compile Include="Models\ResolveBackgroundModel.cs" />
+    <Compile Include="Models\ScenarioResource.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
