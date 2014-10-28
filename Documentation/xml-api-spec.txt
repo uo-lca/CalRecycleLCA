@@ -1,0 +1,120 @@
+==========
+Tue Oct 28 13:18:42 -0700 2014
+
+Proposed specification for an XML handler for LCA tool
+
+# The way it works
+
+XML files are stored in a file repository laid out as specified in the
+schema document:
+
+$DATA_ROOT/<source name>/ILCD/<datatype>/<UUID>.xml
+
+These files contain hard-coded references to (a) other XML resources and
+(b) stylesheets.
+
+The objective is to present a virtual file hierarchy that:
+
+ 1. allows the user to transparently access XML resources by UUID;
+ 2. obscures the data source where the file is stored;
+ 3. hides data from data sources marked "private";
+ 4. emulates the file hierarchy embedded in the XML file references.
+
+# URI Structure
+
+The proposed virtual file hierarchy looks like the following:
+
+$URL_ROOT/xml/<level 0>/<level 1>/<UUID>.+
+
+with all text after a valid UUID ignored.
+
+$URL_ROOT/xml/<level 0>/<level 1>/<UUID>.+/versions/<Version>
+
+implementation of the 'versions' methods postponed indefinitely.
+
+<level 0> allowed values are:
+
+ - schemas
+ - stylesheets
+ - ILCD
+
+# API Routes
+
+ * $URL_ROOT/xml/schemas/<filename>
+
+   should return the requested file from $DATA_ROOT/ILCD_generic/schemas/
+   or 404 if not found.
+
+ * $URL_ROOT/xml/stylesheets/<filename>
+
+   should return the requested file from $DATA_ROOT/ILCD_generic/stylesheets/
+   or 404 if not found.
+
+ * $URL_ROOT/xml/ILCD/<level 1>/<UUID>
+   $URL_ROOT/xml/ILCD/<level 1>/<UUID>.+
+
+   (any text after a valid UUID should be stripped when the URI is parsed)
+
+   <level 1> allowed values are:
+
+    - processes
+    - flows
+    - flowproperties
+    - lciamethods
+    - unitgroups
+
+   The following are valid but currently not supported:
+
+    - contacts
+    - sources
+    - external_docs
+
+   Operation:
+
+    1. extract valid UUID; if invalid return some error, e.g HTTP 400, with
+       body text "Invalid UUID"
+
+    2. lookup UUID in ILCDEntity.  If not found, return 404.
+
+    3. If found, confirm that <level 1> value matches the data type of the
+       entity. (note: pathnames use DataType.PathName). If not, return HTTP
+       400 with body "UUID datatype mismatch"
+
+    4. filter ILCDEntity based on UUID.
+
+    5. determine whether any ILCDEntities in the result set are visible
+       according to the user's authorization level.  If all are private,
+       return 403.
+       [in the future, check user authorization and return 403 if not
+       authorized]
+
+    5. From the ILCDEntities that the user is authorized to view, determine
+       the ILCDEntity with the lexically highest version string.
+
+    6. Return the xml resource to the browser.
+
+
+
+# Future enhancements
+
+
+
+ * $URL_ROOT/xml/<UUID>
+
+    1. extract valid UUID; if invalid return some error, e.g HTTP 400
+
+    2. lookup UUID in ILCDEntity.  If not found, return 404.
+
+    3. if found, issue HTTP 302 Found, redirect to
+       $URL_ROOT/xml/ILCD/<datatype>/<UUID>
+
+ * $URL_ROOT/xml/ILCD/<level 1>/<UUID>/versions/<Version>
+   $URL_ROOT/xml/ILCD/<level 1>/<UUID>.+/versions/<Version>
+
+   Just like the route above, except return the ILCDEntity for which
+   <Version> is an exact match, or 404 if none found.  
+
+ * $URL_ROOT/xml/ILCD/<level 1>/<UUID>/versions
+   $URL_ROOT/xml/ILCD/<level 1>/<UUID>.+/versions
+
+
