@@ -115,13 +115,13 @@ namespace LCAToolAPI.API
         // TODO: Add scenario group filter
         [Route("api/fragments/{fragmentID:int}/lciamethods/{lciaMethodID:int}/lciaresults")]
         [HttpGet]
-        public IEnumerable<FragmentLCIAResource> GetFragmentLCIAResultsAllScenarios(int fragmentID, int lciaMethodID) {
+        public IEnumerable<LCIAResultResource> GetFragmentLCIAResultsAllScenarios(int fragmentID, int lciaMethodID) {
              return _ResourceService.GetFragmentLCIAResultsAllScenarios(fragmentID, lciaMethodID);
         }
 
         [Route("api/scenarios/{scenarioID:int}/fragments/{fragmentID:int}/lciamethods/{lciaMethodID:int}/lciaresults")]
         [HttpGet]
-        public FragmentLCIAResource GetFragmentLCIAResults(int fragmentID, int lciaMethodID, int scenarioID) {
+        public LCIAResultResource GetFragmentLCIAResults(int fragmentID, int lciaMethodID, int scenarioID) {
             return _ResourceService.GetFragmentLCIAResults(fragmentID, lciaMethodID, scenarioID);
         }
 

@@ -356,10 +356,10 @@ function LciaWaterfall() {
     function onResultsLoaded() {
         if ("lciaresults" in LCA.loadedData) {
             LCA.loadedData.lciaresults.forEach(function (s) {
-                if (("scenarioID" in s) && (s.scenarioID in scenarios) && ("fragmentFlowLCIAResults" in s)) {
+                if (("scenarioID" in s) && (s.scenarioID in scenarios) && ("lciaScore" in s)) {
                     var indexedResults = {};
-                    s.fragmentFlowLCIAResults.forEach(function (r) {
-                        indexedResults[r.fragmentFlowID] = +r.result;
+                    s.lciaScore.forEach(function (r) {
+                        indexedResults[r.fragmentFlowID] = +r.cumulativeResult;
                     });
                     scenarios[s.scenarioID].lciaResults = indexedResults;
                 }

@@ -315,10 +315,11 @@ namespace CalRecycleLCA.Services
             };
         }
 
-        public FragmentFlowLCIAResource Transform(FragmentLCIAModel m) {
-            return new FragmentFlowLCIAResource {
+        public AggregateLCIAResource Transform(FragmentLCIAModel m) {
+            return new AggregateLCIAResource {
                 FragmentFlowID = TransformNullable(m.FragmentFlowID, "FragmentLCIAModel.FragmentFlowID"),
-                Result = Convert.ToDouble(m.Result)
+                CumulativeResult = Convert.ToDouble(m.Result),
+                LCIADetail = new List<DetailedLCIAResource>()
             };
         }
 
@@ -588,7 +589,7 @@ namespace CalRecycleLCA.Services
         /// <param name="lciaMethodID"></param>
         /// <param name="scenarioID">Defaults to base scenario</param>
         /// <returns>Fragment LCIA results for given parameters</returns> 
-        public FragmentLCIAResource GetFragmentLCIAResults(int fragmentID, int lciaMethodID, int scenarioID = 0) {
+        public LCIAResultResource GetFragmentLCIAResults(int fragmentID, int lciaMethodID, int scenarioID = 0) {
             IEnumerable<FragmentLCIAModel> results = _FragmentLCIAComputation.ComputeFragmentLCIA(fragmentID, scenarioID, lciaMethodID);
             IEnumerable<FragmentLCIAModel> aggResults = results
                 .GroupBy(r => r.FragmentFlowID)
@@ -597,9 +598,10 @@ namespace CalRecycleLCA.Services
                     FragmentFlowID = group.Key,
                     Result = group.Sum(a => a.Result)
                 });
-            FragmentLCIAResource lciaResult = new FragmentLCIAResource {
+            LCIAResultResource lciaResult = new LCIAResultResource {
                 ScenarioID = scenarioID,
-                FragmentFlowLCIAResults = aggResults.Select(r => Transform(r)).ToList()
+                LCIAMethodID = lciaMethodID,
+                LCIAScore = aggResults.Select(r => Transform(r)).ToList()
             };
             return lciaResult;
         }
@@ -611,7 +613,7 @@ namespace CalRecycleLCA.Services
         /// <param name="lciaMethodID"></param>
         /// <param name="scenarioGroupID">Scenario group of the user making request</param>
         /// <returns>List of LCIAResultResource objects</returns> 
-        public IEnumerable<FragmentLCIAResource> GetFragmentLCIAResultsAllScenarios(int fragmentID, int lciaMethodID, int scenarioGroupID = 1) {
+        public IEnumerable<LCIAResultResource> GetFragmentLCIAResultsAllScenarios(int fragmentID, int lciaMethodID, int scenarioGroupID = 1) {
             IEnumerable<Scenario> scenarios = _ScenarioService.Queryable().Where(s => s.ScenarioGroupID == scenarioGroupID);
             return scenarios.Select(s => GetFragmentLCIAResults(fragmentID, lciaMethodID, s.ScenarioID)).ToList();
         }
