@@ -18,7 +18,7 @@ namespace Entities.Models {
     /// 
     public class ProcessFlowResource {
 
-        public int ProcessFlowID { get; set; }
+        // public int ProcessFlowID { get; set; } // not necessary; may expose information
         public FlowResource Flow { get; set; }
         public int DirectionID { get; set; }
         public string VarName { get; set; }

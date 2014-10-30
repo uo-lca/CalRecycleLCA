@@ -292,7 +292,7 @@ namespace CalRecycleLCA.Services
 
         public ProcessFlowResource Transform(ProcessFlow pf) {
             return new ProcessFlowResource {
-                ProcessFlowID = pf.ProcessFlowID,
+                // ProcessFlowID = pf.ProcessFlowID,
                 Flow = Transform( pf.Flow),
                 DirectionID = TransformNullable( pf.DirectionID, "ProcessFlow.DirectionID"),
                 VarName = pf.VarName,
@@ -302,8 +302,8 @@ namespace CalRecycleLCA.Services
             };
         }
 
-        public ProcessLCIAResultResource Transform(LCIAModel m) {
-            return new ProcessLCIAResultResource {
+        public DetailedLCIAResource Transform(LCIAModel m) {
+            return new DetailedLCIAResource {
                 //LCIAMethodID = TransformNullable(m.LCIAMethodID, "LCIAModel.LCIAMethodID"),
                 FlowID = TransformNullable(m.FlowID, "LCIAModel.FlowID"),
                 DirectionID = TransformNullable(m.DirectionID, "LCIAModel.DirectionID"),
@@ -526,19 +526,31 @@ namespace CalRecycleLCA.Services
         /// Work around problem in LCIA computation: should be filtering out LCIA with Geography 
         /// </summary>
         /// <returns>LCIAResultResource or null if lciaMethodID not found</returns> 
-        public LCIAResultResource GetLCIAResultResource(int processID, int lciaMethodID, int scenarioID = 0) {
+        public LCIAResultResource GetProcessLCIAResult(int processID, int lciaMethodID, int scenarioID = 0) {
             LCIAMethod lciaMethod = _LciaMethodService.Find(lciaMethodID);
             if (lciaMethod == null) {
                 // TODO: figure how to handle this sort of error
                 return null;
             }
-            else {
+            else { 
                 IEnumerable<InventoryModel> inventory = _LCIAComputation.ComputeProcessLCI(processID, scenarioID);
-                IEnumerable<LCIAModel> lciaResults = _LCIAComputation.ComputeProcessLCIA(inventory, lciaMethod, scenarioID)
+                IEnumerable<LCIAModel> lciaDetail = _LCIAComputation.ComputeProcessLCIA(inventory, lciaMethod, scenarioID)
                     .Where(l => String.IsNullOrEmpty(l.Geography));
-                LCIAResultResource lciaResult = new LCIAResultResource {
+                var privacy_flag = _ProcessService.Query(p => p.ProcessID == processID)
+                    .Include(p => p.ILCDEntity.DataSource)
+                    .Select(p => p.ILCDEntity.DataSource.VisibilityID).First() == 2;
+                var lciaScore = new AggregateLCIAResource
+                    {
+                        ProcessID = processID,
+                        CumulativeResult = (double)lciaDetail.Sum(a => a.ComputationResult),
+                        LCIADetail = (privacy_flag 
+                            ? new List<DetailedLCIAResource>()
+                            : lciaDetail.Select(m => Transform(m)).ToList() )
+                    };  
+                var lciaResult = new LCIAResultResource {
                     LCIAMethodID = lciaMethodID,
-                    ProcessLCIAResults = lciaResults.Select(m => Transform(m)).ToList()
+                    ScenarioID = scenarioID,
+                    LCIAScore = new List<AggregateLCIAResource>() { lciaScore }
                 };
                 return lciaResult;
             }
