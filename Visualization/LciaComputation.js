@@ -525,7 +525,7 @@ function lciaComputation() {
 
     function onResultsLoaded() {
         if ("lciaresults" in LCA.loadedData) {
-            visualizeResults(LCA.loadedData.lciaresults.processLCIAResults);
+            visualizeResults(LCA.loadedData.lciaresults.lciaScore.lciaDetail);
         } 
     }
 
