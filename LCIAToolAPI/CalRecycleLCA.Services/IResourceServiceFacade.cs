@@ -18,11 +18,11 @@ namespace CalRecycleLCA.Services
         IEnumerable<ProcessFlowResource> GetProcessFlows(int processID);
         IEnumerable<FlowPropertyResource> GetFlowPropertiesByFragment(int fragmentID);
         IEnumerable<FlowPropertyResource> GetFlowPropertiesByProcess(int processID);
-        FragmentLCIAResource GetFragmentLCIAResults(int fragmentID, int lciaMethodID, int scenarioID = 0);
-        IEnumerable<FragmentLCIAResource> GetFragmentLCIAResultsAllScenarios(int fragmentID, int lciaMethodID, int scenarioGroupID = 1);
+        LCIAResultResource GetFragmentLCIAResults(int fragmentID, int lciaMethodID, int scenarioID = 0);
+        IEnumerable<LCIAResultResource> GetFragmentLCIAResultsAllScenarios(int fragmentID, int lciaMethodID, int scenarioGroupID = 1);
         IEnumerable<ProcessResource> GetProcesses(int? flowTypeID = null);
         IEnumerable<ImpactCategoryResource> GetImpactCategories();
-        LCIAResultResource GetLCIAResultResource(int processID, int lciaMethodID, int scenarioID = 0);
+        LCIAResultResource GetProcessLCIAResult(int processID, int lciaMethodID, int scenarioID = 0);
         IEnumerable<FlowTypeResource> GetFlowTypes();
     }
 }

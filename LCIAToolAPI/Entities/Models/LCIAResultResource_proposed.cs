@@ -35,6 +35,6 @@ namespace Entities.Models.Proposed {
         public int ScenarioID;
         public int LCIAMethodID { get; set; }
 
-        public ICollection<AggregateLCIAResource> ProcessLCIAResults  { get; set; }
+        public ICollection<AggregateLCIAResource> LCIAResults  { get; set; }
     }
 }

@@ -292,7 +292,7 @@ namespace CalRecycleLCA.Services
 
         public ProcessFlowResource Transform(ProcessFlow pf) {
             return new ProcessFlowResource {
-                ProcessFlowID = pf.ProcessFlowID,
+                // ProcessFlowID = pf.ProcessFlowID,
                 Flow = Transform( pf.Flow),
                 DirectionID = TransformNullable( pf.DirectionID, "ProcessFlow.DirectionID"),
                 VarName = pf.VarName,
@@ -302,8 +302,8 @@ namespace CalRecycleLCA.Services
             };
         }
 
-        public ProcessLCIAResultResource Transform(LCIAModel m) {
-            return new ProcessLCIAResultResource {
+        public DetailedLCIAResource Transform(LCIAModel m) {
+            return new DetailedLCIAResource {
                 //LCIAMethodID = TransformNullable(m.LCIAMethodID, "LCIAModel.LCIAMethodID"),
                 FlowID = TransformNullable(m.FlowID, "LCIAModel.FlowID"),
                 DirectionID = TransformNullable(m.DirectionID, "LCIAModel.DirectionID"),
@@ -315,10 +315,11 @@ namespace CalRecycleLCA.Services
             };
         }
 
-        public FragmentFlowLCIAResource Transform(FragmentLCIAModel m) {
-            return new FragmentFlowLCIAResource {
+        public AggregateLCIAResource Transform(FragmentLCIAModel m) {
+            return new AggregateLCIAResource {
                 FragmentFlowID = TransformNullable(m.FragmentFlowID, "FragmentLCIAModel.FragmentFlowID"),
-                Result = Convert.ToDouble(m.Result)
+                CumulativeResult = Convert.ToDouble(m.Result),
+                LCIADetail = new List<DetailedLCIAResource>()
             };
         }
 
@@ -378,12 +379,14 @@ namespace CalRecycleLCA.Services
         }
 
         /// <summary>
-        /// Get list of flows related to a fragment or a process
+        /// Get list of flows related to a fragment or a process-- eliminated. use
+        /// GetFlowsByFragment or GetProcessFlows.
         /// </summary>
         /// <param name="relType">Relationship class type (FragmentFlow or ProcessFlow)</param>
         /// <param name="relID">ID of related fragment or process</param>
         /// <returns>List of FlowResource objects</returns>
-        public IEnumerable<FlowResource> GetFlows(Type relType, int relID)
+        /*********
+         * public IEnumerable<FlowResource> GetFlows(Type relType, int relID)
         {
             IEnumerable<Flow> flowQuery;
             if (relType == typeof(FragmentFlow))
@@ -400,7 +403,7 @@ namespace CalRecycleLCA.Services
             }
             return flowQuery.Select(f => Transform(f)).ToList();
         }
-
+        ************** */
 
         /// <summary>
         /// Get list of flows related to a fragment (via FragmentFlow)
@@ -408,18 +411,41 @@ namespace CalRecycleLCA.Services
         /// <param name="fragmentID">FragmentID filter</param>
         /// <returns>List of FlowResource objects</returns>
         public IEnumerable<FlowResource> GetFlowsByFragment(int fragmentID) {
-            return GetFlows(typeof(FragmentFlow), fragmentID);
+            //return GetFlows(typeof(FragmentFlow), fragmentID);
+            return _FlowService.Query(f => f.FragmentFlows.Any(ff => ff.FragmentID == fragmentID))
+                .Include(x => x.FragmentFlows)
+                .Select()
+                .Select(f => Transform(f)).ToList();
+            // return flowQuery.Select(f => Transform(f)).ToList();
         }
 
         /// <summary>
-        /// Get list of processflow resources
+        /// Get list of processflow resources.  
+        /// 
+        /// This needs to be privacy aware, since the processflows are what are being protected. 
+        /// Several conceivable levels of privacy: 
+        ///  * list nothing (the current behavior); 
+        ///  * list only flow names with no quantities; 
+        ///  * list only elementary flows;
+        ///  * (list only intermediate flows-- these are fragmentflows and so are already listed)
+        ///    [ Important to qualify-- fragment traversal (without quantity)- 
+        ///      so traversal results must be protected too. effectively this means you can't 
+        ///      descend into certain fragments]
+        /// Ultimately, could be switch IsPrivate rather than bool.
         /// </summary>
         public IEnumerable<ProcessFlowResource> GetProcessFlows(int processID) {
-            var processFlows = _ProcessFlowService.Query(x => x.ProcessID == processID)
+
+            if (_ProcessService.IsPrivate(processID))
+            {
+                return new List<ProcessFlowResource>();
+            }
+            else
+            {
+                return _ProcessFlowService.Query(x => x.ProcessID == processID)
                                                 .Include(x => x.Flow)
-                                                .Select().ToList();
-                                                //.Where(pf => pf.ProcessID == processID).ToList();
-            return processFlows.Select(pf => Transform(pf)).ToList();
+                                                .Select()
+                                                .Select(pf => Transform(pf)).ToList();
+            }
         }
 
         /// <summary>
@@ -526,19 +552,31 @@ namespace CalRecycleLCA.Services
         /// Work around problem in LCIA computation: should be filtering out LCIA with Geography 
         /// </summary>
         /// <returns>LCIAResultResource or null if lciaMethodID not found</returns> 
-        public LCIAResultResource GetLCIAResultResource(int processID, int lciaMethodID, int scenarioID = 0) {
+        public LCIAResultResource GetProcessLCIAResult(int processID, int lciaMethodID, int scenarioID = 0) {
             LCIAMethod lciaMethod = _LciaMethodService.Find(lciaMethodID);
             if (lciaMethod == null) {
                 // TODO: figure how to handle this sort of error
                 return null;
             }
-            else {
+            else { 
                 IEnumerable<InventoryModel> inventory = _LCIAComputation.ComputeProcessLCI(processID, scenarioID);
-                IEnumerable<LCIAModel> lciaResults = _LCIAComputation.ComputeProcessLCIA(inventory, lciaMethod, scenarioID)
+                IEnumerable<LCIAModel> lciaDetail = _LCIAComputation.ComputeProcessLCIA(inventory, lciaMethod, scenarioID)
                     .Where(l => String.IsNullOrEmpty(l.Geography));
-                LCIAResultResource lciaResult = new LCIAResultResource {
+                // var privacy_flag = _ProcessService.Query(p => p.ProcessID == processID)
+                //     .Include(p => p.ILCDEntity.DataSource)
+                //     .Select(p => p.ILCDEntity.DataSource.VisibilityID).First() == 2;
+                var lciaScore = new AggregateLCIAResource
+                    {
+                        ProcessID = processID,
+                        CumulativeResult = (double)lciaDetail.Sum(a => a.ComputationResult),
+                        LCIADetail = (_ProcessService.IsPrivate(processID)
+                            ? new List<DetailedLCIAResource>()
+                            : lciaDetail.Select(m => Transform(m)).ToList() )
+                    };  
+                var lciaResult = new LCIAResultResource {
                     LCIAMethodID = lciaMethodID,
-                    ProcessLCIAResults = lciaResults.Select(m => Transform(m)).ToList()
+                    ScenarioID = scenarioID,
+                    LCIAScore = new List<AggregateLCIAResource>() { lciaScore }
                 };
                 return lciaResult;
             }
@@ -551,7 +589,7 @@ namespace CalRecycleLCA.Services
         /// <param name="lciaMethodID"></param>
         /// <param name="scenarioID">Defaults to base scenario</param>
         /// <returns>Fragment LCIA results for given parameters</returns> 
-        public FragmentLCIAResource GetFragmentLCIAResults(int fragmentID, int lciaMethodID, int scenarioID = 0) {
+        public LCIAResultResource GetFragmentLCIAResults(int fragmentID, int lciaMethodID, int scenarioID = 0) {
             IEnumerable<FragmentLCIAModel> results = _FragmentLCIAComputation.ComputeFragmentLCIA(fragmentID, scenarioID, lciaMethodID);
             IEnumerable<FragmentLCIAModel> aggResults = results
                 .GroupBy(r => r.FragmentFlowID)
@@ -560,9 +598,10 @@ namespace CalRecycleLCA.Services
                     FragmentFlowID = group.Key,
                     Result = group.Sum(a => a.Result)
                 });
-            FragmentLCIAResource lciaResult = new FragmentLCIAResource {
+            LCIAResultResource lciaResult = new LCIAResultResource {
                 ScenarioID = scenarioID,
-                FragmentFlowLCIAResults = aggResults.Select(r => Transform(r)).ToList()
+                LCIAMethodID = lciaMethodID,
+                LCIAScore = aggResults.Select(r => Transform(r)).ToList()
             };
             return lciaResult;
         }
@@ -574,7 +613,7 @@ namespace CalRecycleLCA.Services
         /// <param name="lciaMethodID"></param>
         /// <param name="scenarioGroupID">Scenario group of the user making request</param>
         /// <returns>List of LCIAResultResource objects</returns> 
-        public IEnumerable<FragmentLCIAResource> GetFragmentLCIAResultsAllScenarios(int fragmentID, int lciaMethodID, int scenarioGroupID = 1) {
+        public IEnumerable<LCIAResultResource> GetFragmentLCIAResultsAllScenarios(int fragmentID, int lciaMethodID, int scenarioGroupID = 1) {
             IEnumerable<Scenario> scenarios = _ScenarioService.Queryable().Where(s => s.ScenarioGroupID == scenarioGroupID);
             return scenarios.Select(s => GetFragmentLCIAResults(fragmentID, lciaMethodID, s.ScenarioID)).ToList();
         }
