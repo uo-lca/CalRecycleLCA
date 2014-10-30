@@ -378,12 +378,14 @@ namespace CalRecycleLCA.Services
         }
 
         /// <summary>
-        /// Get list of flows related to a fragment or a process
+        /// Get list of flows related to a fragment or a process-- eliminated. use
+        /// GetFlowsByFragment or GetProcessFlows.
         /// </summary>
         /// <param name="relType">Relationship class type (FragmentFlow or ProcessFlow)</param>
         /// <param name="relID">ID of related fragment or process</param>
         /// <returns>List of FlowResource objects</returns>
-        public IEnumerable<FlowResource> GetFlows(Type relType, int relID)
+        /*********
+         * public IEnumerable<FlowResource> GetFlows(Type relType, int relID)
         {
             IEnumerable<Flow> flowQuery;
             if (relType == typeof(FragmentFlow))
@@ -400,7 +402,7 @@ namespace CalRecycleLCA.Services
             }
             return flowQuery.Select(f => Transform(f)).ToList();
         }
-
+        ************** */
 
         /// <summary>
         /// Get list of flows related to a fragment (via FragmentFlow)
@@ -408,18 +410,41 @@ namespace CalRecycleLCA.Services
         /// <param name="fragmentID">FragmentID filter</param>
         /// <returns>List of FlowResource objects</returns>
         public IEnumerable<FlowResource> GetFlowsByFragment(int fragmentID) {
-            return GetFlows(typeof(FragmentFlow), fragmentID);
+            //return GetFlows(typeof(FragmentFlow), fragmentID);
+            return _FlowService.Query(f => f.FragmentFlows.Any(ff => ff.FragmentID == fragmentID))
+                .Include(x => x.FragmentFlows)
+                .Select()
+                .Select(f => Transform(f)).ToList();
+            // return flowQuery.Select(f => Transform(f)).ToList();
         }
 
         /// <summary>
-        /// Get list of processflow resources
+        /// Get list of processflow resources.  
+        /// 
+        /// This needs to be privacy aware, since the processflows are what are being protected. 
+        /// Several conceivable levels of privacy: 
+        ///  * list nothing (the current behavior); 
+        ///  * list only flow names with no quantities; 
+        ///  * list only elementary flows;
+        ///  * (list only intermediate flows-- these are fragmentflows and so are already listed)
+        ///    [ Important to qualify-- fragment traversal (without quantity)- 
+        ///      so traversal results must be protected too. effectively this means you can't 
+        ///      descend into certain fragments]
+        /// Ultimately, could be switch IsPrivate rather than bool.
         /// </summary>
         public IEnumerable<ProcessFlowResource> GetProcessFlows(int processID) {
-            var processFlows = _ProcessFlowService.Query(x => x.ProcessID == processID)
+
+            if (_ProcessService.IsPrivate(processID))
+            {
+                return new List<ProcessFlowResource>();
+            }
+            else
+            {
+                return _ProcessFlowService.Query(x => x.ProcessID == processID)
                                                 .Include(x => x.Flow)
-                                                .Select().ToList();
-                                                //.Where(pf => pf.ProcessID == processID).ToList();
-            return processFlows.Select(pf => Transform(pf)).ToList();
+                                                .Select()
+                                                .Select(pf => Transform(pf)).ToList();
+            }
         }
 
         /// <summary>
@@ -536,14 +561,14 @@ namespace CalRecycleLCA.Services
                 IEnumerable<InventoryModel> inventory = _LCIAComputation.ComputeProcessLCI(processID, scenarioID);
                 IEnumerable<LCIAModel> lciaDetail = _LCIAComputation.ComputeProcessLCIA(inventory, lciaMethod, scenarioID)
                     .Where(l => String.IsNullOrEmpty(l.Geography));
-                var privacy_flag = _ProcessService.Query(p => p.ProcessID == processID)
-                    .Include(p => p.ILCDEntity.DataSource)
-                    .Select(p => p.ILCDEntity.DataSource.VisibilityID).First() == 2;
+                // var privacy_flag = _ProcessService.Query(p => p.ProcessID == processID)
+                //     .Include(p => p.ILCDEntity.DataSource)
+                //     .Select(p => p.ILCDEntity.DataSource.VisibilityID).First() == 2;
                 var lciaScore = new AggregateLCIAResource
                     {
                         ProcessID = processID,
                         CumulativeResult = (double)lciaDetail.Sum(a => a.ComputationResult),
-                        LCIADetail = (privacy_flag 
+                        LCIADetail = (_ProcessService.IsPrivate(processID)
                             ? new List<DetailedLCIAResource>()
                             : lciaDetail.Select(m => Transform(m)).ToList() )
                     };  

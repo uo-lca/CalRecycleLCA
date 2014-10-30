@@ -42,6 +42,7 @@
     <Compile Include="FragmentFlowRepository.cs" />
     <Compile Include="FragmentNodeFragmentRepository.cs" />
     <Compile Include="FragmentNodeProcessRepository.cs" />
+    <Compile Include="ProcessRepository.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
