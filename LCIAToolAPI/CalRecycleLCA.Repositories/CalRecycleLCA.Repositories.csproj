@@ -33,6 +33,9 @@
     <Reference Include="LcaDataModel">
       <HintPath>..\Database\DataModel\bin\Debug\LcaDataModel.dll</HintPath>
     </Reference>
+    <Reference Include="Moq">
+      <HintPath>..\..\packages\Moq.4.2.1409.1722\lib\net40\Moq.dll</HintPath>
+    </Reference>
     <Reference Include="Repository.Pattern">
       <HintPath>..\LCIAToolAPI\Frameworks\Repository.Pattern.Ef6\bin\Debug\Repository.Pattern.dll</HintPath>
     </Reference>
@@ -58,6 +61,10 @@
       <Project>{bc864533-a57f-4efe-b967-ef8cafc2b2f1}</Project>
       <Name>Entities</Name>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="app.config" />
+    <None Include="packages.config" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
