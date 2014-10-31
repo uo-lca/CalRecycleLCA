@@ -7,6 +7,7 @@ using System.Web.Http;
 using Ninject;
 using Entities.Models;
 using CalRecycleLCA.Services;
+using LcaDataModel;
 
 namespace LCAToolAPI.API
 {
@@ -32,6 +33,17 @@ namespace LCAToolAPI.API
         [HttpGet]
         public IEnumerable<FlowTypeResource> GetFlowTypes() {
             return _ResourceService.GetFlowTypes();
+        }
+
+        [Route("api/scenarios")]
+        [HttpGet]
+        public IEnumerable<ScenarioResource> GetScenarios()
+        {
+            // need auth here to determine remote user's scenario group.  
+            // if unprivileged:
+            //return _ResourceService.GetScenarios(userGroupID);
+            // else:
+            return _ResourceService.GetScenarios();
         }
 
         [Route("api/fragments")]
@@ -103,13 +115,13 @@ namespace LCAToolAPI.API
         // TODO: Add scenario group filter
         [Route("api/fragments/{fragmentID:int}/lciamethods/{lciaMethodID:int}/lciaresults")]
         [HttpGet]
-        public IEnumerable<FragmentLCIAResource> GetFragmentLCIAResultsAllScenarios(int fragmentID, int lciaMethodID) {
+        public IEnumerable<LCIAResultResource> GetFragmentLCIAResultsAllScenarios(int fragmentID, int lciaMethodID) {
              return _ResourceService.GetFragmentLCIAResultsAllScenarios(fragmentID, lciaMethodID);
         }
 
         [Route("api/scenarios/{scenarioID:int}/fragments/{fragmentID:int}/lciamethods/{lciaMethodID:int}/lciaresults")]
         [HttpGet]
-        public FragmentLCIAResource GetFragmentLCIAResults(int fragmentID, int lciaMethodID, int scenarioID) {
+        public LCIAResultResource GetFragmentLCIAResults(int fragmentID, int lciaMethodID, int scenarioID) {
             return _ResourceService.GetFragmentLCIAResults(fragmentID, lciaMethodID, scenarioID);
         }
 
@@ -166,15 +178,17 @@ namespace LCAToolAPI.API
         // access control needed here
         [Route("api/processes/{processID:int}/lciamethods/{lciaMethodID:int}/lciaresults")]
         [HttpGet]
-        public LCIAResultResource GetLCIAResultResources(int processID, int lciaMethodID) {
-            return _ResourceService.GetLCIAResultResource(processID, lciaMethodID);
+        public LCIAResultResource GetProcessLCIAResult(int processID, int lciaMethodID)
+        {
+            return _ResourceService.GetProcessLCIAResult(processID, lciaMethodID);
         }
 
         // as above w/ scenario
         [Route("api/scenarios/{scenarioID:int}/processes/{processID:int}/lciamethods/{lciaMethodID:int}/lciaresults")]
         [HttpGet]
-        public LCIAResultResource GetLCIAResultResource(int processID, int lciaMethodID, int scenarioID) {
-            return _ResourceService.GetLCIAResultResource(processID, lciaMethodID, scenarioID);
+        public LCIAResultResource GetProcessLCIAResult(int processID, int lciaMethodID, int scenarioID)
+        {
+            return _ResourceService.GetProcessLCIAResult(processID, lciaMethodID, scenarioID);
         }
 
 

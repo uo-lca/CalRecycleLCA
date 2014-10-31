@@ -15,9 +15,11 @@ namespace Entities.Models {
         public string Name { get; set; }
         public int TopLevelFragmentID { get; set; }
         public double ActivityLevel { get; set; }
+        public int ReferenceFlowID { get; set; }
+        public int ReferenceDirectionID { get; set; }
 
         // ScenarioGroup.Name
-        public int ScenarioGroup { get; set; }
+        public int ScenarioGroupID { get; set; }
         
     }
 
@@ -28,7 +30,7 @@ namespace Entities.Models {
         public int ParamTypeID { get; set; }
         public int ScenarioID { get; set; }
         public string Name { get; set; }
-        // joined from DependencyParam-- nullable
+        // joined from DependencyParam-- nullable -- frontend should 
         public int? FragmentFlowID { get; set; }
         // joined from FlowPropertyParam
         public int? FlowFlowPropertyID { get; set; }
@@ -59,6 +61,7 @@ namespace Entities.Models {
         public int SubstituteFragmentID { get; set; }
     }
 
+    /*************
     public class ScenarioSubstitutionResource {
         
         public int ScenarioID { get; set; }
@@ -69,5 +72,6 @@ namespace Entities.Models {
         public ICollection<NodeSubstitution> ScenarioNodeSubstitutions { get; set; }
         // composition substitution later
     }
+     * *************/
 }
 

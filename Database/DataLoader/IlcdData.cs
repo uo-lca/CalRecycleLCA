@@ -197,11 +197,21 @@ namespace LcaDataLoader {
         /// <param name="processID">Process parent entity ID</param>
         private ProcessFlow CreateProcessFlow(DbContextWrapper ilcdDb, XElement el, int processID) {
             ProcessFlow pf = null;
-            string type = (string)el.Element(ElementName("referenceToVariable"));
-            string varName = (string)el.Element(_CommonNamespace + "other").Element(_GabiNamespace + "GaBi").Attribute("IOType");
+            string varName = (string)el.Element(ElementName("referenceToVariable"));
+            string type;
+            if (el.Element(_CommonNamespace + "other") == null )
+            {
+                type  = "none";
+            }
+            else {
+                type=(string)el.Element(_CommonNamespace + "other").Element(_GabiNamespace + "GaBi").Attribute("IOType");
+            }
             double magnitude = (double)el.Element(ElementName("meanAmount"));
             double result = (double)el.Element(ElementName("resultingAmount"));
-            double stdev = (double)el.Element(ElementName("relativeStandardDeviation95In"));
+            double stdev = 0;
+            if ( el.Element("relativeStandardDeviation95In") != null) {
+                stdev = (double)el.Elements(ElementName("relativeStandardDeviation95In")).FirstOrDefault();
+            }
             string uuid = el.Element(ElementName("referenceToFlowDataSet")).Attribute("refObjectId").Value;
             int flowID;
             if (ilcdDb.FindRefIlcdEntityID<Flow>(uuid, out flowID)) {
@@ -402,6 +412,7 @@ namespace LcaDataLoader {
             string uuid = GetCommonUUID();
             string version = GetCommonVersion();
             if (!ilcdDb.IlcdEntityAlreadyExists<LcaDataModel.Process>(uuid, version)) {
+                Program.Logger.InfoFormat("Importing process with uuid {0}", uuid);
                 LcaDataModel.Process process = new LcaDataModel.Process();
                 SaveIlcdEntity(ilcdDb, process, DataTypeEnum.Process);
                 process.Name = GetElementValue(ElementName("baseName"));

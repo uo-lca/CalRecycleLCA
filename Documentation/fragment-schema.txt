@@ -95,6 +95,8 @@ The following tables are required:
     * DataTypeID 
     * Name [ Flow | FlowProperty | Process  | UnitGroup | Source 
       	    | LCIAMethod | Contact | Fragment ]
+    + PathName [ flows | flowproperties | processes | unitgroups | sources
+      	    | lciamethods | contacts | fragments ]
 
     Data types described in the ILCD documentation, used mainly for
     handling classification information.  'Fragment' represents the
