@@ -26,7 +26,7 @@ namespace CalRecycleLCA.Services
         //Needs to be expanded to get this from processsubstitution table if present
         public FragmentNodeResource GetFragmentNodeProcessId(int fragmentFlowId, int scenarioID = 0)
         {
-            return _repository.GetFragmentNodeProcessId(fragmentFlowId, scenarioID);
+            return _repository.GetFragmentNodeProcess(fragmentFlowId, scenarioID);
 
         }
     }

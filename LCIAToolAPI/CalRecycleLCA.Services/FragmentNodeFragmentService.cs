@@ -26,9 +26,9 @@ namespace CalRecycleLCA.Services
 
         //Gets the subfragmentId from the FragmentNodeFragment table
         //Needs to be expanded to get this from processsubstitution table if present
-        public FragmentNodeResource GetFragmentNodeSubFragmentId(int fragmentFlowId)
+        public FragmentNodeResource GetFragmentNodeSubFragmentId(int fragmentFlowId, int scenarioId = 0)
         {
-            return _repository.GetFragmentNodeSubFragmentId(fragmentFlowId);
+            return _repository.GetFragmentNodeSubFragment(fragmentFlowId,scenarioId);
 
         }
     }
