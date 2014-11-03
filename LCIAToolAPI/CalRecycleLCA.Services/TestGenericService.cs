@@ -49,28 +49,9 @@ namespace CalRecycleLCA.Services
 
         public FragmentNodeResource FindTerminus(int fragmentFlowID, int scenarioID)
         {
-            var ff = _fragmentFlowService.Query(x => x.FragmentFlowID == fragmentFlowID).Select().FirstOrDefault();
-            FragmentNodeResource fnr;
-            switch (ff.NodeTypeID)
-            {
-                case 1:
-                    {
-                        fnr = _fragmentNodeProcessService.GetFragmentNodeProcessId(fragmentFlowID, scenarioID);
-                        break;
-                    }
-                case 2:
-                    {
-                        fnr = _fragmentNodeFragmentService.GetFragmentNodeSubFragmentId(fragmentFlowID);
-                        break;
-                    }
-                default:
-                    {
-                        fnr = new FragmentNodeResource { };
-                        break;
-                    }
-            }
+            var ff = _fragmentFlowService.GetFragmentFlow(fragmentFlowID);
+            var fnr = _fragmentFlowService.Terminate(ff, scenarioID, true);
             return fnr;
-
         }
     }
 }

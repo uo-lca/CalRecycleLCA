@@ -189,6 +189,7 @@ namespace CalRecycleLCA.Services
         }
 
         private ICollection<FlowPropertyMagnitude> GetFlowPropertyMagnitudes(FragmentFlow ff, int scenarioID) {
+            // MOVE TO REPO
             IEnumerable<FlowFlowProperty> ffpData = ff.Flow.FlowFlowProperties;
             IEnumerable<NodeCache> ncData = ff.NodeCaches;
 
@@ -208,6 +209,7 @@ namespace CalRecycleLCA.Services
         }
 
         public FragmentFlowResource Transform(FragmentFlow ff, int scenarioID) {
+            // NEED FIX
             int? nullID = null;
             return new FragmentFlowResource {
                 FragmentFlowID = ff.FragmentFlowID,
@@ -368,6 +370,7 @@ namespace CalRecycleLCA.Services
         /// <param name="scenarioID">ScenarioID filter for NodeCache</param>
         /// <returns>List of FragmentFlowResource objects</returns>
         public IEnumerable<FragmentFlowResource> GetFragmentFlowResources(int fragmentID, int scenarioID = 0) {
+            /// NEED FIX
             _FragmentTraversalV2.Traverse(fragmentID, scenarioID);
             var fragmentFlows = _FragmentFlowService.Query(q => q.FragmentID == fragmentID)
                                                 .Include(x => x.FragmentNodeFragments)
@@ -590,8 +593,8 @@ namespace CalRecycleLCA.Services
         /// <param name="scenarioID">Defaults to base scenario</param>
         /// <returns>Fragment LCIA results for given parameters</returns> 
         public LCIAResultResource GetFragmentLCIAResults(int fragmentID, int lciaMethodID, int scenarioID = 0) {
-            IEnumerable<FragmentLCIAModel> results = _FragmentLCIAComputation.ComputeFragmentLCIA(fragmentID, scenarioID, lciaMethodID);
-            IEnumerable<FragmentLCIAModel> aggResults = results
+            // IEnumerable<FragmentLCIAModel> results = _FragmentLCIAComputation.ComputeFragmentLCIA(fragmentID, scenarioID, lciaMethodID);
+            IEnumerable<FragmentLCIAModel> aggResults = _FragmentLCIAComputation.ComputeFragmentLCIA(fragmentID, scenarioID, lciaMethodID)
                 .GroupBy(r => r.FragmentFlowID)
                 .Select(group => new FragmentLCIAModel
                 {

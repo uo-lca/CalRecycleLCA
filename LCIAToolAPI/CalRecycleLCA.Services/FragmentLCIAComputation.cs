@@ -300,99 +300,26 @@ namespace CalRecycleLCA.Services
 
             var fragmentFlows = _nodeCacheService.Queryable()
                 .Where(x => x.ScenarioID == scenarioId)
-                .Join(_fragmentFlowService.Queryable().Where(x => x.FragmentID == fragmentId), nc => nc.FragmentFlowID, ff => ff.FragmentFlowID, (nc, ff) => new { nc, ff }).ToList();
+                .Join(_fragmentFlowService.Queryable()
+                .Where(x => x.FragmentID == fragmentId), 
+                    nc => nc.FragmentFlowID, 
+                    ff => ff.FragmentFlowID, 
+                    (nc, ff) => new { nc, ff }).ToList();
 
             foreach (var item in fragmentFlows)
             {
-                // var nodeCache = _nodeCacheService.Query().Filter(x => x.FragmentFlowID == item.ff.FragmentFlowID && x.ScenarioID == scenarioId).Get();
+                if (item.ff.FlowID == null)
+                    item.ff.FlowID = 0; // TODO: this should be set to whatever is the fragment's inflow-- ??
 
-                // int nodeCacheId = Convert.ToInt32(nodeCache.Select(x => x.NodeCacheID).FirstOrDefault());
-
-                int nodeTypeId = Convert.ToInt32(item.ff.NodeTypeID);
-                int? targetId = 0;
-                switch (nodeTypeId)
+                var fragmentNode = _fragmentFlowService.Terminate(item.ff, scenarioId, true); // true => do Background 
+                
+                if (fragmentNode.NodeTypeID == 2)
                 {
-                    case 1:
-                        var target1 = _fragmentNodeProcessService.Queryable()
-                            .Where(x => x.FragmentFlowID == item.ff.FragmentFlowID)
-                                  .GroupJoin(_processSubstitutionService.Queryable()
-                            //leave this out for now, as you obviously can't add a
-                            //where clause for a table that has no data.
-                            //.Where(x => x.ScenarioID == scenarioId)
-      , fnp => fnp.ProcessID
-      , ps => ps.ProcessID
-      , (fnp, ps) => new { fragmentNodeProcesses = fnp, processSubstitutions = ps })
-      .SelectMany(x => x.processSubstitutions.DefaultIfEmpty()
-      , (x, processSubstitutions) => new FragmentLCIAModel
-      {
-          fnpProcessID = x.fragmentNodeProcesses.ProcessID,
-          psProcessID = processSubstitutions == null ? 0 : processSubstitutions.ProcessID
-      }).ToList();
-                        foreach (var target1Item in target1)
-                        {
-                            if (target1Item.psProcessID == 0)
-                            {
-                                targetId = target1Item.fnpProcessID;
-                            }
-                            else
-                            {
-                                targetId = target1Item.psProcessID;
-                            }
-                        }
-
-                        SetScoreCache(targetId, nodeTypeId, lciaMethods, scenarioId, item.ff.FragmentFlowID);
-
-                        break;
-                    case 2:
-
-                        var target2 = _fragmentNodeFragmentService.Queryable()
-                            .Where(x => x.FragmentFlowID == item.ff.FragmentFlowID)
-                                  .GroupJoin(_fragmentSubstitutionService.Queryable()
-                            //leave this out for now, as you obviously can't add a
-                            //where clause for a table that has no data.
-                            //.Where(x => x.ScenarioID == scenarioId)
-      , fnf => fnf.SubFragmentID
-      , fs => fs.SubFragmentID
-      , (fnf, fs) => new { fragmentNodeFragments = fnf, fragmentSubstitutions = fs })
-      .SelectMany(x => x.fragmentSubstitutions.DefaultIfEmpty()
-      , (x, fragmentSubstitutions) => new FragmentLCIAModel
-      {
-          fnpSubFragmentID = x.fragmentNodeFragments.SubFragmentID,
-          psSubFragmentID = fragmentSubstitutions == null ? 0 : fragmentSubstitutions.SubFragmentID
-      }).ToList();
-
-                        foreach (var target2Item in target2)
-                        {
-
-                            if (target2Item.psSubFragmentID == 0)
-                            {
-                                targetId = target2Item.fnpSubFragmentID;
-                            }
-                            else
-                            {
-                                targetId = target2Item.psSubFragmentID;
-                            }
-                        }
-
-
-
-                        //recursive LCIA computation, results to cache
-                        FragmentFlowLCIA(targetId, scenarioId, lciaMethods);
-                        SetScoreCache(targetId, nodeTypeId, lciaMethods, scenarioId, item.ff.FragmentFlowID);
-
-                        break;
-                    case 3:
-                        //do nothing for Input/Output
-                        break;
-
-                    case 4:
-                        //needed to get an object containing NodetypeId and targetId - not just the integer targetid
-                        var resolveBackground = ResolveBackground(item.ff.FlowID, item.ff.DirectionID, scenarioId, nodeTypeId);
-                        int? resolveBackgroundTargetId = resolveBackground.TargetID;
-                        int? resolveBackgroundNodeTypeId = resolveBackground.NodeTypeID;
-                        SetScoreCache(resolveBackgroundTargetId, resolveBackgroundNodeTypeId, lciaMethods, scenarioId, item.ff.FragmentFlowID);
-                        break;
+                    //recursive LCIA computation, results to cache
+                    FragmentFlowLCIA(fragmentNode.SubFragmentID, fragmentNode.ScenarioID, lciaMethods);
                 }
+
+                SetScoreCache(item.ff.FragmentFlowID, fragmentNode, lciaMethods);
 
             }
 
@@ -407,6 +334,7 @@ namespace CalRecycleLCA.Services
         }
 
 
+        /* *************
         public ResolveBackgroundModel ResolveBackground(int? flowId, int? directionId, int? scenarioId, int? nodeTypeId)
         {
             IEnumerable<ResolveBackgroundModel> background = null;
@@ -472,12 +400,16 @@ namespace CalRecycleLCA.Services
             return resolveBackground;
 
         }
+        ************* */
 
-
-        public void SetScoreCache(int? targetId, int? nodeTypeId, IEnumerable<LCIAMethod> lciaMethods, int scenarioId, int fragmentFlowId)
+     //   public void SetScoreCache(int? targetId, int? nodeTypeId, IEnumerable<LCIAMethod> lciaMethods, int scenarioId, int fragmentFlowId)
+       // {
+         //   error('not implemented');
+        //}
+        public void SetScoreCache(int fragmentFlowId, FragmentNodeResource fragmentNode, IEnumerable<LCIAMethod> lciaMethods)
         {
             IEnumerable<int> haveLciaMethods = _scoreCacheService.Queryable()
-                                                        .Where(x => x.ScenarioID == scenarioId
+                                                        .Where(x => x.ScenarioID == fragmentNode.ScenarioID
                                                                 && x.FragmentFlowID == fragmentFlowId).AsEnumerable()
                                                         .Select(y => y.LCIAMethodID );
 
@@ -488,7 +420,7 @@ namespace CalRecycleLCA.Services
             if (needLciaMethods == null)
                 return;
 
-            switch (nodeTypeId)
+            switch (fragmentNode.NodeTypeID)
             {
                 case 1:
 
@@ -505,9 +437,7 @@ namespace CalRecycleLCA.Services
                         _characterizationParamService,
                         _paramService);
 
-                    var scores = lciaComputation.ProcessLCIA(targetId, needLciaMethods, scenarioId);
-
-                    IList<ScoreCache> scoreCaches = new List<ScoreCache>();
+                    var scores = lciaComputation.ProcessLCIA(fragmentNode.ProcessID, needLciaMethods, fragmentNode.ScenarioID);
 
                     foreach (var lciaMethodItem in needLciaMethods.AsQueryable())
                     {
@@ -524,7 +454,7 @@ namespace CalRecycleLCA.Services
                             impactScore = Convert.ToDouble(score.ImpactScore);
 
                             ScoreCache scoreCache = new ScoreCache();
-                            scoreCache.ScenarioID = scenarioId;
+                            scoreCache.ScenarioID = fragmentNode.ScenarioID;
                             scoreCache.FragmentFlowID = fragmentFlowId;
                             scoreCache.LCIAMethodID = lciaMethodItem.LCIAMethodID;
                             scoreCache.ImpactScore = impactScore;
@@ -534,12 +464,11 @@ namespace CalRecycleLCA.Services
                         }
 
                     }
-                    _unitOfWork.SaveChanges();
                     break;
                 case 2:
-                    foreach (var lciaMethodItem in lciaMethods)
+                    foreach (var lciaMethodItem in needLciaMethods)
                     {
-                        var lcias = ComputeFragmentLCIA(targetId, scenarioId, lciaMethodItem.LCIAMethodID);
+                        var lcias = ComputeFragmentLCIA(fragmentNode.SubFragmentID, fragmentNode.ScenarioID, lciaMethodItem.LCIAMethodID);
 
                         if (lcias != null)
                         {
@@ -554,7 +483,7 @@ namespace CalRecycleLCA.Services
                      });
 
                             ScoreCache scoreCache = new ScoreCache();
-                            scoreCache.ScenarioID = scenarioId;
+                            scoreCache.ScenarioID = fragmentNode.ScenarioID;
                             scoreCache.FragmentFlowID = fragmentFlowId;
                             scoreCache.LCIAMethodID = lciaMethodItem.LCIAMethodID;
                             scoreCache.ImpactScore = Convert.ToDouble(lciaScore.Select(a => a.Result).FirstOrDefault());
@@ -566,7 +495,8 @@ namespace CalRecycleLCA.Services
                     _unitOfWork.SaveChanges();
 
                     break;
-            }
-        }
+            }  /* end of switch NodeType */
+            _unitOfWork.SaveChanges();
+        } /* end of SetScoreCache */
     }
 }

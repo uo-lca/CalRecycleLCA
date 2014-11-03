@@ -11,6 +11,6 @@ namespace CalRecycleLCA.Services
 {
     public interface IFragmentNodeFragmentService : IService<FragmentNodeFragment>
     {
-        FragmentNodeResource GetFragmentNodeSubFragmentId(int fragmentFlowId);
+        FragmentNodeResource GetFragmentNodeSubFragmentId(int fragmentFlowId, int scenarioId = 0);
     }
 }
