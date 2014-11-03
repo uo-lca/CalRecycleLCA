@@ -1,14 +1,14 @@
 'use strict';
-
-angular.module('lcaApp.fragment.sankey', ['ui.router', 'lcaApp.sankey', 'lcaApp.resources.service',
-    'lcaApp.idmap.service', 'angularSpinner'])
-.controller('FragmentSankeyCtrl',
-    ['$scope', '$stateParams', 'usSpinnerService', '$q', '$window',
+/* Controller for Fragment Sankey Diagram View */
+angular.module('lcaApp.fragment.sankey',
+                ['ui.router', 'lcaApp.sankey', 'lcaApp.resources.service', 'lcaApp.idmap.service', 'angularSpinner'])
+    .controller('FragmentSankeyCtrl',
+        ['$scope', '$stateParams', 'usSpinnerService', '$q', '$window',
         'ScenarioService', 'FragmentService', 'FragmentFlowService', 'FlowForFragmentService', 'ProcessService',
         'FlowPropertyForFragmentService', 'NodeTypeService',
-        function ($scope, $stateParams, usSpinnerService, $q, $window,
-                  ScenarioService, FragmentService, FragmentFlowService, FlowForFragmentService, ProcessService,
-                  FlowPropertyForFragmentService, NodeTypeService) {
+        function ($scope, $stateParams, usSpinnerService, $q, $window, ScenarioService, FragmentService,
+                  FragmentFlowService, FlowForFragmentService, ProcessService, FlowPropertyForFragmentService,
+                  NodeTypeService) {
             var fragmentID = $stateParams.fragmentID,
                 scenarioID = $stateParams.scenarioID,
             //
@@ -72,7 +72,8 @@ angular.module('lcaApp.fragment.sankey', ['ui.router', 'lcaApp.sankey', 'lcaApp.
                     },
                     fragFlow = FragmentFlowService.get(element.fragmentFlowID),
                     nodeType = NodeTypeService.get(element.nodeTypeID),
-                    refObj;
+                    refObj //, navState
+                    ;
 
                 if (fragFlow) {
                     node.nodeName = fragFlow["shortName"];
@@ -82,12 +83,21 @@ angular.module('lcaApp.fragment.sankey', ['ui.router', 'lcaApp.sankey', 'lcaApp.
                 }
                 if ("processID" in element) {
                     refObj = ProcessService.get(element.processID);
+//                    node.toolTip = node.toolTip + "<p>" + refObj.name + "</p>";
                 } else if ("subFragmentID" in element) {
                     refObj = FragmentService.get(element.subFragmentID);
+//                    navState = "scenarios.fragment({fragmentID: " + fragmentID +
+//                        ", scenarioID: " + scenarioID + "})";
+//                    node.toolTip = node.toolTip + "<p><a ui-sref='" + navState +  "'>" + refObj.name + "</a></p>";
+//                    navState = "#/scenarios/" + scenarioID + "/fragment-sankey/" + fragmentID;
+//                    node.toolTip = node.toolTip + "<p><a href='" + navState +  "'>" + refObj.name + "</a></p>";
                 }
                 if (refObj) {
-                    node.toolTip = node.toolTip + "<p>" + refObj.name + "</p>";
+                    node.selectable = true;
+                    node.toolTip = node.toolTip + "<p>" + refObj.name +
+                        "</p><i><small>Click to navigate</small></i>";
                 }
+
                 reverseIndex[element.fragmentFlowID] = graph.nodes.push(node) - 1;
             }
 
@@ -137,32 +147,36 @@ angular.module('lcaApp.fragment.sankey', ['ui.router', 'lcaApp.sankey', 'lcaApp.
                 $window.alert(errMsg);
             }
 
-            function updateBreadCrumb() {
-                var fragment = FragmentService.get(fragmentID);
-                if ( fragment) {
-                    $scope.fragmentName = fragment.name;
+            /**
+             * Prepare fragment data for visualization
+             */
+            function visualizeFragment() {
+                $scope.fragment = FragmentService.get(fragmentID);
+                if ($scope.fragment) {
+                    setFlowProperties();
+                    buildGraph(true);
+                    stopWaiting();
+                    $scope.graph = graph;
                 } else {
-                    $scope.fragmentName = "Invalid Fragment";
-                    handleFailure("Fragment with ID, " + fragmentID + ", not found.");
+                    handleFailure("Invalid fragmentID: " + fragmentID);
                 }
-                return fragment !== null;
             }
 
+            /**
+             * Function called after requests for resources have been fulfilled.
+             */
             function handleSuccess() {
                 $scope.scenario = ScenarioService.get(scenarioID);
-
                 if ($scope.scenario) {
-                    setFlowProperties();
-                    if ( updateBreadCrumb() ) {
-                        buildGraph(true);
-                        stopWaiting();
-                        $scope.graph = graph;
-                    }
+                    visualizeFragment();
                 } else {
-                    handleFailure("Scenario with ID," + scenarioID + ", not found.");
+                    handleFailure("Invalid scenarioID: " + scenarioID);
                 }
             }
 
+            /**
+             * Compare function used to sort array of objects by name
+             */
             function compareNames(a, b) {
                 if (a.name > b.name) {
                     return 1;
@@ -206,7 +220,9 @@ angular.module('lcaApp.fragment.sankey', ['ui.router', 'lcaApp.sankey', 'lcaApp.
                 $scope.selectedFlowProperty = selectedFlowProperty;
             }
 
-
+            /**
+             * Get all data resources
+             */
             function getData() {
                 $q.all([ScenarioService.load(), FragmentService.load(), ProcessService.load(),
                     FlowPropertyForFragmentService.load({fragmentID: fragmentID}),
@@ -217,15 +233,66 @@ angular.module('lcaApp.fragment.sankey', ['ui.router', 'lcaApp.sankey', 'lcaApp.
                     handleFailure);
             }
 
+            /**
+             * Get data resources that are filtered by fragment.
+             * Called after fragment selection changes.
+             * If successful, visualize selected fragment.
+             */
+            function getDataForFragment() {
+                $q.all([FlowPropertyForFragmentService.load({fragmentID: fragmentID}),
+                    FragmentFlowService.load({scenarioID: scenarioID, fragmentID: fragmentID}),
+                    FlowForFragmentService.load({fragmentID: fragmentID})])
+                    .then(visualizeFragment,
+                    handleFailure);
+            }
+
+            /**
+             * Called when flow property selection changes.
+             * Updates existing sankey graph.
+             */
             $scope.onFlowPropertyChange = function () {
                 //console.log("Flow property changed. Current: " + $scope.selectedFlowProperty.name);
                 buildGraph(false);
                 $scope.graph = graph;
             };
 
+            /**
+             * Called when a parent fragment is selected from fragment breadcrumbs.
+             * Updates fragment breadcrumbs and gets new fragment data.
+             * @param fragment  Fragment selected
+             * @param index     Breadcrumb index
+             */
+            $scope.onParentFragmentSelected = function (fragment, index) {
+                $scope.parentFragments.splice(index);
+                fragmentID = fragment.fragmentID;
+                getDataForFragment();
+            };
+
+            /**
+             * Called when a node in sankey directive is selected.
+             * The node can represent either a fragment or a process.
+             * @param newVal    The selected node
+             */
+            function onNodeSelectionChange(newVal) {
+                if (newVal) {
+                    var fragmentFlow = FragmentFlowService.get(newVal.nodeID);
+                    if (newVal.nodeTypeID === 2) {
+                        $scope.parentFragments.push($scope.fragment);
+                        $scope.fragment = null;
+                        fragmentID = fragmentFlow.subFragmentID;
+                        getDataForFragment();
+                    }
+                }
+            }
+
             usSpinnerService.spin("spinner-lca");
             $scope.color = { domain: ([2, 3, 4, 1, 0]), range: colorbrewer.Set3[5], property: "nodeTypeID" };
             $scope.selectedFlowProperty = null;
+            $scope.selectedNode = null;
+            $scope.parentFragments = [];
+            $scope.fragment = null;
+            $scope.scenario = null;
+            $scope.$watch("selectedNode", onNodeSelectionChange);
             getData();
 
         }]);

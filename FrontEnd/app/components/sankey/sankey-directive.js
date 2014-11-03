@@ -6,15 +6,15 @@ angular.module('lcaApp.sankey.directive', ['d3.sankey', 'd3.tip'])
 
     function link(scope, element, attrs) {
 
-        // TODO : make the following settings configurable
         var margin = {
                 top: 10,
-                right: 20,
-                bottom: 30,
-                left: 20
+                right: 10,
+                bottom: 10,
+                left: 10
             },
-            width = 800 - margin.left - margin.right,   // diagram width
-            height = 650 - margin.top - margin.bottom,  // diagram height
+            parentElement = element[0],
+            width = parentElement.clientWidth - margin.left - margin.right,   // diagram width
+            height = parentElement.clientHeight - margin.top - margin.bottom,  // diagram height
             sankeyWidth = width - 150, // leave room for labels on right
             svg,
             color = d3.scale.ordinal(),
@@ -34,7 +34,7 @@ angular.module('lcaApp.sankey.directive', ['d3.sankey', 'd3.tip'])
         /**
          * Initial preparation of svg element.
          */
-        function prepareSvg(parentElement) {
+        function prepareSvg() {
 
             svg = d3.select(parentElement)
                 .append("svg")
@@ -70,6 +70,18 @@ angular.module('lcaApp.sankey.directive', ['d3.sankey', 'd3.tip'])
                 .transition()
                 .style("stroke-opacity", opacity.link);
             TipService.hide();
+        }
+
+        /**
+        * Respond to click on node
+        *
+        * @param {Object}  node    Reference to graph node data
+        */
+        function onNodeClick(node) {
+            d3.event.stopPropagation();
+            scope.$apply(function(){
+                scope.selectedNode = node;
+            });
         }
 
         /**
@@ -193,20 +205,18 @@ angular.module('lcaApp.sankey.directive', ['d3.sankey', 'd3.tip'])
             //
             // Nodes with click behavior
             //
-            // TODO: make this controllable
-//            node.filter(function (d) {
-//                return (d.nodeTypeID === 2);
-//            })
-//                .style("cursor", "pointer")
-//                .on("click", onNodeClick);
-
+            node.filter(function (d) {
+                return (d.selectable);
+            })
+                .style("cursor", "pointer")
+                .on("click", onNodeClick);
         }
 
         function prepareToolTip() {
             // Initialize tooltip plugin
             TipService
-                .offset([-10, -10])
-                .direction('ne')
+                .offset([-10, 0])
+                .direction('n')
                 .html(function (d) {
                     if ("toolTip" in d) {
                         return d["toolTip"];
@@ -221,7 +231,7 @@ angular.module('lcaApp.sankey.directive', ['d3.sankey', 'd3.tip'])
             TipService.hide();
         }
 
-        prepareSvg(element[0]);
+        prepareSvg();
         color.domain(scope.color.domain);
         color.range(scope.color.range);
         scope.$watch('graph.links', onGraphChanged);
@@ -231,7 +241,7 @@ angular.module('lcaApp.sankey.directive', ['d3.sankey', 'd3.tip'])
 
     return {
         restrict: 'E',
-        scope: { graph: '=', color: '='},
+        scope: { graph: '=', color: '=', selectedNode: '=selectedNode'},
         link: link
     }
 }]);
