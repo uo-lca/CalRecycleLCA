@@ -64,13 +64,13 @@ namespace CalRecycleLCA.Repositories
                     targetId = repository.GetRepository<Process>().Queryable()
                         .Where(x => x.ILCDEntityID == background.RefID)
                         .Select(z => (int)z.ProcessID).FirstOrDefault();
-                    background.SubFragmentID = targetId;
+                    background.ProcessID = targetId;
                     break;
                 case 2:
                     targetId = repository.GetRepository<Fragment>().Queryable()
                         .Where(x => x.ILCDEntityID == background.RefID)
                         .Select(z => (int)z.FragmentID).FirstOrDefault();
-                    background.ProcessID = targetId;
+                    background.SubFragmentID = targetId;
                     break;
             }
             return background;
