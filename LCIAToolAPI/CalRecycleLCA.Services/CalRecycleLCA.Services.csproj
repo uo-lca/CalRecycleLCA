@@ -171,7 +171,6 @@
     <Compile Include="ProcessSubstitutionService.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="ResourceServiceFacade.cs" />
-    <Compile Include="ScenarioBackgroundService.cs" />
     <Compile Include="ScenarioService.cs" />
     <Compile Include="ScoreCacheService.cs" />
     <Compile Include="TestGenericService.cs" />

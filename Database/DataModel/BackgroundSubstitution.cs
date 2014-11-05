@@ -7,11 +7,11 @@ namespace LcaDataModel
     using System.ComponentModel.DataAnnotations.Schema;
     using System.Data.Entity.Spatial;
 
-    [Table("ScenarioBackground")]
-    public partial class ScenarioBackground : Entity
+    [Table("BackgroundSubstitution")]
+    public partial class BackgroundSubstitution : Entity
     {
         [DatabaseGenerated(DatabaseGeneratedOption.None)]
-        public int ScenarioBackgroundID { get; set; }
+        public int BackgroundSubstitutionID { get; set; }
 
         public int ScenarioID { get; set; }
 

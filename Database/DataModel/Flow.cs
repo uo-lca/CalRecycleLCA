@@ -22,7 +22,7 @@ namespace LcaDataModel
             LCIAs = new HashSet<LCIA>();
             Processes = new HashSet<Process>();
             ProcessFlows = new HashSet<ProcessFlow>();
-            ScenarioBackgrounds = new HashSet<ScenarioBackground>();
+            BackgroundSubstitutions = new HashSet<BackgroundSubstitution>();
             Scenarios = new HashSet<Scenario>();
         }
 
@@ -34,7 +34,7 @@ namespace LcaDataModel
         [StringLength(15)]
         public string CASNumber { get; set; }
 
-        public int? ReferenceFlowProperty { get; set; }
+        public int ReferenceFlowProperty { get; set; }
 
         public int? FlowTypeID { get; set; }
 
@@ -66,7 +66,7 @@ namespace LcaDataModel
 
         public virtual ICollection<ProcessFlow> ProcessFlows { get; set; }
 
-        public virtual ICollection<ScenarioBackground> ScenarioBackgrounds { get; set; }
+        public virtual ICollection<BackgroundSubstitution> BackgroundSubstitutions { get; set; }
 
         public virtual ICollection<Scenario> Scenarios { get; set; }
     }

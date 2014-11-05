@@ -27,7 +27,7 @@ namespace CalRecycleLCA.Repositories
             var background = new FragmentNodeResource();
             int targetId;
 
-            background = repository.GetRepository<ScenarioBackground>().Queryable()
+            background = repository.GetRepository<BackgroundSubstitution>().Queryable()
                 .Where(x => x.ScenarioID == scenarioId)
                 .Where(x => x.FlowID == flowId)
                 .Where(x => x.DirectionID == directionId)

@@ -63,7 +63,7 @@ namespace LcaDataModel {
         public virtual DbSet<ProcessType> ProcessTypes { get; set; }
         public virtual DbSet<ReferenceType> ReferenceTypes { get; set; }
         public virtual DbSet<Scenario> Scenarios { get; set; }
-        public virtual DbSet<ScenarioBackground> ScenarioBackgrounds { get; set; }
+        public virtual DbSet<BackgroundSubstitution> BackgroundSubstitutions { get; set; }
         public virtual DbSet<ScenarioGroup> ScenarioGroups { get; set; }
         
         public virtual DbSet<ScoreCache> ScoreCaches { get; set; }
@@ -148,7 +148,7 @@ namespace LcaDataModel {
 
             modelBuilder.Entity<FlowProperty>()
                 .HasMany(e => e.Flows)
-                .WithOptional(e => e.FlowProperty)
+                .WithRequired(e => e.FlowProperty)
                 .HasForeignKey(e => e.ReferenceFlowProperty);
 
             modelBuilder.Entity<FlowProperty>()

@@ -106,7 +106,7 @@
     <Compile Include="ReferenceType.cs" />
     <Compile Include="ResponseObject.cs" />
     <Compile Include="Scenario.cs" />
-    <Compile Include="ScenarioBackground.cs" />
+    <Compile Include="BackgroundSubstitution.cs" />
     <Compile Include="ScenarioGroup.cs" />
     <Compile Include="ScoreCache.cs" />
     <Compile Include="UnitConversion.cs" />
