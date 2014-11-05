@@ -84,6 +84,13 @@ namespace LCAToolAPI.API
             return _testService.FindTerminus(fragmentFlowID, scenarioID);
         }
 
+        [Route("api/fragmentflows/{fragmentFlowID}/scenarios/{scenarioID}/outflows")]
+        [System.Web.Http.AcceptVerbs("GET", "POST")]
+        [System.Web.Http.HttpGet]
+        public IEnumerable<InventoryModel> GetDependencies(int fragmentFlowID, int scenarioID)
+        {
+            return _testService.GetDependencies(fragmentFlowID, scenarioID);
+        }
 
 
 

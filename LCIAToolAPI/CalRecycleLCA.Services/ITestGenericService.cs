@@ -13,5 +13,6 @@ namespace CalRecycleLCA.Services
     {
         IEnumerable<LCIAMethod> GetLCIAMethods();
         FragmentNodeResource FindTerminus(int fragmentFlowID, int scenarioID);
+        IEnumerable<InventoryModel> GetDependencies(int fragmentFlowId, int scenarioId);
     }
 }
