@@ -16,10 +16,14 @@ using System.Web.Http.Results;
 
 namespace LCIAToolAPI.Tests
 {
+    /// <summary>
+    /// this concentrates on testing api end points as requested
+    /// new development should test each unit of work at the service level
+    /// </summary>
     [TestClass]
     public class ResourceControllerTests
     {
- 
+
         private ICategoryService _categoryService;
         private IClassificationService _classificationService;
         private IFragmentService _fragmentService;
@@ -38,7 +42,7 @@ namespace LCIAToolAPI.Tests
         private IFlowFlowPropertyService _flowFlowPropertyService;
         private IDependencyParamService _dependencyParamService;
         private IFlowPropertyParamService _flowPropertyParamService;
-        private IParamService _paramService;   
+        private IParamService _paramService;
         private IScoreCacheService _scoreCacheService;
         private IProcessSubstitutionService _processSubstitutionService;
         private IFragmentSubstitutionService _fragmentSubstitutionService;
@@ -60,6 +64,8 @@ namespace LCIAToolAPI.Tests
         private ResourceController _resourceController;
 
         private List<FlowType> _flowTypes;
+        private LCIAResultResource _processLCIAResult;
+        private LCIAMethod _lciaMethod;
 
 
         private Mock<IRepositoryAsync<Category>> _mockCategoryRepository;
@@ -129,30 +135,10 @@ namespace LCIAToolAPI.Tests
             _mockLCIARepository = new Mock<IRepositoryAsync<LCIA>>();
             _mockCharacterizationParamRepository = new Mock<IRepositoryAsync<CharacterizationParam>>();
             _mockUnitOfWork = new Mock<IUnitOfWork>();
-         
-        }
 
-       [TestMethod]
-        public void ShouldSuccesfullyCompareOnCount()
-        {
-            // Arrrange
-            _flowTypes = new List<FlowType>
-                     {
-                            new FlowType(){FlowTypeID=1,Name="IntermediateFlow"},
-                            new FlowType(){FlowTypeID=2,Name="ElementaryFlow"}
-
-                     }.ToList();
-
-            List<FlowTypeResource> _flowTypeResources = _flowTypes
-   .Select(x => new FlowTypeResource() { FlowTypeID = x.FlowTypeID, Name = x.Name })
-   .ToList();
-
-            List<FlowTypeResource> _flowTypeResources1 = _flowTypes
-  .Select(x => new FlowTypeResource() { FlowTypeID = x.FlowTypeID, Name = x.Name })
-  .ToList();
-
-            _mockFlowTypeRepository.Setup(m => m.Queryable()).Returns(_flowTypes.AsQueryable());
-
+            //we do need to pass a mock repository to all these services as the ResourceController 
+            //expects the resource facade to be passed to it.  In turn the resource facade takes these 
+            //service types and methods.
             _flowTypeService = new FlowTypeService(_mockFlowTypeRepository.Object);
             _categoryService = new CategoryService(_mockCategoryRepository.Object);
             _classificationService = new ClassificationService(_mockClassificationRepository.Object);
@@ -186,22 +172,19 @@ namespace LCIAToolAPI.Tests
             _characterizationParamService = new CharacterizationParamService(_mockCharacterizationParamRepository.Object);
             _unitOfWork = _mockUnitOfWork.Object;
 
-            
-
-        //private IUnitOfWork _unitOfWork;
-
+            //methods that resource service facade is dependent on.
             _fragmentTraversalV2 = new FragmentTraversalV2(_flowService,
-            _fragmentFlowService,
-            _nodeCacheService,
-            _fragmentNodeProcessService,
-            _processFlowService,
-            _fragmentNodeFragmentService,
-            _flowFlowPropertyService,
-            _dependencyParamService,
-            _flowPropertyParamService,
-            _fragmentService,
-            _paramService,
-            _unitOfWork);
+_fragmentFlowService,
+_nodeCacheService,
+_fragmentNodeProcessService,
+_processFlowService,
+_fragmentNodeFragmentService,
+_flowFlowPropertyService,
+_dependencyParamService,
+_flowPropertyParamService,
+_fragmentService,
+_paramService,
+_unitOfWork);
 
             _fragmentLCIAComputation = new FragmentLCIAComputation(_fragmentFlowService,
             _scoreCacheService,
@@ -258,19 +241,109 @@ namespace LCIAToolAPI.Tests
                                _processFlowService,
                                _scenarioService);
 
+        }
+
+
+
+        [TestMethod]
+        public void ShouldSuccesfullyCompareOnCount()
+        {
+            // Arrrange - This will populate our "mock" repository as a use case to
+            //compare again what we actually recieve from the method.
+            _flowTypes = new List<FlowType>
+                     {
+                            new FlowType(){FlowTypeID=1,Name="IntermediateFlow"},
+                            new FlowType(){FlowTypeID=2,Name="ElementaryFlow"}
+
+                     }.ToList();
+
+            //needs to be converted into a FlowTypeResource type as thing is what the method will return
+            List<FlowTypeResource> _flowTypeResources = _flowTypes
+   .Select(x => new FlowTypeResource() { FlowTypeID = x.FlowTypeID, Name = x.Name })
+   .ToList();
+
+            //We only set up the mock repository that we need
+            _mockFlowTypeRepository.Setup(m => m.Queryable()).Returns(_flowTypes.AsQueryable());
+
             _resourceController = new ResourceController(_resourceServiceFacade);
 
             //Act
             List<FlowTypeResource> result = _resourceController.GetFlowTypes().ToList();
-            //Assert
-            //Assert.AreEqual(_flowTypeResources, result);
-            //CollectionAssert.AreEqual(_flowTypeResources, result);
-           Assert.AreEqual(_flowTypeResources.Count,result.Count);
-           //Assert.AreEqual(_flowTypeResources.Last(), result.Last());
+            Assert.AreEqual(_flowTypeResources.Count, result.Count);
         }
+
+        [TestMethod]
+        public void ShouldSuccesfullyGetProcessLCIAResult()
+        {
+            int processID = 1; 
+            int lciaMethodID = 1;
+            int scenarioID = 0;
+
+          
+
+          
+
+            //We only set up the mock repositories that we need
+          
+
+
+              _processLCIAResult = new LCIAResultResource()
+                     {
+                                LCIAMethodID=1,
+                                ScenarioID=0, 
+                                LCIAScore = new List<AggregateLCIAResource>
+                                   {
+                                      new AggregateLCIAResource()
+                                         {
+                                              ProcessID=1,
+                                              LCIADetail = new List<DetailedLCIAResource>
+                                                {
+                                                     new DetailedLCIAResource()
+                                                     {
+                                                          FlowID = 168,
+                                                          DirectionID = 2,
+                                                          Quantity = 3E-06,
+                                                          Factor = 0.000171,
+                                                          Result = 5.1300000000000009E-10
+                                                     },
+                                                      new DetailedLCIAResource()
+                                                     {
+                                                          FlowID = 398,
+                                                          DirectionID = 2,
+                                                          Quantity = 6.93E-07,
+                                                          Factor = 0.0168,
+                                                          Result = 1.16424E-08
+                                                     },
+                                                      new DetailedLCIAResource()
+                                                     {
+                                                          FlowID = 1014,
+                                                          DirectionID = 2,
+                                                          Quantity = 1.35E-06,
+                                                          Factor = 4.19E-05,
+                                                          Result = 5.6565E-11
+                                                     }
+   
+                                                }
+                                          }
+                                    }
+                            
+                     
+                     
+                     };
+
+            _resourceController = new ResourceController(_resourceServiceFacade);
+
+            //Act
+            LCIAResultResource result = _resourceController.GetProcessLCIAResult(processID, lciaMethodID, scenarioID);
+            Assert.AreEqual(_processLCIAResult.LCIAMethodID, result.LCIAMethodID); 
+
+
+
+        }
+
 
 
     }
 
-     
+
 }
