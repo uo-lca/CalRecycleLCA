@@ -20,11 +20,6 @@ namespace CalRecycleLCA.Repositories
 	        var fragmentNode = new FragmentNodeResource();
             int inFlowId;
             fragmentNode.NodeTypeID = ff.NodeTypeID;
-            if (ff.FlowID == null)
-            {
-                throw new ArgumentNullException("FragmentFlow.FlowID must be set!");
-            }
-            else inFlowId = (int)ff.FlowID;
 	    
 	        switch (ff.NodeTypeID)
 	        {   
@@ -44,13 +39,22 @@ namespace CalRecycleLCA.Repositories
 	            }
     	        case 3:
 	            {
-		            fragmentNode.RefID = ff.FragmentFlowID;
+                    if (ff.FlowID == null)
+                    {
+                        throw new ArgumentNullException("FragmentFlow.FlowID must be set!");
+                    }
+                    fragmentNode.RefID = ff.FragmentFlowID;
             		fragmentNode.ScenarioID = scenarioId;
-                    fragmentNode.TermFlowID = inFlowId;
+                    fragmentNode.TermFlowID = (int)ff.FlowID; 
 		            break;
         	    }
     	        default:
 	            {
+                    if (ff.FlowID == null)
+                    {
+                        throw new ArgumentNullException("FragmentFlow.FlowID must be set!");
+                    }
+                    else inFlowId = (int)ff.FlowID;
                     if (doBackground)
                     {
                         fragmentNode = repository.GetRepository<Background>()
