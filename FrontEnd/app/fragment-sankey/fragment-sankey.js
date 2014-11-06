@@ -1,7 +1,8 @@
 'use strict';
 /* Controller for Fragment Sankey Diagram View */
 angular.module('lcaApp.fragment.sankey',
-                ['ui.router', 'lcaApp.sankey', 'lcaApp.resources.service', 'lcaApp.idmap.service', 'angularSpinner'])
+                ['ui.router', 'lcaApp.sankey', 'lcaApp.resources.service', 'lcaApp.idmap.service', 'angularSpinner',
+                 'ui.bootstrap.alert'])
     .controller('FragmentSankeyCtrl',
         ['$scope', '$stateParams', 'usSpinnerService', '$q', '$window',
         'ScenarioService', 'FragmentService', 'FragmentFlowService', 'FlowForFragmentService', 'ProcessService',
@@ -139,19 +140,25 @@ angular.module('lcaApp.fragment.sankey',
                 }
             }
 
+            function startWaiting() {
+                $scope.alert = null;
+                usSpinnerService.spin("spinner-lca");
+            }
+
             function stopWaiting() {
                 usSpinnerService.stop("spinner-lca");
             }
 
             function handleFailure(errMsg) {
                 stopWaiting();
-                $window.alert(errMsg);
+                $scope.alert = { type: "danger", msg: errMsg };
             }
 
             /**
              * Prepare fragment data for visualization
              */
             function visualizeFragment() {
+                $scope.alert = null;
                 $scope.fragment = FragmentService.get(fragmentID);
                 if ($scope.fragment) {
                     setFlowProperties();
@@ -167,26 +174,13 @@ angular.module('lcaApp.fragment.sankey',
              * Function called after requests for resources have been fulfilled.
              */
             function handleSuccess() {
+
                 $scope.scenario = ScenarioService.get(scenarioID);
                 if ($scope.scenario) {
                     visualizeFragment();
                 } else {
                     handleFailure("Invalid scenarioID: " + scenarioID);
                 }
-            }
-
-            /**
-             * Compare function used to sort array of objects by name
-             */
-            function compareNames(a, b) {
-                if (a.name > b.name) {
-                    return 1;
-                }
-                if (a.name < b.name) {
-                    return -1;
-                }
-                // a must be equal to b
-                return 0;
             }
 
             /**
@@ -198,8 +192,7 @@ angular.module('lcaApp.fragment.sankey',
                 //  if that is in the list. Otherwise, set to first element in resource payload.
                 //
                 var selectedFlowProperty = $scope.selectedFlowProperty,
-                    flowProperties = FlowPropertyForFragmentService.objects;
-                flowProperties.sort(compareNames);
+                    flowProperties = FlowPropertyForFragmentService.getSortedObjects();
                 if (flowProperties) {
                     if (selectedFlowProperty) {
                         selectedFlowProperty = flowProperties.find(function (element) {
@@ -240,6 +233,7 @@ angular.module('lcaApp.fragment.sankey',
              * If successful, visualize selected fragment.
              */
             function getDataForFragment() {
+                startWaiting();
                 $q.all([FlowPropertyForFragmentService.load({fragmentID: fragmentID}),
                     FragmentFlowService.load({scenarioID: scenarioID, fragmentID: fragmentID}),
                     FlowForFragmentService.load({fragmentID: fragmentID})])
@@ -331,7 +325,7 @@ angular.module('lcaApp.fragment.sankey',
                 }
             }
 
-            usSpinnerService.spin("spinner-lca");
+            startWaiting();
             $scope.color = { domain: ([2, 3, 4, 1, 0]), range: colorbrewer.Set3[5], property: "nodeTypeID" };
             $scope.selectedFlowProperty = null;
             $scope.selectedNode = null;

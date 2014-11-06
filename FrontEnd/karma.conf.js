@@ -14,8 +14,10 @@ module.exports = function(config){
       'app/bower_components/spin.js/spin.js',
       'app/bower_components/angular-spinner/angular-spinner.js',
       'app/bower_components/angular-breadcrumb/release/angular-breadcrumb.js',
+      'app/bower_components/angular-bootstrap/ui-bootstrap.js',
       'app/components/**/*.js',
       'app/fragment-sankey/**/*.js',
+      'app/process-lcia/**/*.js',
       'app/scenarios/**/*.js'
     ],
 
