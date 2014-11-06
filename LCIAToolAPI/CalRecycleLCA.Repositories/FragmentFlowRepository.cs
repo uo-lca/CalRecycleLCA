@@ -148,7 +148,7 @@ namespace CalRecycleLCA.Repositories
                         FlowID = group.Key.FlowID,
                         DirectionID = group.Key.DirectionID,
                         Result = group.Sum(a => a.Result)
-                    });
+                    }).ToList();
 
             // wow! what a mouthful
             // next thing to do is pull out the out inFlowMagnitude
@@ -156,9 +156,14 @@ namespace CalRecycleLCA.Repositories
             var inFlow = Outflows.Where(o => o.FlowID == flowId)
                 .Where(o => o.DirectionID == myDirectionId).First();
 
-            inFlowMagnitude = (double)inFlow.Result;
+            inFlowMagnitude = (double)inFlow.Result; // out param
 
-            return Outflows.Where(p => p != inFlow);
+            var cropOutflows = Outflows.Where(p => p != inFlow);
+
+            if (cropOutflows.Count() == Outflows.Count())
+                throw new ArgumentException("No inFlow found to exclude!");
+
+            return cropOutflows;
 
 
 
