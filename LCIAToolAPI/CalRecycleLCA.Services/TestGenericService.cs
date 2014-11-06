@@ -23,8 +23,8 @@ namespace CalRecycleLCA.Services
         private readonly IFragmentFlowService _fragmentFlowService;
         [Inject]
         private readonly IFragmentNodeProcessService _fragmentNodeProcessService;
-        //[Inject]
-        //private readonly IProcessFlowService _processFlowService;
+        [Inject]
+        private readonly IProcessFlowService _processFlowService;
         [Inject]
         private readonly IFragmentNodeFragmentService _fragmentNodeFragmentService;
 
@@ -32,11 +32,13 @@ namespace CalRecycleLCA.Services
         public TestGenericService(
             ILCIAMethodService lciaMethodService,
             IFragmentFlowService fragmentFlowService,
+            IProcessFlowService processFlowService,
             IFragmentNodeProcessService fragmentNodeProcessService,
             IFragmentNodeFragmentService fragmentNodeFragmentService)
         {
             _lciaMethodService = lciaMethodService;
             _fragmentFlowService = fragmentFlowService;
+            _processFlowService = processFlowService;
             _fragmentNodeProcessService = fragmentNodeProcessService;
             _fragmentNodeFragmentService = fragmentNodeFragmentService;
         }
@@ -52,6 +54,30 @@ namespace CalRecycleLCA.Services
             var ff = _fragmentFlowService.GetFragmentFlow(fragmentFlowID);
             var fnr = _fragmentFlowService.Terminate(ff, scenarioID, true);
             return fnr;
+        }
+
+        public IEnumerable<InventoryModel> GetDependencies(int fragmentFlowId, int scenarioId)
+        {
+            var inv = new List<InventoryModel>();
+            var ff = _fragmentFlowService.GetFragmentFlow(fragmentFlowId);
+            var fnr = _fragmentFlowService.Terminate(ff, scenarioId, true);
+            switch (fnr.NodeTypeID)
+            {
+                case 1:
+                    {
+                        inv = _processFlowService.GetDependencies((int)fnr.ProcessID,fnr.TermFlowID,ff.DirectionID)
+                            .ToList();
+                        break;
+                    }
+                case 2:
+                    {
+                        double foo = 1.0;
+                        inv = _fragmentFlowService.GetDependencies((int)fnr.SubFragmentID, fnr.TermFlowID, ff.DirectionID,
+                            out foo, fnr.ScenarioID).ToList();
+                        break;
+                    }
+            }
+            return inv;
         }
     }
 }

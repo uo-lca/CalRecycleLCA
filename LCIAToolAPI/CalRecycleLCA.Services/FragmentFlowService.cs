@@ -15,6 +15,8 @@ namespace CalRecycleLCA.Services
     {
         FragmentFlow GetFragmentFlow(int fragmentFlowId);
         FragmentNodeResource Terminate(FragmentFlow ff, int scenarioId, bool doBackground = false);
+        IEnumerable<InventoryModel> GetDependencies(int fragmentId, int flowId, int ex_directionId, 
+            out double inFlowMagnitude, int scenarioId = 0);
     }
 
     public class FragmentFlowService : Service<FragmentFlow>, IFragmentFlowService
@@ -44,5 +46,11 @@ namespace CalRecycleLCA.Services
 	    {
 	        return _repository.Terminate(ff, scenarioId, doBackground);
     	}
+
+        public IEnumerable<InventoryModel> GetDependencies(int fragmentId, int flowId, int ex_directionId, 
+            out double inFlowMagnitude, int scenarioId = 0)
+        {
+            return _repository.GetDependencies(fragmentId, flowId, ex_directionId, out inFlowMagnitude, scenarioId);
+        }
     }
 }

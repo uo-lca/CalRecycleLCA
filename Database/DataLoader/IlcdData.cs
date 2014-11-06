@@ -223,7 +223,7 @@ namespace LcaDataLoader {
                 }
                 string location = (string)el.Element(ElementName(("location")));
                 pf = new ProcessFlow {
-                    DirectionID = dirID,
+                    DirectionID = (int)dirID,
                     FlowID = flowID,
                     Geography = location,
                     Magnitude = magnitude,
@@ -351,7 +351,7 @@ namespace LcaDataLoader {
                 dataSetInternalID = GetElementValue(ElementName("referenceToReferenceFlowProperty"));
                 fpElement = GetElementWithInternalId(ElementName("flowProperty"), dataSetInternalID);
                 fpID = GetFlowPropertyID(ilcdDb, fpElement);
-                flow.ReferenceFlowProperty = fpID;
+                flow.ReferenceFlowProperty = (int)fpID;
 
                 if (ilcdDb.AddIlcdEntity(flow, uuid)) {
                     ilcdDb.AddEntities<FlowFlowProperty>(CreateFFPList(ilcdDb, flow));

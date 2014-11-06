@@ -17,9 +17,9 @@ namespace LcaDataModel
         [DatabaseGenerated(DatabaseGeneratedOption.None)]
         public int DependencyParamID { get; set; }
 
-        public int? ParamID { get; set; }
+        public int ParamID { get; set; }
 
-        public int? FragmentFlowID { get; set; }
+        public int FragmentFlowID { get; set; }
 
         public double? Value { get; set; }
 
