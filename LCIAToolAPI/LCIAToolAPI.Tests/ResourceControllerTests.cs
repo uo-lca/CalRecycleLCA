@@ -190,17 +190,17 @@ namespace LCIAToolAPI.Tests
 
         //private IUnitOfWork _unitOfWork;
 
-            _fragmentTraversalV2 = new FragmentTraversalV2(_flowService,
+            _fragmentTraversalV2 = new FragmentTraversalV2(//_flowService,
             _fragmentFlowService,
             _nodeCacheService,
-            _fragmentNodeProcessService,
+            //_fragmentNodeProcessService,
             _processFlowService,
-            _fragmentNodeFragmentService,
+            //_fragmentNodeFragmentService,
             _flowFlowPropertyService,
             _dependencyParamService,
-            _flowPropertyParamService,
-            _fragmentService,
-            _paramService,
+            //_flowPropertyParamService,
+            //_fragmentService,
+            //_paramService,
             _unitOfWork);
 
             _fragmentLCIAComputation = new FragmentLCIAComputation(_fragmentFlowService,

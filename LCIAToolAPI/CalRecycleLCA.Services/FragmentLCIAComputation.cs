@@ -283,17 +283,17 @@ namespace CalRecycleLCA.Services
 
 
             // this does nothing if traversal has already been completed - FIGURE OUT THIS PART ON THURSDAY
-            FragmentTraversalV2 fragmentTraversalV2 = new FragmentTraversalV2(_flowService,
+            FragmentTraversalV2 fragmentTraversalV2 = new FragmentTraversalV2(//_flowService,
                             _fragmentFlowService,
                             _nodeCacheService,
-                            _fragmentNodeProcessService,
+                            //_fragmentNodeProcessService,
                             _processFlowService,
-                            _fragmentNodeFragmentService,
+                            //_fragmentNodeFragmentService,
                             _flowFlowPropertyService,
                             _dependencyParamService,
-                            _flowPropertyParamService,
-                            _fragmentService,
-                            _paramService,
+                            //_flowPropertyParamService,
+                            //_fragmentService,
+                            //_paramService,
                             _unitOfWork);
 
             fragmentTraversalV2.Traverse(fragmentId, scenarioId);

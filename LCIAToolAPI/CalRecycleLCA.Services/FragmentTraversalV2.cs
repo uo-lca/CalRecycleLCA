@@ -17,69 +17,55 @@ namespace CalRecycleLCA.Services
     public class FragmentTraversalV2 : IFragmentTraversalV2
     {
         [Inject]
-        private readonly IFlowService _flowService;
-        [Inject]
         private readonly IFragmentFlowService _fragmentFlowService;
         [Inject]
         private readonly INodeCacheService _nodeCacheService;
         [Inject]
-        private readonly IFragmentNodeProcessService _fragmentNodeProcessService;
-        [Inject]
         private readonly IProcessFlowService _processFlowService;
-        [Inject]
-        private readonly IFragmentNodeFragmentService _fragmentNodeFragmentService;
         [Inject]
         private readonly IFlowFlowPropertyService _flowFlowPropertyService;
         [Inject]
         private readonly IDependencyParamService _dependencyParamService;
         [Inject]
-        private readonly IParamService _paramService;
-        [Inject]
-        private readonly IFlowPropertyParamService _flowPropertyParamService;
-        [Inject]
-        private readonly IFragmentService _fragmentService;
-        [Inject]
         private readonly IUnitOfWork _unitOfWork;
 
 
-        public FragmentTraversalV2(IFlowService flowService,
+        public FragmentTraversalV2(
             IFragmentFlowService fragmentFlowService,
             INodeCacheService nodeCacheService,
-            IFragmentNodeProcessService fragmentNodeProcessService,
             IProcessFlowService processFlowService,
-            IFragmentNodeFragmentService fragmentNodeFragmentService,
             IFlowFlowPropertyService flowFlowPropertyService,
             IDependencyParamService dependencyParamService,
-            IFlowPropertyParamService flowPropertyParamService,
-            IFragmentService fragmentService,
-            IParamService paramService,
             IUnitOfWork unitOfWork)
         {
-            _flowService = flowService;
             _fragmentFlowService = fragmentFlowService;
             _nodeCacheService = nodeCacheService;
-            _fragmentNodeProcessService = fragmentNodeProcessService;
             _processFlowService = processFlowService;
-            _fragmentNodeFragmentService = fragmentNodeFragmentService;
             _flowFlowPropertyService = flowFlowPropertyService;
             _dependencyParamService = dependencyParamService;
-            _paramService = paramService;
-            _flowPropertyParamService = flowPropertyParamService;
-            _fragmentService = fragmentService;
             _unitOfWork = unitOfWork;
         }
 
 
 
+        /// <summary>
+        /// Traverse a fragment by recursively following fragmentflow links.
+        /// 
+        /// This function needs to be updated to use fragment In-flows.
+        /// 
+        /// </summary>
+        /// <param name="fragmentId"></param>
+        /// <param name="scenarioId"></param>
+        /// <returns></returns>
         public bool Traverse(int? fragmentId = 0, int scenarioId = 0)
         {
             int refFlow = _fragmentFlowService
                 .Query(q => q.FragmentID == fragmentId && q.ParentFragmentFlowID == null)
                 .Select()
-                .FirstOrDefault()
+                .First()
                 .FragmentFlowID;
 
-            float? activity = 1;
+            float activity = 1;
 
             var chk = _nodeCacheService
                 .Query(q => q.FragmentFlowID == refFlow && q.ScenarioID == scenarioId)
@@ -90,6 +76,7 @@ namespace CalRecycleLCA.Services
             if (chk == 0)
             {
                 NodeRecurse(refFlow, scenarioId, activity);
+                _unitOfWork.SaveChanges();
                 return true;
             }
             else
@@ -100,220 +87,143 @@ namespace CalRecycleLCA.Services
 
         }
 
-        public void NodeRecurse(int fragmentFlowId, int scenarioId, double? flowMagnitude)
+        /// <summary>
+        /// Traverse a fragment by recursively following fragmentflow links.  nodes of type
+        /// 3 or 4 are terminal cases; nodes of type 1 or 2 are recursive.
+        /// It is a data integrity requirement that a given process or subfragment has the same 
+        /// dependencies as the fragment node in which it is instantiated.
+        /// </summary>
+        /// <param name="fragmentFlowId">FragmentFlow link being traversed</param>
+        /// <param name="scenarioId">scenario for current traversal</param>
+        /// <param name="flowMagnitude">magnitude of current link exiting parent node.</param>
+        public void NodeRecurse(int fragmentFlowId, int scenarioId, double flowMagnitude)
         {
-            var theFlow = _fragmentFlowService
-                .Query(q => q.FragmentFlowID == fragmentFlowId)
-                .Select()
-                .AsEnumerable<FragmentFlow>();
+            var theFragmentFlow = _fragmentFlowService.GetFragmentFlow(fragmentFlowId);
+            
+            FragmentNodeResource term = _fragmentFlowService.Terminate(theFragmentFlow,scenarioId); // don't bother to resolve background
 
-            var nodeFlows = GetScenarioProductFlows(theFlow, scenarioId).ToList();
-
-            int? termFlowId = GetTermFlow(theFlow);
-
-            int? theFlowDirection = Convert.ToInt32(theFlow.Select(x => x.DirectionID).FirstOrDefault());
-
-            double? nodeConv = null;
-
-            switch (theFlowDirection)
+            // first, calculate node weight
+            double? flow_conv = _flowFlowPropertyService.FlowConv(theFragmentFlow.FlowID, term.TermFlowID, scenarioId);
+            // and incoming exchange
+            // note this is not subject to parameter adjustment
+            double flow_exch;
+            var outFlows = GetScenarioProductFlows(term, theFragmentFlow.DirectionID, out flow_exch);
+            
+            if (flow_conv == null)
             {
-                case 1:
-                    theFlowDirection = 2;
-                    break;
-                case 2:
-                    theFlowDirection = 1;
-                    break;
+                throw new ArgumentNullException("Flow conversion was not found and cannot be null");
             }
 
-            var inFlow = nodeFlows
-                    .Where(x => x.FlowID == termFlowId)
-                    .Where(x => x.DirectionID == theFlowDirection)
-
-                         .Select(b => new NodeFlowModel
-                    {
-                        FlowID = b.FlowID,
-                        DirectionID = b.DirectionID,
-                        FlowMagnitude = b.FlowMagnitude,
-                        Result = b.Result
-                    }).ToList();
-
-
-
-            int? theFlowId = theFlow.Select(x => x.FlowID).FirstOrDefault();
-
-
-            //set theFlowId to termFlowId in cases where FlowID is null (eg records with a null for ParentFragmentFlowID)
-            if (theFlowId == termFlowId || theFlowId == null)
-            {
-                nodeConv = 1;
-            }
-            else
-            {
-                var termFlow = _flowService.Query(x => x.FlowID == termFlowId).Select().FirstOrDefault();
-                
-                var conv = _flowFlowPropertyService.Queryable()
-                    .GroupJoin(_flowPropertyParamService.Queryable() // Target table
-                , ffp => ffp.FlowFlowPropertyID
-                , fpp => fpp.FlowFlowPropertyID
-                , (ffp, fpp) => new { flowFlowProperties = ffp, flowPropertyParams = fpp })
-                .SelectMany(s => s.flowPropertyParams.DefaultIfEmpty()
-                , (s, flowPropertyParams) => new
-                {
-
-                    ParamID = flowPropertyParams == null ? 0 : flowPropertyParams.ParamID,
-                    FlowPropertyID = s.flowFlowProperties.FlowPropertyID,
-                    FlowID = s.flowFlowProperties.FlowID,
-                    MeanValue = s.flowFlowProperties.MeanValue,
-                    Value = flowPropertyParams == null ? 0 : flowPropertyParams.Value,
-                })
-                .GroupJoin(_paramService.Queryable() // Target table
-                , fpp => fpp.ParamID
-                , p => p.ParamID
-                , (fpp, p) => new { flowPropertyParams = fpp, parameters = p })
-                .SelectMany(s => s.parameters.DefaultIfEmpty()
-                , (s, parameters) => new
-                {
-
-                    ParamID = parameters == null ? 0 : parameters.ParamID,
-                    FlowPropertyID = s.flowPropertyParams.FlowPropertyID,
-                    FlowID = s.flowPropertyParams.FlowID,
-                    MeanValue = s.flowPropertyParams.MeanValue,
-                    Value = s.flowPropertyParams.Value,
-                    ScenarioID = parameters == null ? 0 : parameters.ScenarioID
-                })
-                    .Select(b => new
-                    {
-                        Default = b.MeanValue,
-                        Subs = b.Value == null ? 0 : b.Value
-                    });
-
-
-
-
-                double? convDefault = conv.Select(x => x.Default).FirstOrDefault();
-                double? convSubs = conv.Select(x => x.Subs).FirstOrDefault();
-
-                if (convSubs != 0)
-                {
-                    nodeConv = convSubs;
-                }
-                else
-                {
-                    nodeConv = convDefault;
-                }
-            }
-
-            double? nodeScale;
-            if (inFlow.Select(x => x.Result).FirstOrDefault() == 0)
+            if (flow_exch == 0)
             {
                 throw new ArgumentException("The inflow result cannot be 0");
             }
-            else
-            {
-                nodeScale = 1 / inFlow.Select(x => x.Result).FirstOrDefault();
-            }
 
-            
-            double? nodeWeight = flowMagnitude * nodeConv * nodeScale;
+            double nodeWeight = flowMagnitude * (double)flow_conv / flow_exch;
 
-            //do not save to NodeCache and abandon recursion if nodeweight == 0
+            // do not cache if nodeweight == 0 
             if (nodeWeight != 0)
             {
+                // begin recursion by finding all FragmentFlows with the current parent
+                IEnumerable<FragmentFlow> outLinks = _fragmentFlowService.Queryable()
+                    .Where(ff => ff.ParentFragmentFlowID == theFragmentFlow.FragmentFlowID).ToList();
 
+                IEnumerable<int> outFFids = outLinks.Select(a => a.FragmentFlowID);
 
-                var outFlows = _fragmentFlowService.Queryable()
-                    .Where(x => x.ParentFragmentFlowID == fragmentFlowId).ToList()
-
-                    .GroupJoin(nodeFlows // Target table
-    , ff => ff.FlowID
-    , nf => nf.FlowID
-    , (ff, nf) => new { fragmentflows = ff, nodeFlows = nf })
-    .SelectMany(s => s.nodeFlows.DefaultIfEmpty()
-    , (s, nodeflows) => new
-    {
-        FragmentFlowID = s.fragmentflows.FragmentFlowID,
-        FlowID = s.fragmentflows.FlowID,
-        FFDirectionID = s.fragmentflows.DirectionID,
-        NFDirectionID = nodeflows == null ? 0 : nodeflows.DirectionID,
-        Result = nodeflows == null ? 0 : nodeflows.Result,
-        ParentFragmentFlowID = s.fragmentflows.ParentFragmentFlowID
-    })
-
-    .GroupJoin(_dependencyParamService.Queryable().ToList() // Target table
-                    , ff => ff.FragmentFlowID
-                    , dp => dp.FragmentFlowID
-                    , (ff, dp) => new { fragmentflows = ff, dependencyparams = dp })
-                    .SelectMany(s => s.dependencyparams.DefaultIfEmpty()
-                    , (s, dependencyparams) => new
-                    {
-                        FragmentFlowID = s.fragmentflows.FragmentFlowID,
-                        FlowID = s.fragmentflows.FlowID,
-                        FFDirectionID = s.fragmentflows.FFDirectionID,
-                        NFDirectionID = s.fragmentflows.NFDirectionID,
-                        Result = s.fragmentflows.Result,
-                        ParamID = dependencyparams == null ? -1 : dependencyparams.ParamID,
-                        ParamValue = dependencyparams == null ? 0 : dependencyparams.Value,
-                        ParentFragmentFlowID = s.fragmentflows.ParentFragmentFlowID
-                    })
-
-    .GroupJoin(_paramService.Queryable()
-   .Where(x => x.ScenarioID == scenarioId).ToList()
-                    , dp => dp.ParamID
-                    , sp => sp.ParamID
-                    , (dp, sp) => new { dependencyParams = dp, scenarioParams = sp })
-                    .SelectMany(s => s.scenarioParams.DefaultIfEmpty()
-                    , (s, scenarioparams) => new OutFlowModel
-                    {
-                        ScenarioID = scenarioparams == null ? scenarioId : scenarioparams.ScenarioID,
-                        FragmentFlowID = s.dependencyParams.FragmentFlowID,
-                        FlowID = s.dependencyParams.FlowID,
-                        FFDirectionID = s.dependencyParams.FFDirectionID,
-                        NFDirectionID = s.dependencyParams.NFDirectionID,
-                        Result = s.dependencyParams.Result,
-                        ParamID = s.dependencyParams.ParamID,
-                        ParamValue = s.dependencyParams.ParamValue,
-                        ParentFragmentFlowID = s.dependencyParams.ParentFragmentFlowID
-                    }).ToList()
-    .Where(x => x.FFDirectionID == x.NFDirectionID);
-
-
-                if (outFlows != null)
+                if (outLinks.Count() != outFlows.Count())
                 {
-                    foreach (var item in outFlows)
-                    {
-                      
-                        if (item.Result == null)
-                        {
-                            throw new ArgumentNullException("This value cannot be null.");
-                        }
-                        else
-                        {
-                            if (item.ParamValue != 0  && scenarioId != 0)
-                            {
-                                item.Result = item.ParamValue;
-                            }
-                            double outflowMagnitude = Convert.ToDouble(nodeWeight * item.Result);
-                            int outflowFragmentFlowID = Convert.ToInt32(item.FragmentFlowID);
-                            NodeRecurse(outflowFragmentFlowID, scenarioId, outflowMagnitude);
-                        }
-                    }
+                    throw new ArgumentException("OutFlows and OutLinks don't reconcile!");
                 }
 
-                var nodeCache = new NodeCache
+                // pull dependency params
+                var ff_params = new List<DependencyParam>();
+                    
+                if (term.NodeTypeID == 1)
                 {
-                    FragmentFlowID = fragmentFlowId,
-                    ScenarioID = scenarioId,
-                    FlowMagnitude = flowMagnitude,
-                    NodeWeight = nodeWeight
-                };
+                    // only process outflows may be parameterized
+                    ff_params = _dependencyParamService.Query(dp => dp.Param.ScenarioID == scenarioId).Select()
+                        .Where(dp => outFFids.Contains(dp.FragmentFlowID)).ToList();
+                }
 
-                nodeCache.ObjectState = ObjectState.Added;
-                _nodeCacheService.InsertOrUpdateGraph(nodeCache);
-                _unitOfWork.SaveChanges();
+                // abandon recursion if no recursive steps-- but foreach should just not run if outLinks is empty
+                foreach (var item in outLinks)
+                {
+                    var ff_param = ff_params.Where(dp => dp.FragmentFlowID == item.FragmentFlowID).FirstOrDefault();
+                    double resultVal = (double)outFlows
+                        .Where(o => o.FlowID == item.FlowID && o.DirectionID == item.DirectionID)
+                        .First().Result; // First() should generate exception if no match is found
+
+                    if (ff_param != null)
+                        resultVal = (double)ff_param.Value;
+
+                    NodeRecurse(item.FragmentFlowID, scenarioId, nodeWeight * resultVal);
+                }
+
+            var nodeCache = new NodeCache
+            {
+                FragmentFlowID = fragmentFlowId,
+                ScenarioID = scenarioId,
+                FlowMagnitude = flowMagnitude,
+                NodeWeight = nodeWeight
+            };
+            
+            nodeCache.ObjectState = ObjectState.Added;
+            _nodeCacheService.InsertOrUpdateGraph(nodeCache);
             }
-
         }
 
+                /// <summary>
+        /// Determine dependency flows required by the fragmentflow termination being supplied.
+        /// This function assumes that all flow+direction combinations are distinct for processes and fragments.
+        /// (for fragments, node outflows are grouped by flow+direction)
+        /// </summary>
+        /// <param name="term">FragmentNodeResource corresponding to the terminus of the current FragmentFlow</param>
+        /// <param name="ex_directionId">Direction of the physical flow with respect to the *parent*</param>
+        /// <param name="flow_exch">out param set equal to the inflow's exchange</param>
+        /// <returns></returns>
+        public IEnumerable<InventoryModel> GetScenarioProductFlows(FragmentNodeResource term, int ex_directionId, out double flow_exch)
+        {
+            IEnumerable<InventoryModel> Outflows;
+            switch (term.NodeTypeID)
+            {
+                case 1:
+                    {
+                        // process-- lookup exchange and outflows separately
+                        var _flow_exch = _processFlowService.FlowExchange((int)term.ProcessID, term.TermFlowID, ex_directionId);
+                        if (_flow_exch == null)
+                        {
+                            throw new ArgumentNullException("Process inflow not found!");
+                        }
+                        flow_exch = (double)_flow_exch;
+
+                        Outflows = _processFlowService.GetDependencies((int)term.ProcessID, term.TermFlowID, ex_directionId);
+                        break;
+                    }
+                case 2:
+                    {
+                        // fragment-- all together
+                        // first, traverse the fragment -- store results in cache
+                        Traverse(term.SubFragmentID, term.ScenarioID);
+                        // access the cache to determine outflow amounts
+                        Outflows = _fragmentFlowService.GetDependencies((int)term.SubFragmentID,term.TermFlowID,ex_directionId,
+                            out flow_exch, term.ScenarioID);
+                        break;
+                    }
+                default:
+                    {
+                        Outflows = new List<InventoryModel>();
+                        flow_exch = 1;
+                        break;
+                    }
+            }
+            return Outflows;
+        }            
+            
+    }
+}
+
+
+/* *********************
         public IEnumerable<NodeFlowModel> GetScenarioProductFlows(IEnumerable<FragmentFlow> theFragmentFlow, int scenarioId)
         {
             int nodeTypeID = Convert.ToInt32(theFragmentFlow.Select(x => x.NodeTypeID).FirstOrDefault());
@@ -511,3 +421,4 @@ namespace CalRecycleLCA.Services
         }
     }
 }
+*************** */
