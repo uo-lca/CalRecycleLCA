@@ -1,39 +1,28 @@
-<!-- Partial html for fragment sankey view -->
+<!-- Partial html for process LCIA view -->
 <div class="row">
-
-
     <form>
         <p>
-            <label>Scenario: </label>
-            <span>{{scenario.name}}</span>
-        </p>
-
-        <p>
-            <label>Fragment: </label>
-        <span ng-repeat="parent in parentFragments">
-            <a class="fragment-link" ng-click="onParentFragmentSelected(parent,$index)">{{parent.name}}</a>
-             >
-        </span>
-            <span>{{fragment.name}}</span>
-        </p>
-
-        <p>
-            <label for="flow-prop-select">Flow Property Type </label>
-            <select id="flow-prop-select" ng-model="selectedFlowProperty" ng-options="fp.name for fp in flowProperties"
-                    ng-change="onFlowPropertyChange()">
+            <label for="scenario-select">
+                Scenario
+            </label>
+            <select id="scenario-select" ng-model="selectedScenario"
+                    ng-options="s.name for s in scenarios"
+                    ng-change="onScenarioChange()">
             </select>
-            <span>&nbsp;</span>
-            <label id="unitLabel">Reference Unit: </label>
-            <span id="refUnitName">{{selectedFlowProperty.referenceUnit}}</span>
+        </p>
+        <p>
+            <label for="process-select">Process</label>
+            <select id="process-select" ng-model="selectedProcess" ng-options="p.name for p in processes"
+                    ng-change="onProcessChange()">
+            </select>
         </p>
     </form>
 </div>
 <div class="row">
     <div class="col-md-8">
-        <div class="sankey-container">
+        <div class="lcia-container">
             <!--suppress HtmlUnknownTag -->
-            <sankey-diagram graph="graph" color="color" selected-node="selectedNode"
-                            mouse-over-node="mouseOverNode"></sankey-diagram>
+            <lcia-diagram results="results" flows="elementaryFlows"></lcia-diagram>
         </div>
     </div>
     <div class="col-md-4">

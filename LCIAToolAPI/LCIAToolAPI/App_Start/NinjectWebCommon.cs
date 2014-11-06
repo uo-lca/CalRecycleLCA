@@ -120,7 +120,7 @@ namespace LCAToolAPI.App_Start
             kernel.Bind(typeof(IRepositoryAsync<ScoreCache>)).To(typeof(Repository<ScoreCache>));
             kernel.Bind(typeof(IRepositoryAsync<ProcessSubstitution>)).To(typeof(Repository<ProcessSubstitution>));
             kernel.Bind(typeof(IRepositoryAsync<FragmentSubstitution>)).To(typeof(Repository<FragmentSubstitution>));
-            kernel.Bind(typeof(IRepositoryAsync<ScenarioBackground>)).To(typeof(Repository<ScenarioBackground>));
+            kernel.Bind(typeof(IRepositoryAsync<BackgroundSubstitution>)).To(typeof(Repository<BackgroundSubstitution>));
             kernel.Bind(typeof(IRepositoryAsync<Background>)).To(typeof(Repository<Background>));
 
 
@@ -151,7 +151,7 @@ namespace LCAToolAPI.App_Start
             kernel.Bind(typeof(IScoreCacheService)).To(typeof(ScoreCacheService));
             kernel.Bind(typeof(IProcessSubstitutionService)).To(typeof(ProcessSubstitutionService));
             kernel.Bind(typeof(IFragmentSubstitutionService)).To(typeof(FragmentSubstitutionService));
-            kernel.Bind(typeof(IScenarioBackgroundService)).To(typeof(ScenarioBackgroundService));
+            // kernel.Bind(typeof(IScenarioBackgroundService)).To(typeof(ScenarioBackgroundService));
             kernel.Bind(typeof(IBackgroundService)).To(typeof(BackgroundService));
             kernel.Bind<IDependencyParamService>().To<DependencyParamService>();
             kernel.Bind<IFlowPropertyParamService>().To<FlowPropertyParamService>();

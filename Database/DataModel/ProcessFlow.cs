@@ -19,11 +19,11 @@ namespace LcaDataModel
 
         public int ProcessFlowID { get; set; }
 
-        public int? ProcessID { get; set; }
+        public int ProcessID { get; set; }
 
-        public int? FlowID { get; set; }
+        public int FlowID { get; set; }
 
-        public int? DirectionID { get; set; }
+        public int DirectionID { get; set; }
 
         [StringLength(15)]
         public string Type { get; set; }

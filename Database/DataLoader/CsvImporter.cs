@@ -210,7 +210,11 @@ namespace LcaDataLoader {
         private static bool CreateFragmentFlow(Row row, DbContextWrapper dbContext) {
             int fragmentFlowID = Convert.ToInt32(row["FragmentFlowID"]);
             if (dbContext.Find<FragmentFlow>(fragmentFlowID) == null) {
-                return dbContext.AddEntity(new FragmentFlow { FragmentFlowID = fragmentFlowID });
+                return dbContext.AddEntity(new FragmentFlow { 
+                    FragmentFlowID = fragmentFlowID,
+                    DirectionID = 1,
+                    NodeTypeID = 1
+                });
             }
             else {
                 Program.Logger.WarnFormat("Found FragmentFlow with ID = {0}. Entity will not be added, but may be updated.", fragmentFlowID);

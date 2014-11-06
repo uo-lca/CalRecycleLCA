@@ -27,7 +27,7 @@ namespace CalRecycleLCA.Repositories
             var background = new FragmentNodeResource();
             int targetId;
 
-            background = repository.GetRepository<ScenarioBackground>().Queryable()
+            background = repository.GetRepository<BackgroundSubstitution>().Queryable()
                 .Where(x => x.ScenarioID == scenarioId)
                 .Where(x => x.FlowID == flowId)
                 .Where(x => x.DirectionID == directionId)
@@ -64,13 +64,13 @@ namespace CalRecycleLCA.Repositories
                     targetId = repository.GetRepository<Process>().Queryable()
                         .Where(x => x.ILCDEntityID == background.RefID)
                         .Select(z => (int)z.ProcessID).FirstOrDefault();
-                    background.SubFragmentID = targetId;
+                    background.ProcessID = targetId;
                     break;
                 case 2:
                     targetId = repository.GetRepository<Fragment>().Queryable()
                         .Where(x => x.ILCDEntityID == background.RefID)
                         .Select(z => (int)z.FragmentID).FirstOrDefault();
-                    background.ProcessID = targetId;
+                    background.SubFragmentID = targetId;
                     break;
             }
             return background;

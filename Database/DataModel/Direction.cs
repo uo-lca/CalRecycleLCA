@@ -14,7 +14,7 @@ namespace LcaDataModel
         {
             Backgrounds = new HashSet<Background>();
             Scenarios = new HashSet<Scenario>();
-            ScenarioBackgrounds = new HashSet<ScenarioBackground>();
+            BackgroundSubstitutions = new HashSet<BackgroundSubstitution>();
             FragmentFlows = new HashSet<FragmentFlow>();
             LCIAs = new HashSet<LCIA>();
             ProcessFlows = new HashSet<ProcessFlow>();
@@ -29,7 +29,7 @@ namespace LcaDataModel
 
         public virtual ICollection<Scenario> Scenarios { get; set; }
 
-        public virtual ICollection<ScenarioBackground> ScenarioBackgrounds { get; set; }
+        public virtual ICollection<BackgroundSubstitution> BackgroundSubstitutions { get; set; }
 
         public virtual ICollection<FragmentFlow> FragmentFlows { get; set; }
 

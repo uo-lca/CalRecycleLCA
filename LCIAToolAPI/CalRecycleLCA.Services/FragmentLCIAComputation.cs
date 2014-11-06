@@ -30,8 +30,8 @@ namespace CalRecycleLCA.Services
         private readonly IFragmentSubstitutionService _fragmentSubstitutionService;
         [Inject]
         private readonly ILCIAMethodService _lciaMethodService;
-        [Inject]
-        private readonly IScenarioBackgroundService _scenarioBackgroundService;
+        // [Inject]
+        // private readonly IScenarioBackgroundService _scenarioBackgroundService;
         [Inject]
         private readonly IBackgroundService _backgroundService;
         [Inject]
@@ -73,7 +73,7 @@ namespace CalRecycleLCA.Services
             IFragmentNodeFragmentService fragmentNodeFragmentService,
             IFragmentSubstitutionService fragmentSubstitutionService,
             ILCIAMethodService lciaMethodService,
-            IScenarioBackgroundService scenarioBackgroundService,
+            // IScenarioBackgroundService scenarioBackgroundService,
             IBackgroundService backgroundService,
             IProcessFlowService processFlowService,
             IProcessEmissionParamService processEmissionParamService,
@@ -133,11 +133,11 @@ namespace CalRecycleLCA.Services
             }
             _fragmentSubstitutionService = fragmentSubstitutionService;
 
-            if (scenarioBackgroundService == null)
-            {
-                throw new ArgumentNullException("scenarioBackgroundService is null");
-            }
-            _scenarioBackgroundService = scenarioBackgroundService;
+            // if (scenarioBackgroundService == null)
+            // {
+            //     throw new ArgumentNullException("scenarioBackgroundService is null");
+            // }
+            // _scenarioBackgroundService = scenarioBackgroundService;
 
 
             if (backgroundService == null)
@@ -283,17 +283,17 @@ namespace CalRecycleLCA.Services
 
 
             // this does nothing if traversal has already been completed - FIGURE OUT THIS PART ON THURSDAY
-            FragmentTraversalV2 fragmentTraversalV2 = new FragmentTraversalV2(_flowService,
+            FragmentTraversalV2 fragmentTraversalV2 = new FragmentTraversalV2(//_flowService,
                             _fragmentFlowService,
                             _nodeCacheService,
-                            _fragmentNodeProcessService,
+                            //_fragmentNodeProcessService,
                             _processFlowService,
-                            _fragmentNodeFragmentService,
+                            //_fragmentNodeFragmentService,
                             _flowFlowPropertyService,
                             _dependencyParamService,
-                            _flowPropertyParamService,
-                            _fragmentService,
-                            _paramService,
+                            //_flowPropertyParamService,
+                            //_fragmentService,
+                            //_paramService,
                             _unitOfWork);
 
             fragmentTraversalV2.Traverse(fragmentId, scenarioId);
