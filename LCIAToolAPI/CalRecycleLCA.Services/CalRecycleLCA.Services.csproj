@@ -133,6 +133,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="BackgroundService.cs" />
+    <Compile Include="BackgroundSubstitutionService.cs" />
     <Compile Include="CategoryService.cs" />
     <Compile Include="CharacterizationParamService.cs" />
     <Compile Include="ClassificationService.cs" />

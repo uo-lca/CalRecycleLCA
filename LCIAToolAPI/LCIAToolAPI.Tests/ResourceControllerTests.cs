@@ -46,7 +46,7 @@ namespace LCIAToolAPI.Tests
         private IScoreCacheService _scoreCacheService;
         private IProcessSubstitutionService _processSubstitutionService;
         private IFragmentSubstitutionService _fragmentSubstitutionService;
-        private IScenarioBackgroundService _scenarioBackgroundService;
+        private IBackgroundSubstitutionService _backgroundSubstitutionService;
         private IBackgroundService _backgroundService;
         private IProcessEmissionParamService _processEmissionParamService;
         private IFlowPropertyEmissionService _flowPropertyEmissionService;
@@ -90,7 +90,7 @@ namespace LCIAToolAPI.Tests
         private Mock<IRepositoryAsync<ScoreCache>> _mockScoreCacheRepository;
         private Mock<IRepositoryAsync<ProcessSubstitution>> _mockProcessSubstitutionRepository;
         private Mock<IRepositoryAsync<FragmentSubstitution>> _mockFragmentSubstitutionRepository;
-        private Mock<IRepositoryAsync<ScenarioBackground>> _mockScenarioBackgroundRepository;
+        private Mock<IRepositoryAsync<BackgroundSubstitution>> _mockBackgroundSubstitutionRepository;
         private Mock<IRepositoryAsync<Background>> _mockBackgroundRepository;
         private Mock<IRepositoryAsync<ProcessEmissionParam>> _mockProcessEmissionParamRepository;
         private Mock<IRepositoryAsync<FlowPropertyEmission>> _mockFlowPropertyEmissionRepository;
@@ -126,7 +126,7 @@ namespace LCIAToolAPI.Tests
             _mockScoreCacheRepository = new Mock<IRepositoryAsync<ScoreCache>>();
             _mockProcessSubstitutionRepository = new Mock<IRepositoryAsync<ProcessSubstitution>>();
             _mockFragmentSubstitutionRepository = new Mock<IRepositoryAsync<FragmentSubstitution>>();
-            _mockScenarioBackgroundRepository = new Mock<IRepositoryAsync<ScenarioBackground>>();
+            _mockBackgroundSubstitutionRepository = new Mock<IRepositoryAsync<BackgroundSubstitution>>();
             _mockBackgroundRepository = new Mock<IRepositoryAsync<Background>>();
             _mockProcessEmissionParamRepository = new Mock<IRepositoryAsync<ProcessEmissionParam>>();
             _mockFlowPropertyEmissionRepository = new Mock<IRepositoryAsync<FlowPropertyEmission>>();
@@ -162,7 +162,7 @@ namespace LCIAToolAPI.Tests
             _scoreCacheService = new ScoreCacheService(_mockScoreCacheRepository.Object);
             _processSubstitutionService = new ProcessSubstitutionService(_mockProcessSubstitutionRepository.Object);
             _fragmentSubstitutionService = new FragmentSubstitutionService(_mockFragmentSubstitutionRepository.Object);
-            _scenarioBackgroundService = new ScenarioBackgroundService(_mockScenarioBackgroundRepository.Object);
+            _backgroundSubstitutionService = new BackgroundSubstitutionService(_mockBackgroundSubstitutionRepository.Object);
             _backgroundService = new BackgroundService(_mockBackgroundRepository.Object);
             _processEmissionParamService = new ProcessEmissionParamService(_mockProcessEmissionParamRepository.Object);
             _flowPropertyEmissionService = new FlowPropertyEmissionService(_mockFlowPropertyEmissionRepository.Object);
@@ -173,17 +173,12 @@ namespace LCIAToolAPI.Tests
             _unitOfWork = _mockUnitOfWork.Object;
 
             //methods that resource service facade is dependent on.
-            _fragmentTraversalV2 = new FragmentTraversalV2(_flowService,
+            _fragmentTraversalV2 = new FragmentTraversalV2(
 _fragmentFlowService,
 _nodeCacheService,
-_fragmentNodeProcessService,
 _processFlowService,
-_fragmentNodeFragmentService,
 _flowFlowPropertyService,
 _dependencyParamService,
-_flowPropertyParamService,
-_fragmentService,
-_paramService,
 _unitOfWork);
 
             _fragmentLCIAComputation = new FragmentLCIAComputation(_fragmentFlowService,
@@ -194,7 +189,6 @@ _unitOfWork);
             _fragmentNodeFragmentService,
             _fragmentSubstitutionService,
             _lciaMethodService,
-            _scenarioBackgroundService,
             _backgroundService,
             _processFlowService,
             _processEmissionParamService,
@@ -265,6 +259,7 @@ _unitOfWork);
             //We only set up the mock repository that we need
             _mockFlowTypeRepository.Setup(m => m.Queryable()).Returns(_flowTypes.AsQueryable());
 
+
             _resourceController = new ResourceController(_resourceServiceFacade);
 
             //Act
@@ -284,8 +279,12 @@ _unitOfWork);
           
 
             //We only set up the mock repositories that we need
-          
+            _lciaMethod = new LCIAMethod()
+            {
+                LCIAMethodID = 1,
+            };
 
+             _mockLCIAMethodRepository.Setup(m => m.Find()).Returns(_lciaMethod);
 
               _processLCIAResult = new LCIAResultResource()
                      {
