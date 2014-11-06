@@ -30,5 +30,7 @@ namespace Entities.Models {
         public int? ReferenceFlowID { get; set; }
 
         public string Version { get; set; } // ILCDEntity.Version
+
+        public bool hasElementaryFlows { get; set; }
     }
 }
