@@ -66,8 +66,13 @@ namespace LCIAToolAPI.Tests
         private List<FlowType> _flowTypes;
         private LCIAResultResource _processLCIAResult;
         private LCIAMethod _lciaMethod;
-
-
+        private List<Scenario> _scenarios;
+        private List<Fragment> _fragments;
+        private Fragment _fragment;
+        private List<FragmentFlow> _fragmentFlows;
+        private List<Flow> _flows;
+        
+        
         private Mock<IRepositoryAsync<Category>> _mockCategoryRepository;
         private Mock<IRepositoryAsync<Classification>> _mockClassificationRepository;
         private Mock<IRepositoryAsync<Fragment>> _mockFragmentRepository;
@@ -268,20 +273,64 @@ _unitOfWork);
         }
 
         [TestMethod]
+        public void ShouldSuccesfullyCompareReturnedFlowTypes()
+        {
+            // Arrrange - This will populate our "mock" repository as a use case to
+            //compare again what we actually recieve from the method.
+            _flowTypes = new List<FlowType>
+                     {
+                            new FlowType(){FlowTypeID=1,Name="IntermediateFlow"},
+                            new FlowType(){FlowTypeID=2,Name="ElementaryFlow"}
+
+                     }.ToList();
+
+            //needs to be converted into a FlowTypeResource type as thing is what the method will return
+            List<FlowTypeResource> _flowTypeResources = _flowTypes
+   .Select(x => new FlowTypeResource() { FlowTypeID = x.FlowTypeID, Name = x.Name })
+   .ToList();
+
+            //We only set up the mock repository that we need
+            _mockFlowTypeRepository.Setup(m => m.Queryable()).Returns(_flowTypes.AsQueryable());
+
+
+            _resourceController = new ResourceController(_resourceServiceFacade);
+
+            //Act
+            List<FlowTypeResource> result = _resourceController.GetFlowTypes().ToList();
+            //CollectionAssert.AreEquivalent(_flowTypeResources, result);
+            //Assert.IsTrue(_flowTypeResources.SequenceEqual(result));
+            Assert.AreEqual(_flowTypeResources[0].FlowTypeID, result[0].FlowTypeID);
+            Assert.AreEqual(_flowTypeResources[1].FlowTypeID, result[1].FlowTypeID); 
+        }
+
+        [TestMethod]
+        //In progress - I think I know why it doesn't pass now.
         public void ShouldSuccesfullyGetProcessLCIAResult()
         {
             int processID = 1; 
             int lciaMethodID = 1;
             int scenarioID = 0;
 
-          
-
-          
-
             //We only set up the mock repositories that we need
             _lciaMethod = new LCIAMethod()
             {
+                //I think this needs all properties defined or the transform will fail.
+                //This may be why we are getting null for LCIAMethod.
+                //TODO - Test out this theory
                 LCIAMethodID = 1,
+                Name = "ILCD2011; Non-cancer human health effects; midpoint; CTUh; USEtox",
+                Methodology = "ILCD2011",
+                ImpactCategoryID =10,
+                ImpactIndicator = "Comparative Toxic Unit for human (CTUh)expressing the estimated increase in morbidity in the total human population per unit mass of a chemical emitted (cases per kilogramme).",
+                ReferenceYear = "time independent",
+                Duration="Indefinite",
+                ImpactLocation="GLO",
+                IndicatorTypeID=1,
+                Normalization=false,
+                Weighting=false,
+                UseAdvice = "Recommended to do a sensitivity analysis by separately calculating the human toxicity results using (i) recommended and interim characterization factors, and (ii) recommended characterization factors only. No factors are listed for particulate matter as there is a specific impact category for that.",
+                ReferenceQuantity=222,
+                ILCDEntityID=1756
             };
 
              _mockLCIAMethodRepository.Setup(m => m.Find()).Returns(_lciaMethod);
@@ -340,6 +389,154 @@ _unitOfWork);
 
         }
 
+        [TestMethod]
+        public void ShouldSuccesfullyCompareReturnedScenarios()
+        {
+            // Arrrange - This will populate our "mock" repository as a use case to
+            //compare again what we actually recieve from the method.
+            _scenarios = new List<Scenario>
+                     {
+                            new Scenario(){ScenarioID=0,Name="Model Base Case"},
+                            new Scenario(){ScenarioID=2,Name="Process Substitution"}
+
+                     }.ToList();
+
+            //needs to be converted into a ScenarioResource type as thing is what the method will return
+            List<ScenarioResource> _scenarioResources = _scenarios
+   .Select(x => new ScenarioResource() { ScenarioID = x.ScenarioID, Name = x.Name })
+   .ToList();
+
+            //We only set up the mock repository that we need
+            _mockScenarioRepository.Setup(m => m.Queryable()).Returns(_scenarios.AsQueryable());
+
+
+            _resourceController = new ResourceController(_resourceServiceFacade);
+
+            //Act
+            List<ScenarioResource> result = _resourceController.GetScenarios().ToList();
+            Assert.AreEqual(_scenarioResources[0].Name, result[0].Name);
+            Assert.AreEqual(_scenarioResources[1].Name, result[1].Name);
+        }
+
+        [TestMethod]
+        public void ShouldSuccesfullyCompareReturnedFragments()
+        {
+            // Arrrange - This will populate our "mock" repository as a use case to
+            //compare again what we actually recieve from the method.
+            _fragments = new List<Fragment>
+                     {
+                            new Fragment(){FragmentID=5,Name="Haz Waste Incineration Output", ReferenceFragmentFlowID=138},
+                            new Fragment(){FragmentID=9,Name="Used oil in Wastewater treatment plant", ReferenceFragmentFlowID=191}
+
+                     }.ToList();
+
+            //needs to be converted into a FlowTypeResource type as thing is what the method will return
+            List<FragmentResource> _fragmentResources = _fragments
+   .Select(x => new FragmentResource() { FragmentID = x.FragmentID, Name = x.Name })
+   .ToList();
+
+            //We only set up the mock repository that we need
+            _mockFragmentRepository.Setup(m => m.Queryable()).Returns(_fragments.AsQueryable());
+
+
+            _resourceController = new ResourceController(_resourceServiceFacade);
+
+            //Act
+            List<FragmentResource> result = _resourceController.GetFragments().ToList();
+            Assert.AreEqual(_fragmentResources[0].Name, result[0].Name);
+            Assert.AreEqual(_fragmentResources[1].Name, result[1].Name);
+        }
+
+        [TestMethod]
+        public void ShouldSuccesfullyCompareReturnedFragmentByFragmentID()
+        {
+            int fragmentID = 1;
+
+            // Arrrange - This will populate our "mock" repository as a use case to
+            //compare again what we actually recieve from the method.
+            //We only set up the mock repositories that we need
+            _fragment = new Fragment()
+            {
+                FragmentID = 1,
+                Name = "Electricity, at grid",
+                ReferenceFragmentFlowID=1
+            };
+
+
+           
+            //We only set up the mock repository that we need
+            _mockFragmentRepository.Setup(m => m.Find(fragmentID)).Returns(_fragment);
+
+
+            _resourceController = new ResourceController(_resourceServiceFacade);
+
+            //Act
+            FragmentResource result = _resourceController.GetFragment(fragmentID);
+            Assert.AreEqual(_fragment.Name, result.Name);
+        }
+
+        [TestMethod]
+        //In progress - I think I know why it doesn't pass now.
+        public void ShouldSuccesfullyCompareReturnedFragmentFlowByFragmentID()
+        {
+            int fragmentID = 1;
+
+            // Arrrange - This will populate our "mock" repository as a use case to
+            //compare again what we actually recieve from the method.
+            _fragmentFlows = new List<FragmentFlow>
+                     {
+                            new FragmentFlow(){ FragmentFlowID=1, FragmentID=1, Name="Electricity, at grid", ShortName="Electricity, at grid", FragmentStageID=null, NodeTypeID=1, FlowID=null, DirectionID=1, ParentFragmentFlowID=null},
+                            new FragmentFlow(){ FragmentFlowID=2, FragmentID=1, Name="Electricity, at grid, CA", ShortName="Electricity, at grid, CA", FragmentStageID=null, NodeTypeID=1, FlowID=687, DirectionID=1, ParentFragmentFlowID=1}
+                     }.ToList();
+
+            //needs to be converted into a FlowTypeResource type as thing is what the method will return
+            List<FragmentFlowResource> _fragmentFlowResources = _fragmentFlows
+   .Select(x => new FragmentFlowResource() { FragmentFlowID = x.FragmentFlowID, Name = x.Name })
+   .ToList();
+
+            //We only set up the mock repository that we need
+            _mockFragmentFlowRepository.Setup(m => m.Queryable()).Returns(_fragmentFlows.AsQueryable());
+
+
+            _resourceController = new ResourceController(_resourceServiceFacade);
+
+            //Act
+            List<FragmentFlowResource> result = _resourceController.GetFragmentFlowResources(fragmentID).ToList();
+            Assert.AreEqual(_fragmentFlowResources[0].Name, result[0].Name);
+            Assert.AreEqual(_fragmentFlowResources[1].Name, result[1].Name);
+        }
+
+        [TestMethod]
+        public void ShouldSuccesfullyCompareReturnedFlowsByFragmentID()
+        {
+            int fragmentID = 1;
+
+            // Arrrange - This will populate our "mock" repository as a use case to
+            //compare again what we actually recieve from the method.
+            //We only set up the mock repositories that we need
+            _flows = new List<Flow>
+                     {
+                            new Flow(){FlowID=1, Name="Electricity from lignite"},
+                            new Flow(){FlowID=5, Name="UO_Light distillates"},
+                            new Flow(){FlowID=9, Name="platinum"},
+
+                     }.ToList();
+
+            List<FlowResource> _flowResources = _flows
+.Select(x => new FlowResource() { FlowID = x.FlowID, Name = x.Name })
+.ToList();
+
+            //We only set up the mock repository that we need
+            _mockFlowRepository.Setup(m => m.Queryable()).Returns(_flows.AsQueryable());
+
+            _resourceController = new ResourceController(_resourceServiceFacade);
+
+            //Act
+            List<FlowResource> result = _resourceController.GetFlowsByFragment(fragmentID).ToList();
+            Assert.AreEqual(_flowResources[0].Name, result[0].Name);
+            Assert.AreEqual(_flowResources[1].Name, result[1].Name);
+            Assert.AreEqual(_flowResources[2].Name, result[2].Name);
+        }
 
 
     }
