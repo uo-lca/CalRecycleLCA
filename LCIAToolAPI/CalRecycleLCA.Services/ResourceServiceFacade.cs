@@ -218,6 +218,7 @@ namespace CalRecycleLCA.Services
                 NodeTypeID = TransformNullable(ff.NodeTypeID, "FragmentFlow.NodeTypeID"),
                 DirectionID = TransformNullable(ff.DirectionID, "FragmentFlow.DirectionID"),
                 FlowID = ff.FlowID,
+                NodeWeight = ff.NodeCaches.Where(nc => nc.ScenarioID == scenarioID).First().NodeWeight,
                 ParentFragmentFlowID = ff.ParentFragmentFlowID,
                 ProcessID = (ff.NodeTypeID == 1) ? ff.FragmentNodeProcesses.FirstOrDefault().ProcessID : nullID,
                 SubFragmentID = (ff.NodeTypeID == 2) ? ff.FragmentNodeFragments.FirstOrDefault().SubFragmentID : nullID,
