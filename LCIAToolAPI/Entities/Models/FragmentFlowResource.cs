@@ -28,6 +28,7 @@ namespace Entities.Models {
         public string Name { get; set; }
         public string ShortName { get; set; }        
         public int NodeTypeID { get; set; }
+        public double NodeWeight { get; set; }
         public int? FlowID { get; set; }
         public int DirectionID { get; set; }
         public int? ParentFragmentFlowID { get; set; }

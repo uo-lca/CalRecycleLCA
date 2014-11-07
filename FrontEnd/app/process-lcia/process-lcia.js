@@ -1,31 +1,34 @@
 'use strict';
 /* Controller for Process LCIA Diagram View */
 angular.module('lcaApp.process.LCIA',
-                ['ui.router', 'lcaApp.resources.service', 'angularSpinner'])
+                ['ui.router', 'lcaApp.resources.service', 'angularSpinner', 'ui.bootstrap.alert'])
     .controller('ProcessLciaCtrl',
         ['$scope', '$stateParams', 'usSpinnerService', '$q', '$window',
-         'ScenarioService', 'ProcessService',
+         'ScenarioService',
         'ProcessForFlowTypeService', 'ProcessFlowService',
         'LciaMethodService', 'FlowPropertyForProcessService', 'LciaResultForProcessService',
         function ($scope, $stateParams, usSpinnerService, $q, $window,
                   ScenarioService,
                   ProcessForFlowTypeService, ProcessFlowService,
                   LciaMethodService, FlowPropertyForProcessService, LciaResultForProcessService) {
-            var processID = $stateParams.processID,
-                scenarioID = $stateParams.scenarioID;
+            var processID = +$stateParams.processID,
+                scenarioID = +$stateParams.scenarioID,
+                activityLevel = +$stateParams.activity;
 
 
             function startWaiting() {
+                $scope.alert = null;
                 usSpinnerService.spin("spinner-lca");
             }
 
             function stopWaiting() {
+                $scope.alert = null;
                 usSpinnerService.stop("spinner-lca");
             }
 
             function handleFailure(errMsg) {
                 stopWaiting();
-                $window.alert(errMsg);
+                $scope.alert = { type: "danger", msg: errMsg };
             }
 
             function getLciaResults() {
@@ -45,10 +48,14 @@ angular.module('lcaApp.process.LCIA',
                 $scope.scenarios = ScenarioService.getSortedObjects();
                 $scope.selectedProcess = ProcessForFlowTypeService.get(processID);
                 $scope.processes = ProcessForFlowTypeService.getSortedObjects();
-                if ($scope.selectedScenario && $scope.selectedProcess) {
-                    getResults();
+                if ($scope.selectedScenario) {
+                    if ($scope.selectedProcess) {
+                        getResults();
+                    } else {
+                        handleFailure("Invalid process ID : ", processID);
+                    }
                 } else {
-                    handleFailure("Invalid route parameters.");
+                    handleFailure("Invalid scenario ID : ", scenarioID);
                 }
             }
 

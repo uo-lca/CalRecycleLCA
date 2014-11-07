@@ -218,6 +218,7 @@ namespace CalRecycleLCA.Services
                 NodeTypeID = TransformNullable(ff.NodeTypeID, "FragmentFlow.NodeTypeID"),
                 DirectionID = TransformNullable(ff.DirectionID, "FragmentFlow.DirectionID"),
                 FlowID = ff.FlowID,
+                NodeWeight = ff.NodeCaches.Where(nc => nc.ScenarioID == scenarioID).First().NodeWeight,
                 ParentFragmentFlowID = ff.ParentFragmentFlowID,
                 ProcessID = (ff.NodeTypeID == 1) ? ff.FragmentNodeProcesses.FirstOrDefault().ProcessID : nullID,
                 SubFragmentID = (ff.NodeTypeID == 2) ? ff.FragmentNodeFragments.FirstOrDefault().SubFragmentID : nullID,
@@ -279,7 +280,7 @@ namespace CalRecycleLCA.Services
             };
         }
 
-        public ProcessResource Transform(Process p) {
+        public ProcessResource Transform(Process p, IList<int> emisProcesses) {
             return new ProcessResource {
                 ProcessID = p.ProcessID,
                 Name = p.Name,
@@ -288,7 +289,8 @@ namespace CalRecycleLCA.Services
                 ReferenceTypeID = p.ReferenceTypeID,
                 ReferenceFlowID = p.ReferenceFlowID,
                 ReferenceYear = p.ReferenceYear,
-                Version = p.ILCDEntity.Version
+                Version = p.ILCDEntity.Version,
+                hasElementaryFlows = emisProcesses.Contains(p.ProcessID)
             };
         }
 
@@ -518,21 +520,20 @@ namespace CalRecycleLCA.Services
         /// <param name="flowTypeID">Optional process flow type filter</param>
         /// <returns>List of ProcessResource objects</returns>
         public IEnumerable<ProcessResource> GetProcesses(int? flowTypeID=null) {
-            IEnumerable<Process> pData;
-            if (flowTypeID == null) {
-                pData = _ProcessService.Query()
-                    .Include(x => x.ILCDEntity)
+
+            var emisProcesses = _ProcessService.Query(p => p.ProcessFlows.Any(pf => pf.Flow.FlowTypeID == 2))
+                .Select(x => x.ProcessID).ToList();
+            
+            IEnumerable<ProcessResource> pData = _ProcessService.Query()
+                .Include(x => x.ILCDEntity)
                     //.Include(x => x.ProcessFlows.Select(p => p.Flow))
-                    .Select().ToList(); 
-            }
+                .Select()
+                .Select(p => Transform(p, emisProcesses));
+
+            if (flowTypeID == 2)
+                return pData.Where(p => p.hasElementaryFlows).ToList();
             else
-            {
-                pData = _ProcessService.Query(p => p.ProcessFlows.Any(pf => pf.Flow.FlowTypeID == flowTypeID))
-                    .Include(x => x.ILCDEntity)
-                    //.Include(x => x.ProcessFlows.Select(p => p.Flow))
-                    .Select().ToList();
-            }
-            return pData.Select(p => Transform(p)).ToList();
+                return pData.ToList();
         }
 
 

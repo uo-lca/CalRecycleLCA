@@ -17,7 +17,7 @@ namespace LcaDataModel
 
         public int? ScenarioID { get; set; }
 
-        public double? NodeWeight { get; set; }
+        public double NodeWeight { get; set; }
 
         public double? FlowMagnitude { get; set; }
 
