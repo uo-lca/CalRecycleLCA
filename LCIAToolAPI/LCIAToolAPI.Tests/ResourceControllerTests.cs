@@ -333,7 +333,22 @@ _unitOfWork);
                 ILCDEntityID=1756
             };
 
-             _mockLCIAMethodRepository.Setup(m => m.Find()).Returns(_lciaMethod);
+            //needs to be converted into a LCIAMethodResource type as this is what the method will return
+            LCIAMethodResource _lciaMethodResources = new LCIAMethodResource();
+            _lciaMethodResources.LCIAMethodID = _lciaMethod.LCIAMethodID;
+            _lciaMethodResources.Name = _lciaMethod.Name;
+            _lciaMethodResources.Methodology = _lciaMethod.Methodology;
+            _lciaMethodResources.ImpactCategoryID = Convert.ToInt32(_lciaMethod.ImpactCategoryID);
+            _lciaMethodResources.ImpactIndicator = _lciaMethod.ImpactIndicator;
+            _lciaMethodResources.ReferenceYear = _lciaMethod.ReferenceYear;
+            _lciaMethodResources.Duration = _lciaMethod.Duration;
+            _lciaMethodResources.ImpactLocation = _lciaMethod.ImpactLocation;
+            _lciaMethodResources.Normalization = Convert.ToBoolean(_lciaMethod.Normalization);
+            _lciaMethodResources.Weighting = Convert.ToBoolean(_lciaMethod.Weighting);
+            _lciaMethodResources.UseAdvice = _lciaMethod.UseAdvice;
+
+
+            _mockLCIAMethodRepository.Setup(m => m.Find(lciaMethodID)).Returns(_lciaMethod);
 
               _processLCIAResult = new LCIAResultResource()
                      {
