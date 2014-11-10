@@ -86,16 +86,18 @@ namespace LCAToolAPI.API
 
         // Fragments //////////////////////////////////////////////////////////////
         [Route("api/fragments/{fragmentID:int}/fragmentflows")]
+        [Route("api/scenarios/{scenarioID:int}/fragments/{fragmentID:int}/fragmentflows")]
         [HttpGet]
-        public IEnumerable<FragmentFlowResource> GetFragmentFlowResources(int fragmentID) {
+        public IEnumerable<FragmentFlowResource> GetFragmentFlowResources(int fragmentID, int scenarioID = 0) {
             // Use default scenario
-            return _ResourceService.GetFragmentFlowResources(fragmentID, 0);
+            return _ResourceService.GetFragmentFlowResources(fragmentID, scenarioID); 
         }
+        /*
         [Route("api/scenarios/{scenarioID:int}/fragments/{fragmentID:int}/fragmentflows")]
         [HttpGet]
         public IEnumerable<FragmentFlowResource> GetFragmentFlowResources(int fragmentID, int scenarioID) {
             return _ResourceService.GetFragmentFlowResources(fragmentID, scenarioID);
-        }
+        }*/
 
         // lists indefinite flows associated with a fragment
         [Route("api/fragments/{fragmentID:int}/flows")]
