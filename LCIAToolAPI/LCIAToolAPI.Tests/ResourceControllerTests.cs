@@ -37,8 +37,8 @@ namespace LCIAToolAPI.Tests
         private IProcessFlowService _processFlowService;
         private IScenarioService _scenarioService;
         private INodeCacheService _nodeCacheService;
-        private IFragmentNodeProcessService _fragmentNodeProcessService;
-        private IFragmentNodeFragmentService _fragmentNodeFragmentService;
+        //private IFragmentNodeProcessService _fragmentNodeProcessService;
+        //private IFragmentNodeFragmentService _fragmentNodeFragmentService;
         private IFlowFlowPropertyService _flowFlowPropertyService;
         private IDependencyParamService _dependencyParamService;
         private IFlowPropertyParamService _flowPropertyParamService;
@@ -157,8 +157,8 @@ namespace LCIAToolAPI.Tests
             _processFlowService = new ProcessFlowService(_mockProcessFlowRepository.Object);
             _scenarioService = new ScenarioService(_mockScenarioRepository.Object);
             _nodeCacheService = new NodeCacheService(_mockNodeCacheRepository.Object);
-            _fragmentNodeProcessService = new FragmentNodeProcessService(_mockFragmentNodeProcessRepository.Object);
-            _fragmentNodeFragmentService = new FragmentNodeFragmentService(_mockFragmentNodeFragmentRepository.Object);
+            //_fragmentNodeProcessService = new FragmentNodeProcessService(_mockFragmentNodeProcessRepository.Object);
+            //_fragmentNodeFragmentService = new FragmentNodeFragmentService(_mockFragmentNodeFragmentRepository.Object);
             _flowFlowPropertyService = new FlowFlowPropertyService(_mockFlowFlowPropertyRepository.Object);
             _dependencyParamService = new DependencyParamService(_mockDependencyParamRepository.Object);
             _flowPropertyParamService = new FlowPropertyParamService(_mockFlowPropertyParamRepository.Object);
@@ -189,10 +189,10 @@ _unitOfWork);
             _fragmentLCIAComputation = new FragmentLCIAComputation(_fragmentFlowService,
             _scoreCacheService,
             _nodeCacheService,
-            _fragmentNodeProcessService,
-            _processSubstitutionService,
-            _fragmentNodeFragmentService,
-            _fragmentSubstitutionService,
+            //_fragmentNodeProcessService,
+            //_processSubstitutionService,
+            //_fragmentNodeFragmentService,
+            //_fragmentSubstitutionService,
             _lciaMethodService,
             _backgroundService,
             _processFlowService,

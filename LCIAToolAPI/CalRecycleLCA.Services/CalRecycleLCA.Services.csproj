@@ -146,14 +146,10 @@
     <Compile Include="FlowTypeService.cs" />
     <Compile Include="FragmentFlowService.cs" />
     <Compile Include="FragmentLCIAComputation.cs" />
-    <Compile Include="FragmentNodeFragmentService.cs" />
-    <Compile Include="FragmentNodeProcessService.cs" />
     <Compile Include="FragmentService.cs" />
     <Compile Include="FragmentSubstitutionService.cs" />
     <Compile Include="FragmentTraversalV2.cs" />
     <Compile Include="IFragmentLCIAComputation.cs" />
-    <Compile Include="IFragmentNodeFragmentService.cs" />
-    <Compile Include="IFragmentNodeProcessService.cs" />
     <Compile Include="IFragmentTraversalV2.cs" />
     <Compile Include="ILCIAComputationV2.cs" />
     <Compile Include="ImpactCategoryService.cs" />

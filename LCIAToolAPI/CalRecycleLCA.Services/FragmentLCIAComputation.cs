@@ -20,14 +20,14 @@ namespace CalRecycleLCA.Services
         private readonly INodeCacheService _nodeCacheService;
         [Inject]
         private readonly IService<ScoreCache> _scoreCacheService;
-        [Inject]
-        private readonly IFragmentNodeProcessService _fragmentNodeProcessService;
-        [Inject]
-        private readonly IProcessSubstitutionService _processSubstitutionService;
-        [Inject]
-        private readonly IFragmentNodeFragmentService _fragmentNodeFragmentService;
-        [Inject]
-        private readonly IFragmentSubstitutionService _fragmentSubstitutionService;
+        //[Inject]
+        //private readonly IFragmentNodeProcessService _fragmentNodeProcessService;
+        //[Inject]
+        //private readonly IProcessSubstitutionService _processSubstitutionService;
+        //[Inject]
+        //private readonly IFragmentNodeFragmentService _fragmentNodeFragmentService;
+        //[Inject]
+        //private readonly IFragmentSubstitutionService _fragmentSubstitutionService;
         [Inject]
         private readonly ILCIAMethodService _lciaMethodService;
         // [Inject]
@@ -68,10 +68,10 @@ namespace CalRecycleLCA.Services
         public FragmentLCIAComputation(IFragmentFlowService fragmentFlowService,
             IScoreCacheService scoreCacheService,
             INodeCacheService nodeCacheService,
-            IFragmentNodeProcessService fragmentNodeProcessService,
-            IProcessSubstitutionService processSubstitutionService,
-            IFragmentNodeFragmentService fragmentNodeFragmentService,
-            IFragmentSubstitutionService fragmentSubstitutionService,
+            //IFragmentNodeProcessService fragmentNodeProcessService,
+            //IProcessSubstitutionService processSubstitutionService,
+            //IFragmentNodeFragmentService fragmentNodeFragmentService,
+            //IFragmentSubstitutionService fragmentSubstitutionService,
             ILCIAMethodService lciaMethodService,
             // IScenarioBackgroundService scenarioBackgroundService,
             IBackgroundService backgroundService,
@@ -108,7 +108,7 @@ namespace CalRecycleLCA.Services
                 throw new ArgumentNullException("nodeCacheService is null");
             }
             _nodeCacheService = nodeCacheService;
-
+            /*
             if (fragmentNodeProcessService == null)
             {
                 throw new ArgumentNullException("fragmentNodeProcessService is null");
@@ -132,7 +132,7 @@ namespace CalRecycleLCA.Services
                 throw new ArgumentNullException("fragmentSubstitutionService is null");
             }
             _fragmentSubstitutionService = fragmentSubstitutionService;
-
+            */
             // if (scenarioBackgroundService == null)
             // {
             //     throw new ArgumentNullException("scenarioBackgroundService is null");
