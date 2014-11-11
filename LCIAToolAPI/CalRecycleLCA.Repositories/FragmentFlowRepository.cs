@@ -92,6 +92,17 @@ namespace CalRecycleLCA.Repositories
                 .Select().ToList();
         }
 
+        public static IEnumerable<FragmentFlow> GetCachedFlows(this IRepositoryAsync<FragmentFlow> repository,
+            int fragmentId, int scenarioId)
+        {
+            return repository.Query(k => k.FragmentID == fragmentId)
+                                .Include(k => k.FragmentNodeProcesses.Select(p => p.ProcessSubstitutions))
+                                .Include(k => k.FragmentNodeFragments.Select(p => p.FragmentSubstitutions))
+                                .Include(k => k.NodeCaches)
+                                .Select()
+                                .Where(kk => kk.NodeCaches.Any(a => a.ScenarioID == scenarioId)).ToList();
+        }
+        
         ///** ************************
         public static FragmentNodeResource Terminate(this IRepositoryAsync<FragmentFlow> repository, 
 						     FragmentFlow ff, int scenarioId, bool doBackground)
