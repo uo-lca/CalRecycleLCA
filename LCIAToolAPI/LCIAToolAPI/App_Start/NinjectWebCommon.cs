@@ -138,8 +138,8 @@ namespace LCAToolAPI.App_Start
             kernel.Bind<IProcessFlowService>().To<ProcessFlowService>();
             kernel.Bind<IScenarioService>().To<ScenarioService>();
             kernel.Bind(typeof(INodeCacheService)).To(typeof(NodeCacheService));
-            kernel.Bind(typeof(IFragmentNodeProcessService)).To(typeof(FragmentNodeProcessService));
-            kernel.Bind(typeof(IFragmentNodeFragmentService)).To(typeof(FragmentNodeFragmentService));
+            //kernel.Bind(typeof(IFragmentNodeProcessService)).To(typeof(FragmentNodeProcessService));
+            //kernel.Bind(typeof(IFragmentNodeFragmentService)).To(typeof(FragmentNodeFragmentService));
             kernel.Bind(typeof(IFlowFlowPropertyService)).To(typeof(FlowFlowPropertyService));
             kernel.Bind(typeof(IProcessEmissionParamService)).To(typeof(ProcessEmissionParamService));
             kernel.Bind(typeof(IFlowPropertyEmissionService)).To(typeof(FlowPropertyEmissionService));
@@ -149,8 +149,8 @@ namespace LCAToolAPI.App_Start
             kernel.Bind(typeof(ICharacterizationParamService)).To(typeof(CharacterizationParamService));
             kernel.Bind(typeof(IParamService)).To(typeof(ParamService));
             kernel.Bind(typeof(IScoreCacheService)).To(typeof(ScoreCacheService));
-            kernel.Bind(typeof(IProcessSubstitutionService)).To(typeof(ProcessSubstitutionService));
-            kernel.Bind(typeof(IFragmentSubstitutionService)).To(typeof(FragmentSubstitutionService));
+            //kernel.Bind(typeof(IProcessSubstitutionService)).To(typeof(ProcessSubstitutionService));
+            //kernel.Bind(typeof(IFragmentSubstitutionService)).To(typeof(FragmentSubstitutionService));
             // kernel.Bind(typeof(IScenarioBackgroundService)).To(typeof(ScenarioBackgroundService));
             kernel.Bind(typeof(IBackgroundService)).To(typeof(BackgroundService));
             kernel.Bind<IDependencyParamService>().To<DependencyParamService>();

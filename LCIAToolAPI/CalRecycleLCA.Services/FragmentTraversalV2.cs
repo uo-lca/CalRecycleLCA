@@ -57,26 +57,24 @@ namespace CalRecycleLCA.Services
         /// <param name="fragmentId"></param>
         /// <param name="scenarioId"></param>
         /// <returns></returns>
-        public bool Traverse(int? fragmentId = 0, int scenarioId = 0)
+        public bool Traverse(int fragmentId, int scenarioId = 0)
         {
-            int refFlow = _fragmentFlowService
-                .Query(q => q.FragmentID == fragmentId && q.ParentFragmentFlowID == null)
-                .Select()
-                .First()
-                .FragmentFlowID;
+            var fragmentFlows = _fragmentFlowService.GetFlowsByFragment(fragmentId);
+            var dependencyParams = _dependencyParamService.Query(dp => dp.Param.ScenarioID == scenarioId).Select().ToList();
 
             float activity = 1;
+
+            int refFlow = fragmentFlows.Where(k => k.ParentFragmentFlow == null).First().FragmentFlowID;
 
             var chk = _nodeCacheService
                 .Query(q => q.FragmentFlowID == refFlow && q.ScenarioID == scenarioId)
                 .Select()
                 .Count();
 
-
             if (chk == 0)
             {
                 _unitOfWork.SetAutoDetectChanges(false);
-                NodeRecurse(refFlow, scenarioId, activity);
+                NodeRecurse(fragmentFlows, dependencyParams, refFlow, scenarioId, activity);
                 _unitOfWork.SaveChanges();
                 _unitOfWork.SetAutoDetectChanges(true);
                 return true;
@@ -98,9 +96,11 @@ namespace CalRecycleLCA.Services
         /// <param name="fragmentFlowId">FragmentFlow link being traversed</param>
         /// <param name="scenarioId">scenario for current traversal</param>
         /// <param name="flowMagnitude">magnitude of current link exiting parent node.</param>
-        public void NodeRecurse(int fragmentFlowId, int scenarioId, double flowMagnitude)
+        public void NodeRecurse(IEnumerable<FragmentFlow> ff, 
+                                IEnumerable<DependencyParam> ff_param,
+                                int fragmentFlowId, int scenarioId, double flowMagnitude)
         {
-            var theFragmentFlow = _fragmentFlowService.GetFragmentFlow(fragmentFlowId);
+            var theFragmentFlow = ff.Where(k => k.FragmentFlowID == fragmentFlowId).First();
             
             FragmentNodeResource term = _fragmentFlowService.Terminate(theFragmentFlow,scenarioId); // don't bother to resolve background
 
@@ -127,39 +127,44 @@ namespace CalRecycleLCA.Services
             if (nodeWeight != 0)
             {
                 // begin recursion by finding all FragmentFlows with the current parent
-                IEnumerable<FragmentFlow> outLinks = _fragmentFlowService.Queryable()
-                    .Where(ff => ff.ParentFragmentFlowID == theFragmentFlow.FragmentFlowID).ToList();
+                IEnumerable<FragmentFlow> outLinks = ff
+                    .Where(k => k.ParentFragmentFlowID == fragmentFlowId).ToList();
 
                 IEnumerable<int> outFFids = outLinks.Select(a => a.FragmentFlowID);
 
-                if (outLinks.Count() != outFlows.Count())
+                // Background: when designing fragments in Matlab, I allowed the user to exclude 
+                // process flows that were not desired to be included in the fragment, rendering 
+                // them in effect as cutoff flows.
+                // Problem: during traversal, these flows will still show up in outFlows, causing 
+                // reconciliation error.
+                // interim solution: relax the reconciliation requirement as long as there are
+                // more outFlows than outLinks. (i.e. allow unlinked outFlows to be cutoff)
+                // Background: when designing fragments in Matlab, I allowed the user to exclude 
+                // process flows that were not desired to be included in the fragment, rendering 
+                // them in effect as cutoff flows.
+                // Problem: during traversal, these flows will still show up in outFlows, causing 
+                // reconciliation error.
+                // interim solution: relax the reconciliation requirement as long as there are
+                // more outFlows than outLinks. (i.e. allow unlinked outFlows to be treated as cutoffs)
+                if (outLinks.Count() > outFlows.Count()) // TODO -- this should be !=
                 {
                     throw new ArgumentException("OutFlows and OutLinks don't reconcile!");
-                }
-
-                // pull dependency params
-                var ff_params = new List<DependencyParam>();
-                    
-                if (term.NodeTypeID == 1)
-                {
-                    // only process outflows may be parameterized
-                    ff_params = _dependencyParamService.Query(dp => dp.Param.ScenarioID == scenarioId).Select()
-                        .Where(dp => outFFids.Contains(dp.FragmentFlowID)).ToList();
                 }
 
                 // abandon recursion if no recursive steps-- but foreach should just not run if outLinks is empty
                 foreach (var item in outLinks)
                 {
-                    var ff_param = ff_params.Where(dp => dp.FragmentFlowID == item.FragmentFlowID).FirstOrDefault();
+                    var this_param = ff_param.Where(dp => dp.FragmentFlowID == item.FragmentFlowID).FirstOrDefault();
                     double resultVal = (double)outFlows
                         .Where(o => o.FlowID == item.FlowID && o.DirectionID == item.DirectionID)
                         .First().Result; // First() should generate exception if no match is found
 
-                    if (ff_param != null)
-                        resultVal = (double)ff_param.Value;
+                    if (this_param != null)
+                        resultVal = (double)this_param.Value;
 
-                    NodeRecurse(item.FragmentFlowID, scenarioId, nodeWeight * resultVal);
+                    NodeRecurse(ff, ff_param, item.FragmentFlowID, scenarioId, nodeWeight * resultVal);
                 }
+            }
 
             var nodeCache = new NodeCache
             {
@@ -171,7 +176,7 @@ namespace CalRecycleLCA.Services
             
             nodeCache.ObjectState = ObjectState.Added;
             _nodeCacheService.InsertOrUpdateGraph(nodeCache);
-            }
+            
         }
 
                 /// <summary>
@@ -205,7 +210,7 @@ namespace CalRecycleLCA.Services
                     {
                         // fragment-- all together
                         // first, traverse the fragment -- store results in cache
-                        Traverse(term.SubFragmentID, term.ScenarioID);
+                        Traverse((int)term.SubFragmentID, term.ScenarioID);
                         // access the cache to determine outflow amounts
                         Outflows = _fragmentFlowService.GetDependencies((int)term.SubFragmentID,term.TermFlowID,ex_directionId,
                             out flow_exch, term.ScenarioID);

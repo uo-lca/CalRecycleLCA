@@ -5,6 +5,7 @@ using Repository.Pattern.Infrastructure;
 using Repository.Pattern.UnitOfWork;
 using Service.Pattern;
 using System;
+using System.Diagnostics;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -20,14 +21,14 @@ namespace CalRecycleLCA.Services
         private readonly INodeCacheService _nodeCacheService;
         [Inject]
         private readonly IService<ScoreCache> _scoreCacheService;
-        [Inject]
-        private readonly IFragmentNodeProcessService _fragmentNodeProcessService;
-        [Inject]
-        private readonly IProcessSubstitutionService _processSubstitutionService;
-        [Inject]
-        private readonly IFragmentNodeFragmentService _fragmentNodeFragmentService;
-        [Inject]
-        private readonly IFragmentSubstitutionService _fragmentSubstitutionService;
+        //[Inject]
+        //private readonly IFragmentNodeProcessService _fragmentNodeProcessService;
+        //[Inject]
+        //private readonly IProcessSubstitutionService _processSubstitutionService;
+        //[Inject]
+        //private readonly IFragmentNodeFragmentService _fragmentNodeFragmentService;
+        //[Inject]
+        //private readonly IFragmentSubstitutionService _fragmentSubstitutionService;
         [Inject]
         private readonly ILCIAMethodService _lciaMethodService;
         // [Inject]
@@ -68,10 +69,10 @@ namespace CalRecycleLCA.Services
         public FragmentLCIAComputation(IFragmentFlowService fragmentFlowService,
             IScoreCacheService scoreCacheService,
             INodeCacheService nodeCacheService,
-            IFragmentNodeProcessService fragmentNodeProcessService,
-            IProcessSubstitutionService processSubstitutionService,
-            IFragmentNodeFragmentService fragmentNodeFragmentService,
-            IFragmentSubstitutionService fragmentSubstitutionService,
+            //IFragmentNodeProcessService fragmentNodeProcessService,
+            //IProcessSubstitutionService processSubstitutionService,
+            //IFragmentNodeFragmentService fragmentNodeFragmentService,
+            //IFragmentSubstitutionService fragmentSubstitutionService,
             ILCIAMethodService lciaMethodService,
             // IScenarioBackgroundService scenarioBackgroundService,
             IBackgroundService backgroundService,
@@ -108,7 +109,7 @@ namespace CalRecycleLCA.Services
                 throw new ArgumentNullException("nodeCacheService is null");
             }
             _nodeCacheService = nodeCacheService;
-
+            /*
             if (fragmentNodeProcessService == null)
             {
                 throw new ArgumentNullException("fragmentNodeProcessService is null");
@@ -132,7 +133,7 @@ namespace CalRecycleLCA.Services
                 throw new ArgumentNullException("fragmentSubstitutionService is null");
             }
             _fragmentSubstitutionService = fragmentSubstitutionService;
-
+            */
             // if (scenarioBackgroundService == null)
             // {
             //     throw new ArgumentNullException("scenarioBackgroundService is null");
@@ -296,22 +297,16 @@ namespace CalRecycleLCA.Services
                             //_paramService,
                             _unitOfWork);
 
-            fragmentTraversalV2.Traverse(fragmentId, scenarioId);
+            fragmentTraversalV2.Traverse((int)fragmentId, scenarioId);
 
-            var fragmentFlows = _nodeCacheService.Queryable()
-                .Where(x => x.ScenarioID == scenarioId)
-                .Join(_fragmentFlowService.Queryable()
-                .Where(x => x.FragmentID == fragmentId), 
-                    nc => nc.FragmentFlowID, 
-                    ff => ff.FragmentFlowID, 
-                    (nc, ff) => new { nc, ff }).ToList();
+            var fragmentFlows = _fragmentFlowService.GetCachedFlows((int)fragmentId, scenarioId);
 
             foreach (var item in fragmentFlows)
             {
-                if (item.ff.FlowID == null)
-                    item.ff.FlowID = 0; // TODO: this should be set to whatever is the fragment's inflow-- ??
+                if (item.FlowID == null)
+                    item.FlowID = 0; // TODO: this should be set to whatever is the fragment's inflow-- ??
 
-                var fragmentNode = _fragmentFlowService.Terminate(item.ff, scenarioId, true); // true => do Background 
+                var fragmentNode = _fragmentFlowService.Terminate(item, scenarioId, true); // true => do Background 
                 
                 if (fragmentNode.NodeTypeID == 2)
                 {
@@ -319,17 +314,17 @@ namespace CalRecycleLCA.Services
                     FragmentFlowLCIA(fragmentNode.SubFragmentID, fragmentNode.ScenarioID, lciaMethods);
                 }
 
-                SetScoreCache(item.ff.FragmentFlowID, fragmentNode, lciaMethods);
+                SetScoreCache(item.FragmentFlowID, fragmentNode, lciaMethods);
 
             }
 
             return fragmentFlows
                   .Select(x => new FragmentLCIAModel
                   {
-                      FragmentFlowID = x.ff.FragmentFlowID,
-                      NodeTypeID = x.ff.NodeTypeID,
-                      FlowID = x.ff.FlowID,
-                      DirectionID = x.ff.DirectionID
+                      FragmentFlowID = x.FragmentFlowID,
+                      NodeTypeID = x.NodeTypeID,
+                      FlowID = x.FlowID,
+                      DirectionID = x.DirectionID
                   });
         }
 
