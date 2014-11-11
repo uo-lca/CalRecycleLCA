@@ -296,7 +296,7 @@ namespace CalRecycleLCA.Services
                             //_paramService,
                             _unitOfWork);
 
-            fragmentTraversalV2.Traverse(fragmentId, scenarioId);
+            fragmentTraversalV2.Traverse((int)fragmentId, scenarioId);
 
             var fragmentFlows = _nodeCacheService.Queryable()
                 .Where(x => x.ScenarioID == scenarioId)

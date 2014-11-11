@@ -13,6 +13,85 @@ namespace CalRecycleLCA.Repositories
 {
     public static class FragmentFlowRepository
     {
+
+        private static FragmentNodeResource GetFragmentNodeProcess(FragmentFlow ff, int scenarioId)
+        {
+            var fragmentNode = ff.FragmentNodeProcesses.First();
+            /* repository.GetRepository<FragmentNodeProcess>()
+                 .Query(x => x.FragmentFlowID == fragmentFlowId)
+                 .Include(x => x.ProcessSubstitutions)
+                 .Select().First();
+            */
+            if (scenarioId != 0)
+            {
+                int? subsId = fragmentNode.ProcessSubstitutions.Where(x => x.ScenarioID == scenarioId)
+                    .Select(a => a.ProcessID).FirstOrDefault();
+
+                if (subsId != null && subsId != 0)
+                    fragmentNode.ProcessID = subsId;
+            }
+
+            return new FragmentNodeResource
+            {
+                RefID = fragmentNode.FragmentNodeProcessID,
+                NodeTypeID = 1,
+                ScenarioID = scenarioId,
+                ProcessID = fragmentNode.ProcessID,
+                TermFlowID = fragmentNode.FlowID
+            };
+        }
+
+        private static FragmentNodeResource GetFragmentNodeSubFragment(FragmentFlow ff, int scenarioId)
+        {
+            var fragmentNode = ff.FragmentNodeFragments.First();
+            /*                
+                
+                            repository.GetRepository<FragmentNodeFragment>()
+                            .Query(x => x.FragmentFlowID == fragmentFlowId)
+                            .Include(x => x.FragmentSubstitutions)
+                            .Select().First();
+            */
+            if (scenarioId != 0)
+            {
+                int? subsId = fragmentNode.FragmentSubstitutions.Where(x => x.ScenarioID == scenarioId)
+                    .Select(a => a.SubFragmentID).FirstOrDefault();
+
+                if (subsId != null && subsId != 0)
+                    fragmentNode.SubFragmentID = subsId;
+            }
+
+            return new FragmentNodeResource
+            {
+                RefID = fragmentNode.FragmentNodeFragmentID,
+                NodeTypeID = 2,
+                ScenarioID = scenarioId,
+                SubFragmentID = fragmentNode.SubFragmentID,
+                TermFlowID = fragmentNode.FlowID
+            };
+        }
+
+        public static IEnumerable<FragmentFlow> GetFragmentFlows(this IRepositoryAsync<FragmentFlow> repository, 
+            IEnumerable<int> ffids)
+        {
+            return repository.Query(k => ffids.Contains(k.FragmentFlowID))
+                //.Include(k => k.FragmentNodeProcesses)
+                .Include(k => k.FragmentNodeProcesses.Select(p => p.ProcessSubstitutions))
+                //.Include(k => k.FragmentNodeFragments)
+                .Include(k => k.FragmentNodeFragments.Select(p => p.FragmentSubstitutions))
+                .Select().ToList();
+        }
+
+        public static IEnumerable<FragmentFlow> GetFlowsByFragment(this IRepositoryAsync<FragmentFlow> repository,
+            int fragmentId)
+        {
+            return repository.Query(k => k.FragmentID == fragmentId)
+                //.Include(k => k.FragmentNodeProcesses)
+                .Include(k => k.FragmentNodeProcesses.Select(p => p.ProcessSubstitutions))
+                //.Include(k => k.FragmentNodeFragments)
+                .Include(k => k.FragmentNodeFragments.Select(p => p.FragmentSubstitutions))
+                .Select().ToList();
+        }
+
         ///** ************************
         public static FragmentNodeResource Terminate(this IRepositoryAsync<FragmentFlow> repository, 
 						     FragmentFlow ff, int scenarioId, bool doBackground)
@@ -27,14 +106,13 @@ namespace CalRecycleLCA.Repositories
                 {
                     //fragmentNode = repository.GetRepository<FragmentNodeProcess>()
 		            //  .GetFragmentNodeProcess(ff.FragmentFlowID, scenarioId);
-                    fragmentNode = repository.GetRepository<FragmentNodeProcess>()
-                        .GetFragmentNodeProcess(ff.FragmentFlowID, scenarioId);
+                    fragmentNode = GetFragmentNodeProcess(ff, scenarioId);
 		            break;
                 }
     	        case 2:
 	            {
-		            fragmentNode = repository.GetRepository<FragmentNodeFragment>()
-		                .GetFragmentNodeSubFragment(ff.FragmentFlowID, scenarioId);
+		            fragmentNode = //repository.GetRepository<FragmentNodeFragment>()
+		                GetFragmentNodeSubFragment(ff, scenarioId);
 		            break;
 	            }
     	        case 3:
@@ -166,62 +244,6 @@ namespace CalRecycleLCA.Repositories
             return cropOutflows;
 
 
-
-        }
-
-
-        public static FragmentFlowResource FragmentFlowExtension(this IRepositoryAsync<FragmentFlow> repository, 
-            int fragmentFlowId, int nodeTypeId)
-        {
-            int? processId=0;
-            int? subFragmentId=0;
-            int? termFlowId=0;
-
-            if (nodeTypeId == 1)
-            {
-                var process = repository.GetRepository<FragmentNodeProcess>().Queryable()
-                    .Where(x => x.FragmentFlowID == fragmentFlowId)
-                    .Select(a => new 
-                    {
-                        ProcessID = a.ProcessID, 
-                        FlowID = a.FlowID
-                    });
-
-                processId = process
-                      .FirstOrDefault()
-                      .ProcessID;
-
-                termFlowId = process
-                     .FirstOrDefault()
-                     .FlowID;
-
-            }
-            else if (nodeTypeId == 2)
-            {
-                 var fragment = repository.GetRepository<FragmentNodeFragment>().Queryable()
-                    .Where(x => x.FragmentFlowID == fragmentFlowId)
-                     .Select(a => new
-                     {
-                         SubFragmentID = a.SubFragmentID,
-                         FlowID = a.FlowID
-                     });
-
-                 subFragmentId = fragment
-                       .FirstOrDefault()
-                       .SubFragmentID;
-                 termFlowId = fragment
-                     .FirstOrDefault()
-                     .FlowID;
-            }
-
-            var fragmentFlowResource = new FragmentFlowResource
-            {
-                ProcessID = processId,
-                SubFragmentID = subFragmentId
-                //TermFlowID = termFlowId
-            };
-
-            return fragmentFlowResource;
 
         }
     }
