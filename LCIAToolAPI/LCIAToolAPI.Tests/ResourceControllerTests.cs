@@ -71,7 +71,7 @@ namespace LCIAToolAPI.Tests
         private Fragment _fragment;
         private List<FragmentFlow> _fragmentFlows;
         private List<Flow> _flows;
-        
+        private List<Process> _processes;
         
         private Mock<IRepositoryAsync<Category>> _mockCategoryRepository;
         private Mock<IRepositoryAsync<Classification>> _mockClassificationRepository;
@@ -314,9 +314,6 @@ _unitOfWork);
             //We only set up the mock repositories that we need
             _lciaMethod = new LCIAMethod()
             {
-                //I think this needs all properties defined or the transform will fail.
-                //This may be why we are getting null for LCIAMethod.
-                //TODO - Test out this theory
                 LCIAMethodID = 1,
                 Name = "ILCD2011; Non-cancer human health effects; midpoint; CTUh; USEtox",
                 Methodology = "ILCD2011",
@@ -349,6 +346,47 @@ _unitOfWork);
 
 
             _mockLCIAMethodRepository.Setup(m => m.Find(lciaMethodID)).Returns(_lciaMethod);
+
+            //We only set up the mock repositories that we need
+            _processes = new List<Process>
+                     {
+                            new Process(){   ProcessID = 1,
+                Name = "Metal Emissions, DK MDO",
+                ReferenceYear = "2013",
+                Geography = "US",
+                ReferenceTypeID = 1,
+                ProcessTypeID = 5,
+                ReferenceFlowID = null,
+                ILCDEntityID = 1264}
+
+                     }.ToList();
+
+            //needs to be converted into a LCIAMethodResource type as this is what the method will return
+            List<ProcessResource> _processResources = _processes
+                   .Select(x => new ProcessResource() { 
+                       ProcessID = x.ProcessID, 
+                       Name = x.Name,
+                       ReferenceYear = x.ReferenceYear,
+                       Geography = x.Geography,
+                       ReferenceTypeID = x.ReferenceTypeID,
+                       ProcessTypeID = Convert.ToInt32(x.ProcessTypeID),
+                       ReferenceFlowID=x.ReferenceFlowID
+                   }).ToList();
+
+
+            //_mockProcessRepository.Setup(m => m.GetRepository<Process>().Query(p => p.ProcessID == processID).Select().FirstOrDefault().Returns(_processes.AsQueryable()));
+            _processService = new ProcessService(_mockProcessRepository.Object);
+            //Act
+            _processService.IsPrivate(processID);
+            //Assert
+            _mockProcessRepository.Verify();
+
+    //        _mockProcessRepository.As<IRepositoryAsync<Process>>()
+    //.Setup( x => x.Queryable.() )
+    //.Returns( Task.FromResult( userData.ToList() ) );
+
+
+
 
               _processLCIAResult = new LCIAResultResource()
                      {
