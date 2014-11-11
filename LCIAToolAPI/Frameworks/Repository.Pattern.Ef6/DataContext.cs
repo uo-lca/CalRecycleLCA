@@ -33,6 +33,17 @@ namespace Repository.Pattern.Ef6
             SyncObjectStateEnabled = true;
         }
 
+        /// <summary>
+        /// Enable/disable automatic detection of changes by Entity Framework.
+        /// Disable to improve performance of Adds. 
+        /// Enable whenever objects are updated.
+        /// </summary>
+        /// <param name="enabled">set to true to enable, false to disable</param>
+        public void SetAutoDetectChanges(bool enabled)
+        {
+            base.Configuration.AutoDetectChangesEnabled = enabled;
+        }
+
         public Guid InstanceId { get { return _instanceId; } }
 
         /// <summary>

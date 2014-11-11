@@ -87,6 +87,11 @@ namespace Repository.Pattern.Ef6
             return _dataContext.SaveChanges();
         }
 
+        public void SetAutoDetectChanges(bool enabled)
+        {
+            _dataContext.SetAutoDetectChanges(enabled);
+        }
+
 
         public IRepository<TEntity> Repository<TEntity>() where TEntity : class, IObjectState
         {

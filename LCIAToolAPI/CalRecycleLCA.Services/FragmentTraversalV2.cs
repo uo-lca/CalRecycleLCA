@@ -75,8 +75,10 @@ namespace CalRecycleLCA.Services
 
             if (chk == 0)
             {
+                _unitOfWork.SetAutoDetectChanges(false);
                 NodeRecurse(refFlow, scenarioId, activity);
                 _unitOfWork.SaveChanges();
+                _unitOfWork.SetAutoDetectChanges(true);
                 return true;
             }
             else

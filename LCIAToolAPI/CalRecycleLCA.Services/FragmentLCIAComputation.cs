@@ -408,6 +408,8 @@ namespace CalRecycleLCA.Services
         //}
         public void SetScoreCache(int fragmentFlowId, FragmentNodeResource fragmentNode, IEnumerable<LCIAMethod> lciaMethods)
         {
+            //disable this until results have been cached - to increase performance
+            _unitOfWork.SetAutoDetectChanges(false);
             IEnumerable<int> haveLciaMethods = _scoreCacheService.Queryable()
                                                         .Where(x => x.ScenarioID == fragmentNode.ScenarioID
                                                                 && x.FragmentFlowID == fragmentFlowId).AsEnumerable()
@@ -492,11 +494,15 @@ namespace CalRecycleLCA.Services
                         }
                     }
 
-                    _unitOfWork.SaveChanges();
+                    //removed - we don't need this twice. - RS
+                    //_unitOfWork.SaveChanges();
 
                     break;
             }  /* end of switch NodeType */
+
             _unitOfWork.SaveChanges();
+            //enable this after results have been cached -  it was turned off to increase performance
+            _unitOfWork.SetAutoDetectChanges(true);
         } /* end of SetScoreCache */
     }
 }
