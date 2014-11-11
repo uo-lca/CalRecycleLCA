@@ -21,26 +21,27 @@ namespace CalRecycleLCA.Services
         private readonly ILCIAMethodService _lciaMethodService;
         [Inject]
         private readonly IFragmentFlowService _fragmentFlowService;
-        [Inject]
-        private readonly IFragmentNodeProcessService _fragmentNodeProcessService;
+        //[Inject]
+        //private readonly IFragmentNodeProcessService _fragmentNodeProcessService;
         [Inject]
         private readonly IProcessFlowService _processFlowService;
-        [Inject]
-        private readonly IFragmentNodeFragmentService _fragmentNodeFragmentService;
+        //[Inject]
+        //private readonly IFragmentNodeFragmentService _fragmentNodeFragmentService;
 
 
         public TestGenericService(
             ILCIAMethodService lciaMethodService,
             IFragmentFlowService fragmentFlowService,
-            IProcessFlowService processFlowService,
-            IFragmentNodeProcessService fragmentNodeProcessService,
-            IFragmentNodeFragmentService fragmentNodeFragmentService)
+            IProcessFlowService processFlowService
+            //IFragmentNodeProcessService fragmentNodeProcessService,
+            //IFragmentNodeFragmentService fragmentNodeFragmentService
+            )
         {
             _lciaMethodService = lciaMethodService;
             _fragmentFlowService = fragmentFlowService;
             _processFlowService = processFlowService;
-            _fragmentNodeProcessService = fragmentNodeProcessService;
-            _fragmentNodeFragmentService = fragmentNodeFragmentService;
+            //_fragmentNodeProcessService = fragmentNodeProcessService;
+            //_fragmentNodeFragmentService = fragmentNodeFragmentService;
         }
 
         public IEnumerable<LCIAMethod> GetLCIAMethods()

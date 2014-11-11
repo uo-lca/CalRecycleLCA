@@ -15,12 +15,10 @@ namespace CalRecycleLCA.Repositories
         public static bool CheckPrivacy(this IRepositoryAsync<Process> repository,
             int processID)
 	    {
-            //return (repository.GetRepository<Process>()
-            //    .Query(p => p.ProcessID == processID)
-            //    .Include(p => p.ILCDEntity.DataSource)
-            //    .Select(p => p.ILCDEntity.DataSource.VisibilityID).First() == 2);
-            return true;
-
+            return (repository.GetRepository<Process>()
+                .Query(p => p.ProcessID == processID)
+                .Include(p => p.ILCDEntity.DataSource)
+                .Select(p => p.ILCDEntity.DataSource.VisibilityID).First() == 2);
 	    }
     }
 }
