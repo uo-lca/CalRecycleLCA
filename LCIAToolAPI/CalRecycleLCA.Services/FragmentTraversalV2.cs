@@ -130,7 +130,21 @@ namespace CalRecycleLCA.Services
 
                 IEnumerable<int> outFFids = outLinks.Select(a => a.FragmentFlowID);
 
-                if (outLinks.Count() != outFlows.Count())
+                // Background: when designing fragments in Matlab, I allowed the user to exclude 
+                // process flows that were not desired to be included in the fragment, rendering 
+                // them in effect as cutoff flows.
+                // Problem: during traversal, these flows will still show up in outFlows, causing 
+                // reconciliation error.
+                // interim solution: relax the reconciliation requirement as long as there are
+                // more outFlows than outLinks. (i.e. allow unlinked outFlows to be cutoff)
+                // Background: when designing fragments in Matlab, I allowed the user to exclude 
+                // process flows that were not desired to be included in the fragment, rendering 
+                // them in effect as cutoff flows.
+                // Problem: during traversal, these flows will still show up in outFlows, causing 
+                // reconciliation error.
+                // interim solution: relax the reconciliation requirement as long as there are
+                // more outFlows than outLinks. (i.e. allow unlinked outFlows to be treated as cutoffs)
+                if (outLinks.Count() > outFlows.Count()) // TODO -- this should be !=
                 {
                     throw new ArgumentException("OutFlows and OutLinks don't reconcile!");
                 }
@@ -148,6 +162,7 @@ namespace CalRecycleLCA.Services
 
                     NodeRecurse(ff, ff_param, item.FragmentFlowID, scenarioId, nodeWeight * resultVal);
                 }
+            }
 
             var nodeCache = new NodeCache
             {
@@ -159,7 +174,7 @@ namespace CalRecycleLCA.Services
             
             nodeCache.ObjectState = ObjectState.Added;
             _nodeCacheService.InsertOrUpdateGraph(nodeCache);
-            }
+            
         }
 
                 /// <summary>

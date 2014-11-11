@@ -13,9 +13,9 @@ namespace LcaDataModel
 
         public int NodeCacheID { get; set; }
 
-        public int? FragmentFlowID { get; set; }
+        public int? FragmentFlowID { get; set; } // should be non-nullable
 
-        public int? ScenarioID { get; set; }
+        public int? ScenarioID { get; set; } // should be non-nullable
 
         public double NodeWeight { get; set; }
 
