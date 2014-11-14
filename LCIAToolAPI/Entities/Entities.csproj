@@ -132,6 +132,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Models\ParamInstance.cs" />
     <Compile Include="Models\FragmentFlowResource.cs" />
     <Compile Include="Models\FragmentNodeResource.cs" />
     <Compile Include="Models\ProcessFlowResource.cs" />
@@ -139,18 +140,13 @@
     <Compile Include="Models\ImpactCategoryResource.cs" />
     <Compile Include="Models\LCIAResultResource.cs" />
     <Compile Include="Models\LCIAMethodResource.cs" />
-    <Compile Include="Models\DependencyParamModel.cs" />
     <Compile Include="Models\FragmentLCIAModel.cs" />
     <Compile Include="Models\FragmentResource.cs" />
     <Compile Include="Models\InventoryModel.cs" />
     <Compile Include="Models\LCIAModel.cs" />
-    <Compile Include="Models\NodeFlowModel.cs" />
-    <Compile Include="Models\OutFlowModel.cs" />
     <Compile Include="Models\FlowPropertyResource.cs" />
     <Compile Include="Models\FlowResource.cs" />
-    <Compile Include="Models\FlowPropertyParamModel.cs" />
     <Compile Include="Models\ProcessResource.cs" />
-    <Compile Include="Models\ResolveBackgroundModel.cs" />
     <Compile Include="Models\ScenarioResource.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
