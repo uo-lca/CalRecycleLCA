@@ -1,7 +1,7 @@
 CalRecycleLCA - Visualization
 =============================
 
-Visualizations for the CalRecycle Used Oil LCA Online Tool implemented in HTML, CSS, and JavaScript. 
+Visualization prototypes for the CalRecycle Used Oil LCA Online Tool implemented in HTML, CSS, and JavaScript. 
 
 Visualization is implemented with the help of D3.js and uses SVG. SVG requires a "modern" browser (see [Can I use SVG](http://caniuse.com/svg)). 
 
