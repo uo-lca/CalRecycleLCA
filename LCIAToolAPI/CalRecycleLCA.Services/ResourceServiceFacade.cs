@@ -311,19 +311,22 @@ namespace CalRecycleLCA.Services
                 //LCIAMethodID = TransformNullable(m.LCIAMethodID, "LCIAModel.LCIAMethodID"),
                 FlowID = TransformNullable(m.FlowID, "LCIAModel.FlowID"),
                 DirectionID = TransformNullable(m.DirectionID, "LCIAModel.DirectionID"),
-                Quantity = Convert.ToDouble(m.Result),
-                Factor = (m.LCParamValue == null || m.LCParamValue == 0) ?
-                        Convert.ToDouble(m.LCIAFactor) : 
-                        Convert.ToDouble(m.LCParamValue),
-                Result = Convert.ToDouble(m.ComputationResult)
+                Quantity = Convert.ToDouble(m.Quantity),
+                Factor = Convert.ToDouble(m.Factor),
+                Result = Convert.ToDouble(m.LCIAResult)
             };
         }
 
         public AggregateLCIAResource Transform(FragmentLCIAModel m) {
+            //ICollection<DetailedLCIAResource> details = new List<DetailedLCIAResource>();
+            //if (m.NodeLCIAResults.Count() != 0)
+            //    details = m.NodeLCIAResults.Select(k => Transform(k)).ToList();
+
             return new AggregateLCIAResource {
                 FragmentFlowID = TransformNullable(m.FragmentFlowID, "FragmentLCIAModel.FragmentFlowID"),
                 CumulativeResult = Convert.ToDouble(m.Result),
                 LCIADetail = new List<DetailedLCIAResource>()
+                //LCIADetail = details
             };
         }
 
@@ -562,7 +565,7 @@ namespace CalRecycleLCA.Services
                 // TODO: figure how to handle this sort of error
                 return null;
             }
-            else { 
+            else {
                 IEnumerable<InventoryModel> inventory = _LCIAComputation.ComputeProcessLCI(processID, scenarioID);
                 IEnumerable<LCIAModel> lciaDetail = _LCIAComputation.ComputeProcessLCIA(inventory, lciaMethod, scenarioID)
                     .Where(l => String.IsNullOrEmpty(l.Geography));
@@ -572,7 +575,7 @@ namespace CalRecycleLCA.Services
                 var lciaScore = new AggregateLCIAResource
                     {
                         ProcessID = processID,
-                        CumulativeResult = (double)lciaDetail.Sum(a => a.ComputationResult),
+                        CumulativeResult = (double)lciaDetail.Sum(a => a.LCIAResult),
                         LCIADetail = (_ProcessService.IsPrivate(processID)
                             ? new List<DetailedLCIAResource>()
                             : lciaDetail.Select(m => Transform(m)).ToList() )
@@ -596,10 +599,15 @@ namespace CalRecycleLCA.Services
         public LCIAResultResource GetFragmentLCIAResults(int fragmentID, int lciaMethodID, int scenarioID = 0) {
             // IEnumerable<FragmentLCIAModel> results = _FragmentLCIAComputation.ComputeFragmentLCIA(fragmentID, scenarioID, lciaMethodID);
             IEnumerable<FragmentLCIAModel> aggResults = _FragmentLCIAComputation.ComputeFragmentLCIA(fragmentID, scenarioID, lciaMethodID)
-                .GroupBy(r => r.FragmentFlowID)
+                .GroupBy(r => new
+                {
+                    r.FragmentFlowID,
+                    r.LCIAMethodID
+                })
                 .Select(group => new FragmentLCIAModel
                 {
-                    FragmentFlowID = group.Key,
+                    FragmentFlowID = group.Key.FragmentFlowID,
+                    LCIAMethodID = group.Key.LCIAMethodID,
                     Result = group.Sum(a => a.Result)
                 });
             LCIAResultResource lciaResult = new LCIAResultResource {

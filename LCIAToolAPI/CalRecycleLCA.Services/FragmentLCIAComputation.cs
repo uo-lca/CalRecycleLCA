@@ -250,7 +250,7 @@ namespace CalRecycleLCA.Services
             var lciaMethods = _lciaMethodService.Queryable().ToList();
 
 
-            FragmentFlowLCIA(fragmentId, scenarioId, lciaMethods).ToList();
+            FragmentFlowLCIA(fragmentId, scenarioId, lciaMethods);//.ToList();
 
         }
 
@@ -272,12 +272,13 @@ namespace CalRecycleLCA.Services
                 NodeWeight = s.nodeCaches.nc.NodeWeight,
                 ImpactScore = s.scoreCaches == null ? 0 : s.scoreCaches.ImpactScore,
                 Result = s.nodeCaches.nc.NodeWeight * (s.scoreCaches == null ? 0 : s.scoreCaches.ImpactScore)
+                //NodeLCIAResults = new List<LCIAModel>()
             });
 
             return lcia;
         }
 
-        public IEnumerable<FragmentLCIAModel> FragmentFlowLCIA(int? fragmentId, int scenarioId, IEnumerable<LCIAMethod> lciaMethods)
+        public void FragmentFlowLCIA(int? fragmentId, int scenarioId, IEnumerable<LCIAMethod> lciaMethods)
         {
             // set score cache for fragment / scenario / method: iterate through
             // fragmentflows 
@@ -318,14 +319,15 @@ namespace CalRecycleLCA.Services
 
             }
 
-            return fragmentFlows
-                  .Select(x => new FragmentLCIAModel
+            return; // fragmentFlows
+/*                  .Select(x => new FragmentLCIAModel
                   {
                       FragmentFlowID = x.FragmentFlowID,
                       NodeTypeID = x.NodeTypeID,
                       FlowID = x.FlowID,
                       DirectionID = x.DirectionID
                   });
+ * */
         }
 
 
@@ -422,17 +424,17 @@ namespace CalRecycleLCA.Services
                 case 1:
 
                     LCIAComputationV2 lciaComputation = new LCIAComputationV2(_processFlowService,
-                        _processEmissionParamService,
+                        //_processEmissionParamService,
                         _lciaMethodService,
-                        _flowService,
-                        _flowFlowPropertyService,
-                        _flowPropertyParamService,
-                        _flowPropertyEmissionService,
-                        _processDissipationService,
-                        _processDissipationParamService,
-                        _lciaService,
-                        _characterizationParamService,
-                        _paramService);
+                        //_flowService,
+                        //_flowFlowPropertyService,
+                        //_flowPropertyParamService,
+                        //_flowPropertyEmissionService,
+                        //_processDissipationService,
+                        //_processDissipationParamService,
+                        _lciaService);
+                        //_characterizationParamService,
+                        //_paramService);
 
                     var scores = lciaComputation.ProcessLCIA(fragmentNode.ProcessID, needLciaMethods, fragmentNode.ScenarioID);
 
@@ -445,7 +447,7 @@ namespace CalRecycleLCA.Services
                                 .Where(x => x.LCIAMethodID == lciaMethodItem.LCIAMethodID)
                                 .Select(x => new ScoreCache
                                     {
-                                        ImpactScore = Convert.ToDouble(x.Score)
+                                        ImpactScore = Convert.ToDouble(x.Result)
                                     }).FirstOrDefault();
 
                             impactScore = Convert.ToDouble(score.ImpactScore);
@@ -467,6 +469,7 @@ namespace CalRecycleLCA.Services
                     {
                         var lcias = ComputeFragmentLCIA(fragmentNode.SubFragmentID, fragmentNode.ScenarioID, lciaMethodItem.LCIAMethodID);
 
+                        /*
                         if (lcias != null)
                         {
                             var lciaScore = lcias.ToList()
@@ -476,17 +479,16 @@ namespace CalRecycleLCA.Services
                         })
                      .Select(group => new LCIAModel
                      {
-                         Result = group.Sum(a => a.Result)
+                         LCIAResult = group.Sum(a => a.Result)
                      });
-
-                            ScoreCache scoreCache = new ScoreCache();
-                            scoreCache.ScenarioID = fragmentNode.ScenarioID;
-                            scoreCache.FragmentFlowID = fragmentFlowId;
-                            scoreCache.LCIAMethodID = lciaMethodItem.LCIAMethodID;
-                            scoreCache.ImpactScore = Convert.ToDouble(lciaScore.Select(a => a.Result).FirstOrDefault());
-                            scoreCache.ObjectState = ObjectState.Added;
-                            _scoreCacheService.InsertOrUpdateGraph(scoreCache);
-                        }
+                        */
+                        ScoreCache scoreCache = new ScoreCache();
+                        scoreCache.ScenarioID = fragmentNode.ScenarioID;
+                        scoreCache.FragmentFlowID = fragmentFlowId;
+                        scoreCache.LCIAMethodID = lciaMethodItem.LCIAMethodID;
+                        scoreCache.ImpactScore = Convert.ToDouble(lcias.Sum(a => a.Result));
+                        scoreCache.ObjectState = ObjectState.Added;
+                        _scoreCacheService.InsertOrUpdateGraph(scoreCache);
                     }
 
                     //removed - we don't need this twice. - RS

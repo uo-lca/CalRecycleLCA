@@ -215,6 +215,7 @@ namespace CalRecycleLCA.Repositories
             // first thing to do is determine the flows and magnitudes from FragmentFlow * NodeCache
             var Outflows = repository.Queryable()
                 .Where(ff => ff.FragmentID == fragmentId) // fragment flows belonging to this fragment
+                .Where(ff => ff.FlowID != null)           // reference flow (null FlowID) is .Unioned below
                 .Where(ff => ff.NodeTypeID == 3)          // of type InputOutput
                 .Join(repository.GetRepository<NodeCache>().Queryable().Where(nc => nc.ScenarioID == scenarioId),
                     ff => ff.FragmentFlowID,
@@ -222,7 +223,7 @@ namespace CalRecycleLCA.Repositories
                     (ff, nc) => new { ff, nc })         // join to NodeCache to get flow magnitude
                     .Select(a => new InventoryModel
                     {
-                        FlowID = a.ff.FlowID,
+                        FlowID = (int)a.ff.FlowID,
                         DirectionID = a.ff.DirectionID,
                         Result = a.nc.FlowMagnitude
                     }).ToList()                         // into List<InventoryModel>
