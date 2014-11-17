@@ -139,7 +139,7 @@ namespace CalRecycleLCA.Services
 
             //return lciaMethods;
 
-            var lciaMethods = _lciaMethodService.Queryable().ToList();
+            var lciaMethods = _lciaMethodService.QueryActiveMethods().ToList();
 
             var result = ProcessLCIA(processId, lciaMethods, scenarioId);
             return result;

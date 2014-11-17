@@ -247,7 +247,7 @@ namespace CalRecycleLCA.Services
         public void FragmentLCIACompute(int fragmentId, int scenarioId)
         {
 
-            var lciaMethods = _lciaMethodService.Queryable().ToList();
+            var lciaMethods = _lciaMethodService.QueryActiveMethods().ToList();
 
 
             FragmentFlowLCIA(fragmentId, scenarioId, lciaMethods);//.ToList();

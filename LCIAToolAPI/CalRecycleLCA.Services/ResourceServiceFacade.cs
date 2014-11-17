@@ -351,14 +351,11 @@ namespace CalRecycleLCA.Services
         /// <summary>
         /// Get LCIAMethodResource list with optional filter by ImpactCategory
         /// </summary>
-        public IEnumerable<LCIAMethodResource> GetLCIAMethodResources(int? impactCategoryID = null) {
+        public IEnumerable<LCIAMethodResource> GetActiveLCIAMethodResources(int? impactCategoryID = null) {
             IEnumerable<LCIAMethod> lciaMethods;
-            var query = _LciaMethodService.Query()
-                                                .Include(x => x.IndicatorType)
-                                                .Include(x => x.FlowProperty.UnitGroup.UnitConversion)
-                                                .Select()
+            var query = _LciaMethodService.FetchActiveMethods()
                                                 .ToList();
-
+            
             if (impactCategoryID == null) {
                 lciaMethods = ((IEnumerable)query).Cast<LCIAMethod>();
             }
