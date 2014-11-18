@@ -24,7 +24,8 @@ The objective is to present a virtual file hierarchy that:
 
 The proposed virtual file hierarchy looks like the following:
 
-$URL_ROOT/xml/<level 0>/<level 1>/<UUID>.+
+$URL_ROOT/xml/<level 0>/<level 1>/<UUID>.+ - this is the link in the sankey diagram that the user will click on.  
+Must resolve to the actual file structure.  The purpose of this is to hide the true files structure from the user. - RS
 
 with all text after a valid UUID ignored.
 
@@ -80,13 +81,13 @@ implementation of the 'versions' methods postponed indefinitely.
        entity. (note: pathnames use DataType.PathName). If not, return HTTP
        400 with body "UUID datatype mismatch"
 
-    4. filter ILCDEntity based on UUID.
+    4. filter ILCDEntity based on UUID. - most only have one distict UUID (examples with 2 or more identical UUID values are ILCDEntityID 1537 , 1548)
 
     5. determine whether any ILCDEntities in the result set are visible
        according to the user's authorization level.  If all are private,
        return 403.
        [in the future, check user authorization and return 403 if not
-       authorized]
+       authorized] - assume user is authorized and because there is no authentication yet - RS
 
     5. From the ILCDEntities that the user is authorized to view, determine
        the ILCDEntity with the lexically highest version string.

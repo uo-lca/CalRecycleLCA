@@ -29,6 +29,8 @@ namespace CalRecycleLCA.Services
         [Inject]
         private readonly IUnitOfWork _unitOfWork;
 
+        private List<NodeCache> nodeCaches;
+
 
         public FragmentTraversalV2(
             IFragmentFlowService fragmentFlowService,
@@ -59,6 +61,8 @@ namespace CalRecycleLCA.Services
         /// <returns></returns>
         public bool Traverse(int fragmentId, int scenarioId = 0)
         {
+            nodeCaches = new List<NodeCache>();
+
             var fragmentFlows = _fragmentFlowService.GetFlowsByFragment(fragmentId);
             var dependencyParams = _dependencyParamService.Query(dp => dp.Param.ScenarioID == scenarioId).Select().ToList();
 
@@ -75,6 +79,12 @@ namespace CalRecycleLCA.Services
             {
                 _unitOfWork.SetAutoDetectChanges(false);
                 NodeRecurse(fragmentFlows, dependencyParams, refFlow, scenarioId, activity);
+
+                foreach (var nodeCache in nodeCaches)
+                {
+                    nodeCache.ObjectState = ObjectState.Added;
+                }
+                _nodeCacheService.InsertGraphRange(nodeCaches);
                 _unitOfWork.SaveChanges();
                 _unitOfWork.SetAutoDetectChanges(true);
                 return true;
@@ -166,16 +176,27 @@ namespace CalRecycleLCA.Services
                 }
             }
 
-            var nodeCache = new NodeCache
+            //var nodeCache = new NodeCache
+            //{
+            //    FragmentFlowID = fragmentFlowId,
+            //    ScenarioID = scenarioId,
+            //    FlowMagnitude = flowMagnitude,
+            //    NodeWeight = nodeWeight
+            //};
+            
+            //nodeCache.ObjectState = ObjectState.Added;
+            //_nodeCacheService.InsertOrUpdateGraph(nodeCache);
+
+            
+            nodeCaches.Add(new NodeCache()
             {
                 FragmentFlowID = fragmentFlowId,
                 ScenarioID = scenarioId,
                 FlowMagnitude = flowMagnitude,
                 NodeWeight = nodeWeight
-            };
+            });
+
             
-            nodeCache.ObjectState = ObjectState.Added;
-            _nodeCacheService.InsertOrUpdateGraph(nodeCache);
             
         }
 

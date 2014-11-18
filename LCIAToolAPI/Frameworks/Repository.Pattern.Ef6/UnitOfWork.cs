@@ -92,6 +92,11 @@ namespace Repository.Pattern.Ef6
             _dataContext.SetAutoDetectChanges(enabled);
         }
 
+        public void BulkInsert(object entity)
+        {
+            _dataContext.BulkInsert(entity);
+        }
+
 
         public IRepository<TEntity> Repository<TEntity>() where TEntity : class, IObjectState
         {

@@ -20,6 +20,7 @@ namespace LCAToolAPI.App_Start
 	using Service.Pattern;
 	using Repository.Pattern.DataContext;
 	using Repository.Pattern.Ef6.Factories;
+    using XMLHandler;
 
     public static class NinjectWebCommon 
     {
@@ -85,12 +86,10 @@ namespace LCAToolAPI.App_Start
             kernel.Bind<IUnitOfWork>().To<UnitOfWork>();
             kernel.Bind<IUnitOfWorkAsync>().To<UnitOfWork>();
             kernel.Bind<IFragmentTraversalV2>().To<FragmentTraversalV2>();
-            //kernel.Bind<IFlowPropertyParamService>().To<FlowPropertyParamService>();
             kernel.Bind<ILCIAComputationV2>().To<LCIAComputationV2>();
             kernel.Bind<IFragmentLCIAComputation>().To<FragmentLCIAComputation>();
             kernel.Bind<IResourceServiceFacade>().To<ResourceServiceFacade>();
-
-            //kernel.Bind(typeof(IService<>)).To(typeof(Service<>));
+            kernel.Bind<IFlowTestService>().To<FlowTestService>();
 
             kernel.Bind(typeof(IRepositoryAsync<Category>)).To(typeof(Repository<Category>));
             kernel.Bind(typeof(IRepositoryAsync<Classification>)).To(typeof(Repository<Classification>));
@@ -138,8 +137,6 @@ namespace LCAToolAPI.App_Start
             kernel.Bind<IProcessFlowService>().To<ProcessFlowService>();
             kernel.Bind<IScenarioService>().To<ScenarioService>();
             kernel.Bind(typeof(INodeCacheService)).To(typeof(NodeCacheService));
-            //kernel.Bind(typeof(IFragmentNodeProcessService)).To(typeof(FragmentNodeProcessService));
-            //kernel.Bind(typeof(IFragmentNodeFragmentService)).To(typeof(FragmentNodeFragmentService));
             kernel.Bind(typeof(IFlowFlowPropertyService)).To(typeof(FlowFlowPropertyService));
             kernel.Bind(typeof(IProcessEmissionParamService)).To(typeof(ProcessEmissionParamService));
             kernel.Bind(typeof(IFlowPropertyEmissionService)).To(typeof(FlowPropertyEmissionService));
@@ -149,44 +146,10 @@ namespace LCAToolAPI.App_Start
             kernel.Bind(typeof(ICharacterizationParamService)).To(typeof(CharacterizationParamService));
             kernel.Bind(typeof(IParamService)).To(typeof(ParamService));
             kernel.Bind(typeof(IScoreCacheService)).To(typeof(ScoreCacheService));
-            //kernel.Bind(typeof(IProcessSubstitutionService)).To(typeof(ProcessSubstitutionService));
-            //kernel.Bind(typeof(IFragmentSubstitutionService)).To(typeof(FragmentSubstitutionService));
-            // kernel.Bind(typeof(IScenarioBackgroundService)).To(typeof(ScenarioBackgroundService));
             kernel.Bind(typeof(IBackgroundService)).To(typeof(BackgroundService));
             kernel.Bind<IDependencyParamService>().To<DependencyParamService>();
             kernel.Bind<IFlowPropertyParamService>().To<FlowPropertyParamService>();
 
-
-
-
-
-          
-
-
-            //kernel.Bind(typeof(IService<LCIAMethod>)).To(typeof(Service<LCIAMethod>));
-            //kernel.Bind(typeof(IService<Process>)).To(typeof(Service<Process>));
-            //kernel.Bind(typeof(IService<Flow>)).To(typeof(Service<Flow>));
-            //kernel.Bind(typeof(IService<FragmentFlow>)).To(typeof(Service<FragmentFlow>));
-            //kernel.Bind(typeof(IService<NodeCache>)).To(typeof(Service<NodeCache>));
-            //kernel.Bind(typeof(IService<FragmentNodeProcess>)).To(typeof(Service<FragmentNodeProcess>));
-            //kernel.Bind(typeof(IService<ProcessFlow>)).To(typeof(Service<ProcessFlow>));
-            //kernel.Bind(typeof(IService<FragmentNodeFragment>)).To(typeof(Service<FragmentNodeFragment>));
-            //kernel.Bind(typeof(IService<FlowFlowProperty>)).To(typeof(Service<FlowFlowProperty>));
-            //kernel.Bind(typeof(IService<DependencyParam>)).To(typeof(Service<DependencyParam>));
-            //kernel.Bind(typeof(IService<Param>)).To(typeof(Service<Param>));
-            //kernel.Bind(typeof(IService<FlowPropertyParam>)).To(typeof(Service<FlowPropertyParam>));
-            //kernel.Bind(typeof(IService<Fragment>)).To(typeof(Service<Fragment>));
-            //kernel.Bind(typeof(IService<ProcessEmissionParam>)).To(typeof(Service<ProcessEmissionParam>));
-            //kernel.Bind(typeof(IService<FlowPropertyEmission>)).To(typeof(Service<FlowPropertyEmission>));
-            //kernel.Bind(typeof(IService<ProcessDissipation>)).To(typeof(Service<ProcessDissipation>));
-            //kernel.Bind(typeof(IService<ProcessDissipationParam>)).To(typeof(Service<ProcessDissipationParam>));
-            //kernel.Bind(typeof(IService<LCIA>)).To(typeof(Service<LCIA>));
-            //kernel.Bind(typeof(IService<CharacterizationParam>)).To(typeof(Service<CharacterizationParam>));
-            //kernel.Bind(typeof(IService<Param>)).To(typeof(Service<Param>));
-        
-        
-        //[Inject]
-        //private readonly IService<Param> _paramService;
 
             kernel.Bind<ITestGenericService>().To<TestGenericService>();
         }
