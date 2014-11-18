@@ -229,9 +229,15 @@ namespace CalRecycleLCA.Services
                     }
                 case 2:
                     {
+                        IFragmentTraversalV2 recursive_traversal = new FragmentTraversalV2(_fragmentFlowService,
+                            _nodeCacheService,
+                            _processFlowService,
+                            _flowFlowPropertyService,
+                            _dependencyParamService,
+                            _unitOfWork);
                         // fragment-- all together
                         // first, traverse the fragment -- store results in cache
-                        Traverse((int)term.SubFragmentID, term.ScenarioID);
+                        recursive_traversal.Traverse((int)term.SubFragmentID, term.ScenarioID);
                         // access the cache to determine outflow amounts
                         Outflows = _fragmentFlowService.GetDependencies((int)term.SubFragmentID,term.TermFlowID,ex_directionId,
                             out flow_exch, term.ScenarioID);
