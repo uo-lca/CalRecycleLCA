@@ -43,7 +43,9 @@ before you can use npm to install this project's dependencies.*
 
 ```
 npm install
-``` calls `bower install`.  When it completes, you should find that you have two new
+```
+
+Behind the scenes this will also call `bower install`.  You should find that you have two new
 folders in your project.
 
 * `node_modules` - contains the npm packages for the tools we need
@@ -66,16 +68,20 @@ Now browse to the app at `http://localhost:8000/app/index.html`.
 
 
 
-## Directory Layout
+## Repository directory structure
 
 * app/                --> all of the source files for the application
-    * components/           --> shared modules
-        * idmap                 --> idmap service module
+    * components/           --> shared modules (services and directives)
+        * color-code            --> Maps categories to colors
+        * d3-tip                --> d3.tip service
+        * idmap                 --> Maps resource ID to resource
         * version/              --> version related components (came with angular-seed)
-        * resources/               --> resource service module
-        * sankey/                  --> sankey diagram module   
+        * lcia-bar-chart        --> LCIA bar chart directive
+        * resources/            --> WebAPI resource service 
+        * sankey/               --> Sankey diagram service and directive   
+    * fragment-sankey/          --> Fragment sankey view and controller
+    * process-lcia/             --> Process LCIA view and controller
     * scenarios/                --> scenarios view and controller
-    * fragment-sankey/          --> fragment sankey view and controller
 * karma.conf.js         --> config file for running unit tests with Karma
 * e2e-tests/            --> end-to-end tests (not currently implemented)
 
@@ -218,54 +224,12 @@ Alternatively, you can choose to configure your own webserver, such as apache or
 configure your server to serve the files under the `app/` directory.
 
 
-### Running the App in Production
+### How to Publish on Production Server
 
-This really depends on how complex your app is and the overall infrastructure of your system, but
-the general rule is that all you need in production are all the files under the `app/` directory.
-Everything else should be omitted.
+Install dependencies as described above.
 
-Angular apps are really just a bunch of static html, css and js files that just need to be hosted
-somewhere they can be accessed by browsers.
+Copy the `app/` folder to a web server host. In IIS, create a web app that points to the app folder.
 
-If your Angular app is talking to the backend server via xhr or other means, you need to figure
-out what is the best way to host the static files to comply with the same origin policy if
-applicable. Usually this is done by hosting the files by the backend server or through
-reverse-proxying the backend server(s) and webserver(s).
+Change `API_ROOT` setting to the base URI of the web API. Edit `app/components/resources/resource-service.js`. Update the value of the `API_ROOT` constant at the top of the file.
 
-
-## Continuous Integration
-
-### Travis CI
-
-[Travis CI][travis] is a continuous integration service, which can monitor GitHub for new commits
-to your repository and execute scripts such as building the app or running tests. The angular-seed
-project contains a Travis configuration file, `.travis.yml`, which will cause Travis to run your
-tests when you push to GitHub.
-
-You will need to enable the integration between Travis and GitHub. See the Travis website for more
-instruction on how to do this.
-
-### CloudBees
-
-CloudBees have provided a CI/deployment setup:
-
-<a href="https://grandcentral.cloudbees.com/?CB_clickstart=https://raw.github.com/CloudBees-community/angular-js-clickstart/master/clickstart.json">
-<img src="https://d3ko533tu1ozfq.cloudfront.net/clickstart/deployInstantly.png"/></a>
-
-If you run this, you will get a cloned version of this repo to start working on in a private git repo,
-along with a CI service (in Jenkins) hosted that will run unit and end to end tests in both Firefox and Chrome.
-
-
-## Contact
-
-For more information on AngularJS please check out http://angularjs.org/
-
-[git]: http://git-scm.com/
-[bower]: http://bower.io
-[npm]: https://www.npmjs.org/
-[node]: http://nodejs.org
-[protractor]: https://github.com/angular/protractor
-[jasmine]: http://jasmine.github.io
-[karma]: http://karma-runner.github.io
-[travis]: https://travis-ci.org/
-[http-server]: https://github.com/nodeapps/http-server
+Configure the web app to enable loading of application JSON files. In IIS, add MIME type extension: `.json`,  MIME type: `application/json`.

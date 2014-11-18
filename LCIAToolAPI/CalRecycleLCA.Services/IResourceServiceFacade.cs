@@ -8,7 +8,7 @@ using Entities.Models;
 namespace CalRecycleLCA.Services
 {
     public interface IResourceServiceFacade {
-        IEnumerable<LCIAMethodResource> GetLCIAMethodResources(int? impactCategoryID = null);
+        IEnumerable<LCIAMethodResource> GetActiveLCIAMethodResources(int? impactCategoryID = null);
         IEnumerable<ScenarioResource> GetScenarios();
         IEnumerable<ScenarioResource> GetScenarios(int ScenarioGroupID);
         IEnumerable<FragmentResource> GetFragmentResources();

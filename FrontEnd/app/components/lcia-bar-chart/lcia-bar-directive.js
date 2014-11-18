@@ -7,7 +7,7 @@ angular.module('lcaApp.lciaBar.directive', [])
         function link(scope, element, attrs) {
 
             var margin = {
-                    top: 10,
+                    top: 30,
                     right: 30,
                     bottom: 30,
                     left: 30
@@ -28,8 +28,8 @@ angular.module('lcaApp.lciaBar.directive', [])
                     .orient("bottom")
                     .ticks(4)
                     .tickFormat(labelFormat),
-                svg = null;
-
+                svg = null,
+                threshold = 0;
             /**
              * Initial preparation of svg element.
              */
@@ -43,7 +43,7 @@ angular.module('lcaApp.lciaBar.directive', [])
                     .append("text").attr("id", "chart-header").style("font-weight", "bold").text("LCIA Details (positive scores)");
                 svg.append("g")
                     .attr("class", "x axis")
-                    .attr("transform", "translate(" + margin.left + "," + (chartHeight - margin.bottom) + ")");
+                    .attr("transform", "translate(" + margin.left + "," + (chartHeight + margin.top - margin.bottom) + ")");
                 svg.append("g")
                     .attr("class", "legend-group")
                     .attr("transform", "translate(" + margin.left + "," + (chartHeight + margin.top) + ")");
@@ -51,24 +51,23 @@ angular.module('lcaApp.lciaBar.directive', [])
             }
 
             /**
-             * Create new array with positive impacts. Roll up small impacts into one element.
+             * Roll up results below threshold
              */
-            function getPositiveResults() {
-                var positiveDetails = [],
-                    rolledImpact = {flowID: 0, result: 0},
-                    threshold = scope.lcia["cumulativeResult"] * 0.005;
+            function rollUpResults() {
+                var details = [],
+                    rolledImpact = {flowID: 0, result: 0};
 
-                scope.lcia["lciaDetail"].forEach( function (d) {
-                    if (d.result > threshold) {
-                        positiveDetails.push(d);
-                    } else if (d.result > 0) {
-                        rolledImpact.result +=  d.result;
+                scope.lcia["positiveResults"].forEach( function (d) {
+                    if (d.result >= threshold) {
+                        details.push(d);
+                    } else {
+                        rolledImpact.result += d.result;
                     }
                 });
                 if (rolledImpact.result > 0) {
-                    positiveDetails.push(rolledImpact);
+                    details.push(rolledImpact);
                 }
-                return positiveDetails;
+                return details;
             }
             /**
              * Compare function used to sort LCIA results in descending order
@@ -85,12 +84,8 @@ angular.module('lcaApp.lciaBar.directive', [])
                     runningTotal = 0,
                     rectSelection,
                     colorClassSize = 9, // Maximum number of color classes, ranges from 3 to 9
-                    reverseColors, // Clone of color array in reverse order (dark to light)
-                    activityLevel = 1;
+                    reverseColors; // Clone of color array in reverse order (dark to light)
 
-                if ("activity" in scope) {
-                    activityLevel = scope.activity;
-                }
                 displayResults.sort(compareLciaResults);
                 flowList = displayResults.map(function (d) {
                     return d.flowID;
@@ -110,11 +105,11 @@ angular.module('lcaApp.lciaBar.directive', [])
                  */
                 displayResults.forEach(function (d) {
                     d.x0 = runningTotal;
-                    runningTotal += +d.result * activityLevel;
+                    runningTotal += d.result;
                     d.x1 = runningTotal;
                 });
 
-                xScale.domain([0, runningTotal]);
+
                 svg.select(".x.axis")
                     .call(xAxis);
                 /**
@@ -183,9 +178,7 @@ angular.module('lcaApp.lciaBar.directive', [])
                     textY = 9,
                     colXs = [0, boxSize + colPadding, width - 275, width - 75],
                     legend,
-                    newRows,
-                    squares,
-                    flows;
+                    newRows;
 
                 makeLegendHeader(colXs[1], colXs[2], colXs[3], textY);
                 // Update legend data
@@ -235,7 +228,7 @@ angular.module('lcaApp.lciaBar.directive', [])
                 legend.selectAll(".flow-name")
                     .text(function (d) {
                         if (d.flowID === 0) {
-                            return "Flows having impact < 0.5%";
+                            return "flows having score < " + threshold;
                         } else if (d.flowID in scope.flows){
                             return scope.flows[d.flowID].name;
                         }
@@ -248,11 +241,13 @@ angular.module('lcaApp.lciaBar.directive', [])
 
 
             scope.$watch('lcia', function (newVal){
-                if ((typeof newVal != 'undefined') && newVal && ("lciaDetail" in scope.lcia)) {
-                    if ( scope.lcia.lciaDetail.length > 0 ) {
-                        var displayResults = getPositiveResults();
+                if ((typeof newVal != 'undefined') && newVal && ("positiveResults" in scope.lcia)) {
+                    if ( scope.lcia.positiveResults.length > 0 ) {
+                        xScale.domain([0, +scope.lcia.positiveSum]);
+                        threshold = (+scope.lcia.positiveSum / width).toPrecision(4);
+                        var displayResults = rollUpResults();
                         if (displayResults.length > 0) {
-                            svgHeight = chartHeight + margin.top + (legendRowHeight * (displayResults.length + 1));
+                            svgHeight = chartHeight + (legendRowHeight * (displayResults.length + 1));
                             prepareSvg();
                             drawBar(displayResults);
                             if ("flows" in scope) {
@@ -266,7 +261,7 @@ angular.module('lcaApp.lciaBar.directive', [])
 
         return {
                 restrict: 'E',
-                scope: { lcia : '=', flows: '=', activity: '='},
+                scope: { lcia : '=', flows: '='},
                 link: link
             }
         }]);

@@ -137,13 +137,13 @@ namespace LCAToolAPI.API
         [Route("api/impactcategories/{impactCategoryID:int}/lciamethods")]
         [HttpGet]
         public IEnumerable<LCIAMethodResource> GetLCIAMethodsByImpactCategory(int impactCategoryID) {
-            return _ResourceService.GetLCIAMethodResources(impactCategoryID);
+            return _ResourceService.GetActiveLCIAMethodResources(impactCategoryID);
         }
 
         [Route("api/lciamethods")]
         [HttpGet]
         public IEnumerable<LCIAMethodResource> GetLCIAMethodResources() {
-            return _ResourceService.GetLCIAMethodResources();
+            return _ResourceService.GetActiveLCIAMethodResources();
         }
 
         // Process metadata /////////////////////////////////////////////////////////

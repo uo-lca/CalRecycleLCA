@@ -212,17 +212,17 @@ _unitOfWork);
             _unitOfWork);
 
             _lciaComputation = new LCIAComputationV2(_processFlowService,
-            _processEmissionParamService,
+                //_processEmissionParamService,
             _lciaMethodService,
-            _flowService,
-            _flowFlowPropertyService,
-            _flowPropertyParamService,
-            _flowPropertyEmissionService,
-            _processDissipationService,
-            _processDissipationParamService,
-            _lciaService,
-            _characterizationParamService,
-            _paramService);
+                //_flowService,
+                //_flowFlowPropertyService,
+                //_flowPropertyParamService,
+                //_flowPropertyEmissionService,
+                //_processDissipationService,
+                //_processDissipationParamService,
+            _lciaService);
+            //_characterizationParamService,
+            //_paramService);
 
             _resourceServiceFacade = new ResourceServiceFacade(_categoryService,
                                _classificationService,

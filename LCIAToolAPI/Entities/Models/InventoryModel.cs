@@ -8,12 +8,12 @@ namespace Entities.Models
 {
     public class InventoryModel
     {
-        public int? FlowID { get; set; }
+        public int FlowID { get; set; }
 
-        public int? DirectionID { get; set; }
+        public int DirectionID { get; set; }
 
         public double? Result { get; set; }
 
-        public double? ParamValue { get; set; }
+        public ParamInstance Param { get; set; }
     }
 }
