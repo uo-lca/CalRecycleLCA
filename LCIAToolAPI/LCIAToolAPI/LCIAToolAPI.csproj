@@ -249,6 +249,7 @@
     <Compile Include="API\FragmentTraversalController.cs" />
     <Compile Include="API\ResourceController.cs" />
     <Compile Include="API\TestGenericServiceController.cs" />
+    <Compile Include="API\XMLHandlerController.cs" />
     <Compile Include="App_Start\BundleConfig.cs" />
     <Compile Include="App_Start\NinjectWeb.cs" />
     <Compile Include="App_Start\NinjectWebApi.cs" />
@@ -310,9 +311,15 @@
       <Project>{86f86650-ee3c-4372-8fec-40c2fe015022}</Project>
       <Name>Service.Pattern</Name>
     </ProjectReference>
+    <ProjectReference Include="..\XMLHandler\XMLHandler.csproj">
+      <Project>{731d7f1f-b7db-4d75-9c08-20ead35a9bf8}</Project>
+      <Name>XMLHandler</Name>
+    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <Content Include="web.config" />
+    <Content Include="web.config">
+      <SubType>Designer</SubType>
+    </Content>
     <None Include="web.Debug.config">
       <DependentUpon>web.config</DependentUpon>
     </None>

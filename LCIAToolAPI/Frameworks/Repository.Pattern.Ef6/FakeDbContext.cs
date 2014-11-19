@@ -32,6 +32,8 @@ namespace Repository.Pattern.Ef6
 
         public void SetAutoDetectChanges(bool enabled) {  }
 
+        public void BulkInsert(object entity) { }
+
         public void SyncObjectState<TEntity>(TEntity entity) where TEntity : class, IObjectState
         {
             // no implentation needed, unit tests which uses FakeDbContext since there is no actual database for unit tests, 

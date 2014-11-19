@@ -9,6 +9,7 @@ namespace Repository.Pattern.UnitOfWork
     {
         int SaveChanges();
         void SetAutoDetectChanges(bool enabled);
+        void BulkInsert(object entity);
         void Dispose(bool disposing);
         IRepository<TEntity> Repository<TEntity>() where TEntity : class, IObjectState;
         void BeginTransaction(IsolationLevel isolationLevel = IsolationLevel.Unspecified);

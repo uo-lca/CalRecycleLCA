@@ -5,6 +5,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Repository.Pattern.DataContext;
 using Repository.Pattern.Infrastructure;
+using EntityFramework.BulkInsert.Extensions;
 
 namespace Repository.Pattern.Ef6
 {
@@ -42,6 +43,11 @@ namespace Repository.Pattern.Ef6
         public void SetAutoDetectChanges(bool enabled)
         {
             base.Configuration.AutoDetectChangesEnabled = enabled;
+        }
+
+        public void BulkInsert(object entity)
+        {
+            BulkInsert(entity);
         }
 
         public Guid InstanceId { get { return _instanceId; } }

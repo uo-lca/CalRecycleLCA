@@ -9,5 +9,6 @@ namespace Repository.Pattern.DataContext
         void SyncObjectState<TEntity>(TEntity entity) where TEntity : class, IObjectState;
         void SyncObjectsStatePostCommit();
         void SetAutoDetectChanges(bool enabled);
+        void BulkInsert(object entity);
     }
 }
