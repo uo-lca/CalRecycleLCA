@@ -600,10 +600,10 @@ namespace LcaDataLoader {
                 Program.Logger.InfoFormat("Load fragment files in {0}...", dirName);
                 UpdateDataSource(DataSourceEnum.fragments, dirName, dbContext);
                 fRows = ImportCSV(Path.Combine(dirName, "Fragment.csv"), CreateFragment, dbContext);
+                ImportCSV(Path.Combine(dirName, "FragmentStage.csv"), ImportFragmentStage, dbContext);
                 ffRows = ImportCSV(Path.Combine(dirName, "FragmentFlow.csv"), CreateFragmentFlow, dbContext);
                 UpdateEntities(ffRows, UpdateFragmentFlow, dbContext);
                 UpdateEntities(fRows, UpdateFragment, dbContext);
-                ImportCSV(Path.Combine(dirName, "FragmentStage.csv"), ImportFragmentStage, dbContext);
                 ImportCSV(Path.Combine(dirName, "FragmentNodeProcess.csv"), ImportFragmentNodeProcess, dbContext);
                 ImportCSV(Path.Combine(dirName, "FragmentNodeFragment.csv"), ImportFragmentNodeFragment, dbContext);
                 ImportCSV(Path.Combine(dirName, "Background.csv"), ImportBackground, dbContext);
