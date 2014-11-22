@@ -245,6 +245,21 @@ namespace LcaDataLoader {
             return isImported;
         }
 
+        private static bool ImportFragmentStage(Row row, DbContextWrapper dbContext)
+        {
+            bool isImported = false, isNew;
+            int id = Convert.ToInt32(row["FragmentStageID"]);
+            FragmentStage ent = dbContext.ProduceEntityWithID<FragmentStage>(id, out isNew);
+            if (ent != null)
+            {
+                ent.FragmentID = Convert.ToInt32(row["FragmentID"]);
+                ent.StageName = row["Name"];
+                isImported = isNew ? dbContext.AddEntity(ent) : (dbContext.SaveChanges() > 0);
+            }
+            return isImported;
+
+        }
+
         private static bool ImportFragmentNodeProcess(Row row, DbContextWrapper dbContext) {
             bool isImported = false, isNew;
             int id = Convert.ToInt32(row["FragmentNodeProcessID"]);
@@ -588,6 +603,7 @@ namespace LcaDataLoader {
                 ffRows = ImportCSV(Path.Combine(dirName, "FragmentFlow.csv"), CreateFragmentFlow, dbContext);
                 UpdateEntities(ffRows, UpdateFragmentFlow, dbContext);
                 UpdateEntities(fRows, UpdateFragment, dbContext);
+                ImportCSV(Path.Combine(dirName, "FragmentStage.csv"), ImportFragmentStage, dbContext);
                 ImportCSV(Path.Combine(dirName, "FragmentNodeProcess.csv"), ImportFragmentNodeProcess, dbContext);
                 ImportCSV(Path.Combine(dirName, "FragmentNodeFragment.csv"), ImportFragmentNodeFragment, dbContext);
                 ImportCSV(Path.Combine(dirName, "Background.csv"), ImportBackground, dbContext);

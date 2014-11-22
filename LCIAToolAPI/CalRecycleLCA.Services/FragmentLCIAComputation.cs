@@ -267,6 +267,7 @@ namespace CalRecycleLCA.Services
       , (nc, sc) => new { nodeCaches = nc, scoreCaches = sc }).Select(s => new FragmentLCIAModel
             {
                 FragmentFlowID = s.nodeCaches.ff.FragmentFlowID,
+                FragmentStageID = s.nodeCaches.ff.FragmentStageID,
                 NodeWeight = s.nodeCaches.nc.NodeWeight,
                 ImpactScore = s.scoreCaches == null ? 0 : s.scoreCaches.ImpactScore,
                 Result = s.nodeCaches.nc.NodeWeight * (s.scoreCaches == null ? 0 : s.scoreCaches.ImpactScore)

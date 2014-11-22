@@ -98,6 +98,16 @@ namespace LcaDataModel {
         }
     }
 
+    public partial class FragmentStage : Entity, IEntity
+    {
+        [NotMapped]
+        public int ID
+        {
+            get { return FragmentStageID; }
+            set { FragmentStageID = value; }
+        }
+    }
+
     public partial class FragmentNodeProcess : Entity, IEntity
     {
         [NotMapped]
