@@ -16,6 +16,13 @@ namespace Entities.Models {
 
     }
 
+    public class FragmentStageResource
+    {
+        public int FragmentStageID { get; set; }
+        public int? FragmentID { get; set; }
+        public string Name { get; set; }
+    }
+
     /// <summary>
     /// A FragmentFlowResource is a FragmentFlow merged with related Node data
     /// Contains collection of FlowMagnitude objects - one for every property of the flow
@@ -25,6 +32,7 @@ namespace Entities.Models {
         // FragmentFlow Properties
         //
         public int FragmentFlowID { get; set; }
+        public int? FragmentStageID { get; set; }
         public string Name { get; set; }
         public string ShortName { get; set; }        
         public int NodeTypeID { get; set; }

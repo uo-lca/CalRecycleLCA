@@ -106,6 +106,16 @@ namespace LCAToolAPI.API
             return _ResourceService.GetFlowsByFragment(fragmentID);
         }
 
+        [Route("api/fragmentstages")]
+        [Route("api/stages")]
+        [Route("api/fragments/{fragmentID:int}/fragmentstages")]
+        [Route("api/fragments/{fragmentID:int}/stages")]
+        [HttpGet]
+        public IEnumerable<FragmentStageResource> GetStagesByFragment(int fragmentID = 0)
+        {
+            return _ResourceService.GetStagesByFragment(fragmentID);
+        }
+        
         // lists all flow properties associated with fragment flows
         [Route("api/fragments/{fragmentID:int}/flowproperties")]
         [HttpGet]
