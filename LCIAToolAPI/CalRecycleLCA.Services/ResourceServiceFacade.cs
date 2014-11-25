@@ -399,31 +399,20 @@ namespace CalRecycleLCA.Services
         }
 
         /// <summary>
-        /// Get list of flows related to a fragment or a process-- eliminated. use
-        /// GetFlowsByFragment or GetProcessFlows.
+        /// Get list of all flows.  Optional flowtypeID is 1 = Intermediate, 2 = Elementary, 0 = both
         /// </summary>
-        /// <param name="relType">Relationship class type (FragmentFlow or ProcessFlow)</param>
+        /// <param name="flowtypeID">from FlowType</param>
         /// <param name="relID">ID of related fragment or process</param>
         /// <returns>List of FlowResource objects</returns>
-        /*********
-         * public IEnumerable<FlowResource> GetFlows(Type relType, int relID)
+        public IEnumerable<FlowResource> GetFlows(int flowtypeID)
         {
-            IEnumerable<Flow> flowQuery;
-            if (relType == typeof(FragmentFlow))
-            {
-                flowQuery = _FlowService.Query(f => f.FragmentFlows.Any(ff => ff.FragmentID == relID))
-                    .Include(x => x.FragmentFlows)
-                    .Select().ToList();
-            }
-            else // if (relType == typeof(ProcessFlow))
-            {
-                flowQuery = _FlowService.Query(f => f.ProcessFlows.Any(pf => pf.ProcessID == relID))
-                    .Include(x => x.ProcessFlows)
-                    .Select().ToList();
-            }
-            return flowQuery.Select(f => Transform(f)).ToList();
+            if (flowtypeID == 0)
+                return _FlowService.Query().Select()
+                    .Select(f => Transform(f)).ToList();
+            else
+                return _FlowService.Query(f => f.FlowTypeID == flowtypeID).Select()
+                    .Select(f => Transform(f)).ToList();
         }
-        ************** */
 
         /// <summary>
         /// Get list of flows related to a fragment (via FragmentFlow)
@@ -479,6 +468,18 @@ namespace CalRecycleLCA.Services
                                                 .Select()
                                                 .Select(pf => Transform(pf)).ToList();
             }
+        }
+
+        /// <summary>
+        /// Return all flowproperties
+        /// </summary>
+        /// <returns></returns>
+        public IEnumerable<FlowPropertyResource> GetFlowProperties()
+        {
+            return _FlowPropertyService.Query()
+                .Include(fp => fp.UnitGroup.UnitConversion)
+                .Select()
+                .Select(fp => Transform(fp)).ToList();
         }
 
         /// <summary>

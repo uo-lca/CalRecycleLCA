@@ -23,55 +23,79 @@ namespace Entities.Models {
         
     }
 
-    public class ScenarioParamResource {
+    /// <summary>
+    /// ParamResource describes a parameter.  
+    /// Parameters are uniquely determined by a ScenarioID and either one or two internal 
+    /// reference IDs, depending on the param type.  
+    ///    ParamType:      1   2   3   4   5   6   7   8   9   10
+    ///    FragmentFlowID  X   X
+    /// CompositionDataID                 (x)
+    ///            FlowID              X       X  (x)  X  (x)  X
+    ///    FlowPropertyID              X
+    ///         ProcessID                      X  (x)  X  (x) 
+    ///      LCIAMethodID                                      X
+    /// 
+    /// Notes: ParamTypeID = 3 is not used / obsolete.
+    /// ParamTypeID = 5 is not yet implemented
+    /// ParamTypeID = 7, 9 are not going to be implemented
+    /// </summary>
+    public class ParamResource {
         
         // from Param table
         public int ParamID { get; set; }
         public int ParamTypeID { get; set; }
         public int ScenarioID { get; set; }
         public string Name { get; set; }
-        // joined from DependencyParam-- nullable -- frontend should 
+        // For ParamTypeID == 1, 2 [ 3 is irrelevant]
         public int? FragmentFlowID { get; set; }
-        // joined from FlowPropertyParam
-        public int? FlowFlowPropertyID { get; set; }
-        // joined from ProcessDissipationParam
-        public int? ProcessDissipationID { get; set; }
-        // joined from ProcessEmissionParam
-        public int? ProcessFlowID { get; set; }
-        // joined from CharacterizationParam
-        public int? LCIAID { get; set; }
-        // joined from whatever target table was indicated above
+        // For ParamTypeID == 5 // note: not yet implemented
+        public int? CompositionDataID { get; set; }
+        // For ParamTypeID == 4, 6, 8, 10
+        public int? FlowID { get; set; }
+        // For ParamTypeID == 4
+        public int? FlowPropertyID { get; set; }
+        // For ParamTypeID == 6, 8 [ 7, 9 will not be implemented]
+        public int? ProcessID { get; set; }
+        // For ParamTypeID == 10
+        public int? LCIAMethodID { get; set; }
+        // common to all
         public float Value { get; set; }
     }
 
-    public class NodeSubstitution {
 
-        // from FragmentFlow
-        public int FragmentFlowID { get; set; }
-        public int NodeTypeID { get; set; }
-        // node type 1
-        // from FragmentNodeProcess
-        public int DefaultProcessID { get; set; }
-        // from ProcessSubstitution
-        public int SubstituteProcessID { get; set; }
-        // node type 2
-        // from FragmentNodeFragment
-        public int DefaultFragmentID { get; set; }
-        // from ProcessSubstitution
-        public int SubstituteFragmentID { get; set; }
-    }
-
-    /*************
-    public class ScenarioSubstitutionResource {
-        
+    public class NodeSubstitutionResource {
         public int ScenarioID { get; set; }
-        // ScenarioBackground
-        public ICollection<BackgroundResource> ScenarioBackgrounds { get; set; }
-        // ProcessSubstitution and FragmentSubstitution
-        // or should these be separate classes?
-        public ICollection<NodeSubstitution> ScenarioNodeSubstitutions { get; set; }
-        // composition substitution later
+        public int FragmentFlowID { get; set; }
+        public int SubstituteILCDEntityID { get; set; }
     }
-     * *************/
+
+    public class BackgroundSubstutitionResource {
+        public int ScenarioID { get; set ; }
+        public int FlowID { get; set; }
+        public int DirectionID { get; set; }
+        public int SubstituteILCDEntityID { get; set; }
+    }
+
+    /* **************
+     * This will wait until composition stuff is fixed in the schema
+    public class CompositionSubstitutionResource {
+        public int ScenarioID { get; set; }
+
+    }
+     * ************ */
+
+    /// <summary>
+    /// The set of params and substitutions associated with a given scenario.
+    /// </summary>
+    public class ScenarioDetailResource {
+
+        public int ScenarioID { get; set; }
+        public IEnumerable<ParamResource> ScenarioParams { get; set; }
+
+        public IEnumerable<NodeSubstitutionResource> NodeSubstitutions { get; set; }
+        public IEnumerable<BackgroundSubstutitionResource> BackgroundSubstitutions { get; set; }
+        // public IEnumerable<CompositionSubstitutionResource> CompositionSubstitutions { get; set; }
+    }
+
 }
 
