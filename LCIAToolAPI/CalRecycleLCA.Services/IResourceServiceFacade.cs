@@ -14,9 +14,11 @@ namespace CalRecycleLCA.Services
         IEnumerable<FragmentResource> GetFragmentResources();
         FragmentResource GetFragmentResource(int fragmentID);
         IEnumerable<FragmentFlowResource> GetFragmentFlowResources(int fragmentID, int scenarioID = 0);
+        IEnumerable<FlowResource> GetFlows(int flowtypeID);
         IEnumerable<FlowResource> GetFlowsByFragment(int fragmentID);
         IEnumerable<FragmentStageResource> GetStagesByFragment(int fragmentID = 0);
         IEnumerable<ProcessFlowResource> GetProcessFlows(int processID);
+        IEnumerable<FlowPropertyResource> GetFlowProperties();
         IEnumerable<FlowPropertyResource> GetFlowPropertiesByFragment(int fragmentID);
         IEnumerable<FlowPropertyResource> GetFlowPropertiesByProcess(int processID);
         LCIAResultResource GetFragmentLCIAResults(int fragmentID, int lciaMethodID, int scenarioID = 0);
