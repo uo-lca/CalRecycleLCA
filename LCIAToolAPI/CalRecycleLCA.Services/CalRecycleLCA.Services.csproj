@@ -139,7 +139,6 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="BackgroundService.cs" />
-    <Compile Include="BackgroundSubstitutionService.cs" />
     <Compile Include="CategoryService.cs" />
     <Compile Include="CharacterizationParamService.cs" />
     <Compile Include="ClassificationService.cs" />
@@ -153,6 +152,7 @@
     <Compile Include="FragmentFlowService.cs" />
     <Compile Include="FragmentLCIAComputation.cs" />
     <Compile Include="FragmentService.cs" />
+    <Compile Include="FragmentStageService.cs" />
     <Compile Include="FragmentSubstitutionService.cs" />
     <Compile Include="FragmentTraversalV2.cs" />
     <Compile Include="IFragmentLCIAComputation.cs" />

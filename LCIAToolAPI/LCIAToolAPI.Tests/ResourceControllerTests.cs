@@ -28,6 +28,7 @@ namespace LCIAToolAPI.Tests
         private IClassificationService _classificationService;
         private IFragmentService _fragmentService;
         private IFragmentFlowService _fragmentFlowService;
+        private IFragmentStageService _fragmentStageService;
         private IFlowService _flowService;
         private IFlowPropertyService _flowPropertyService;
         private FlowTypeService _flowTypeService;
@@ -46,7 +47,7 @@ namespace LCIAToolAPI.Tests
         private IScoreCacheService _scoreCacheService;
         private IProcessSubstitutionService _processSubstitutionService;
         private IFragmentSubstitutionService _fragmentSubstitutionService;
-        private IBackgroundSubstitutionService _backgroundSubstitutionService;
+        //private IBackgroundSubstitutionService _backgroundSubstitutionService;
         private IBackgroundService _backgroundService;
         private IProcessEmissionParamService _processEmissionParamService;
         private IFlowPropertyEmissionService _flowPropertyEmissionService;
@@ -77,6 +78,7 @@ namespace LCIAToolAPI.Tests
         private Mock<IRepositoryAsync<Classification>> _mockClassificationRepository;
         private Mock<IRepositoryAsync<Fragment>> _mockFragmentRepository;
         private Mock<IRepositoryAsync<FragmentFlow>> _mockFragmentFlowRepository;
+        private Mock<IRepositoryAsync<FragmentStage>> _mockFragmentStageRepository;
         private Mock<IRepositoryAsync<Flow>> _mockFlowRepository;
         private Mock<IRepositoryAsync<FlowProperty>> _mockFlowPropertyRepository;
         private Mock<IRepositoryAsync<FlowType>> _mockFlowTypeRepository;
@@ -114,6 +116,7 @@ namespace LCIAToolAPI.Tests
             _mockClassificationRepository = new Mock<IRepositoryAsync<Classification>>();
             _mockFragmentRepository = new Mock<IRepositoryAsync<Fragment>>();
             _mockFragmentFlowRepository = new Mock<IRepositoryAsync<FragmentFlow>>();
+            _mockFragmentStageRepository = new Mock<IRepositoryAsync<FragmentStage>>();
             _mockFlowRepository = new Mock<IRepositoryAsync<Flow>>();
             _mockFlowPropertyRepository = new Mock<IRepositoryAsync<FlowProperty>>();
             _mockImpactCategoryRepository = new Mock<IRepositoryAsync<ImpactCategory>>();
@@ -149,6 +152,7 @@ namespace LCIAToolAPI.Tests
             _classificationService = new ClassificationService(_mockClassificationRepository.Object);
             _fragmentService = new FragmentService(_mockFragmentRepository.Object);
             _fragmentFlowService = new FragmentFlowService(_mockFragmentFlowRepository.Object);
+            _fragmentStageService = new FragmentStageService(_mockFragmentStageRepository.Object);
             _flowService = new FlowService(_mockFlowRepository.Object);
             _flowPropertyService = new FlowPropertyService(_mockFlowPropertyRepository.Object);
             _impactCategoryService = new ImpactCategoryService(_mockImpactCategoryRepository.Object);
@@ -167,7 +171,7 @@ namespace LCIAToolAPI.Tests
             _scoreCacheService = new ScoreCacheService(_mockScoreCacheRepository.Object);
             _processSubstitutionService = new ProcessSubstitutionService(_mockProcessSubstitutionRepository.Object);
             _fragmentSubstitutionService = new FragmentSubstitutionService(_mockFragmentSubstitutionRepository.Object);
-            _backgroundSubstitutionService = new BackgroundSubstitutionService(_mockBackgroundSubstitutionRepository.Object);
+            //_backgroundSubstitutionService = new BackgroundSubstitutionService(_mockBackgroundSubstitutionRepository.Object);
             _backgroundService = new BackgroundService(_mockBackgroundRepository.Object);
             _processEmissionParamService = new ProcessEmissionParamService(_mockProcessEmissionParamRepository.Object);
             _flowPropertyEmissionService = new FlowPropertyEmissionService(_mockFlowPropertyEmissionRepository.Object);
@@ -228,6 +232,7 @@ _unitOfWork);
                                _classificationService,
                                _fragmentService,
                                _fragmentFlowService,
+                               _fragmentStageService,
                                _fragmentTraversalV2,
                                _fragmentLCIAComputation,
                                _flowService,

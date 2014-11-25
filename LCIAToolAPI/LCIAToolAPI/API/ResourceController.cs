@@ -29,12 +29,44 @@ namespace LCAToolAPI.API
             _ResourceService = resourceService;
         }
 
+        /// <summary>
+        /// List all flows in the database.
+        /// </summary>
+        /// <returns></returns>
+        [Route("api/flows")]
+        [Route("api/flowtypes/{flowtypeID:int}/flows")]
+        [HttpGet]
+        public IEnumerable<FlowResource> GetFlows(int flowtypeID = 0)
+        {
+            return _ResourceService.GetFlows(flowtypeID);
+        }
+
+        /// <summary>
+        /// List enumerated flow types.  1-- Intermediate.  2-- Elementary.
+        /// </summary>
+        /// <returns></returns>
         [Route("api/flowTypes")]
         [HttpGet]
         public IEnumerable<FlowTypeResource> GetFlowTypes() {
             return _ResourceService.GetFlowTypes();
         }
 
+        /// <summary>
+        /// List all flowproperties in the database.
+        /// </summary>
+        /// <returns></returns>
+        [Route("api/flowproperties")]
+        [HttpGet]
+        public IEnumerable<FlowPropertyResource> GetFlowProperties()
+        {
+            return _ResourceService.GetFlowProperties();
+        }
+
+        /// <summary>
+        /// Get the list of all scenarios eligible to be viewed given the connection's authorization.
+        /// Note: authorization is presently not implemented.
+        /// </summary>
+        /// <returns></returns>
         [Route("api/scenarios")]
         [HttpGet]
         public IEnumerable<ScenarioResource> GetScenarios()
@@ -46,12 +78,21 @@ namespace LCAToolAPI.API
             return _ResourceService.GetScenarios();
         }
 
+        /// <summary>
+        /// Get the list of all fragments in the DB.
+        /// </summary>
+        /// <returns></returns>
         [Route("api/fragments")]
         [HttpGet]
         public IEnumerable<FragmentResource> GetFragments() {
             return _ResourceService.GetFragmentResources();
         }
 
+        /// <summary>
+        /// a little-seen stub method to return a single FragmentResource.
+        /// </summary>
+        /// <param name="fragmentID"></param>
+        /// <returns></returns>
         [Route("api/fragments/{fragmentID:int}")]
         [HttpGet]
         public FragmentResource GetFragment(int fragmentID) {
@@ -85,6 +126,13 @@ namespace LCAToolAPI.API
         // }
 
         // Fragments //////////////////////////////////////////////////////////////
+        /// <summary>
+        /// Returns a list of FragmentFlows belonging to a fragment.. i.e. the links in the 
+        /// fragment tree structure.  Optionally specify a scenarioID.
+        /// </summary>
+        /// <param name="fragmentID"></param>
+        /// <param name="scenarioID"></param>
+        /// <returns>FragmentFlowResource array</returns>
         [Route("api/fragments/{fragmentID:int}/fragmentflows")]
         [Route("api/scenarios/{scenarioID:int}/fragments/{fragmentID:int}/fragmentflows")]
         [HttpGet]
@@ -106,6 +154,23 @@ namespace LCAToolAPI.API
             return _ResourceService.GetFlowsByFragment(fragmentID);
         }
 
+        /// <summary>
+        /// Return a table of FragmentStage resources.  FragmentStages are grouping units for nodes
+        /// in a fragment for the purposes of LCIA reporting.  Each fragment has its own distinct
+        /// stages, and every impact-generating flow belongs to one stage.
+        /// </summary>
+        /// <param name="fragmentID">if present, report only stages belonging to the specified fragment</param>
+        /// <returns>FragmentStageResource array</returns>
+        [Route("api/fragmentstages")]
+        [Route("api/stages")]
+        [Route("api/fragments/{fragmentID:int}/fragmentstages")]
+        [Route("api/fragments/{fragmentID:int}/stages")]
+        [HttpGet]
+        public IEnumerable<FragmentStageResource> GetStagesByFragment(int fragmentID = 0)
+        {
+            return _ResourceService.GetStagesByFragment(fragmentID);
+        }
+        
         // lists all flow properties associated with fragment flows
         [Route("api/fragments/{fragmentID:int}/flowproperties")]
         [HttpGet]

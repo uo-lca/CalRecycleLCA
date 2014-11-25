@@ -34,6 +34,8 @@ namespace CalRecycleLCA.Services
         [Inject]
         private readonly IFragmentFlowService _FragmentFlowService;
         [Inject]
+        private readonly IFragmentStageService _FragmentStageService;
+        [Inject]
         private readonly IFlowService _FlowService;
         [Inject]
         private readonly IFlowPropertyService _FlowPropertyService;
@@ -82,6 +84,7 @@ namespace CalRecycleLCA.Services
                                IClassificationService classificationService,
                                IFragmentService fragmentService,
                                IFragmentFlowService fragmentFlowService,
+                               IFragmentStageService fragmentStageService,   
                                IFragmentTraversalV2 fragmentTraversalV2,
                                IFragmentLCIAComputation fragmentLCIAComputation,
                                IFlowService flowService,
@@ -101,6 +104,7 @@ namespace CalRecycleLCA.Services
             _ClassificationService = verifiedDependency(classificationService);
             _FragmentService = verifiedDependency(fragmentService);
             _FragmentFlowService = verifiedDependency(fragmentFlowService);
+            _FragmentStageService = verifiedDependency(fragmentStageService);
             _FragmentLCIAComputation = verifiedDependency(fragmentLCIAComputation);
             _FragmentTraversalV2 = verifiedDependency(fragmentTraversalV2);         
             _FlowService = verifiedDependency(flowService);
@@ -225,6 +229,7 @@ namespace CalRecycleLCA.Services
             int? nullID = null;
             return new FragmentFlowResource {
                 FragmentFlowID = ff.FragmentFlowID,
+                FragmentStageID = ff.FragmentStageID,
                 Name = ff.Name,
                 ShortName = ff.ShortName,
                 NodeTypeID = TransformNullable(ff.NodeTypeID, "FragmentFlow.NodeTypeID"),
@@ -269,6 +274,16 @@ namespace CalRecycleLCA.Services
                 ReferenceFlowPropertyID = TransformNullable(f.ReferenceFlowProperty, "Flow.ReferenceFlowProperty"),
                 CASNumber = f.CASNumber,
                 Category = categoryName
+            };
+        }
+
+        public FragmentStageResource Transform(FragmentStage s)
+        {
+            return new FragmentStageResource
+            {
+                FragmentStageID = s.FragmentStageID,
+                FragmentID = s.FragmentID,
+                Name = s.StageName
             };
         }
 
@@ -335,7 +350,7 @@ namespace CalRecycleLCA.Services
             //    details = m.NodeLCIAResults.Select(k => Transform(k)).ToList();
 
             return new AggregateLCIAResource {
-                FragmentFlowID = TransformNullable(m.FragmentFlowID, "FragmentLCIAModel.FragmentFlowID"),
+                FragmentStageID = TransformNullable(m.FragmentStageID, "FragmentLCIAModel.FragmentFlowID"),
                 CumulativeResult = Convert.ToDouble(m.Result),
                 LCIADetail = new List<DetailedLCIAResource>()
                 //LCIADetail = details
@@ -396,31 +411,20 @@ namespace CalRecycleLCA.Services
         }
 
         /// <summary>
-        /// Get list of flows related to a fragment or a process-- eliminated. use
-        /// GetFlowsByFragment or GetProcessFlows.
+        /// Get list of all flows.  Optional flowtypeID is 1 = Intermediate, 2 = Elementary, 0 = both
         /// </summary>
-        /// <param name="relType">Relationship class type (FragmentFlow or ProcessFlow)</param>
+        /// <param name="flowtypeID">from FlowType</param>
         /// <param name="relID">ID of related fragment or process</param>
         /// <returns>List of FlowResource objects</returns>
-        /*********
-         * public IEnumerable<FlowResource> GetFlows(Type relType, int relID)
+        public IEnumerable<FlowResource> GetFlows(int flowtypeID)
         {
-            IEnumerable<Flow> flowQuery;
-            if (relType == typeof(FragmentFlow))
-            {
-                flowQuery = _FlowService.Query(f => f.FragmentFlows.Any(ff => ff.FragmentID == relID))
-                    .Include(x => x.FragmentFlows)
-                    .Select().ToList();
-            }
-            else // if (relType == typeof(ProcessFlow))
-            {
-                flowQuery = _FlowService.Query(f => f.ProcessFlows.Any(pf => pf.ProcessID == relID))
-                    .Include(x => x.ProcessFlows)
-                    .Select().ToList();
-            }
-            return flowQuery.Select(f => Transform(f)).ToList();
+            if (flowtypeID == 0)
+                return _FlowService.Query().Select()
+                    .Select(f => Transform(f)).ToList();
+            else
+                return _FlowService.Query(f => f.FlowTypeID == flowtypeID).Select()
+                    .Select(f => Transform(f)).ToList();
         }
-        ************** */
 
         /// <summary>
         /// Get list of flows related to a fragment (via FragmentFlow)
@@ -435,6 +439,19 @@ namespace CalRecycleLCA.Services
                 .Select(f => Transform(f)).ToList();
             // return flowQuery.Select(f => Transform(f)).ToList();
         }
+
+        public IEnumerable<FragmentStageResource> GetStagesByFragment(int fragmentID)
+        {
+            if (fragmentID == 0)
+                return _FragmentStageService.Query()
+                    .Select()
+                    .Select(s => Transform(s)).ToList();
+            else
+                return _FragmentStageService.Query(s => s.FragmentID == fragmentID)
+                    .Select()
+                    .Select(s => Transform(s)).ToList();
+        }
+
 
         /// <summary>
         /// Get list of processflow resources.  
@@ -463,6 +480,18 @@ namespace CalRecycleLCA.Services
                                                 .Select()
                                                 .Select(pf => Transform(pf)).ToList();
             }
+        }
+
+        /// <summary>
+        /// Return all flowproperties
+        /// </summary>
+        /// <returns></returns>
+        public IEnumerable<FlowPropertyResource> GetFlowProperties()
+        {
+            return _FlowPropertyService.Query()
+                .Include(fp => fp.UnitGroup.UnitConversion)
+                .Select()
+                .Select(fp => Transform(fp)).ToList();
         }
 
         /// <summary>
@@ -610,12 +639,12 @@ namespace CalRecycleLCA.Services
             IEnumerable<FragmentLCIAModel> aggResults = _FragmentLCIAComputation.ComputeFragmentLCIA(fragmentID, scenarioID, lciaMethodID)
                 .GroupBy(r => new
                 {
-                    r.FragmentFlowID,
+                    r.FragmentStageID,
                     r.LCIAMethodID
                 })
                 .Select(group => new FragmentLCIAModel
                 {
-                    FragmentFlowID = group.Key.FragmentFlowID,
+                    FragmentStageID = group.Key.FragmentStageID,
                     LCIAMethodID = group.Key.LCIAMethodID,
                     Result = group.Sum(a => a.Result)
                 });

@@ -95,6 +95,7 @@ namespace LCAToolAPI.App_Start
             kernel.Bind(typeof(IRepositoryAsync<Classification>)).To(typeof(Repository<Classification>));
             kernel.Bind(typeof(IRepositoryAsync<Fragment>)).To(typeof(Repository<Fragment>));
             kernel.Bind(typeof(IRepositoryAsync<FragmentFlow>)).To(typeof(Repository<FragmentFlow>));
+            kernel.Bind(typeof(IRepositoryAsync<FragmentStage>)).To(typeof(Repository<FragmentStage>));
             kernel.Bind(typeof(IRepositoryAsync<Flow>)).To(typeof(Repository<Flow>));
             kernel.Bind(typeof(IRepositoryAsync<FlowProperty>)).To(typeof(Repository<FlowProperty>));
             kernel.Bind(typeof(IRepositoryAsync<FlowType>)).To(typeof(Repository<FlowType>));
@@ -128,6 +129,7 @@ namespace LCAToolAPI.App_Start
             kernel.Bind<IClassificationService>().To<ClassificationService>();
             kernel.Bind<IFragmentService>().To<FragmentService>();
             kernel.Bind<IFragmentFlowService>().To<FragmentFlowService>();
+            kernel.Bind<IFragmentStageService>().To<FragmentStageService>();
             kernel.Bind<IFlowService>().To<FlowService>();
             kernel.Bind<IFlowPropertyService>().To<FlowPropertyService>();
             kernel.Bind<IFlowTypeService>().To<FlowTypeService>();

@@ -13,6 +13,7 @@ namespace Entities.Models
     public class FragmentLCIAModel
     {
         public int? FragmentFlowID { get; set; }
+        public int? FragmentStageID { get; set; }
         public int LCIAMethodID { get; set; }
         public double? NodeWeight { get; set; }
         public double? ImpactScore { get; set; }
