@@ -46,9 +46,11 @@
     <Compile Include="LCIARepository.cs" />
     <Compile Include="FlowFlowPropertyRepository.cs" />
     <Compile Include="FragmentFlowRepository.cs" />
+    <Compile Include="NodeCacheRepository.cs" />
     <Compile Include="ProcessFlowRepository.cs" />
     <Compile Include="ProcessRepository.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="ScoreCacheRepository.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\Database\DataModel\LcaDataModel.csproj">

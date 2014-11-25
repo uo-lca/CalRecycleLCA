@@ -193,6 +193,63 @@ namespace LCAToolAPI.API
             return _ResourceService.GetProcessLCIAResult(processID, lciaMethodID, scenarioID);
         }
 
+        /// <summary>
+        /// Clear NodeCache data by ScenarioID
+        /// </summary>
+        /// <param name="scenarioId"></param>
+        [Route("api/scenarios/{scenarioID:int}/clearnodecaches")]
+        [HttpGet]
+        public void ClearNodeCacheByScenario(int scenarioId = 0)
+        {
+            _ResourceService.ClearNodeCacheByScenario(scenarioId);
+        }
+
+        /// <summary>
+        /// Clear NodeCache data by ScenarioID and FragmentID
+        /// </summary>
+        /// <param name="scenarioId"></param>
+        /// <param name="fragmentId"></param>
+        [Route("api/scenarios/{scenarioID:int}/fragments/{fragmentID:int}/clearnodecaches")]
+        [HttpGet]
+        public void ClearNodeCacheByScenarioAndFragment(int scenarioId = 0, int fragmentId = 0)
+        {
+            _ResourceService.ClearNodeCacheByScenarioAndFragment(scenarioId, fragmentId);
+        }
+
+        /// <summary>
+        /// Clear ScoreCache data by ScenarioID
+        /// </summary>
+        /// <param name="scenarioId"></param>
+        [Route("api/scenarios/{scenarioID:int}/clearscorecaches")]
+        [HttpGet]
+        public void ClearScoreCacheByScenario(int scenarioId = 0)
+        {
+            _ResourceService.ClearScoreCacheByScenario(scenarioId);
+        }
+
+        /// <summary>
+        /// Clear ScoreCache data by ScenarioID and FragmentID
+        /// </summary>
+        /// <param name="scenarioId"></param>
+        /// <param name="fragmentId"></param>
+        [Route("api/scenarios/{scenarioID:int}/fragments/{fragmentID:int}/clearscorecaches")]
+        [HttpGet]
+        public void ClearScoreCacheByScenarioAndFragment(int scenarioId = 0, int fragmentId = 0)
+        {
+            _ResourceService.ClearScoreCacheByScenarioAndFragment(scenarioId, fragmentId);
+        }
+
+        /// <summary>
+        /// Clear ScoreCache data by ScenarioID and LCIAMethodID
+        /// </summary>
+        /// <param name="scenarioId"></param>
+        /// <param name="fragmentId"></param>
+        [Route("api/scenarios/{scenarioID:int}/lciamethods/{lciaMethodID:int}/clearscorecaches")]
+        [HttpGet]
+        public void ClearScoreCacheByScenarioAndLCIAMethod(int scenarioId = 0, int lciaMethodId = 0)
+        {
+            _ResourceService.ClearScoreCacheByScenarioAndLCIAMethod(scenarioId, lciaMethodId);
+        }
 
         /* TODO:
          * 

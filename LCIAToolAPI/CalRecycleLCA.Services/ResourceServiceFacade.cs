@@ -49,6 +49,12 @@ namespace CalRecycleLCA.Services
         private readonly IProcessFlowService _ProcessFlowService;
         [Inject]
         private readonly IScenarioService _ScenarioService;
+        [Inject]
+        private readonly INodeCacheService _NodeCacheService;
+        [Inject]
+        private readonly IScoreCacheService _ScoreCacheService;
+        [Inject]
+        private readonly IUnitOfWork _unitOfWork;
         //
         // Traversal and Computation components
         //
@@ -86,7 +92,10 @@ namespace CalRecycleLCA.Services
                                ILCIAMethodService lciaMethodService,
                                IProcessService processService,
                                IProcessFlowService processFlowService,
-                               IScenarioService scenarioService) 
+                               IScenarioService scenarioService,
+                               INodeCacheService nodeCacheService,
+                               IScoreCacheService scoreCacheService,
+                               IUnitOfWork unitOfWork) 
         {
             _CategoryService = verifiedDependency(categoryService);
             _ClassificationService = verifiedDependency(classificationService);
@@ -103,6 +112,9 @@ namespace CalRecycleLCA.Services
             _ProcessService = verifiedDependency(processService);
             _ProcessFlowService = verifiedDependency(processFlowService);
             _ScenarioService = verifiedDependency(scenarioService);
+            _NodeCacheService = verifiedDependency(nodeCacheService);
+            _ScoreCacheService = verifiedDependency(scoreCacheService);
+            _unitOfWork = verifiedDependency(unitOfWork);
         }
         #endregion
 
@@ -656,6 +668,52 @@ namespace CalRecycleLCA.Services
                 Name = d.Name
             }).ToList();
         }
+
+        /// <summary>
+        /// Delete NodeCache data by ScenarioId
+        /// </summary>
+        public void ClearNodeCacheByScenario(int scenarioId = 0)
+        {
+            _NodeCacheService.ClearNodeCacheByScenario(scenarioId);
+            _unitOfWork.SaveChanges();
+        }
+
+        /// <summary>
+        /// Delete NodeCache data by ScenarioID and FragmentID
+        /// </summary>
+        public void ClearNodeCacheByScenarioAndFragment(int scenarioId = 0, int fragmentId = 0)
+        {
+            _NodeCacheService.ClearNodeCacheByScenarioAndFragment(scenarioId, fragmentId);
+            _unitOfWork.SaveChanges();
+        }
+
+        /// <summary>
+        /// Delete ScoreCache data by ScenarioId
+        /// </summary>
+        public void ClearScoreCacheByScenario(int scenarioId = 0)
+        {
+            _ScoreCacheService.ClearScoreCacheByScenario(scenarioId);
+            _unitOfWork.SaveChanges();
+        }
+
+        /// <summary>
+        /// Delete ScoreCache data by ScenarioID and FragmentID
+        /// </summary>
+        public void ClearScoreCacheByScenarioAndFragment(int scenarioId = 0, int fragmentId = 0)
+        {
+            _ScoreCacheService.ClearScoreCacheByScenarioAndFragment(scenarioId, fragmentId);
+            _unitOfWork.SaveChanges();
+        }
+
+        /// <summary>
+        /// Delete ScoreCache data by ScenarioID and LCIAMethodID
+        /// </summary>
+        public void ClearScoreCacheByScenarioAndLCIAMethod(int scenarioId = 0, int lciaMethodId = 0)
+        {
+            _ScoreCacheService.ClearScoreCacheByScenarioAndLCIAMethod(scenarioId, lciaMethodId);
+            _unitOfWork.SaveChanges();
+        }
+
         #endregion
     }
 }

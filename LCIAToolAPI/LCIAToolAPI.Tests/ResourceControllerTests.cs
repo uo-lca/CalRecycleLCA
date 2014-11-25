@@ -238,7 +238,10 @@ _unitOfWork);
                                _lciaMethodService,
                                _processService,
                                _processFlowService,
-                               _scenarioService);
+                               _scenarioService, 
+                               _nodeCacheService, 
+                               _scoreCacheService, 
+                               _unitOfWork);
 
         }
 

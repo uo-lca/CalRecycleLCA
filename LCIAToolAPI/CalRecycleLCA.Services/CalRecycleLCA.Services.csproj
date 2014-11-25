@@ -159,7 +159,9 @@
     <Compile Include="IFragmentTraversalV2.cs" />
     <Compile Include="ILCIAComputationV2.cs" />
     <Compile Include="ImpactCategoryService.cs" />
+    <Compile Include="INodeCacheService.cs" />
     <Compile Include="IResourceServiceFacade.cs" />
+    <Compile Include="IScoreCacheService.cs" />
     <Compile Include="ITestGenericService.cs" />
     <Compile Include="LCIAComputationV2.cs" />
     <Compile Include="LCIAMethodService.cs" />

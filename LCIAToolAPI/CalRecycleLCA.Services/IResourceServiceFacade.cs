@@ -24,5 +24,10 @@ namespace CalRecycleLCA.Services
         IEnumerable<ImpactCategoryResource> GetImpactCategories();
         LCIAResultResource GetProcessLCIAResult(int processID, int lciaMethodID, int scenarioID = 0);
         IEnumerable<FlowTypeResource> GetFlowTypes();
+        void ClearNodeCacheByScenario(int scenarioId);
+        void ClearNodeCacheByScenarioAndFragment(int scenarioId = 0, int fragmentId = 0);
+        void ClearScoreCacheByScenario(int scenarioId = 0);
+        void ClearScoreCacheByScenarioAndFragment(int scenarioId = 0, int fragmentId = 0);
+        void ClearScoreCacheByScenarioAndLCIAMethod(int scenarioId = 0, int lciaMethodId = 0);
     }
 }
