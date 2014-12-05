@@ -1,3 +1,102 @@
+==============
+Fri Dec 5 2014
+
+Summary of discussions regarding the front-end app to date.
+
+========================
+Initial View / Home Page
+========================
+
+We assume user authentication will be handled by Ryan @ CalRecycle.
+The app's initial view will appear after the user logs in.
+
+Brandon has requested that the initial view contain a list of  
+scenarios and a list of LCIA methods. He is open to Sabina's suggestion that 
+the initial view be a visualization that provides a bird's eye view of 
+all LCIA results. This visualization would contain links that would allow 
+the user to drill down to more detailed views.
+
+------------------
+Scenario List View
+------------------
+Table of user's scenarios containing hyperlinks to other views
+Scenario name 		-> Scenario Parameter View
+Top-Level Fragment name -> Fragment Sankey View
+
+-----------------------
+Scenario Parameter View
+-----------------------
+Contains table of all parameters for the selected scenario and displays 
+user's pending changes to the parameters.
+
+ * Parameter table columns
+   - Type
+   - Descriptor (auto-generated)
+   - Name (optional, created by user)
+   - Original value (current value before change?)
+   - New value (pending value change?)
+
+ User clicks on Apply button to send parameter changes to back end via web API.
+ Parameter changes will impact results, so the front-end should clear its own
+ cached results and get new results from the web API after the Apply action.
+
+---------------------
+LCIA Method List View
+---------------------
+Table of LCIA methods with check box column that allows user to choose which 
+methods will be shown in LCIA result views.
+LCIA method name will be a hyperlink to LCIA detail view.
+
+-----------------------
+LCIA Method Detail View
+-----------------------
+ * Displays LCIA Method properties
+
+ * Contains table of all LCIA Characterization Factors for the selected method.
+   For every factor that has a parameter, the parameter will be displayed on the 
+   same row.
+   Table columns:
+   - Flow name
+   - Composition
+   - Name (optional, created by user)
+   - Original value (current value before change?)
+   - New value (pending value change?)
+   
+ * User may create and update LCIA Characterization Factor parameters here. 
+   These changes should not be sent to the web API immediately. 
+   They should appear in the Scenario Detail view as pending changes.
+
+ * LCIA Factor table columns
+   - Flow Name
+   - Composition
+   - Factor
+   - Parameter name (optional)
+   - Parameter value
+
+------------------------
+Process LCIA Detail View
+------------------------
+User navigates here from a process node in the Fragment Sankey view. 
+Therefore, this view has a scenario, fragment flow, and process context.
+The activity level from fragment flow navigation is also applied.
+
+For every active LCIA method, if details are in process LCIA results,
+this view contains a segmented bar chart of Process LCIA result details. 
+Relevant parameters should be displayed near the result details.
+The relevant parameter types are 4, 6, 8, and 10?
+
+=========
+Questions
+=========
+
+ 1. How/where is parameter descriptor generated?
+ 2. Please specify web API actions to execute when parameter changes are applied.
+ 3. Do we have a web API method for getting LCIA characterization factors?
+ 4. LCIA Method Detail view does not have scenario context.
+    How will user assign LCIA Characterization Factor parameter to scenario?
+ 5. Need help describing the parameter table in the Process LCIA details view.
+    
+
 ==========
 Mon Sep 15 23:08:04 PDT 2014
 
