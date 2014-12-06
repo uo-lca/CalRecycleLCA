@@ -10,6 +10,11 @@ Initial View / Home Page
 We assume user authentication will be handled by Ryan @ CalRecycle.
 The app's initial view will appear after the user logs in.
 
+[BK] The app will need to store some kind of authentication token it
+receives from CalRecycle, and send it as a URL parameter for every request
+that requires authentication (basically, for every request that begins with
+/scenarios/x/... where the requested scenario is not in ScenarioGroup 0).
+
 Brandon has requested that the initial view contain a list of  
 scenarios and a list of LCIA methods. He is open to Sabina's suggestion that 
 the initial view be a visualization that provides a bird's eye view of 
@@ -85,17 +90,72 @@ this view contains a segmented bar chart of Process LCIA result details.
 Relevant parameters should be displayed near the result details.
 The relevant parameter types are 4, 6, 8, and 10?
 
+[BK] Type 4 params are not relevant to the Process LCIA view.  For now,
+only type 8+10 are relevant.  (Type 5+6 would be relevant if the dissipation
+code ever gets written.)
+
+
 =========
 Questions
 =========
 
  1. How/where is parameter descriptor generated?
+
+    [BK] the parameter descriptor is simply the concatenation of names of
+    the IDs listed in the ParamResource-- e.g. Process and Flow for types 6
+    and 8; LCIA Method + Flow for type 10; FragmentFlow for types 1+2.
+
+    They should be generated on the fly from the front end in the Scenario
+    Detail View only.  They are not needed elsewhere.
+
  2. Please specify web API actions to execute when parameter changes are applied.
+
+    [BK] PUT or POST a list of ParamResources.  Alternatively, PUT or POST
+    a ScenarioDetailResource containing a list of ParamResources.
+
+    Note-- I can't think of a good reason to distinguish between PUT and
+    POST methods.  Each param is uniquely determined by its reference
+    IDs... so, if the param doesn't exist, create it; if it does exist;
+    update it.  
+
+    If you think it's important to treat POST and PUT differently, then the
+    frontend will have to do two API calls- one to POST new params, and the
+    other to PUT changes to existing params.
+
  3. Do we have a web API method for getting LCIA characterization factors?
+
+    [BK] Not presently! I guess we need one.
+
  4. LCIA Method Detail view does not have scenario context.
     How will user assign LCIA Characterization Factor parameter to scenario?
+
+    [BK] The Frontend should have in mind an "active" scenario.  It should
+    also know whether the user is authorized to edit the active scenario.
+    This can be determined from the Scenario.ScenarioGroup entry.  If the
+    ScenarioGroup is 1, the scenario may not be edited.  If the
+    ScenarioGroup is non-1, it can be edited.
+
  5. Need help describing the parameter table in the Process LCIA details view.
-    
+
+    OK-- noted.    
+    Here's a try:
+    Flow Name | Flow Category | EF | CF | Result
+
+    EF = Emission Factor = ProcessFlow.Result 
+       	 	  	   OR Param.Value for Type 8 Params
+
+    CF = Characterization Factor = LCIA.Factor
+       	 		  	   OR Param.Value for Type 10 Params
+
+    Result = EF * CF
+
+    User should be able to select any EF and parameterize it, creating a
+    new type 8 param; or any CF and parameterize it, creating a new type 10
+    param. 
+
+
+
+
 
 ==========
 Mon Sep 15 23:08:04 PDT 2014
