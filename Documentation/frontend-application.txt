@@ -1,4 +1,153 @@
 ==============
+Mon Dec 8 2014
+
+Summary incorporating recent clarifications.
+
+==============
+Authentication
+==============
+User authentication will be done before app starts. The app will receive an
+authorization token which it will add to every web API request.
+
+========================
+Initial View / Home Page
+========================
+Initial view will contain list of scenarios and list of LCIA methods.
+User may select one active LCIA methods. Active scenario is selected via  
+navigation.
+Desired, but not required: bird's eye visualization of all results.
+(For example, grid of small bar charts displaying Fragment LCIA cumulative 
+ results).
+
+-------------
+Scenario List
+-------------
+Table of user's scenarios containing hyperlinks to other views
+Scenario name 		-> Scenario Detail View
+Top-Level Fragment name -> Fragment Sankey View
+
+User may create new scenario here.
+
+--------------------
+Scenario Detail View
+--------------------
+Contains table of all parameters for the selected scenario. 
+
+If the scenario is editable (scenariogroupid <> 1),
+then existing parameters may be updated or deleted. 
+
+ * Parameter table columns
+   - Type
+   - Descriptor: Name(s) of entity (or entities) related to the parameter.
+   - Name (optional, created by user)
+   - Original Value (unparameterized value)
+   - Parameter Value
+
+? How will front-end get original value for all types of parameters ?
+
+ User clicks on Apply button to send parameter changes to back end via web API.
+ Parameters are updated/deleted one at time. Back-end will clear related 
+ cache records. The front-end will clear its own caches of LCIA results. 
+ 
+ Note: Computation will be performed, and cache records generated as needed when 
+  LCIA results are queried via web API.
+
+---------------------
+LCIA Method List View
+---------------------
+Table of LCIA methods with check box column that allows user to choose which 
+methods will be shown in LCIA result views.
+LCIA method name will be a hyperlink to LCIA detail view.
+
+-----------------------
+LCIA Method Detail View
+-----------------------
+
+ * Displays LCIA Method properties
+
+ * Contains table of all LCIA Characterization Factors for the selected method.
+   For every factor that has a parameter in the "active" scenario, 
+   the parameter will be displayed on the same row.
+   Since this view does not have a scenario parent view, it will allow the user 
+   to select the active scenario.
+
+ * If user is allowed to update scenario,
+    user may create, update, delete LCIA Characterization Factor parameters here.
+    New parameters may be created.
+
+   Front-end clears its own LCIA result caches after scenario 
+   parameter changes.
+
+ * LCIA Factor table columns
+   - Flow Name
+   - Composition
+   - Factor
+   - Parameter name (optional)
+   - Parameter value
+
+**********************************************************************************
+New Parameter Constraint: The thing that is parameterized in the scenario can only  one 
+have one parameter of a particular type.
+For example, if an LCIA Characterization Factor has a type 10 parameter in the 
+active scenario, then the user will be prevented from creating another 
+type 10 parameter for that factor.
+**********************************************************************************
+
+--------------------
+Fragment Sankey View
+--------------------
+The table of inputs and outputs in the fragment sankey view should be 
+parameterizable, generating type 1 params.  type 4 params would be accessed by 
+looking at the flowproperties belonging to a given fragmentflow, but that is 
+not a priority.
+
+TBD:
+Interface for editing Dependency parameters 
+(relevant to fragment node input/output flows)
+Interface for editing Flow Property parameters
+
+------------------
+Process LCIA View
+------------------
+User navigates here from a process node in the Fragment Sankey view. 
+Therefore, this view has a scenario, fragment flow, and process context.
+The activity level from fragment flow navigation is also applied.
+
+If the active scenario can be updated by the user, then the user will be
+allowed to change parameters relevant to Process LCIA (currently, ProcessEmission
+and LCIAFactor). 
+
+It is not feasible to display parameters in the current Process LCIA view. The 
+legend below the bar only display flows with significant magnitiude, and there 
+is no room in the current layout for new columns.
+
+Therefore, SB proposes adding a Process LCIA Parameter View where related 
+parameters can viewed, updated, added and deleted. Each active method in the
+Process LCIA view would have a link to the Process LCIA Parameter View.  
+
+---------------------------
+Process LCIA Parameter View
+---------------------------
+This view has scenario, fragment flow, process, and LCIA method context.
+It will display related ProcessEmission and LCIA Factor parameters. (In the future,
+other parameter types will be supported).
+
+If the user is allowed to update the scenario, then the user may edit the parameters 
+(create/delete/update).
+
+* Process LCIA Parameter table columns
+   - Flow Name
+   - Flow Category
+   - Factor
+   - Parameter name (optional)
+   - Parameter value
+
+After user Applies parameter changes, the front-end will clear its cache of Process LCIA 
+results for the active scneario and current process (? all active methods ?). 
+When the user returns to the Process LCIA view, new Process LCIA results will be loaded 
+and displayed.
+
+==============
 Fri Dec 5 2014
 
 Summary of discussions regarding the front-end app to date.
@@ -152,9 +301,6 @@ Questions
     User should be able to select any EF and parameterize it, creating a
     new type 8 param; or any CF and parameterize it, creating a new type 10
     param. 
-
-
-
 
 
 ==========
