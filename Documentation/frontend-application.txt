@@ -1,4 +1,37 @@
+===============================================================================
+Thur Dec 11 2014
+by SB
+
+Additions, Issues
+
 ==============
+Navigation Bar
+==============
+The top of the page will display a navigation bar in all views.
+Navigation bar links: Home page, Fragment LCIA, Process LCIA
+
+------------------
+Process LCIA View
+------------------
+If a user navigates here from the navigation bar, then this view will not have
+scenario and fragment navigation context. In that state, the view
+should allow the user to select a process with elementary flows.
+
+==================
+Issues / Questions
+==================
+1. Since parameters are updated, added, and deleted one at a time, there is no
+need for a pending parameter change queue. Should the scenario detail view still
+allow the user to view and change parameters? I don't see an easy way to get
+parameterized entities from the web API in that view. They will be needed in order to
+generate descriptor and original value. 
+In other views, the related entities are already loaded. 
+
+2. Would be helpful to have a summary of dependencies between parameters and
+results. In other words, for each parameter type, what type of result should be
+cleared from front-end cache when parameter is added/updated/deleted.
+
+===============================================================================
 Mon Dec 8 2014
 
 Summary incorporating recent clarifications.
