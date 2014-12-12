@@ -10,7 +10,7 @@ namespace LcaDataModel
     [Table("BackgroundSubstitution")]
     public partial class BackgroundSubstitution : Entity
     {
-        [DatabaseGenerated(DatabaseGeneratedOption.None)]
+        //[DatabaseGenerated(DatabaseGeneratedOption.None)]
         public int BackgroundSubstitutionID { get; set; }
 
         public int ScenarioID { get; set; }

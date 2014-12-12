@@ -13,7 +13,7 @@ namespace LcaDataModel
         public ProcessFlow()
         {
             NodeEmissionParams = new HashSet<NodeEmissionParam>();
-            ProcessDissipations = new HashSet<ProcessDissipation>();
+            //ProcessDissipations = new HashSet<ProcessDissipation>();
             ProcessEmissionParams = new HashSet<ProcessEmissionParam>();
         }
 
@@ -48,7 +48,7 @@ namespace LcaDataModel
 
         public virtual Process Process { get; set; }
 
-        public virtual ICollection<ProcessDissipation> ProcessDissipations { get; set; }
+        //public virtual ICollection<ProcessDissipation> ProcessDissipations { get; set; }
 
         public virtual ICollection<ProcessEmissionParam> ProcessEmissionParams { get; set; }
     }

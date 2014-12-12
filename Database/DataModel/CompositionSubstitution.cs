@@ -13,17 +13,17 @@ namespace LcaDataModel {
     {
         [Key]
         [Column(Order = 1)]
-        public int ProcessCompositionID { get; set; }
+        public int CompositionModelID { get; set; }
 
         [Key]
         [Column(Order = 2)]
         public int ScenarioID { get; set; }
 
-        public int CompositionModelID { get; set; }
+        public int SubstituteCompositionModelID { get; set; }
 
         // Navigation Properties
-        public virtual ProcessComposition ProcessComposition { get; set; }
-        public virtual Scenario Scenario { get; set; }
         public virtual CompositionModel CompositionModel { get; set; }
+        public virtual Scenario Scenario { get; set; }
+        public virtual CompositionModel SubstituteCompositionModel { get; set; }
     }
 }

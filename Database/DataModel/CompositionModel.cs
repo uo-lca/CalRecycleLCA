@@ -13,6 +13,7 @@ namespace LcaDataModel
         public CompositionModel()
         {
             CompositionDataSet = new HashSet<CompositionData>();
+            CompositionSubstitutions = new HashSet<CompositionSubstitution>();
         }
 
         [Key]
@@ -26,5 +27,7 @@ namespace LcaDataModel
         public virtual ICollection<CompositionData> CompositionDataSet { get; set; }
 
         public virtual Flow Flow { get; set; }
+
+        public virtual ICollection<CompositionSubstitution> CompositionSubstitutions { get; set; }
     }
 }

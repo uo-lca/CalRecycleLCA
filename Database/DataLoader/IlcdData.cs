@@ -185,7 +185,7 @@ namespace LcaDataLoader {
             }
             lcia = new LCIA { //FlowID = id, 
                               FlowUUID = uuid, FlowName = name,
-                              DirectionID = dirID, Factor = meanValue, Geography = location, LCIAMethodID = lciaMethodID };
+                              DirectionID = (int)dirID, Factor = meanValue, Geography = location, LCIAMethodID = lciaMethodID };
             return lcia;
         }
 

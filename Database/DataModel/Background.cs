@@ -15,7 +15,7 @@ namespace LcaDataModel
             BackgroundCaches = new HashSet<BackgroundCache>();
         }
 
-        [DatabaseGenerated(DatabaseGeneratedOption.None)]
+        //[DatabaseGenerated(DatabaseGeneratedOption.None)]
         public int BackgroundID { get; set; }
 
         public int FlowID { get; set; }

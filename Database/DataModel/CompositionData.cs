@@ -10,6 +10,11 @@ namespace LcaDataModel
     [Table("CompositionData")]
     public partial class CompositionData : Entity
     {
+        public CompositionData()
+        {
+            // reverse navigation property
+            CompositionParams = new HashSet<CompositionParam>();
+        }
         public int CompositionDataID { get; set; }
 
         public int CompositionModelID { get; set; }
@@ -21,5 +26,8 @@ namespace LcaDataModel
         public virtual CompositionModel CompositionModel { get; set; }
 
         public virtual FlowProperty FlowProperty { get; set; }
+
+        // reverse navigation property
+        public virtual IEnumerable<CompositionParam> CompositionParams { get; set; }
     }
 }

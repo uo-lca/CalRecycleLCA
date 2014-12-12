@@ -170,7 +170,7 @@ namespace CalRecycleLCA.Services
                         .First().Result; // First() should generate exception if no match is found
 
                     if (this_param != null)
-                        resultVal = (double)this_param.Value;
+                        resultVal = this_param.Value;
 
                     NodeRecurse(ff, ff_param, item.FragmentFlowID, scenarioId, nodeWeight * resultVal);
                 }

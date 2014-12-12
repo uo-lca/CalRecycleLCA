@@ -12,10 +12,10 @@ namespace LcaDataModel {
     public partial class ProcessComposition : Entity
     {
 
-        public ProcessComposition()
-        {
-            CompositionSubstitutions = new HashSet<CompositionSubstitution>();
-        }
+        // public ProcessComposition()
+        // {
+        //     CompositionSubstitutions = new HashSet<CompositionSubstitution>();
+        // }
 
         [DatabaseGenerated(DatabaseGeneratedOption.None)]
         public int ProcessCompositionID { get; set; }
@@ -28,7 +28,7 @@ namespace LcaDataModel {
 
         public virtual Process Process { get; set; }
 
-        public virtual ICollection<CompositionSubstitution> CompositionSubstitutions { get; set; }
+        // public virtual ICollection<CompositionSubstitution> CompositionSubstitutions { get; set; }
 
     }
 }

@@ -283,7 +283,7 @@ namespace CalRecycleLCA.Services
             {
                 FragmentStageID = s.FragmentStageID,
                 FragmentID = s.FragmentID,
-                Name = s.StageName
+                Name = s.Name
             };
         }
 

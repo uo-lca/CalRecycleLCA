@@ -100,8 +100,8 @@ namespace CalRecycleLCA.Repositories
                             Result = s.baseFlows.Result,
                             Param = efParams == null ? null : new ParamInstance
                             {
-                                ParamID = (int)efParams.ParamID,
-                                Value = (double)efParams.Value
+                                ParamID = efParams.ParamID,
+                                Value = efParams.Value
                             }
                         });
 

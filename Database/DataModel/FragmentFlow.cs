@@ -13,6 +13,7 @@ namespace LcaDataModel
         public FragmentFlow()
         {
             DependencyParams = new HashSet<DependencyParam>();
+            ConservationParams = new HashSet<ConservationParam>();
             Fragments = new HashSet<Fragment>();
             ChildFragmentFlows = new HashSet<FragmentFlow>();
             FragmentNodeFragments = new HashSet<FragmentNodeFragment>();
@@ -45,6 +46,7 @@ namespace LcaDataModel
         public int? ParentFragmentFlowID { get; set; }
 
         public virtual ICollection<DependencyParam> DependencyParams { get; set; }
+        public virtual ICollection<ConservationParam> ConservationParams { get; set; }
 
         public virtual Direction Direction { get; set; }
 

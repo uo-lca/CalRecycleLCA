@@ -61,6 +61,16 @@ namespace LcaDataModel {
         }
     }
 
+    public partial class CompositionParam : Entity, IEntity
+    {
+        [NotMapped]
+        public int ID
+        {
+            get { return CompositionParamID; }
+            set { CompositionParamID = value; }
+        }
+    }
+
     public partial class DependencyParam : Entity, IEntity
     {
         [NotMapped]
@@ -71,12 +81,42 @@ namespace LcaDataModel {
     }
 
     // Weak entity - related to DependencyParam
-    public partial class DistributionParam : Entity, IEntity
+    public partial class ConservationParam : Entity, IEntity
     {
         [NotMapped]
         public int ID {
             get { return DependencyParamID; }
             set { DependencyParamID = value; }
+        }
+    }
+
+    public partial class ProcessDissipationParam : Entity, IEntity
+    {
+        [NotMapped]
+        public int ID
+        {
+            get { return ProcessDissipationParamID; }
+            set { ProcessDissipationParamID = value; }
+        }
+    }
+
+    public partial class ProcessEmissionParam : Entity, IEntity
+    {
+        [NotMapped]
+        public int ID
+        {
+            get { return ProcessEmissionParamID; }
+            set { ProcessEmissionParamID = value; }
+        }
+    }
+
+    public partial class CharacterizationParam : Entity, IEntity
+    {
+        [NotMapped]
+        public int ID
+        {
+            get { return CharacterizationParamID; }
+            set { CharacterizationParamID = value; }
         }
     }
 
