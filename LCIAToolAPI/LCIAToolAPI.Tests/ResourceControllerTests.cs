@@ -245,7 +245,14 @@ _unitOfWork);
                                _processFlowService,
                                _scenarioService, 
                                _nodeCacheService, 
-                               _scoreCacheService, 
+                               _scoreCacheService,
+                               _paramService,
+                               _dependencyParamService,
+                               _flowFlowPropertyService,
+                               _flowPropertyParamService,
+                               _processEmissionParamService,
+                               _lciaService,
+                               _characterizationParamService,
                                _unitOfWork);
 
         }

@@ -11,6 +11,7 @@ using Repository.Pattern.UnitOfWork;
 using Service.Pattern;
 using System.Runtime.CompilerServices;
 using System.Collections;
+using Newtonsoft.Json.Linq;
 
 namespace CalRecycleLCA.Services
 {
@@ -21,6 +22,9 @@ namespace CalRecycleLCA.Services
     /// </summary>
     public class ResourceServiceFacade : IResourceServiceFacade
     {
+
+
+
         #region Dependency Injection
         //
         // LcaDataModel services
@@ -56,6 +60,20 @@ namespace CalRecycleLCA.Services
         [Inject]
         private readonly IScoreCacheService _ScoreCacheService;
         [Inject]
+        private readonly IParamService _ParamService;
+        [Inject]
+        private readonly IDependencyParamService _DependencyParamService;
+        [Inject]
+        private readonly IFlowFlowPropertyService _FlowFlowPropertyService;
+        [Inject]
+        private readonly IFlowPropertyParamService _FlowPropertyParamService;
+        [Inject]
+        private readonly IProcessEmissionParamService _ProcessEmissionParamService;
+        [Inject]
+        private readonly ILCIAService _LCIAService;
+        [Inject]
+        private readonly ICharacterizationParamService _CharacterizationParamService;
+        [Inject]
         private readonly IUnitOfWork _unitOfWork;
         //
         // Traversal and Computation components
@@ -67,11 +85,14 @@ namespace CalRecycleLCA.Services
         [Inject]
         private readonly ILCIAComputationV2 _LCIAComputation;
 
-        private T verifiedDependency<T>(T dependency) where T : class {
-            if (dependency == null) {
+        private T verifiedDependency<T>(T dependency) where T : class
+        {
+            if (dependency == null)
+            {
                 throw new ArgumentNullException("dependency", String.Format("Type: {0}", dependency.GetType().ToString()));
             }
-            else {
+            else
+            {
                 return dependency;
             }
         }
@@ -84,7 +105,7 @@ namespace CalRecycleLCA.Services
                                IClassificationService classificationService,
                                IFragmentService fragmentService,
                                IFragmentFlowService fragmentFlowService,
-                               IFragmentStageService fragmentStageService,   
+                               IFragmentStageService fragmentStageService,
                                IFragmentTraversalV2 fragmentTraversalV2,
                                IFragmentLCIAComputation fragmentLCIAComputation,
                                IFlowService flowService,
@@ -98,7 +119,14 @@ namespace CalRecycleLCA.Services
                                IScenarioService scenarioService,
                                INodeCacheService nodeCacheService,
                                IScoreCacheService scoreCacheService,
-                               IUnitOfWork unitOfWork) 
+                               IParamService paramService,
+                               IDependencyParamService dependencyParamService,
+                               IFlowFlowPropertyService flowFlowPropertyService,
+                               IFlowPropertyParamService flowPropertyParamService,
+                               IProcessEmissionParamService processEmissionParamService,
+                               ILCIAService lciaService,
+                               ICharacterizationParamService characterizationParamService,
+                               IUnitOfWork unitOfWork)
         {
             _CategoryService = verifiedDependency(categoryService);
             _ClassificationService = verifiedDependency(classificationService);
@@ -106,7 +134,7 @@ namespace CalRecycleLCA.Services
             _FragmentFlowService = verifiedDependency(fragmentFlowService);
             _FragmentStageService = verifiedDependency(fragmentStageService);
             _FragmentLCIAComputation = verifiedDependency(fragmentLCIAComputation);
-            _FragmentTraversalV2 = verifiedDependency(fragmentTraversalV2);         
+            _FragmentTraversalV2 = verifiedDependency(fragmentTraversalV2);
             _FlowService = verifiedDependency(flowService);
             _FlowPropertyService = verifiedDependency(flowPropertyService);
             _FlowTypeService = verifiedDependency(flowTypeService);
@@ -118,6 +146,13 @@ namespace CalRecycleLCA.Services
             _ScenarioService = verifiedDependency(scenarioService);
             _NodeCacheService = verifiedDependency(nodeCacheService);
             _ScoreCacheService = verifiedDependency(scoreCacheService);
+            _ParamService = verifiedDependency(paramService);
+            _DependencyParamService = verifiedDependency(dependencyParamService);
+            _FlowFlowPropertyService = verifiedDependency(flowFlowPropertyService);
+            _FlowPropertyParamService = verifiedDependency(flowPropertyParamService);
+            _ProcessEmissionParamService = verifiedDependency(processEmissionParamService);
+            _LCIAService = verifiedDependency(lciaService);
+            _CharacterizationParamService = verifiedDependency(characterizationParamService);
             _unitOfWork = verifiedDependency(unitOfWork);
         }
         #endregion
@@ -136,11 +171,14 @@ namespace CalRecycleLCA.Services
         /// <param name="propVal">EF property value</param>
         /// <param name="propName">EF property name</param>
         /// <returns>int value</returns>
-        private int TransformNullable(int? propVal, string propName) {
-            if (propVal == null) {
+        private int TransformNullable(int? propVal, string propName)
+        {
+            if (propVal == null)
+            {
                 throw new ArgumentNullException(propName);
             }
-            else {
+            else
+            {
                 return Convert.ToInt32(propVal);
             }
         }
@@ -153,11 +191,14 @@ namespace CalRecycleLCA.Services
         /// <param name="propVal">EF property value</param>
         /// <param name="propName">EF property name</param>
         /// <returns>bool value</returns>
-        private bool TransformNullable(bool? propVal, string propName) {
-            if (propVal == null) {
+        private bool TransformNullable(bool? propVal, string propName)
+        {
+            if (propVal == null)
+            {
                 throw new ArgumentNullException(propName);
             }
-            else {
+            else
+            {
                 return Convert.ToBoolean(propVal);
             }
         }
@@ -170,11 +211,14 @@ namespace CalRecycleLCA.Services
         /// <param name="propVal">EF property value</param>
         /// <param name="propName">EF property name</param>
         /// <returns>bool value</returns>
-        private double TransformNullable(double? propVal, string propName) {
-            if (propVal == null) {
+        private double TransformNullable(double? propVal, string propName)
+        {
+            if (propVal == null)
+            {
                 throw new ArgumentNullException(propName);
             }
-            else {
+            else
+            {
                 return Convert.ToDouble(propVal);
             }
         }
@@ -186,8 +230,10 @@ namespace CalRecycleLCA.Services
         /// </summary>
         /// <param name="lm"></param>
         /// <returns></returns>
-        public LCIAMethodResource Transform(LCIAMethod lm) {
-            return new LCIAMethodResource {
+        public LCIAMethodResource Transform(LCIAMethod lm)
+        {
+            return new LCIAMethodResource
+            {
                 LCIAMethodID = lm.LCIAMethodID,
                 Name = lm.Name,
                 Methodology = lm.Methodology,
@@ -204,19 +250,23 @@ namespace CalRecycleLCA.Services
             };
         }
 
-        private ICollection<FlowPropertyMagnitude> GetFlowPropertyMagnitudes(FragmentFlow ff, int scenarioID) {
+        private ICollection<FlowPropertyMagnitude> GetFlowPropertyMagnitudes(FragmentFlow ff, int scenarioID)
+        {
             // MOVE TO REPO
             IEnumerable<FlowFlowProperty> ffpData = ff.Flow.FlowFlowProperties;
             IEnumerable<NodeCache> ncData = ff.NodeCaches;
 
             NodeCache nodeCache = ncData.Where(nc => nc.ScenarioID == scenarioID).FirstOrDefault();
-            if (nodeCache == null) {
+            if (nodeCache == null)
+            {
                 return null;
             }
-            else {
+            else
+            {
                 double flowMagnitude = Convert.ToDouble(nodeCache.FlowMagnitude);
                 return ffpData.Select(ffp =>
-                        new FlowPropertyMagnitude {
+                        new FlowPropertyMagnitude
+                        {
                             FlowPropertyID = Convert.ToInt32(ffp.FlowPropertyID),
                             Magnitude = flowMagnitude * Convert.ToDouble(ffp.MeanValue)
                         }).ToList();
@@ -224,10 +274,12 @@ namespace CalRecycleLCA.Services
 
         }
 
-        public FragmentFlowResource Transform(FragmentFlow ff, int scenarioID) {
+        public FragmentFlowResource Transform(FragmentFlow ff, int scenarioID)
+        {
             // NEED FIX
             int? nullID = null;
-            return new FragmentFlowResource {
+            return new FragmentFlowResource
+            {
                 FragmentFlowID = ff.FragmentFlowID,
                 FragmentStageID = ff.FragmentStageID,
                 Name = ff.Name,
@@ -248,7 +300,8 @@ namespace CalRecycleLCA.Services
         /// </summary>
         /// <param name="f">Instance of Flow</param>
         /// <returns>Instance of FlowResource</returns>
-        public FlowResource Transform(Flow f) {
+        public FlowResource Transform(Flow f)
+        {
 
             int? maxHL;
             string categoryName;
@@ -262,12 +315,13 @@ namespace CalRecycleLCA.Services
                                                 .Query(c => c.ILCDEntityID == f.ILCDEntityID)
                                                 .Include(c => c.Category)
                                                 .Select();
-            
+
 
             maxHL = classes.Max(c => Convert.ToInt32(c.Category.HierarchyLevel));
             categoryName = classes.Where(c => c.Category.HierarchyLevel == maxHL).Single().Category.Name;
 
-            return new FlowResource {
+            return new FlowResource
+            {
                 FlowID = f.FlowID,
                 Name = f.Name,
                 FlowTypeID = TransformNullable(f.FlowTypeID, "Flow.FlowTypeID"),
@@ -287,28 +341,35 @@ namespace CalRecycleLCA.Services
             };
         }
 
-        public FlowPropertyResource Transform(FlowProperty fp) {
+        public FlowPropertyResource Transform(FlowProperty fp)
+        {
             string unitName = "";
-            if (fp.UnitGroup != null && fp.UnitGroup.UnitConversion != null) {
+            if (fp.UnitGroup != null && fp.UnitGroup.UnitConversion != null)
+            {
                 unitName = fp.UnitGroup.UnitConversion.Unit;
             }
-            return new FlowPropertyResource {
+            return new FlowPropertyResource
+            {
                 FlowPropertyID = fp.FlowPropertyID,
                 Name = fp.Name,
                 ReferenceUnit = unitName
             };
         }
 
-         public FragmentResource Transform(Fragment f) {
-            return new FragmentResource {
+        public FragmentResource Transform(Fragment f)
+        {
+            return new FragmentResource
+            {
                 FragmentID = f.FragmentID,
                 Name = f.Name,
                 ReferenceFragmentFlowID = TransformNullable(f.ReferenceFragmentFlowID, "Fragment.ReferenceFragmentFlowID")
             };
         }
 
-        public ProcessResource Transform(Process p, IList<int> emisProcesses) {
-            return new ProcessResource {
+        public ProcessResource Transform(Process p, IList<int> emisProcesses)
+        {
+            return new ProcessResource
+            {
                 ProcessID = p.ProcessID,
                 Name = p.Name,
                 Geography = p.Geography,
@@ -321,11 +382,13 @@ namespace CalRecycleLCA.Services
             };
         }
 
-        public ProcessFlowResource Transform(ProcessFlow pf) {
-            return new ProcessFlowResource {
+        public ProcessFlowResource Transform(ProcessFlow pf)
+        {
+            return new ProcessFlowResource
+            {
                 // ProcessFlowID = pf.ProcessFlowID,
-                Flow = Transform( pf.Flow),
-                DirectionID = TransformNullable( pf.DirectionID, "ProcessFlow.DirectionID"),
+                Flow = Transform(pf.Flow),
+                DirectionID = TransformNullable(pf.DirectionID, "ProcessFlow.DirectionID"),
                 VarName = pf.VarName,
                 Magnitude = TransformNullable(pf.Magnitude, "ProcessFlow.Magnitude"),
                 Result = TransformNullable(pf.Result, "ProcessFlow.Result"),
@@ -333,8 +396,10 @@ namespace CalRecycleLCA.Services
             };
         }
 
-        public DetailedLCIAResource Transform(LCIAModel m) {
-            return new DetailedLCIAResource {
+        public DetailedLCIAResource Transform(LCIAModel m)
+        {
+            return new DetailedLCIAResource
+            {
                 //LCIAMethodID = TransformNullable(m.LCIAMethodID, "LCIAModel.LCIAMethodID"),
                 FlowID = TransformNullable(m.FlowID, "LCIAModel.FlowID"),
                 DirectionID = TransformNullable(m.DirectionID, "LCIAModel.DirectionID"),
@@ -344,12 +409,14 @@ namespace CalRecycleLCA.Services
             };
         }
 
-        public AggregateLCIAResource Transform(FragmentLCIAModel m) {
+        public AggregateLCIAResource Transform(FragmentLCIAModel m)
+        {
             //ICollection<DetailedLCIAResource> details = new List<DetailedLCIAResource>();
             //if (m.NodeLCIAResults.Count() != 0)
             //    details = m.NodeLCIAResults.Select(k => Transform(k)).ToList();
 
-            return new AggregateLCIAResource {
+            return new AggregateLCIAResource
+            {
                 FragmentStageID = TransformNullable(m.FragmentStageID, "FragmentLCIAModel.FragmentFlowID"),
                 CumulativeResult = Convert.ToDouble(m.Result),
                 LCIADetail = new List<DetailedLCIAResource>()
@@ -378,15 +445,18 @@ namespace CalRecycleLCA.Services
         /// <summary>
         /// Get LCIAMethodResource list with optional filter by ImpactCategory
         /// </summary>
-        public IEnumerable<LCIAMethodResource> GetActiveLCIAMethodResources(int? impactCategoryID = null) {
+        public IEnumerable<LCIAMethodResource> GetActiveLCIAMethodResources(int? impactCategoryID = null)
+        {
             IEnumerable<LCIAMethod> lciaMethods;
             var query = _LciaMethodService.FetchActiveMethods()
                                                 .ToList();
-            
-            if (impactCategoryID == null) {
+
+            if (impactCategoryID == null)
+            {
                 lciaMethods = ((IEnumerable)query).Cast<LCIAMethod>();
             }
-            else {
+            else
+            {
                 lciaMethods = ((IEnumerable)query).Cast<LCIAMethod>().Where(d => d.ImpactCategoryID == impactCategoryID);
             }
             return lciaMethods.Select(lm => Transform(lm)).ToList();
@@ -398,7 +468,8 @@ namespace CalRecycleLCA.Services
         /// <param name="fragmentID">FragmentID filter</param>
         /// <param name="scenarioID">ScenarioID filter for NodeCache</param>
         /// <returns>List of FragmentFlowResource objects</returns>
-        public IEnumerable<FragmentFlowResource> GetFragmentFlowResources(int fragmentID, int scenarioID = 0) {
+        public IEnumerable<FragmentFlowResource> GetFragmentFlowResources(int fragmentID, int scenarioID = 0)
+        {
             /// NEED FIX
             _FragmentTraversalV2.Traverse(fragmentID, scenarioID);
             var fragmentFlows = _FragmentFlowService.Query(q => q.FragmentID == fragmentID)
@@ -431,7 +502,8 @@ namespace CalRecycleLCA.Services
         /// </summary>
         /// <param name="fragmentID">FragmentID filter</param>
         /// <returns>List of FlowResource objects</returns>
-        public IEnumerable<FlowResource> GetFlowsByFragment(int fragmentID) {
+        public IEnumerable<FlowResource> GetFlowsByFragment(int fragmentID)
+        {
             //return GetFlows(typeof(FragmentFlow), fragmentID);
             return _FlowService.Query(f => f.FragmentFlows.Any(ff => ff.FragmentID == fragmentID))
                 .Include(x => x.FragmentFlows)
@@ -467,7 +539,8 @@ namespace CalRecycleLCA.Services
         ///      descend into certain fragments]
         /// Ultimately, could be switch IsPrivate rather than bool.
         /// </summary>
-        public IEnumerable<ProcessFlowResource> GetProcessFlows(int processID) {
+        public IEnumerable<ProcessFlowResource> GetProcessFlows(int processID)
+        {
 
             if (_ProcessService.IsPrivate(processID))
             {
@@ -497,7 +570,8 @@ namespace CalRecycleLCA.Services
         /// <summary>
         /// Get list of flow properties related to a process (via FlowFlowProperty and ProcessFlow)
         /// </summary>
-        public IEnumerable<FlowPropertyResource> GetFlowPropertiesByProcess(int processID) {
+        public IEnumerable<FlowPropertyResource> GetFlowPropertiesByProcess(int processID)
+        {
             //IEnumerable<FlowProperty> flowProperties = _FlowPropertyService.Query()
             //    .Include(fp => fp.UnitGroup.UnitConversion)
             //    .Filter(fp => fp.Flows.Any(f => f.ProcessFlows.Any(pf => pf.ProcessID == processID)))
@@ -506,7 +580,7 @@ namespace CalRecycleLCA.Services
                 .Include(pf => pf.Flow.FlowFlowProperties)
                 .GroupBy(x => x.Flow.FlowFlowProperties.Select(f => f.FlowPropertyID))
                 .Select(x => x.Flow.FlowFlowProperties.Select(f => f.FlowPropertyID));
-              */  
+              */
             var flowProperties = _FlowPropertyService
                 .Query(fp => fp.Flows.Any(f => f.ProcessFlows.Any(pf => pf.ProcessID == processID)))
                 .Include(fp => fp.UnitGroup.UnitConversion)
@@ -520,7 +594,8 @@ namespace CalRecycleLCA.Services
         /// </summary>
         /// <param name="fragmentID">FragmentID filter</param>
         /// <returns>List of FlowPropertyResource objects</returns>
-        public IEnumerable<FlowPropertyResource> GetFlowPropertiesByFragment(int fragmentID) {
+        public IEnumerable<FlowPropertyResource> GetFlowPropertiesByFragment(int fragmentID)
+        {
             var flowProperties = _FlowPropertyService
                 .Query(fp => fp.Flows.Any(f => f.FragmentFlows.Any(ff => ff.FragmentID == fragmentID)))
                 .Include(fp => fp.UnitGroup.UnitConversion)
@@ -529,7 +604,7 @@ namespace CalRecycleLCA.Services
             return flowProperties.Select(fp => Transform(fp)).ToList();
         }
 
-         /// <summary>
+        /// <summary>
         /// Get Fragment data and transform to API resource model
         /// </summary>
         /// <returns>List of FragmentResource objects</returns>
@@ -544,13 +619,16 @@ namespace CalRecycleLCA.Services
         /// </summary>
         /// <param name="fragmentID">FragmentID</param>
         /// <returns>FragmentResource</returns>
-        public FragmentResource GetFragmentResource(int fragmentID) {
+        public FragmentResource GetFragmentResource(int fragmentID)
+        {
             Fragment fragment = _FragmentService.Find(fragmentID);
-            if (fragment == null) {
+            if (fragment == null)
+            {
                 // error handling deferred to controller
                 return null;
             }
-            else {
+            else
+            {
                 return Transform(fragment);
             }
         }
@@ -560,14 +638,15 @@ namespace CalRecycleLCA.Services
         /// </summary>
         /// <param name="flowTypeID">Optional process flow type filter</param>
         /// <returns>List of ProcessResource objects</returns>
-        public IEnumerable<ProcessResource> GetProcesses(int? flowTypeID=null) {
+        public IEnumerable<ProcessResource> GetProcesses(int? flowTypeID = null)
+        {
 
             var emisProcesses = _ProcessService.Query(p => p.ProcessFlows.Any(pf => pf.Flow.FlowTypeID == 2))
                 .Select(x => x.ProcessID).ToList();
-            
+
             IEnumerable<ProcessResource> pData = _ProcessService.Query()
                 .Include(x => x.ILCDEntity)
-                    //.Include(x => x.ProcessFlows.Select(p => p.Flow))
+                //.Include(x => x.ProcessFlows.Select(p => p.Flow))
                 .Select()
                 .Select(p => Transform(p, emisProcesses));
 
@@ -583,10 +662,12 @@ namespace CalRecycleLCA.Services
         /// Omit categories that are not related to any LCIAMethod
         /// </summary>
         /// <returns>List of ImpactCategoryResource objects</returns>
-        public IEnumerable<ImpactCategoryResource> GetImpactCategories() {
+        public IEnumerable<ImpactCategoryResource> GetImpactCategories()
+        {
             IEnumerable<ImpactCategory> data = _ImpactCategoryService.Queryable()
                 .Where(i => i.LCIAMethods.Count() > 0);
-            return data.Select(d => new ImpactCategoryResource {
+            return data.Select(d => new ImpactCategoryResource
+            {
                 ImpactCategoryID = d.ID,
                 Name = d.Name
             }).ToList();
@@ -597,13 +678,16 @@ namespace CalRecycleLCA.Services
         /// Work around problem in LCIA computation: should be filtering out LCIA with Geography 
         /// </summary>
         /// <returns>LCIAResultResource or null if lciaMethodID not found</returns> 
-        public LCIAResultResource GetProcessLCIAResult(int processID, int lciaMethodID, int scenarioID = 0) {
+        public LCIAResultResource GetProcessLCIAResult(int processID, int lciaMethodID, int scenarioID = 0)
+        {
             LCIAMethod lciaMethod = _LciaMethodService.Find(lciaMethodID);
-            if (lciaMethod == null) {
+            if (lciaMethod == null)
+            {
                 // TODO: figure how to handle this sort of error
                 return null;
             }
-            else {
+            else
+            {
                 IEnumerable<InventoryModel> inventory = _LCIAComputation.ComputeProcessLCI(processID, scenarioID);
                 IEnumerable<LCIAModel> lciaDetail = _LCIAComputation.ComputeProcessLCIA(inventory, lciaMethod, scenarioID)
                     .Where(l => String.IsNullOrEmpty(l.Geography));
@@ -616,9 +700,10 @@ namespace CalRecycleLCA.Services
                         CumulativeResult = (double)lciaDetail.Sum(a => a.LCIAResult),
                         LCIADetail = (_ProcessService.IsPrivate(processID)
                             ? new List<DetailedLCIAResource>()
-                            : lciaDetail.Select(m => Transform(m)).ToList() )
-                    };  
-                var lciaResult = new LCIAResultResource {
+                            : lciaDetail.Select(m => Transform(m)).ToList())
+                    };
+                var lciaResult = new LCIAResultResource
+                {
                     LCIAMethodID = lciaMethodID,
                     ScenarioID = scenarioID,
                     LCIAScore = new List<AggregateLCIAResource>() { lciaScore }
@@ -634,7 +719,8 @@ namespace CalRecycleLCA.Services
         /// <param name="lciaMethodID"></param>
         /// <param name="scenarioID">Defaults to base scenario</param>
         /// <returns>Fragment LCIA results for given parameters</returns> 
-        public LCIAResultResource GetFragmentLCIAResults(int fragmentID, int lciaMethodID, int scenarioID = 0) {
+        public LCIAResultResource GetFragmentLCIAResults(int fragmentID, int lciaMethodID, int scenarioID = 0)
+        {
             // IEnumerable<FragmentLCIAModel> results = _FragmentLCIAComputation.ComputeFragmentLCIA(fragmentID, scenarioID, lciaMethodID);
             IEnumerable<FragmentLCIAModel> aggResults = _FragmentLCIAComputation.ComputeFragmentLCIA(fragmentID, scenarioID, lciaMethodID)
                 .GroupBy(r => new
@@ -648,7 +734,8 @@ namespace CalRecycleLCA.Services
                     LCIAMethodID = group.Key.LCIAMethodID,
                     Result = group.Sum(a => a.Result)
                 });
-            LCIAResultResource lciaResult = new LCIAResultResource {
+            LCIAResultResource lciaResult = new LCIAResultResource
+            {
                 ScenarioID = scenarioID,
                 LCIAMethodID = lciaMethodID,
                 LCIAScore = aggResults.Select(r => Transform(r)).ToList()
@@ -663,7 +750,8 @@ namespace CalRecycleLCA.Services
         /// <param name="lciaMethodID"></param>
         /// <param name="scenarioGroupID">Scenario group of the user making request</param>
         /// <returns>List of LCIAResultResource objects</returns> 
-        public IEnumerable<LCIAResultResource> GetFragmentLCIAResultsAllScenarios(int fragmentID, int lciaMethodID, int scenarioGroupID = 1) {
+        public IEnumerable<LCIAResultResource> GetFragmentLCIAResultsAllScenarios(int fragmentID, int lciaMethodID, int scenarioGroupID = 1)
+        {
             IEnumerable<Scenario> scenarios = _ScenarioService.Queryable().Where(s => s.ScenarioGroupID == scenarioGroupID);
             return scenarios.Select(s => GetFragmentLCIAResults(fragmentID, lciaMethodID, s.ScenarioID)).ToList();
         }
@@ -682,7 +770,7 @@ namespace CalRecycleLCA.Services
         public IEnumerable<ScenarioResource> GetScenarios(int userGroupID)
         {
             IEnumerable<Scenario> scenarios = _ScenarioService.Queryable()
-                .Where(c => ( c.ScenarioGroupID == 1 || c.ScenarioGroupID == userGroupID));
+                .Where(c => (c.ScenarioGroupID == 1 || c.ScenarioGroupID == userGroupID));
             return scenarios.Select(c => Transform(c)).ToList();
         }
 
@@ -690,9 +778,11 @@ namespace CalRecycleLCA.Services
         /// Get FlowType data and transform to API resource model
         /// </summary>
         /// <returns>List of FlowTypeResource objects</returns>
-        public IEnumerable<FlowTypeResource> GetFlowTypes() {
+        public IEnumerable<FlowTypeResource> GetFlowTypes()
+        {
             IEnumerable<FlowType> data = _FlowTypeService.Queryable();
-            return data.Select(d => new FlowTypeResource {
+            return data.Select(d => new FlowTypeResource
+            {
                 FlowTypeID = d.ID,
                 Name = d.Name
             }).ToList();
@@ -743,6 +833,281 @@ namespace CalRecycleLCA.Services
             _unitOfWork.SaveChanges();
         }
 
+        public void AddScenario(string addScenarioJSON)
+        {
+            // Parse JSON into dynamic object
+            JObject jsonScenarios = JObject.Parse(addScenarioJSON);
+
+            List<Scenario> scenarios = new List<Scenario>();
+
+            // add each scenario to a list
+            foreach (var jsonScenario in jsonScenarios["scenarios"])
+            {
+                scenarios.Add(new Scenario()
+                {
+                    ScenarioID = Convert.ToInt32((string)jsonScenario["scenarioID"]),
+                    ScenarioGroupID = Convert.ToInt32((string)jsonScenario["scenarioGroupID"]),
+                    TopLevelFragmentID = Convert.ToInt32((string)jsonScenario["topLevelFragmentID"]),
+                    ActivityLevel = Convert.ToDouble((string)jsonScenario["activityLevel"]),
+                    Name = (string)jsonScenario["name"],
+                    FlowID = Convert.ToInt32((string)jsonScenario["flowID"]),
+                    DirectionID = Convert.ToInt32((string)jsonScenario["directionID"])
+                });
+            }
+
+            foreach (var scenario in scenarios)
+            {
+                scenario.ObjectState = ObjectState.Added;
+            }
+
+            _ScenarioService.InsertGraphRange(scenarios);
+            _unitOfWork.SaveChanges();
+
+        }
+
+        public void UpdateScenario(string updateScenarioJSON)
+        {
+            // Parse JSON into dynamic object
+            JObject jsonScenarios = JObject.Parse(updateScenarioJSON);
+
+            List<Scenario> scenarios = new List<Scenario>();
+
+            // add each scenario to a list
+            foreach (var jsonScenario in jsonScenarios["scenarios"])
+            {
+                scenarios.Add(new Scenario()
+                {
+                    ScenarioID = Convert.ToInt32((string)jsonScenario["scenarioID"]),
+                    ScenarioGroupID = Convert.ToInt32((string)jsonScenario["scenarioGroupID"]),
+                    TopLevelFragmentID = Convert.ToInt32((string)jsonScenario["topLevelFragmentID"]),
+                    ActivityLevel = Convert.ToDouble((string)jsonScenario["activityLevel"]),
+                    Name = (string)jsonScenario["name"],
+                    FlowID = Convert.ToInt32((string)jsonScenario["flowID"]),
+                    DirectionID = Convert.ToInt32((string)jsonScenario["directionID"])
+                });
+            }
+
+            foreach (var scenario in scenarios)
+            {
+                scenario.ObjectState = ObjectState.Modified;
+                _ScenarioService.InsertOrUpdateGraph(scenario);
+            }
+            _unitOfWork.SaveChanges();
+
+        }
+
+        public void DeleteScenario(string deleteScenarioJSON)
+        {
+            // Parse JSON into dynamic object
+            JObject jsonScenarios = JObject.Parse(deleteScenarioJSON);
+
+            List<Scenario> scenarios = new List<Scenario>();
+
+            // add each scenario to a list
+            foreach (var jsonScenario in jsonScenarios["scenarios"])
+            {
+                scenarios.Add(new Scenario()
+                {
+                    ScenarioID = Convert.ToInt32((string)jsonScenario["scenarioID"])
+                });
+            }
+
+            foreach (var scenario in scenarios)
+            {
+                scenario.ObjectState = ObjectState.Deleted;
+                _ScenarioService.Delete(scenario.ScenarioID);
+            }
+            _unitOfWork.SaveChanges();
+
+        }
+
+        public void DeleteParam(string deleteParamJSON)
+        {
+            // Parse JSON into dynamic object
+            JObject jsonParams = JObject.Parse(deleteParamJSON);
+
+            List<Param> paramList = new List<Param>();
+
+            // add each param to a list
+            foreach (var jsonParam in jsonParams["paramList"])
+            {
+                paramList.Add(new Param()
+                {
+                    ParamID = Convert.ToInt32((string)jsonParam["paramID"]),
+
+                });
+            }
+
+            foreach (var param in paramList)
+            {
+                param.ObjectState = ObjectState.Deleted;
+                _ParamService.Delete(param.ParamID);
+            }
+            _unitOfWork.SaveChanges();
+
+        }
+
+        public void AddParam(string addParamJSON)
+        
+        
+        {
+            // Parse JSON into dynamic object
+            JObject jsonParams = JObject.Parse(addParamJSON);
+
+            //  private string addParamJSON = "{\"params\":[" +
+            // "flowPropertyID\":\"373\", \"processID\":\"373\", \"lciaMethodID\":\"373\", \"conservation\":\"true\",}" +
+            //"]}";
+
+            List<ParamResource> paramList = new List<ParamResource>();
+
+            // add each param resource to a list
+            foreach (var jsonParam in jsonParams["params"])
+            {
+                paramList.Add(new ParamResource()
+                {
+                    ParamID = Convert.ToInt32((string)jsonParam["paramID"]),
+                    ParamTypeID = Convert.ToInt32((string)jsonParam["paramTypeID"]),
+                    ScenarioID = Convert.ToInt32((string)jsonParam["scenarioID"]),
+                    Name = (string)jsonParam["name"],
+                    Value = float.Parse((string)jsonParam["value"]),
+                    FragmentFlowID = Convert.ToInt32((string)jsonParam["fragmentFlowID"]),
+                    FlowID = Convert.ToInt32((string)jsonParam["flowID"]),
+                    FlowPropertyID = Convert.ToInt32((string)jsonParam["flowPropertyID"]),
+                    ProcessID = Convert.ToInt32((string)jsonParam["processID"]),
+                    LCIAMethodID = Convert.ToInt32((string)jsonParam["lciaMethodID"])
+                });
+            }
+
+            foreach (var paramResource in paramList)
+            {
+
+                Param param = new Param();
+                DependencyParam dParam = new DependencyParam();
+                FlowPropertyParam fpParam = new FlowPropertyParam();
+                ProcessEmissionParam peParam = new ProcessEmissionParam();
+                CharacterizationParam cParam = new CharacterizationParam();
+
+                switch (paramResource.ParamTypeID)
+                {
+                    case 1:
+                        {
+
+                            param.ParamID = paramResource.ParamID;
+                            param.ParamTypeID = paramResource.ParamTypeID;
+                            param.ScenarioID = paramResource.ScenarioID;
+                            param.Name = paramResource.Name;
+
+                            dParam.ParamID = paramResource.ParamID;
+                            dParam.FragmentFlowID = Convert.ToInt32(paramResource.FragmentFlowID);
+                            dParam.Value = paramResource.Value;
+
+                            param.ObjectState = ObjectState.Added;
+                            _ParamService.InsertOrUpdateGraph(param);
+                            dParam.ObjectState = ObjectState.Added;
+                            _DependencyParamService.InsertOrUpdateGraph(dParam);
+
+                            break;
+                        }
+                    case 2:
+                        {
+                            param.ParamID = paramResource.ParamID;
+                            param.ParamTypeID = paramResource.ParamTypeID;
+                            param.ScenarioID = paramResource.ScenarioID;
+                            param.Name = paramResource.Name;
+
+                            dParam.ParamID = paramResource.ParamID;
+                            dParam.FragmentFlowID = Convert.ToInt32(paramResource.FragmentFlowID);
+                            dParam.Value = paramResource.Value;
+
+                            param.ObjectState = ObjectState.Added;
+                            _ParamService.InsertOrUpdateGraph(param);
+                            dParam.ObjectState = ObjectState.Added;
+                            _DependencyParamService.InsertOrUpdateGraph(dParam);
+                            break;
+                        }
+
+                    case 3:
+                        {
+                            break;
+                        }
+
+                    case 4:
+                        {
+                            int flowFlowPropertyID = _FlowFlowPropertyService.Queryable()
+                                .Where(x => x.FlowID == paramResource.FlowID && x.FlowPropertyID == paramResource.FlowPropertyID)
+                                .FirstOrDefault()
+                                .FlowFlowPropertyID;
+
+                            param.ParamID = paramResource.ParamID;
+                            param.ParamTypeID = paramResource.ParamTypeID;
+                            param.ScenarioID = paramResource.ScenarioID;
+                            param.Name = paramResource.Name;
+
+                            fpParam.ParamID = paramResource.ParamID;
+                            fpParam.FlowFlowPropertyID = Convert.ToInt32(flowFlowPropertyID);
+
+                            param.ObjectState = ObjectState.Added;
+                            _ParamService.InsertOrUpdateGraph(param);
+                            fpParam.ObjectState = ObjectState.Added;
+                            _FlowPropertyParamService.InsertOrUpdateGraph(fpParam);
+                            break;
+                        }
+
+                    case 8:
+                        {
+                            int processID = _ProcessFlowService.Queryable()
+                                .Where(x => x.FlowID == paramResource.FlowID)
+                                .FirstOrDefault()
+                                .ProcessID;
+                            int processFlowID = _ProcessFlowService.Queryable()
+                                .Where(x => x.FlowID == paramResource.FlowID)
+                                .FirstOrDefault()
+                                .ProcessFlowID;
+
+                            param.ParamID = paramResource.ParamID;
+                            param.ParamTypeID = paramResource.ParamTypeID;
+                            param.ScenarioID = paramResource.ScenarioID;
+                            param.Name = paramResource.Name;
+
+                            peParam.ParamID = paramResource.ParamID;
+                            peParam.ProcessFlowID = Convert.ToInt32(processFlowID);
+
+                            param.ObjectState = ObjectState.Added;
+                            _ParamService.InsertOrUpdateGraph(param);
+                            peParam.ObjectState = ObjectState.Added;
+                            _ProcessEmissionParamService.InsertOrUpdateGraph(peParam);
+                            break;
+                        }
+
+                    case 9:
+                        {
+                            int lciaID = _LCIAService.Queryable()
+                                .Where(x => x.FlowID == paramResource.FlowID)
+                                .FirstOrDefault()
+                                .LCIAID;
+
+                            param.ParamID = paramResource.ParamID;
+                            param.ParamTypeID = paramResource.ParamTypeID;
+                            param.ScenarioID = paramResource.ScenarioID;
+                            param.Name = paramResource.Name;
+
+                            cParam.ParamID = paramResource.ParamID;
+                            cParam.LCAID = Convert.ToInt32(lciaID);
+
+                            param.ObjectState = ObjectState.Added;
+                            _ParamService.InsertOrUpdateGraph(param);
+                            cParam.ObjectState = ObjectState.Added;
+                            _CharacterizationParamService.InsertOrUpdateGraph(cParam);
+                            break;
+                        }
+
+
+                }
+            }
+                _unitOfWork.SaveChanges();
+
+          
         #endregion
+        }
     }
 }

@@ -32,5 +32,10 @@ namespace CalRecycleLCA.Services
         void ClearScoreCacheByScenario(int scenarioId = 0);
         void ClearScoreCacheByScenarioAndFragment(int scenarioId = 0, int fragmentId = 0);
         void ClearScoreCacheByScenarioAndLCIAMethod(int scenarioId = 0, int lciaMethodId = 0);
+        void AddScenario(string addScenarioJSON);
+        void UpdateScenario(string updateScenarioJSON);
+        void DeleteScenario(string deleteScenarioJSON);
+        void DeleteParam(string deleteParamJSON);
+        void AddParam(string addParamJSON);
     }
 }

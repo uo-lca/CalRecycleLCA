@@ -17,6 +17,27 @@ namespace LCAToolAPI.API
     /// </summary>
     public class ResourceController : ApiController
     {
+        // mockup JSON that would be sent from Sabina's AngularJs app.
+        private string addScenarioJSON = "{\"scenarios\":[" +
+             "{\"scenarioID\":\"3\",\"scenarioGroupID\":\"1\",\"topLevelFragmentID\":\"8\",\"activityLevel\":\"8300\", \"name\":\"Test Scenario\", \"flowID\":\"373\", \"directionID\":\"2\"}" +
+             "]}";
+
+        private string updateScenarioJSON = "{\"scenarios\":[" +
+           "{\"scenarioID\":\"3\",\"scenarioGroupID\":\"1\",\"topLevelFragmentID\":\"8\",\"activityLevel\":\"8500\", \"name\":\"Test Scenario\", \"flowID\":\"373\", \"directionID\":\"2\"}" +
+           "]}";
+
+        private string deleteScenarioJSON = "{\"scenarios\":[" +
+         "{\"scenarioID\":\"3\"}" +
+         "]}";
+
+        private string deleteParamJSON = "{\"params\":[" +
+         "{\"paramID\":\"3\"}" +
+         "]}";
+
+        private string addParamJSON = "{\"params\":[" +
+             "{\"paramID\":\"11\", \"paramTypeID\":\"1\",\"scenarioID\":\"1\", \"name\":\"Test Param\", \"value\":\"6.99\", \"fragmentFlowID\":\"243\", \"flowID\":\"373\", \"flowPropertyID\":\"373\", \"processID\":\"373\", \"lciaMethodID\":\"373\", \"conservation\":\"true\", \"dependencyParamID\":\"20\",}" +
+             "]}";
+
         [Inject]
         private readonly IResourceServiceFacade _ResourceService;
 
@@ -263,7 +284,7 @@ namespace LCAToolAPI.API
         /// </summary>
         /// <param name="scenarioId"></param>
         [Route("api/scenarios/{scenarioID:int}/clearnodecaches")]
-        [HttpGet]
+        [HttpPost]
         public void ClearNodeCacheByScenario(int scenarioId = 0)
         {
             _ResourceService.ClearNodeCacheByScenario(scenarioId);
@@ -275,7 +296,7 @@ namespace LCAToolAPI.API
         /// <param name="scenarioId"></param>
         /// <param name="fragmentId"></param>
         [Route("api/scenarios/{scenarioID:int}/fragments/{fragmentID:int}/clearnodecaches")]
-        [HttpGet]
+        [HttpPost]
         public void ClearNodeCacheByScenarioAndFragment(int scenarioId = 0, int fragmentId = 0)
         {
             _ResourceService.ClearNodeCacheByScenarioAndFragment(scenarioId, fragmentId);
@@ -286,7 +307,7 @@ namespace LCAToolAPI.API
         /// </summary>
         /// <param name="scenarioId"></param>
         [Route("api/scenarios/{scenarioID:int}/clearscorecaches")]
-        [HttpGet]
+        [HttpPost]
         public void ClearScoreCacheByScenario(int scenarioId = 0)
         {
             _ResourceService.ClearScoreCacheByScenario(scenarioId);
@@ -298,7 +319,7 @@ namespace LCAToolAPI.API
         /// <param name="scenarioId"></param>
         /// <param name="fragmentId"></param>
         [Route("api/scenarios/{scenarioID:int}/fragments/{fragmentID:int}/clearscorecaches")]
-        [HttpGet]
+        [HttpPost]
         public void ClearScoreCacheByScenarioAndFragment(int scenarioId = 0, int fragmentId = 0)
         {
             _ResourceService.ClearScoreCacheByScenarioAndFragment(scenarioId, fragmentId);
@@ -310,10 +331,52 @@ namespace LCAToolAPI.API
         /// <param name="scenarioId"></param>
         /// <param name="fragmentId"></param>
         [Route("api/scenarios/{scenarioID:int}/lciamethods/{lciaMethodID:int}/clearscorecaches")]
-        [HttpGet]
+        [HttpPost]
         public void ClearScoreCacheByScenarioAndLCIAMethod(int scenarioId = 0, int lciaMethodId = 0)
         {
             _ResourceService.ClearScoreCacheByScenarioAndLCIAMethod(scenarioId, lciaMethodId);
+        }
+
+    
+
+        [Route("api/addScenario")]
+        [AcceptVerbs("GET", "POST")]
+        [HttpPost]
+        public void AddScenario()
+        {
+            _ResourceService.AddScenario(addScenarioJSON);
+        }
+
+        [Route("api/updateScenario")]
+        [AcceptVerbs("GET", "POST")]
+        [HttpPost]
+        public void UpdateScenario()
+        {
+            _ResourceService.UpdateScenario(updateScenarioJSON);
+        }
+
+        [Route("api/deleteScenario")]
+        [AcceptVerbs("GET", "POST")]
+        [HttpPost]
+        public void DeleteScenario()
+        {
+            _ResourceService.DeleteScenario(deleteScenarioJSON);
+        }
+
+        [Route("api/deleteParam")]
+        [AcceptVerbs("GET", "POST")]
+        [HttpPost]
+        public void DeleteParam()
+        {
+            _ResourceService.DeleteParam(deleteParamJSON);
+        }
+
+        [Route("api/addParam")]
+        [AcceptVerbs("GET", "POST")]
+        [HttpPost]
+        public void AddParam()
+        {
+            _ResourceService.AddParam(addParamJSON);
         }
 
         /* TODO:
