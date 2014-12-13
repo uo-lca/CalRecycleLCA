@@ -13,7 +13,5 @@ LCIAToolAPI contains backend projects implementing the core LCA engine and Web A
 
 FrontEnd contains a single page app for data visualization.
 
-Visualization contains visualization prototypes. This folder will be removed when all visualizations are implemented in the single page app.
-
 Details are described in subfolder README files.
 

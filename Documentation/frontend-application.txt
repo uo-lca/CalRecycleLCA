@@ -1,0 +1,476 @@
+===============================================================================
+Thur Dec 11 2014
+by SB
+
+Additions, Issues
+
+==============
+Navigation Bar
+==============
+The top of the page will display a navigation bar in all views.
+Navigation bar links: Home page, Fragment LCIA, Process LCIA
+
+------------------
+Process LCIA View
+------------------
+If a user navigates here from the navigation bar, then this view will not have
+scenario and fragment navigation context. In that state, the view
+should allow the user to select a process with elementary flows.
+
+==================
+Issues / Questions
+==================
+1. Since parameters are updated, added, and deleted one at a time, there is no
+need for a pending parameter change queue. Should the scenario detail view still
+allow the user to view and change parameters? I don't see an easy way to get
+parameterized entities from the web API in that view. They will be needed in order to
+generate descriptor and original value. 
+In other views, the related entities are already loaded. 
+
+2. Would be helpful to have a summary of dependencies between parameters and
+results. In other words, for each parameter type, what type of result should be
+cleared from front-end cache when parameter is added/updated/deleted.
+
+===============================================================================
+Mon Dec 8 2014
+
+Summary incorporating recent clarifications.
+
+==============
+Authentication
+==============
+User authentication will be done before app starts. The app will receive an
+authorization token which it will add to every web API request.
+
+========================
+Initial View / Home Page
+========================
+Initial view will contain list of scenarios and list of LCIA methods.
+User may select one active LCIA methods. Active scenario is selected via  
+navigation.
+Desired, but not required: bird's eye visualization of all results.
+(For example, grid of small bar charts displaying Fragment LCIA cumulative 
+ results).
+
+-------------
+Scenario List
+-------------
+Table of user's scenarios containing hyperlinks to other views
+Scenario name 		-> Scenario Detail View
+Top-Level Fragment name -> Fragment Sankey View
+
+User may create new scenario here.
+
+--------------------
+Scenario Detail View
+--------------------
+Contains table of all parameters for the selected scenario. 
+
+If the scenario is editable (scenariogroupid <> 1),
+then existing parameters may be updated or deleted. 
+
+ * Parameter table columns
+   - Type
+   - Descriptor: Name(s) of entity (or entities) related to the parameter.
+   - Name (optional, created by user)
+   - Original Value (unparameterized value)
+   - Parameter Value
+
+? How will front-end get original value for all types of parameters ?
+
+ User clicks on Apply button to send parameter changes to back end via web API.
+ Parameters are updated/deleted one at time. Back-end will clear related 
+ cache records. The front-end will clear its own caches of LCIA results. 
+ 
+ Note: Computation will be performed, and cache records generated as needed when 
+  LCIA results are queried via web API.
+
+---------------------
+LCIA Method List View
+---------------------
+Table of LCIA methods with check box column that allows user to choose which 
+methods will be shown in LCIA result views.
+LCIA method name will be a hyperlink to LCIA detail view.
+
+-----------------------
+LCIA Method Detail View
+-----------------------
+
+ * Displays LCIA Method properties
+
+ * Contains table of all LCIA Characterization Factors for the selected method.
+   For every factor that has a parameter in the "active" scenario, 
+   the parameter will be displayed on the same row.
+   Since this view does not have a scenario parent view, it will allow the user 
+   to select the active scenario.
+
+ * If user is allowed to update scenario,
+    user may create, update, delete LCIA Characterization Factor parameters here.
+    New parameters may be created.
+
+   Front-end clears its own LCIA result caches after scenario 
+   parameter changes.
+
+ * LCIA Factor table columns
+   - Flow Name
+   - Composition
+   - Factor
+   - Parameter name (optional)
+   - Parameter value
+
+**********************************************************************************
+New Parameter Constraint: The thing that is parameterized in the scenario can only  one 
+have one parameter of a particular type.
+For example, if an LCIA Characterization Factor has a type 10 parameter in the 
+active scenario, then the user will be prevented from creating another 
+type 10 parameter for that factor.
+**********************************************************************************
+
+--------------------
+Fragment Sankey View
+--------------------
+The table of inputs and outputs in the fragment sankey view should be 
+parameterizable, generating type 1 params.  type 4 params would be accessed by 
+looking at the flowproperties belonging to a given fragmentflow, but that is 
+not a priority.
+
+TBD:
+Interface for editing Dependency parameters 
+(relevant to fragment node input/output flows)
+Interface for editing Flow Property parameters
+
+------------------
+Process LCIA View
+------------------
+User navigates here from a process node in the Fragment Sankey view. 
+Therefore, this view has a scenario, fragment flow, and process context.
+The activity level from fragment flow navigation is also applied.
+
+If the active scenario can be updated by the user, then the user will be
+allowed to change parameters relevant to Process LCIA (currently, ProcessEmission
+and LCIAFactor). 
+
+It is not feasible to display parameters in the current Process LCIA view. The 
+legend below the bar only display flows with significant magnitiude, and there 
+is no room in the current layout for new columns.
+
+Therefore, SB proposes adding a Process LCIA Parameter View where related 
+parameters can viewed, updated, added and deleted. Each active method in the
+Process LCIA view would have a link to the Process LCIA Parameter View.  
+
+---------------------------
+Process LCIA Parameter View
+---------------------------
+This view has scenario, fragment flow, process, and LCIA method context.
+It will display related ProcessEmission and LCIA Factor parameters. (In the future,
+other parameter types will be supported).
+
+If the user is allowed to update the scenario, then the user may edit the parameters 
+(create/delete/update).
+
+* Process LCIA Parameter table columns
+   - Flow Name
+   - Flow Category
+   - Factor
+   - Parameter name (optional)
+   - Parameter value
+
+After user Applies parameter changes, the front-end will clear its cache of Process LCIA 
+results for the active scneario and current process (? all active methods ?). 
+When the user returns to the Process LCIA view, new Process LCIA results will be loaded 
+and displayed.
+
+==============
+Fri Dec 5 2014
+
+Summary of discussions regarding the front-end app to date.
+
+========================
+Initial View / Home Page
+========================
+
+We assume user authentication will be handled by Ryan @ CalRecycle.
+The app's initial view will appear after the user logs in.
+
+[BK] The app will need to store some kind of authentication token it
+receives from CalRecycle, and send it as a URL parameter for every request
+that requires authentication (basically, for every request that begins with
+/scenarios/x/... where the requested scenario is not in ScenarioGroup 0).
+
+Brandon has requested that the initial view contain a list of  
+scenarios and a list of LCIA methods. He is open to Sabina's suggestion that 
+the initial view be a visualization that provides a bird's eye view of 
+all LCIA results. This visualization would contain links that would allow 
+the user to drill down to more detailed views.
+
+------------------
+Scenario List View
+------------------
+Table of user's scenarios containing hyperlinks to other views
+Scenario name 		-> Scenario Parameter View
+Top-Level Fragment name -> Fragment Sankey View
+
+-----------------------
+Scenario Parameter View
+-----------------------
+Contains table of all parameters for the selected scenario and displays 
+user's pending changes to the parameters.
+
+ * Parameter table columns
+   - Type
+   - Descriptor (auto-generated)
+   - Name (optional, created by user)
+   - Original value (current value before change?)
+   - New value (pending value change?)
+
+ User clicks on Apply button to send parameter changes to back end via web API.
+ Parameter changes will impact results, so the front-end should clear its own
+ cached results and get new results from the web API after the Apply action.
+
+---------------------
+LCIA Method List View
+---------------------
+Table of LCIA methods with check box column that allows user to choose which 
+methods will be shown in LCIA result views.
+LCIA method name will be a hyperlink to LCIA detail view.
+
+-----------------------
+LCIA Method Detail View
+-----------------------
+ * Displays LCIA Method properties
+
+ * Contains table of all LCIA Characterization Factors for the selected method.
+   For every factor that has a parameter, the parameter will be displayed on the 
+   same row.
+   Table columns:
+   - Flow name
+   - Composition
+   - Name (optional, created by user)
+   - Original value (current value before change?)
+   - New value (pending value change?)
+   
+ * User may create and update LCIA Characterization Factor parameters here. 
+   These changes should not be sent to the web API immediately. 
+   They should appear in the Scenario Detail view as pending changes.
+
+ * LCIA Factor table columns
+   - Flow Name
+   - Composition
+   - Factor
+   - Parameter name (optional)
+   - Parameter value
+
+------------------------
+Process LCIA Detail View
+------------------------
+User navigates here from a process node in the Fragment Sankey view. 
+Therefore, this view has a scenario, fragment flow, and process context.
+The activity level from fragment flow navigation is also applied.
+
+For every active LCIA method, if details are in process LCIA results,
+this view contains a segmented bar chart of Process LCIA result details. 
+Relevant parameters should be displayed near the result details.
+The relevant parameter types are 4, 6, 8, and 10?
+
+[BK] Type 4 params are not relevant to the Process LCIA view.  For now,
+only type 8+10 are relevant.  (Type 5+6 would be relevant if the dissipation
+code ever gets written.)
+
+
+=========
+Questions
+=========
+
+ 1. How/where is parameter descriptor generated?
+
+    [BK] the parameter descriptor is simply the concatenation of names of
+    the IDs listed in the ParamResource-- e.g. Process and Flow for types 6
+    and 8; LCIA Method + Flow for type 10; FragmentFlow for types 1+2.
+
+    They should be generated on the fly from the front end in the Scenario
+    Detail View only.  They are not needed elsewhere.
+
+ 2. Please specify web API actions to execute when parameter changes are applied.
+
+    [BK] PUT or POST a list of ParamResources.  Alternatively, PUT or POST
+    a ScenarioDetailResource containing a list of ParamResources.
+
+    Note-- I can't think of a good reason to distinguish between PUT and
+    POST methods.  Each param is uniquely determined by its reference
+    IDs... so, if the param doesn't exist, create it; if it does exist;
+    update it.  
+
+    If you think it's important to treat POST and PUT differently, then the
+    frontend will have to do two API calls- one to POST new params, and the
+    other to PUT changes to existing params.
+
+ 3. Do we have a web API method for getting LCIA characterization factors?
+
+    [BK] Not presently! I guess we need one.
+
+ 4. LCIA Method Detail view does not have scenario context.
+    How will user assign LCIA Characterization Factor parameter to scenario?
+
+    [BK] The Frontend should have in mind an "active" scenario.  It should
+    also know whether the user is authorized to edit the active scenario.
+    This can be determined from the Scenario.ScenarioGroup entry.  If the
+    ScenarioGroup is 1, the scenario may not be edited.  If the
+    ScenarioGroup is non-1, it can be edited.
+
+ 5. Need help describing the parameter table in the Process LCIA details view.
+
+    OK-- noted.    
+    Here's a try:
+    Flow Name | Flow Category | EF | CF | Result
+
+    EF = Emission Factor = ProcessFlow.Result 
+       	 	  	   OR Param.Value for Type 8 Params
+
+    CF = Characterization Factor = LCIA.Factor
+       	 		  	   OR Param.Value for Type 10 Params
+
+    Result = EF * CF
+
+    User should be able to select any EF and parameterize it, creating a
+    new type 8 param; or any CF and parameterize it, creating a new type 10
+    param. 
+
+
+==========
+Mon Sep 15 23:08:04 PDT 2014
+
+Application state: stored in client
+
+User has access to a set of scenario groups, that are determined
+based on authentication-
+
+The server should tell the API who is making the request, and the DB should
+just have a mapping of UserIDs to Scenario Groups-- each user gets its own,
+plus more can be shared.  so only for sharing do we need a table. UserID
+and ScenarioGroupID can be synonymous.
+
+so: a user has access to a set of scenarios and can create new ones.  To
+create a new scenario: select an existing scenario to duplicate, or start
+from scratch.
+
+components of a scenario:
+
+ * a list of Params: Type, Name, type-specific mapping, value, metadata
+
+   - dependency params: (type 1, 2, 3) apply to FragmentFlows
+   - flow property params: (type 4) apply to FlowFlowProperty entries
+   - [composition params: type 5; currently unsupported]
+   - emission factor params: (type 8) apply to ProcessFlow entries
+   - dissipation factor params: (type 6)" ", via composition model
+   - characterization params: (type 10) apply to LCIA entries
+
+ * a list of substitutions:
+
+   - process / fragment substitutions
+   - background substitutions
+   - composition substitutions
+
+All params and substitutions are applied during the computation routines
+and cached by scenario.
+
+Users interact with the database by:
+
+ (1) navigating the model graphically using the sankey diagrams
+ (2) inspecting resources via query views
+ (3) designing scenarios by creating and adjusting params, either 
+     - during interactive traversal or 
+     - via menu-driven access
+
+
+============
+Initial View
+============
+
+Upon connecting to the service, the user should see a menu of options,
+including:
+
+ * Scenario Viewer (--> sankey view)
+ * Process Inspector (--> process LCIA view)
+ * [imtermediate] Flow Inspector (--> table views; composition models)
+ * Background Resolution
+ * LCIA Method Inspector
+
+The Frontend should remember session information about the user, such as:
+
+  - what scenarios are available
+  - ScenarioID selection list
+  - LCIAMethodID selection list
+  - currently active scenario (edits apply to active scenario)
+  - local list of params to be added / changed / removed from scenario 
+
+  - any cached db information, e.g. flow list + process list
+
+---------------
+Scenario Viewer
+---------------
+
+list of scenarios available to the user:
+
+ - name, group ID- visibility - can edit?
+ - reference flow and activity level of top-level fragment
+ - view in sankey viewer
+ - view/edit as parameter list
+ (- compute LCI)
+
+ - waterfalls? or access those via sankey view
+
+ - compare scenarios by LCIA score?
+
+
+-----------------
+Process Inspector
+-----------------
+
+ - all processes pulldown list
+   * filters: processes with emissions / ?
+
+ - tabular (or sankey?) list of intermediate flows
+ - lcia pulldown list
+ - segmented barchart showing unit LCIA score and breakdown
+
+ -? if ProcessComposition, ... show composition profile?
+   * table of CompositionData->FlowPropertyEmission->ProcessDissipation
+
+ -? if scenario, show params:
+   * type [5,]6- labeled in ProcessComposition table
+   * type 8- labeled in segmented barchart view / list
+
+   * type 10- labeled in segmented barchart view if applicable
+
+ -? support param PUT + POST if user has permissions on scenario
+
+--------------
+Flow Inspector
+--------------
+
+ - select elementary / intermediate
+
+ - if elementary.. that's a doozy of a list
+   * maybe allow user to select by classification
+
+ - if intermediate, a pulldown should suffice
+
+ - shows:
+   * flow metadata
+   * classification
+   * if elementary: show all LCIA factors
+   * if intermediate: show all flowproperties
+
+ - if flow appears in CompositionModel, show available composition models
+
+ - if scenario: GET/PUT/POST type 4 (flowproperty) and type 10 (lcia)
+   params; select alternate composition model
+
+   - where does one input alternate composition models? here, presumably
+
+---------------------
+LCIA Method Inspector
+---------------------
+
+gah
+

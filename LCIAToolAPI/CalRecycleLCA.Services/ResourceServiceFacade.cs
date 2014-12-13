@@ -105,7 +105,7 @@ namespace CalRecycleLCA.Services
                                IClassificationService classificationService,
                                IFragmentService fragmentService,
                                IFragmentFlowService fragmentFlowService,
-                               IFragmentStageService fragmentStageService,
+                               IFragmentStageService fragmentStageService,   
                                IFragmentTraversalV2 fragmentTraversalV2,
                                IFragmentLCIAComputation fragmentLCIAComputation,
                                IFlowService flowService,
@@ -126,7 +126,7 @@ namespace CalRecycleLCA.Services
                                IProcessEmissionParamService processEmissionParamService,
                                ILCIAService lciaService,
                                ICharacterizationParamService characterizationParamService,
-                               IUnitOfWork unitOfWork)
+                               IUnitOfWork unitOfWork) 
         {
             _CategoryService = verifiedDependency(categoryService);
             _ClassificationService = verifiedDependency(classificationService);
@@ -134,7 +134,7 @@ namespace CalRecycleLCA.Services
             _FragmentFlowService = verifiedDependency(fragmentFlowService);
             _FragmentStageService = verifiedDependency(fragmentStageService);
             _FragmentLCIAComputation = verifiedDependency(fragmentLCIAComputation);
-            _FragmentTraversalV2 = verifiedDependency(fragmentTraversalV2);
+            _FragmentTraversalV2 = verifiedDependency(fragmentTraversalV2);         
             _FlowService = verifiedDependency(flowService);
             _FlowPropertyService = verifiedDependency(flowPropertyService);
             _FlowTypeService = verifiedDependency(flowTypeService);
@@ -315,7 +315,7 @@ namespace CalRecycleLCA.Services
                                                 .Query(c => c.ILCDEntityID == f.ILCDEntityID)
                                                 .Include(c => c.Category)
                                                 .Select();
-
+            
 
             maxHL = classes.Max(c => Convert.ToInt32(c.Category.HierarchyLevel));
             categoryName = classes.Where(c => c.Category.HierarchyLevel == maxHL).Single().Category.Name;
@@ -450,7 +450,7 @@ namespace CalRecycleLCA.Services
             IEnumerable<LCIAMethod> lciaMethods;
             var query = _LciaMethodService.FetchActiveMethods()
                                                 .ToList();
-
+            
             if (impactCategoryID == null)
             {
                 lciaMethods = ((IEnumerable)query).Cast<LCIAMethod>();
@@ -468,17 +468,18 @@ namespace CalRecycleLCA.Services
         /// <param name="fragmentID">FragmentID filter</param>
         /// <param name="scenarioID">ScenarioID filter for NodeCache</param>
         /// <returns>List of FragmentFlowResource objects</returns>
-        public IEnumerable<FragmentFlowResource> GetFragmentFlowResources(int fragmentID, int scenarioID = 0)
-        {
-            /// NEED FIX
+        public IEnumerable<FragmentFlowResource> GetFragmentFlowResources(int fragmentID, int scenarioID = 0) {
+            /// NEED FIX--> terminate nodes in repository layer; eager-fetch only scenario NodeCaches
+            /// see http://stackoverflow.com/questions/19386501/linq-to-entities-include-where-method
             _FragmentTraversalV2.Traverse(fragmentID, scenarioID);
             var fragmentFlows = _FragmentFlowService.Query(q => q.FragmentID == fragmentID)
                                                 .Include(x => x.FragmentNodeFragments)
                                                 .Include(x => x.FragmentNodeProcesses)
                                                 .Include(x => x.NodeCaches)
                                                 .Include(x => x.Flow.FlowFlowProperties)
-                                                .Select().ToList();
-            return fragmentFlows.Select(ff => Transform(ff, scenarioID)).ToList();
+                                                .Select().Where(x => x.NodeCaches.Count > 0).ToList();
+            var stopgap = fragmentFlows.Where(f => f.NodeCaches.Any(nc => nc.ScenarioID == scenarioID));
+            return stopgap.Select(ff => Transform(ff, scenarioID)).ToList();
         }
 
         /// <summary>
@@ -580,7 +581,7 @@ namespace CalRecycleLCA.Services
                 .Include(pf => pf.Flow.FlowFlowProperties)
                 .GroupBy(x => x.Flow.FlowFlowProperties.Select(f => f.FlowPropertyID))
                 .Select(x => x.Flow.FlowFlowProperties.Select(f => f.FlowPropertyID));
-              */
+              */  
             var flowProperties = _FlowPropertyService
                 .Query(fp => fp.Flows.Any(f => f.ProcessFlows.Any(pf => pf.ProcessID == processID)))
                 .Include(fp => fp.UnitGroup.UnitConversion)
@@ -604,7 +605,7 @@ namespace CalRecycleLCA.Services
             return flowProperties.Select(fp => Transform(fp)).ToList();
         }
 
-        /// <summary>
+         /// <summary>
         /// Get Fragment data and transform to API resource model
         /// </summary>
         /// <returns>List of FragmentResource objects</returns>
@@ -643,10 +644,10 @@ namespace CalRecycleLCA.Services
 
             var emisProcesses = _ProcessService.Query(p => p.ProcessFlows.Any(pf => pf.Flow.FlowTypeID == 2))
                 .Select(x => x.ProcessID).ToList();
-
+            
             IEnumerable<ProcessResource> pData = _ProcessService.Query()
                 .Include(x => x.ILCDEntity)
-                //.Include(x => x.ProcessFlows.Select(p => p.Flow))
+                    //.Include(x => x.ProcessFlows.Select(p => p.Flow))
                 .Select()
                 .Select(p => Transform(p, emisProcesses));
 
@@ -701,7 +702,7 @@ namespace CalRecycleLCA.Services
                         LCIADetail = (_ProcessService.IsPrivate(processID)
                             ? new List<DetailedLCIAResource>()
                             : lciaDetail.Select(m => Transform(m)).ToList())
-                    };
+                    };  
                 var lciaResult = new LCIAResultResource
                 {
                     LCIAMethodID = lciaMethodID,
@@ -1108,6 +1109,6 @@ namespace CalRecycleLCA.Services
 
           
         #endregion
-        }
     }
+}
 }

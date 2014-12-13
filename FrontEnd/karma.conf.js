@@ -5,6 +5,7 @@ module.exports = function(config){
 
     files : [
       'app/bower_components/angular/angular.js',
+      'app/bower_components/angular-local-storage/dist/angular-local-storage.js',
       'app/bower_components/angular-ui-router/release/angular-ui-router.js',
       'app/bower_components/angular-resource/angular-resource.js',
       'app/bower_components/angular-mocks/angular-mocks.js',
@@ -13,11 +14,11 @@ module.exports = function(config){
       'app/bower_components/d3-tip/index.js',
       'app/bower_components/spin.js/spin.js',
       'app/bower_components/angular-spinner/angular-spinner.js',
-      'app/bower_components/angular-breadcrumb/release/angular-breadcrumb.js',
       'app/bower_components/angular-bootstrap/ui-bootstrap.js',
       'app/components/**/*.js',
       'app/fragment-lcia/**/*.js',
       'app/fragment-sankey/**/*.js',
+      'app/lcia-method/**/*.js',
       'app/process-lcia/**/*.js',
       'app/scenarios/**/*.js'
     ],
