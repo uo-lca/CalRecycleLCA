@@ -408,7 +408,8 @@ namespace CalRecycleLCA.Services
                                                 .Include(x => x.NodeCaches)
                                                 .Include(x => x.Flow.FlowFlowProperties)
                                                 .Select().Where(x => x.NodeCaches.Count > 0).ToList();
-            return fragmentFlows.Select(ff => Transform(ff, scenarioID)).ToList();
+            var stopgap = fragmentFlows.Where(f => f.NodeCaches.Any(nc => nc.ScenarioID == scenarioID));
+            return stopgap.Select(ff => Transform(ff, scenarioID)).ToList();
         }
 
         /// <summary>
