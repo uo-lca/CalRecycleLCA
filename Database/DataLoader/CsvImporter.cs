@@ -436,9 +436,20 @@ namespace LcaDataLoader {
             return isImported;
         }
 
+        private static bool AddEntityWithValidation<T>(DbContextWrapper dbContext, T entity) where T : class, IEntity {
+            int initialID = entity.ID;
+            bool isImported = dbContext.AddEntity(entity);
+            Debug.Assert(isImported && entity.ID == initialID);
+            return isImported;
+        }
+
+        private static int ConvertScenarioID(Row row) {
+            return Convert.ToInt32(row["ScenarioID"]) + 1;
+        }
+
         private static bool ImportScenario(Row row, DbContextWrapper dbContext) {
             bool isImported = false, isNew = true;
-            int id = Convert.ToInt32(row["ScenarioID"]);
+            int id = ConvertScenarioID(row);
             int refID;
             if (dbContext.FindRefIlcdEntityID<Flow>(row["RefFlowUUID"], out refID)) {
                 Scenario ent = dbContext.ProduceEntityWithID<Scenario>(id, out isNew);
@@ -448,7 +459,7 @@ namespace LcaDataLoader {
                 ent.ActivityLevel = Convert.ToDouble(row["ActivityLevel"]);
                 ent.FlowID = refID;
                 ent.DirectionID = Convert.ToInt32(row["RefDirectionID"]);
-                isImported = isNew ? dbContext.AddEntity(ent) : (dbContext.SaveChanges() > 0);
+                isImported = isNew ? AddEntityWithValidation<Scenario>( dbContext, ent) : (dbContext.SaveChanges() > 0);
             }
             return isImported;
         }
@@ -458,7 +469,7 @@ namespace LcaDataLoader {
             int id = Convert.ToInt32(row["ParamID"]);
             Param ent = dbContext.ProduceEntityWithID<Param>(id, out isNew);
             ent.ParamTypeID = Convert.ToInt32(row["ParamTypeID"]);
-            ent.ScenarioID = Convert.ToInt32(row["ScenarioID"]);
+            ent.ScenarioID = ConvertScenarioID(row);
             ent.Name = row["Name"];
             isImported = isNew ? dbContext.AddEntity(ent) : (dbContext.SaveChanges() > 0);
             return isImported;
@@ -618,7 +629,7 @@ namespace LcaDataLoader {
             int refID;
             int [] ids = new int [2];
             ids[0] = Convert.ToInt32(row["FragmentNodeProcessID"]);
-            ids[1] = Convert.ToInt32(row["ScenarioID"]);
+            ids[1] = ConvertScenarioID(row);
 
             ProcessSubstitution ent = processSubstitutions.Find(ids[0], ids[1]);
             if (ent == null) {
