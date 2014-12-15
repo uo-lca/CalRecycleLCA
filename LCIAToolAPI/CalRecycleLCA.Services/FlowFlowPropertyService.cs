@@ -12,7 +12,7 @@ namespace CalRecycleLCA.Services
 {
     public interface IFlowFlowPropertyService : IService<FlowFlowProperty>
     {
-        double? FlowConv(int? myFlowId, int inFlowId, int scenarioId = 0);
+        double? FlowConv(int? myFlowId, int inFlowId, int scenarioId = Scenario.MODEL_BASE_CASE_ID);
     }
 
     public class FlowFlowPropertyService : Service<FlowFlowProperty>, IFlowFlowPropertyService
@@ -34,7 +34,7 @@ namespace CalRecycleLCA.Services
         /// <param name="refFlowId"></param>
         /// <param name="inFlowId"></param>
         /// <returns></returns>
-        public double? FlowConv(int? refFlowId, int inFlowId, int scenarioId = 0)
+        public double? FlowConv(int? refFlowId, int inFlowId, int scenarioId = Scenario.MODEL_BASE_CASE_ID)
         {
             if (refFlowId == null)
                 return 1;

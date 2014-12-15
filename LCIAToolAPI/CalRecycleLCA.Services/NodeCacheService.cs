@@ -21,12 +21,12 @@ namespace CalRecycleLCA.Services
             _repository = repository; 
         }
 
-        public void ClearNodeCacheByScenario(int scenarioId = 0)
+        public void ClearNodeCacheByScenario(int scenarioId = Scenario.MODEL_BASE_CASE_ID)
         {
             _repository.ClearNodeCacheByScenario(scenarioId);
         }
 
-        public void ClearNodeCacheByScenarioAndFragment(int scenarioId = 0, int fragmentId=0)
+        public void ClearNodeCacheByScenarioAndFragment(int scenarioId = Scenario.MODEL_BASE_CASE_ID, int fragmentId = 0)
         {
             _repository.ClearNodeCacheByScenarioAndFragment(scenarioId, fragmentId);
         }

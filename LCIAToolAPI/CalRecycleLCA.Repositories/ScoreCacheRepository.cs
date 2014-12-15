@@ -10,7 +10,7 @@ namespace CalRecycleLCA.Repositories
 {
     public static class ScoreCacheRepository
     {
-        public static void ClearScoreCacheByScenario(this IRepositoryAsync<ScoreCache> repository, int scenarioId = 0)
+        public static void ClearScoreCacheByScenario(this IRepositoryAsync<ScoreCache> repository, int scenarioId = Scenario.MODEL_BASE_CASE_ID)
         {
             var scoreCaches = repository.GetRepository<ScoreCache>().Queryable().Where(sc => sc.ScenarioID == scenarioId).ToList();
 
@@ -20,7 +20,7 @@ namespace CalRecycleLCA.Repositories
             });
         }
 
-        public static void ClearScoreCacheByScenarioAndFragment(this IRepositoryAsync<ScoreCache> repository, int scenarioId = 0, int fragmentId = 0)
+        public static void ClearScoreCacheByScenarioAndFragment(this IRepositoryAsync<ScoreCache> repository, int scenarioId = Scenario.MODEL_BASE_CASE_ID, int fragmentId = 0)
         {
             //get scoreCaches by scenarioId
             var scoreCaches = repository.GetRepository<ScoreCache>().Queryable().Where(sc => sc.ScenarioID == scenarioId);
@@ -41,7 +41,7 @@ namespace CalRecycleLCA.Repositories
             });
         }
 
-        public static void ClearScoreCacheByScenarioAndLCIAMethod(this IRepositoryAsync<ScoreCache> repository, int scenarioId = 0, int lciaMethodID = 0)
+        public static void ClearScoreCacheByScenarioAndLCIAMethod(this IRepositoryAsync<ScoreCache> repository, int scenarioId = Scenario.MODEL_BASE_CASE_ID, int lciaMethodID = 0)
         {
             //get scoreCaches by scenarioId and LCIAMethod
             var scoreCaches = repository.GetRepository<ScoreCache>().Queryable()

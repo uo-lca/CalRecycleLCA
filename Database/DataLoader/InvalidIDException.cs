@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 
 namespace LcaDataLoader {
-
+    [SerializableAttribute]
     public class InvalidIdException : Exception {
         public InvalidIdException() {
         }

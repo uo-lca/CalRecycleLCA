@@ -398,7 +398,7 @@ namespace CalRecycleLCA.Services
         /// <param name="fragmentID">FragmentID filter</param>
         /// <param name="scenarioID">ScenarioID filter for NodeCache</param>
         /// <returns>List of FragmentFlowResource objects</returns>
-        public IEnumerable<FragmentFlowResource> GetFragmentFlowResources(int fragmentID, int scenarioID = 0) {
+        public IEnumerable<FragmentFlowResource> GetFragmentFlowResources(int fragmentID, int scenarioID = Scenario.MODEL_BASE_CASE_ID) {
             /// NEED FIX--> terminate nodes in repository layer; eager-fetch only scenario NodeCaches
             /// see http://stackoverflow.com/questions/19386501/linq-to-entities-include-where-method
             _FragmentTraversalV2.Traverse(fragmentID, scenarioID);
@@ -599,7 +599,7 @@ namespace CalRecycleLCA.Services
         /// Work around problem in LCIA computation: should be filtering out LCIA with Geography 
         /// </summary>
         /// <returns>LCIAResultResource or null if lciaMethodID not found</returns> 
-        public LCIAResultResource GetProcessLCIAResult(int processID, int lciaMethodID, int scenarioID = 0) {
+        public LCIAResultResource GetProcessLCIAResult(int processID, int lciaMethodID, int scenarioID = Scenario.MODEL_BASE_CASE_ID) {
             LCIAMethod lciaMethod = _LciaMethodService.Find(lciaMethodID);
             if (lciaMethod == null) {
                 // TODO: figure how to handle this sort of error
@@ -636,7 +636,7 @@ namespace CalRecycleLCA.Services
         /// <param name="lciaMethodID"></param>
         /// <param name="scenarioID">Defaults to base scenario</param>
         /// <returns>Fragment LCIA results for given parameters</returns> 
-        public LCIAResultResource GetFragmentLCIAResults(int fragmentID, int lciaMethodID, int scenarioID = 0) {
+        public LCIAResultResource GetFragmentLCIAResults(int fragmentID, int lciaMethodID, int scenarioID = Scenario.MODEL_BASE_CASE_ID) {
             // IEnumerable<FragmentLCIAModel> results = _FragmentLCIAComputation.ComputeFragmentLCIA(fragmentID, scenarioID, lciaMethodID);
             IEnumerable<FragmentLCIAModel> aggResults = _FragmentLCIAComputation.ComputeFragmentLCIA(fragmentID, scenarioID, lciaMethodID)
                 .GroupBy(r => new
@@ -703,7 +703,7 @@ namespace CalRecycleLCA.Services
         /// <summary>
         /// Delete NodeCache data by ScenarioId
         /// </summary>
-        public void ClearNodeCacheByScenario(int scenarioId = 0)
+        public void ClearNodeCacheByScenario(int scenarioId = Scenario.MODEL_BASE_CASE_ID)
         {
             _NodeCacheService.ClearNodeCacheByScenario(scenarioId);
             _unitOfWork.SaveChanges();
@@ -712,7 +712,7 @@ namespace CalRecycleLCA.Services
         /// <summary>
         /// Delete NodeCache data by ScenarioID and FragmentID
         /// </summary>
-        public void ClearNodeCacheByScenarioAndFragment(int scenarioId = 0, int fragmentId = 0)
+        public void ClearNodeCacheByScenarioAndFragment(int scenarioId = Scenario.MODEL_BASE_CASE_ID, int fragmentId = 0)
         {
             _NodeCacheService.ClearNodeCacheByScenarioAndFragment(scenarioId, fragmentId);
             _unitOfWork.SaveChanges();
@@ -721,7 +721,7 @@ namespace CalRecycleLCA.Services
         /// <summary>
         /// Delete ScoreCache data by ScenarioId
         /// </summary>
-        public void ClearScoreCacheByScenario(int scenarioId = 0)
+        public void ClearScoreCacheByScenario(int scenarioId = Scenario.MODEL_BASE_CASE_ID)
         {
             _ScoreCacheService.ClearScoreCacheByScenario(scenarioId);
             _unitOfWork.SaveChanges();
@@ -730,7 +730,7 @@ namespace CalRecycleLCA.Services
         /// <summary>
         /// Delete ScoreCache data by ScenarioID and FragmentID
         /// </summary>
-        public void ClearScoreCacheByScenarioAndFragment(int scenarioId = 0, int fragmentId = 0)
+        public void ClearScoreCacheByScenarioAndFragment(int scenarioId = Scenario.MODEL_BASE_CASE_ID, int fragmentId = 0)
         {
             _ScoreCacheService.ClearScoreCacheByScenarioAndFragment(scenarioId, fragmentId);
             _unitOfWork.SaveChanges();
@@ -739,7 +739,7 @@ namespace CalRecycleLCA.Services
         /// <summary>
         /// Delete ScoreCache data by ScenarioID and LCIAMethodID
         /// </summary>
-        public void ClearScoreCacheByScenarioAndLCIAMethod(int scenarioId = 0, int lciaMethodId = 0)
+        public void ClearScoreCacheByScenarioAndLCIAMethod(int scenarioId = Scenario.MODEL_BASE_CASE_ID, int lciaMethodId = 0)
         {
             _ScoreCacheService.ClearScoreCacheByScenarioAndLCIAMethod(scenarioId, lciaMethodId);
             _unitOfWork.SaveChanges();

@@ -10,6 +10,8 @@ namespace LcaDataModel
     [Table("Scenario")]
     public partial class Scenario : Entity
     {
+        public const int MODEL_BASE_CASE_ID = 1;
+
         public Scenario()
         {
             BackgroundCaches = new HashSet<BackgroundCache>();

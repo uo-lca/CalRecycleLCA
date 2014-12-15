@@ -10,7 +10,7 @@ namespace CalRecycleLCA.Repositories
 {
     public static class NodeCacheRepository
     {
-        public static void ClearNodeCacheByScenario(this IRepositoryAsync<NodeCache> repository, int scenarioId = 0)
+        public static void ClearNodeCacheByScenario(this IRepositoryAsync<NodeCache> repository, int scenarioId = Scenario.MODEL_BASE_CASE_ID)
         {
             var nodeCaches = repository.GetRepository<NodeCache>().Queryable().Where(nc => nc.ScenarioID == scenarioId).ToList();
 
@@ -20,7 +20,7 @@ namespace CalRecycleLCA.Repositories
                 });
         }
 
-        public static void ClearNodeCacheByScenarioAndFragment(this IRepositoryAsync<NodeCache> repository, int scenarioId = 0, int fragmentId = 0)
+        public static void ClearNodeCacheByScenarioAndFragment(this IRepositoryAsync<NodeCache> repository, int scenarioId = Scenario.MODEL_BASE_CASE_ID, int fragmentId = 0)
         {
             //get nodeCaches by scenarioId
             var nodeCaches = repository.GetRepository<NodeCache>().Queryable().Where(nc => nc.ScenarioID == scenarioId);

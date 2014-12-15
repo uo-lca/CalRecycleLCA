@@ -15,7 +15,7 @@ namespace CalRecycleLCA.Services
     {
         double? FlowExchange(int processId, int flowId, int ex_directionId); // opposite of ProcessFlow.DirectionID
         IEnumerable<InventoryModel> GetDependencies(int processId, int flowId, int ex_directionId);
-        IEnumerable<InventoryModel> GetEmissions(int processId, int scenarioId = 0);
+        IEnumerable<InventoryModel> GetEmissions(int processId, int scenarioId = Scenario.MODEL_BASE_CASE_ID);
         // IEnumerable<InventoryModel> GetEmissionsOld(int processId, int scenarioId);
     }
 
@@ -39,7 +39,7 @@ namespace CalRecycleLCA.Services
             return _repository.GetDependencies(processId, flowId, ex_directionId);
         }
 
-        public IEnumerable<InventoryModel> GetEmissions(int processId, int scenarioId = 0)
+        public IEnumerable<InventoryModel> GetEmissions(int processId, int scenarioId = Scenario.MODEL_BASE_CASE_ID)
         {
             return _repository.GetEmissions(processId, scenarioId);
         }

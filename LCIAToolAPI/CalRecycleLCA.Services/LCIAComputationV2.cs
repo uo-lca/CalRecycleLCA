@@ -146,7 +146,7 @@ namespace CalRecycleLCA.Services
 
         }
 
-        public IEnumerable<FragmentLCIAModel> ProcessLCIA(int? processId, IEnumerable<LCIAMethod> lciaMethods, int? scenarioId = 1)
+        public IEnumerable<FragmentLCIAModel> ProcessLCIA(int? processId, IEnumerable<LCIAMethod> lciaMethods, int? scenarioId)
         {
             var inventory = ComputeProcessLCI(processId, scenarioId);
             //IEnumerable<LCIAModel> lcias=null;

@@ -59,7 +59,7 @@ namespace CalRecycleLCA.Services
         /// <param name="fragmentId"></param>
         /// <param name="scenarioId"></param>
         /// <returns></returns>
-        public bool Traverse(int fragmentId, int scenarioId = 0)
+        public bool Traverse(int fragmentId, int scenarioId = Scenario.MODEL_BASE_CASE_ID)
         {
             nodeCaches = new List<NodeCache>();
 
