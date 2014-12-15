@@ -179,13 +179,23 @@ namespace LcaDataLoader {
             //else {
             //    id = flow.FlowID;
             //}
+            
             int? dirID = ilcdDb.LookupEntityID<Direction>(direction);
+            int reqDirID = Convert.ToInt32(DirectionEnum.Output);
             if (dirID == null) {
-                Program.Logger.ErrorFormat("Unable to find ID for LCIA exchangeDirection = {0}", direction);
+                Program.Logger.WarnFormat("Invalid LCIA exchangeDirection : {0}, refObjectId = {1}. Resetting to Output.", direction, uuid);
+            }
+            else {
+                reqDirID = Convert.ToInt32(dirID);
             }
             lcia = new LCIA { //FlowID = id, 
-                              FlowUUID = uuid, FlowName = name,
-                              DirectionID = (int)dirID, Factor = meanValue, Geography = location, LCIAMethodID = lciaMethodID };
+                FlowUUID = uuid,
+                FlowName = name,
+                DirectionID = reqDirID,
+                Factor = meanValue,
+                Geography = location,
+                LCIAMethodID = lciaMethodID
+            };
             return lcia;
         }
 
