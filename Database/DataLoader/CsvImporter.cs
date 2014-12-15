@@ -439,7 +439,11 @@ namespace LcaDataLoader {
         private static bool AddEntityWithValidation<T>(DbContextWrapper dbContext, T entity) where T : class, IEntity {
             int initialID = entity.ID;
             bool isImported = dbContext.AddEntity(entity);
-            Debug.Assert(isImported && entity.ID == initialID);
+            if (isImported && entity.ID == initialID) {
+                string msg = String.Format(
+                    "Entity ID, {0}, does not match database generated ID, {1}.", initialID, entity.ID);
+                throw new InvalidIdException(msg);
+            }
             return isImported;
         }
 

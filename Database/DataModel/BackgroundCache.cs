@@ -10,7 +10,7 @@ namespace LcaDataModel
     [Table("BackgroundCache")]
     public partial class BackgroundCache : Entity
     {
-        [DatabaseGenerated(DatabaseGeneratedOption.None)]
+        //[DatabaseGenerated(DatabaseGeneratedOption.None)]
         public int BackgroundCacheID { get; set; }
 
         public int? BackgroundID { get; set; }
