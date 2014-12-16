@@ -186,7 +186,7 @@ namespace LcaDataLoader {
                         FragmentID = fragmentID,
                         ILCDEntity = ilcdEntity
                     };
-                    isImported = dbContext.AddEntity(obj);
+                    isImported = AddEntityWithVerification<Fragment>(dbContext, obj);
                 }
             }
             return isImported;
@@ -214,18 +214,17 @@ namespace LcaDataLoader {
         }
 
         private static bool CreateFragmentFlow(Row row, DbContextWrapper dbContext) {
+            bool isImported = false, isNew;
             int fragmentFlowID = Convert.ToInt32(row["FragmentFlowID"]);
-            if (dbContext.Find<FragmentFlow>(fragmentFlowID) == null) {
-                return dbContext.AddEntity(new FragmentFlow { 
-                    FragmentFlowID = fragmentFlowID,
-                    DirectionID = 1,
-                    NodeTypeID = 1
-                });
+            FragmentFlow ent = dbContext.ProduceEntityWithID<FragmentFlow>(fragmentFlowID, out isNew);
+            if (ent != null) {
+                ent.FragmentFlowID = fragmentFlowID;
+                // Set required properties. Others will be set by UpdateFragmentFlow
+                ent.DirectionID = Convert.ToInt32(row["DirectionID"]);
+                ent.NodeTypeID = Convert.ToInt32(row["NodeTypeID"]);
+                isImported = isNew ? AddEntityWithVerification<FragmentFlow>(dbContext, ent) : (dbContext.SaveChanges() > 0);
             }
-            else {
-                Program.Logger.WarnFormat("Found FragmentFlow with ID = {0}. Entity will not be added, but may be updated.", fragmentFlowID);
-                return false;
-            }
+            return isImported;
         }
 
         private static bool UpdateFragmentFlow(Row row, DbContextWrapper dbContext) {
@@ -277,7 +276,7 @@ namespace LcaDataLoader {
                     ent.ProcessID = refID;
                 if (dbContext.FindRefIlcdEntityID<LcaDataModel.Flow>(row["FlowUUID"], out refID))
                     ent.FlowID = refID;
-                isImported = isNew ? dbContext.AddEntity(ent) : (dbContext.SaveChanges() > 0);
+                isImported = isNew ? AddEntityWithVerification<FragmentNodeProcess>(dbContext, ent) : (dbContext.SaveChanges() > 0);
             }
             return isImported;
         }
@@ -292,7 +291,7 @@ namespace LcaDataLoader {
                 ent.SubFragmentID = Convert.ToInt32(row["SubFragmentID"]);
                 if (dbContext.FindRefIlcdEntityID<LcaDataModel.Flow>(row["FlowUUID"], out refID))
                     ent.FlowID = refID;
-                isImported = isNew ? dbContext.AddEntity(ent) : (dbContext.SaveChanges() > 0);
+                isImported = isNew ? AddEntityWithVerification<FragmentNodeFragment>(dbContext, ent) : (dbContext.SaveChanges() > 0);
             }
             return isImported;
         }

@@ -24,7 +24,7 @@ namespace LcaDataModel
             ScoreCaches = new HashSet<ScoreCache>();
         }
 
-        [DatabaseGenerated(DatabaseGeneratedOption.None)]
+        //[DatabaseGenerated(DatabaseGeneratedOption.None)]
         public int FragmentFlowID { get; set; }
 
         public int? FragmentID { get; set; }
