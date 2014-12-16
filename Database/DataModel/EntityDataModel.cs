@@ -24,12 +24,13 @@ namespace LcaDataModel {
         public virtual DbSet<Classification> Classifications { get; set; }
         public virtual DbSet<CompositionData> CompositionDataSet { get; set; }
         public virtual DbSet<CompositionModel> CompositionModels { get; set; }
+        public virtual DbSet<CompositionParam> CompositionParams { get; set; }
         public virtual DbSet<CompositionSubstitution> CompositionSubstitutions { get; set; }
         public virtual DbSet<DataSource> DataSources { get; set; }
         public virtual DbSet<DataType> DataTypes { get; set; }
         public virtual DbSet<DependencyParam> DependencyParams { get; set; }
         public virtual DbSet<Direction> Directions { get; set; }
-        public virtual DbSet<DistributionParam> DistributionParams { get; set; }
+        public virtual DbSet<ConservationParam> ConservationParams { get; set; }
         public virtual DbSet<Flow> Flows { get; set; }
         public virtual DbSet<FlowFlowProperty> FlowFlowProperties { get; set; }
         public virtual DbSet<FlowProperty> FlowProperties { get; set; }
@@ -100,6 +101,16 @@ namespace LcaDataModel {
                 .Property(e => e.Name)
                 .IsUnicode(false);
 
+            modelBuilder.Entity<CompositionModel>()
+                .HasMany(e => e.CompositionSubstitutions)
+                .WithRequired(d => d.CompositionModel)
+                .HasForeignKey(d => d.CompositionModelID);
+
+            modelBuilder.Entity<CompositionModel>()
+                .HasMany(e => e.CompositionSubstitutions)
+                .WithRequired(d => d.SubstituteCompositionModel)
+                .HasForeignKey(d => d.SubstituteCompositionModelID);
+
             modelBuilder.Entity<DataSource>()
                 .Property(e => e.Name)
                 .IsUnicode(false);
@@ -112,17 +123,17 @@ namespace LcaDataModel {
                 .Property(e => e.Name)
                 .IsUnicode(false);
 
-            modelBuilder.Entity<DistributionParam>()
-                .HasKey(e => e.DependencyParamID);
+            // modelBuilder.Entity<ConservationParam>()
+            //    .HasKey(e => e.BalanceParamID);
 
-            modelBuilder.Entity<DistributionParam>()
-                .HasRequired(e => e.DependencyParam)
-                .WithOptional(e => e.DistributionParam);
+            //modelBuilder.Entity<ConservationParam>()
+            //    .HasRequired(e => e.DistributionParam);
+                //.WithOptional(e => e.DistributionParam);
 
-            modelBuilder.Entity<DistributionParam>()
-                .HasRequired(e => e.ConservationDependencyParam)
-                .WithMany(d => d.ConservationDistributionParams)
-                .HasForeignKey(e => e.ConservationDependencyParamID);
+            //modelBuilder.Entity<ConservationParam>()
+            //    .HasRequired(e => e.ConservationDependencyParam)
+            //    .WithMany(d => d.ConservationDistributionParams)
+            //    .HasForeignKey(e => e.ConservationDependencyParamID);
 
             modelBuilder.Entity<Direction>()
                 .Property(e => e.Name)
@@ -199,7 +210,7 @@ namespace LcaDataModel {
                 .HasForeignKey(e => e.ParentFragmentFlowID);
 
             modelBuilder.Entity<FragmentStage>()
-                .Property(e => e.StageName)
+                .Property(e => e.Name)
                 .IsUnicode(false);
 
             modelBuilder.Entity<ILCDEntity>()
@@ -222,10 +233,10 @@ namespace LcaDataModel {
                 .Property(e => e.Geography)
                 .IsUnicode(false);
 
-            modelBuilder.Entity<LCIA>()
-                .HasMany(e => e.CharacterizationParams)
-                .WithOptional(e => e.LCIA)
-                .HasForeignKey(e => e.LCAID);
+            //modelBuilder.Entity<LCIA>()
+            //    .HasMany(e => e.CharacterizationParams)
+            //    .WithOptional(e => e.LCIA)
+            //    .HasForeignKey(e => e.LCIAID);
 
             modelBuilder.Entity<LCIAMethod>()
                 .Property(e => e.Name)
@@ -262,6 +273,16 @@ namespace LcaDataModel {
             modelBuilder.Entity<Param>()
                 .Property(e => e.Name)
                 .IsUnicode(false);
+
+            //modelBuilder.Entity<Param>()
+            //    .HasMany(p => p.BalanceParams)
+            //    .WithRequired(b => b.BalanceParam)
+            //    .HasForeignKey(b => b.BalanceParamID);
+
+            //modelBuilder.Entity<Param>()
+            //    .HasMany(p => p.DistributionParams)
+            //    .WithRequired(b => b.DistributionParam)
+            //    .HasForeignKey(b => b.DistributionParamID);
 
             modelBuilder.Entity<ParamType>()
                 .Property(e => e.Name)

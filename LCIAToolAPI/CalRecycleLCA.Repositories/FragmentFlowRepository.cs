@@ -22,7 +22,7 @@ namespace CalRecycleLCA.Repositories
                  .Include(x => x.ProcessSubstitutions)
                  .Select().First();
             */
-            if (scenarioId != 0)
+            if (scenarioId != Scenario.MODEL_BASE_CASE_ID)
             {
                 int? subsId = fragmentNode.ProcessSubstitutions.Where(x => x.ScenarioID == scenarioId)
                     .Select(a => a.ProcessID).FirstOrDefault();
@@ -51,7 +51,7 @@ namespace CalRecycleLCA.Repositories
                             .Include(x => x.FragmentSubstitutions)
                             .Select().First();
             */
-            if (scenarioId != 0)
+            if (scenarioId != Scenario.MODEL_BASE_CASE_ID)
             {
                 int? subsId = fragmentNode.FragmentSubstitutions.Where(x => x.ScenarioID == scenarioId)
                     .Select(a => a.SubFragmentID).FirstOrDefault();

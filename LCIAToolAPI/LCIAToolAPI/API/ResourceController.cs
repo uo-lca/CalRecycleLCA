@@ -157,7 +157,7 @@ namespace LCAToolAPI.API
         [Route("api/fragments/{fragmentID:int}/fragmentflows")]
         [Route("api/scenarios/{scenarioID:int}/fragments/{fragmentID:int}/fragmentflows")]
         [HttpGet]
-        public IEnumerable<FragmentFlowResource> GetFragmentFlowResources(int fragmentID, int scenarioID = 0) {
+        public IEnumerable<FragmentFlowResource> GetFragmentFlowResources(int fragmentID, int scenarioID = Scenario.MODEL_BASE_CASE_ID) {
             // Use default scenario
             return _ResourceService.GetFragmentFlowResources(fragmentID, scenarioID); 
         }
@@ -285,7 +285,7 @@ namespace LCAToolAPI.API
         /// <param name="scenarioId"></param>
         [Route("api/scenarios/{scenarioID:int}/clearnodecaches")]
         [HttpPost]
-        public void ClearNodeCacheByScenario(int scenarioId = 0)
+        public void ClearNodeCacheByScenario(int scenarioId = Scenario.MODEL_BASE_CASE_ID)
         {
             _ResourceService.ClearNodeCacheByScenario(scenarioId);
         }
@@ -297,7 +297,7 @@ namespace LCAToolAPI.API
         /// <param name="fragmentId"></param>
         [Route("api/scenarios/{scenarioID:int}/fragments/{fragmentID:int}/clearnodecaches")]
         [HttpPost]
-        public void ClearNodeCacheByScenarioAndFragment(int scenarioId = 0, int fragmentId = 0)
+        public void ClearNodeCacheByScenarioAndFragment(int scenarioId = Scenario.MODEL_BASE_CASE_ID, int fragmentId = 0)
         {
             _ResourceService.ClearNodeCacheByScenarioAndFragment(scenarioId, fragmentId);
         }
@@ -308,7 +308,7 @@ namespace LCAToolAPI.API
         /// <param name="scenarioId"></param>
         [Route("api/scenarios/{scenarioID:int}/clearscorecaches")]
         [HttpPost]
-        public void ClearScoreCacheByScenario(int scenarioId = 0)
+        public void ClearScoreCacheByScenario(int scenarioId = Scenario.MODEL_BASE_CASE_ID)
         {
             _ResourceService.ClearScoreCacheByScenario(scenarioId);
         }
@@ -320,7 +320,7 @@ namespace LCAToolAPI.API
         /// <param name="fragmentId"></param>
         [Route("api/scenarios/{scenarioID:int}/fragments/{fragmentID:int}/clearscorecaches")]
         [HttpPost]
-        public void ClearScoreCacheByScenarioAndFragment(int scenarioId = 0, int fragmentId = 0)
+        public void ClearScoreCacheByScenarioAndFragment(int scenarioId = Scenario.MODEL_BASE_CASE_ID, int fragmentId = 0)
         {
             _ResourceService.ClearScoreCacheByScenarioAndFragment(scenarioId, fragmentId);
         }
@@ -332,7 +332,7 @@ namespace LCAToolAPI.API
         /// <param name="fragmentId"></param>
         [Route("api/scenarios/{scenarioID:int}/lciamethods/{lciaMethodID:int}/clearscorecaches")]
         [HttpPost]
-        public void ClearScoreCacheByScenarioAndLCIAMethod(int scenarioId = 0, int lciaMethodId = 0)
+        public void ClearScoreCacheByScenarioAndLCIAMethod(int scenarioId = Scenario.MODEL_BASE_CASE_ID, int lciaMethodId = 0)
         {
             _ResourceService.ClearScoreCacheByScenarioAndLCIAMethod(scenarioId, lciaMethodId);
         }

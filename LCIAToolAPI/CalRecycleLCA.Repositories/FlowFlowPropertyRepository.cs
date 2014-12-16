@@ -14,13 +14,13 @@ namespace CalRecycleLCA.Repositories
     public static class FlowFlowPropertyRepository
     {
         public static double inFlowIn(this IRepositoryAsync<FlowFlowProperty> repository,
-            int inFlowId, int flowPropertyId, int scenarioId = 0)
+            int inFlowId, int flowPropertyId, int scenarioId = Scenario.MODEL_BASE_CASE_ID)
         {
             var my_val = repository.Query(ffp => ffp.FlowID == inFlowId)
                 .Select()
                 .Where(ffp => ffp.FlowPropertyID == flowPropertyId).FirstOrDefault();
 
-            if (scenarioId != 0)
+            if (scenarioId != Scenario.MODEL_BASE_CASE_ID)
             {
                 var fp_param = repository.GetRepository<FlowPropertyParam>()
                     .Queryable()
@@ -36,7 +36,7 @@ namespace CalRecycleLCA.Repositories
         }
 
         public static double? FlowConv(this IRepositoryAsync<FlowFlowProperty> repository,
-            int refFlowId, int inFlowId, int scenarioId = 0)
+            int refFlowId, int inFlowId, int scenarioId = Scenario.MODEL_BASE_CASE_ID)
         {
             double flow_conv = 1;
             int refProp = repository.GetRepository<Flow>().Query(f => f.FlowID == refFlowId)

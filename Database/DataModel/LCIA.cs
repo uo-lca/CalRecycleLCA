@@ -30,9 +30,9 @@ namespace LcaDataModel
         [StringLength(100)]
         public string Geography { get; set; }
 
-        public int? DirectionID { get; set; }
+        public int DirectionID { get; set; }
 
-        public double? Factor { get; set; }
+        public double Factor { get; set; }
 
         public virtual ICollection<CharacterizationParam> CharacterizationParams { get; set; }
 

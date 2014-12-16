@@ -10,12 +10,13 @@ namespace LcaDataModel
     [Table("ProcessDissipationParam")]
     public partial class ProcessDissipationParam : Entity
     {
-        [DatabaseGenerated(DatabaseGeneratedOption.None)]
         public int ProcessDissipationParamID { get; set; }
 
-        public int? ParamID { get; set; }
+        public int ParamID { get; set; }
 
-        public int? ProcessDissipationID { get; set; }
+        public int ProcessDissipationID { get; set; }
+
+        public double Value { get; set; }
 
         public virtual Param Param { get; set; }
 

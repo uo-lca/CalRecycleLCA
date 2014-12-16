@@ -16,10 +16,10 @@ namespace CalRecycleLCA.Services
         FragmentFlow GetFragmentFlow(int fragmentFlowId);
         IEnumerable<FragmentFlow> GetFragmentFlows(IEnumerable<int> ffids);
         IEnumerable<FragmentFlow> GetFlowsByFragment(int fragmentId);
-        IEnumerable<FragmentFlow> GetCachedFlows(int fragmentId, int scenarioId = 0);
+        IEnumerable<FragmentFlow> GetCachedFlows(int fragmentId, int scenarioId = Scenario.MODEL_BASE_CASE_ID);
         FragmentNodeResource Terminate(FragmentFlow ff, int scenarioId, bool doBackground = false);
-        IEnumerable<InventoryModel> GetDependencies(int fragmentId, int flowId, int ex_directionId, 
-            out double inFlowMagnitude, int scenarioId = 0);
+        IEnumerable<InventoryModel> GetDependencies(int fragmentId, int flowId, int ex_directionId,
+            out double inFlowMagnitude, int scenarioId = Scenario.MODEL_BASE_CASE_ID);
     }
 
     public class FragmentFlowService : Service<FragmentFlow>, IFragmentFlowService
@@ -65,7 +65,7 @@ namespace CalRecycleLCA.Services
             return _repository.GetFlowsByFragment(fragmentId);
         }
 
-        public IEnumerable<FragmentFlow> GetCachedFlows(int fragmentId, int scenarioId = 0)
+        public IEnumerable<FragmentFlow> GetCachedFlows(int fragmentId, int scenarioId = Scenario.MODEL_BASE_CASE_ID)
         {
             return _repository.GetCachedFlows(fragmentId, scenarioId);
         }
@@ -109,8 +109,8 @@ namespace CalRecycleLCA.Services
         /// <param name="inFlowMagnitude"></param>
         /// <param name="scenarioId"></param>
         /// <returns>list of InventoryModels (flow, direction, quantity)</returns>
-        public IEnumerable<InventoryModel> GetDependencies(int fragmentId, int flowId, int ex_directionId, 
-            out double inFlowMagnitude, int scenarioId = 0)
+        public IEnumerable<InventoryModel> GetDependencies(int fragmentId, int flowId, int ex_directionId,
+            out double inFlowMagnitude, int scenarioId = Scenario.MODEL_BASE_CASE_ID)
         {
             return _repository.GetDependencies(fragmentId, flowId, ex_directionId, out inFlowMagnitude, scenarioId);
         }

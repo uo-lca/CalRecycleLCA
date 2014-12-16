@@ -12,16 +12,18 @@ namespace LcaDataModel
     {
         public Param()
         {
-            CharacterizationParams = new HashSet<CharacterizationParam>();
             DependencyParams = new HashSet<DependencyParam>();
             FlowPropertyParams = new HashSet<FlowPropertyParam>();
-            NodeDissipationParams = new HashSet<NodeDissipationParam>();
-            NodeEmissionParams = new HashSet<NodeEmissionParam>();
+
+            CompositionParams = new HashSet<CompositionParam>();
             ProcessDissipationParams = new HashSet<ProcessDissipationParam>();
+            NodeDissipationParams = new HashSet<NodeDissipationParam>();
             ProcessEmissionParams = new HashSet<ProcessEmissionParam>();
+            NodeEmissionParams = new HashSet<NodeEmissionParam>();
+            CharacterizationParams = new HashSet<CharacterizationParam>();
         }
 
-        [DatabaseGenerated(DatabaseGeneratedOption.None)]
+        //[DatabaseGenerated(DatabaseGeneratedOption.None)]
         public int ParamID { get; set; }
 
         public int? ParamTypeID { get; set; }
@@ -37,22 +39,23 @@ namespace LcaDataModel
 
         public double? Max { get; set; }
 
-        public virtual ICollection<CharacterizationParam> CharacterizationParams { get; set; }
-
+        public virtual ParamType ParamType { get; set; }
+        public virtual Scenario Scenario { get; set; }
+        
         public virtual ICollection<DependencyParam> DependencyParams { get; set; }
 
         public virtual ICollection<FlowPropertyParam> FlowPropertyParams { get; set; }
 
-        public virtual ICollection<NodeDissipationParam> NodeDissipationParams { get; set; }
-
-        public virtual ICollection<NodeEmissionParam> NodeEmissionParams { get; set; }
-
-        public virtual ParamType ParamType { get; set; }
+        public virtual ICollection<CompositionParam> CompositionParams { get; set; }
 
         public virtual ICollection<ProcessDissipationParam> ProcessDissipationParams { get; set; }
 
+        public virtual ICollection<NodeDissipationParam> NodeDissipationParams { get; set; }
+
         public virtual ICollection<ProcessEmissionParam> ProcessEmissionParams { get; set; }
 
-        public virtual Scenario Scenario { get; set; }
+        public virtual ICollection<NodeEmissionParam> NodeEmissionParams { get; set; }
+
+        public virtual ICollection<CharacterizationParam> CharacterizationParams { get; set; }
     }
 }

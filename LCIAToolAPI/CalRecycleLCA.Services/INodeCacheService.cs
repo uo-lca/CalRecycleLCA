@@ -10,7 +10,7 @@ namespace CalRecycleLCA.Services
 {
     public interface INodeCacheService : IService<NodeCache>
     {
-        void ClearNodeCacheByScenario(int scenarioId = 0);
-        void ClearNodeCacheByScenarioAndFragment(int scenarioId = 0, int fragmentId = 0);
+        void ClearNodeCacheByScenario(int scenarioId = Scenario.MODEL_BASE_CASE_ID);
+        void ClearNodeCacheByScenarioAndFragment(int scenarioId = Scenario.MODEL_BASE_CASE_ID, int fragmentId = 0);
     }
 }

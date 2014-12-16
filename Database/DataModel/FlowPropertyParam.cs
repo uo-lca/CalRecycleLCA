@@ -12,11 +12,11 @@ namespace LcaDataModel
     {
         public int FlowPropertyParamID { get; set; }
 
-        public int? ParamID { get; set; }
+        public int ParamID { get; set; }
 
-        public int? FlowFlowPropertyID { get; set; }
+        public int FlowFlowPropertyID { get; set; }
 
-        public double? Value { get; set; }
+        public double Value { get; set; }
 
         public virtual FlowFlowProperty FlowFlowProperty { get; set; }
 

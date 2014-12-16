@@ -26,7 +26,7 @@ namespace CalRecycleLCA.Repositories
                 .GroupJoin(repository.GetRepository<CharacterizationParam>().Queryable()
                         .Where(cp => cp.Param.ScenarioID == scenarioId), // Target table
                     l => l.l.LCIAID,
-                    cp => cp.LCAID,
+                    cp => cp.LCIAID,
                     (l, cp) => new { lcias = l, parameter = cp })
                 .SelectMany(s => s.parameter.DefaultIfEmpty(),
                     (s, parameter) => new LCIAModel
@@ -34,14 +34,14 @@ namespace CalRecycleLCA.Repositories
                         ScenarioID = scenarioId,
                         LCIAMethodID = s.lcias.l.LCIAMethodID,
                         FlowID = (int)s.lcias.l.FlowID,
-                        DirectionID = (int)s.lcias.l.DirectionID,
+                        DirectionID = s.lcias.l.DirectionID,
                         Quantity = s.lcias.i.Result,
                         Factor = parameter == null ? s.lcias.l.Factor : parameter.Value,
                         Geography = s.lcias.l.Geography,
                         CharacterizationParam = parameter == null ? null : new ParamInstance
                             {
-                                ParamID = (int)parameter.ParamID,
-                                Value = (double)parameter.Value
+                                ParamID = parameter.ParamID,
+                                Value = parameter.Value
                             }
                     });
         }
@@ -54,7 +54,7 @@ namespace CalRecycleLCA.Repositories
            .Join(repository.GetRepository<LCIAMethod>().Queryable().Where(x => x.LCIAMethodID == lciaMethodId), l => l.l.LCIAMethodID, lm => lm.LCIAMethodID, (l, lm) => new { l, lm })
            .GroupJoin(repository.GetRepository<CharacterizationParam>().Queryable() // Target table
            , l => l.l.l.LCIAID
-           , cp => cp.LCAID
+           , cp => cp.LCIAID
            , (l, cp) => new { lcias = l, characterizationParams = cp })
            .SelectMany(s => s.characterizationParams.DefaultIfEmpty()
            , (s, characterizationParams) => new
@@ -62,7 +62,7 @@ namespace CalRecycleLCA.Repositories
                FlowID = s.lcias.l.i.FlowID,
                DirectionID = s.lcias.l.i.DirectionID,
                Quantity = s.lcias.l.i.Result,
-               LCIAID = characterizationParams == null ? 0 : characterizationParams.LCAID,
+               LCIAID = characterizationParams == null ? 0 : characterizationParams.LCIAID,
                Value = characterizationParams == null ? 0 : characterizationParams.Value,
                ParamID = characterizationParams == null ? 0 : characterizationParams.ParamID,
                LCIAMethodID = s.lcias.lm.LCIAMethodID,

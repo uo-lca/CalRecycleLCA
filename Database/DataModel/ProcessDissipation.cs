@@ -18,13 +18,17 @@ namespace LcaDataModel
 
         public int ProcessDissipationID { get; set; }
 
-        public int? ProcessFlowID { get; set; }
+        public int ProcessID { get; set; }
+
+        public int FlowPropertyEmissionID { get; set; }
 
         public double? EmissionFactor { get; set; }
 
         public virtual ICollection<NodeDissipationParam> NodeDissipationParams { get; set; }
 
-        public virtual ProcessFlow ProcessFlow { get; set; }
+        public virtual Process Process { get; set; }
+
+        public virtual FlowPropertyEmission FlowPropertyEmission { get; set; }
 
         public virtual ICollection<ProcessDissipationParam> ProcessDissipationParams { get; set; }
     }

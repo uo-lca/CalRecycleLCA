@@ -21,19 +21,19 @@ namespace CalRecycleLCA.Repositories
                 .Where(pf => pf.FlowID == flowId)
 		        .Where(pf => pf.DirectionID != ex_directionId).FirstOrDefault();
 
-	    /* *********
-            if (scenarioId != 0 && pf.Flow.FlowTypeID == 2) // params only apply to elem flows
-            {
-                var pf_param = repository.GetRepository<FlowPropertyParam>()
-                    .Queryable()
-                    .Where(w => w.FlowFlowPropertyID == my_val.FlowFlowPropertyID)
-                    .Where(w => w.Param.ScenarioID == scenarioId)
-                    .FirstOrDefault();
+            /* *********
+                if (scenarioId != Scenario.MODEL_BASE_CASE_ID && pf.Flow.FlowTypeID == 2) // params only apply to elem flows
+                {
+                    var pf_param = repository.GetRepository<FlowPropertyParam>()
+                        .Queryable()
+                        .Where(w => w.FlowFlowPropertyID == my_val.FlowFlowPropertyID)
+                        .Where(w => w.Param.ScenarioID == scenarioId)
+                        .FirstOrDefault();
             
-                if (fp_param != null)
-                    my_val.MeanValue = fp_param.Value;
-            }
-	    ***** */
+                    if (fp_param != null)
+                        my_val.MeanValue = fp_param.Value;
+                }
+            ***** */
 
             return my_val.Result;
         }
@@ -73,7 +73,7 @@ namespace CalRecycleLCA.Repositories
         public static IEnumerable<InventoryModel> GetEmissions(this IRepositoryAsync<ProcessFlow> repository,
             int processId, int scenarioId)
         {
-            if (scenarioId == 0)
+            if (scenarioId == Scenario.MODEL_BASE_CASE_ID)
                 return repository.Queryable()
                     .Where(pf => pf.ProcessID == processId)
                     .Where(pf => pf.Flow.FlowTypeID == 2)
@@ -100,8 +100,8 @@ namespace CalRecycleLCA.Repositories
                             Result = s.baseFlows.Result,
                             Param = efParams == null ? null : new ParamInstance
                             {
-                                ParamID = (int)efParams.ParamID,
-                                Value = (double)efParams.Value
+                                ParamID = efParams.ParamID,
+                                Value = efParams.Value
                             }
                         });
 
@@ -111,7 +111,7 @@ namespace CalRecycleLCA.Repositories
         public static IEnumerable<InventoryModel> GetDissipation(this IRepositoryAsync<ProcessFlow> repository,
             int processId, int scenarioId)
         {
-            if (scenarioId == 0)
+            if (scenarioId == Scenario.MODEL_BASE_CASE_ID)
                 // no params
                 return repository.Queryable()
                     .Where(pf => pf.ProcessID == processId)
