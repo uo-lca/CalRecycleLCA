@@ -38,6 +38,10 @@ namespace LCAToolAPI.API
              "{\"paramID\":\"11\", \"paramTypeID\":\"1\",\"scenarioID\":\"1\", \"name\":\"Test Param\", \"value\":\"6.99\", \"fragmentFlowID\":\"243\", \"flowID\":\"373\", \"flowPropertyID\":\"373\", \"processID\":\"373\", \"lciaMethodID\":\"373\", \"conservation\":\"true\", \"dependencyParamID\":\"20\",}" +
              "]}";
 
+        private string updateParamJSON = "{\"params\":[" +
+          "{\"paramID\":\"10\", \"paramTypeID\":\"1\",\"scenarioID\":\"1\", \"name\":\"Test Param\", \"value\":\"6.99\", \"fragmentFlowID\":\"243\", \"flowID\":\"373\", \"flowPropertyID\":\"373\", \"processID\":\"373\", \"lciaMethodID\":\"373\", \"conservation\":\"true\", \"dependencyParamID\":\"20\",}" +
+          "]}";
+
         [Inject]
         private readonly IResourceServiceFacade _ResourceService;
 
@@ -377,6 +381,14 @@ namespace LCAToolAPI.API
         public void AddParam()
         {
             _ResourceService.AddParam(addParamJSON);
+        }
+
+        [Route("api/updateParam")]
+        [AcceptVerbs("GET", "POST")]
+        [HttpPost]
+        public void UpdateParam()
+        {
+            _ResourceService.UpdateParam(updateParamJSON);
         }
 
         /* TODO:

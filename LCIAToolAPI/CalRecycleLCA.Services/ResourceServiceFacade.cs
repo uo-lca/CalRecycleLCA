@@ -949,15 +949,162 @@ namespace CalRecycleLCA.Services
         }
 
         public void AddParam(string addParamJSON)
-        
-        
         {
             // Parse JSON into dynamic object
             JObject jsonParams = JObject.Parse(addParamJSON);
 
-            //  private string addParamJSON = "{\"params\":[" +
-            // "flowPropertyID\":\"373\", \"processID\":\"373\", \"lciaMethodID\":\"373\", \"conservation\":\"true\",}" +
-            //"]}";
+            List<ParamResource> paramList = new List<ParamResource>();
+
+            // add each param resource to a list
+            foreach (var jsonParam in jsonParams["params"])
+            {
+                paramList.Add(new ParamResource()
+                {
+                    //ParamID = Convert.ToInt32((string)jsonParam["paramID"]),
+                    ParamTypeID = Convert.ToInt32((string)jsonParam["paramTypeID"]),
+                    ScenarioID = Convert.ToInt32((string)jsonParam["scenarioID"]),
+                    Name = (string)jsonParam["name"],
+                    Value = float.Parse((string)jsonParam["value"]),
+                    FragmentFlowID = Convert.ToInt32((string)jsonParam["fragmentFlowID"]),
+                    FlowID = Convert.ToInt32((string)jsonParam["flowID"]),
+                    FlowPropertyID = Convert.ToInt32((string)jsonParam["flowPropertyID"]),
+                    ProcessID = Convert.ToInt32((string)jsonParam["processID"]),
+                    LCIAMethodID = Convert.ToInt32((string)jsonParam["lciaMethodID"])
+                });
+            }
+
+            foreach (var paramResource in paramList)
+            {
+
+                Param param = new Param();
+                DependencyParam dParam = new DependencyParam();
+                FlowPropertyParam fpParam = new FlowPropertyParam();
+                ProcessEmissionParam peParam = new ProcessEmissionParam();
+                CharacterizationParam cParam = new CharacterizationParam();
+
+                switch (paramResource.ParamTypeID)
+                {
+                    case 1:
+                        {
+                            param.ParamTypeID = paramResource.ParamTypeID;
+                            param.ScenarioID = paramResource.ScenarioID;
+                            param.Name = paramResource.Name;
+                            param.ObjectState = ObjectState.Added;
+                            _ParamService.InsertOrUpdateGraph(param);
+                            //int paramId = param.ParamID;
+
+                            //dParam.ParamID = paramResource.ParamID;
+                            dParam.FragmentFlowID = Convert.ToInt32(paramResource.FragmentFlowID);
+                            dParam.Value = paramResource.Value;
+                            dParam.ObjectState = ObjectState.Added;
+                            _DependencyParamService.InsertOrUpdateGraph(dParam);
+
+                            break;
+                        }
+                    case 2:
+                        {
+                            param.ParamID = paramResource.ParamID;
+                            param.ParamTypeID = paramResource.ParamTypeID;
+                            param.ScenarioID = paramResource.ScenarioID;
+                            param.Name = paramResource.Name;
+
+                            dParam.ParamID = paramResource.ParamID;
+                            dParam.FragmentFlowID = Convert.ToInt32(paramResource.FragmentFlowID);
+                            dParam.Value = paramResource.Value;
+
+                            param.ObjectState = ObjectState.Added;
+                            _ParamService.InsertOrUpdateGraph(param);
+                            dParam.ObjectState = ObjectState.Added;
+                            _DependencyParamService.InsertOrUpdateGraph(dParam);
+                            break;
+                        }
+
+                    case 3:
+                        {
+                            break;
+                        }
+
+                    case 4:
+                        {
+                            int flowFlowPropertyID = _FlowFlowPropertyService.Queryable()
+                                .Where(x => x.FlowID == paramResource.FlowID && x.FlowPropertyID == paramResource.FlowPropertyID)
+                                .FirstOrDefault()
+                                .FlowFlowPropertyID;
+
+                            param.ParamID = paramResource.ParamID;
+                            param.ParamTypeID = paramResource.ParamTypeID;
+                            param.ScenarioID = paramResource.ScenarioID;
+                            param.Name = paramResource.Name;
+
+                            fpParam.ParamID = paramResource.ParamID;
+                            fpParam.FlowFlowPropertyID = Convert.ToInt32(flowFlowPropertyID);
+
+                            param.ObjectState = ObjectState.Added;
+                            _ParamService.InsertOrUpdateGraph(param);
+                            fpParam.ObjectState = ObjectState.Added;
+                            _FlowPropertyParamService.InsertOrUpdateGraph(fpParam);
+                            break;
+                        }
+
+                    case 8:
+                        {
+                            int processID = _ProcessFlowService.Queryable()
+                                .Where(x => x.FlowID == paramResource.FlowID)
+                                .FirstOrDefault()
+                                .ProcessID;
+                            int processFlowID = _ProcessFlowService.Queryable()
+                                .Where(x => x.FlowID == paramResource.FlowID)
+                                .FirstOrDefault()
+                                .ProcessFlowID;
+
+                            param.ParamID = paramResource.ParamID;
+                            param.ParamTypeID = paramResource.ParamTypeID;
+                            param.ScenarioID = paramResource.ScenarioID;
+                            param.Name = paramResource.Name;
+
+                            peParam.ParamID = paramResource.ParamID;
+                            peParam.ProcessFlowID = Convert.ToInt32(processFlowID);
+
+                            param.ObjectState = ObjectState.Added;
+                            _ParamService.InsertOrUpdateGraph(param);
+                            peParam.ObjectState = ObjectState.Added;
+                            _ProcessEmissionParamService.InsertOrUpdateGraph(peParam);
+                            break;
+                        }
+
+                    case 9:
+                        {
+                            int lciaID = _LCIAService.Queryable()
+                                .Where(x => x.FlowID == paramResource.FlowID)
+                                .FirstOrDefault()
+                                .LCIAID;
+
+                            param.ParamID = paramResource.ParamID;
+                            param.ParamTypeID = paramResource.ParamTypeID;
+                            param.ScenarioID = paramResource.ScenarioID;
+                            param.Name = paramResource.Name;
+
+                            cParam.ParamID = paramResource.ParamID;
+                            cParam.LCAID = Convert.ToInt32(lciaID);
+
+                            param.ObjectState = ObjectState.Added;
+                            _ParamService.InsertOrUpdateGraph(param);
+                            cParam.ObjectState = ObjectState.Added;
+                            _CharacterizationParamService.InsertOrUpdateGraph(cParam);
+                            break;
+                        }
+
+
+                }
+            }
+                _unitOfWork.SaveChanges();
+
+    }
+
+        public void UpdateParam(string updateParamJSON)
+        {
+            // Parse JSON into dynamic object
+            JObject jsonParams = JObject.Parse(updateParamJSON);
 
             List<ParamResource> paramList = new List<ParamResource>();
 
@@ -1108,7 +1255,9 @@ namespace CalRecycleLCA.Services
                 _unitOfWork.SaveChanges();
 
           
-        #endregion
+        
     }
+
+      #endregion  
 }
 }

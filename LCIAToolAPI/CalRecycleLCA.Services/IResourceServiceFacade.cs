@@ -37,5 +37,6 @@ namespace CalRecycleLCA.Services
         void DeleteScenario(string deleteScenarioJSON);
         void DeleteParam(string deleteParamJSON);
         void AddParam(string addParamJSON);
+        void UpdateParam(string updateParamJSON);
     }
 }
