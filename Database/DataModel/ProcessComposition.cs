@@ -17,7 +17,7 @@ namespace LcaDataModel {
         //     CompositionSubstitutions = new HashSet<CompositionSubstitution>();
         // }
 
-        [DatabaseGenerated(DatabaseGeneratedOption.None)]
+        //[DatabaseGenerated(DatabaseGeneratedOption.None)]
         public int ProcessCompositionID { get; set; }
 
         public int CompositionModelID { get; set; }

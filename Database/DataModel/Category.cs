@@ -16,7 +16,7 @@ namespace LcaDataModel
             Classifications = new HashSet<Classification>();
         }
 
-        [DatabaseGenerated(DatabaseGeneratedOption.None)]
+        //[DatabaseGenerated(DatabaseGeneratedOption.None)]
         public int CategoryID { get; set; }
 
         [StringLength(60)]

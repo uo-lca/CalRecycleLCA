@@ -230,26 +230,6 @@ namespace LcaDataLoader {
         }
 
         /// <summary>
-        /// Create an entity with a given ID, if the ID does not already exist, and add it to the data model.
-        /// Changes are not saved so that other properties can be set before saving.
-        /// Use this when loading entities from CSV.
-        /// </summary>
-        /// <param name="id">The entity ID</param>
-        /// <returns>New or existing entity with matching ID</returns>
-        /// TODO: Replace usage of this method with new method above
-        public T CreateEntityWithID<T>(int id) where T : class, IEntity, new() {
-            T ent = Find<T>(id);
-            if (ent == null) {
-                ent = new T { ID = id };
-                _DbContext.Set<T>().Add(ent);
-            }
-            else {
-                Program.Logger.WarnFormat("Found {1} with ID = {0}. Entity will not be added, but may be updated.", id, typeof(T).ToString());
-            }
-            return ent;
-        }
-
-        /// <summary>
         /// Populate Lookup table, if it is empty.
         /// </summary>
         /// <param name="lutSet">database context DbSet for the lookup table</param>

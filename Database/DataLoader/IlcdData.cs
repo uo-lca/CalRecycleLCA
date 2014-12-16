@@ -161,8 +161,8 @@ namespace LcaDataLoader {
         /// <param name="ilcdDb">Database context wrapper object</param>
         /// <param name="el">LCIAMethod characterization factor element</param>
         /// <param name="lciaMethodID">LCIAMethod parent entity ID</param>
-        private LCIA CreateLCIA(DbContextWrapper ilcdDb, XElement el, int lciaMethodID) {
-            LCIA lcia;
+        private LCIA CreateLCIA(DbContextWrapper ilcdDb, XElement el, int lciaMethodID, string lciaMethodUUID) {
+            LCIA lcia = null;
             XElement refEl = el.Element(ElementName("referenceToFlowDataSet"));
             string uuid = refEl.Attribute("refObjectId").Value;
             double meanValue = (double)el.Element(ElementName(("meanValue")));
@@ -181,21 +181,23 @@ namespace LcaDataLoader {
             //}
             
             int? dirID = ilcdDb.LookupEntityID<Direction>(direction);
-            int reqDirID = Convert.ToInt32(DirectionEnum.Output);
+            
             if (dirID == null) {
-                Program.Logger.WarnFormat("Invalid LCIA exchangeDirection : {0}, refObjectId = {1}. Resetting to Output.", direction, uuid);
+                Program.Logger.ErrorFormat("Invalid LCIA exchangeDirection : {0}, refObjectId = {1}. LCIA Method UUID = {2}. Skipping record.", 
+                    direction, uuid, lciaMethodUUID);
             }
             else {
-                reqDirID = Convert.ToInt32(dirID);
+                int reqDirID = Convert.ToInt32(dirID);
+
+                lcia = new LCIA { //FlowID = id, 
+                    FlowUUID = uuid,
+                    FlowName = name,
+                    DirectionID = reqDirID,
+                    Factor = meanValue,
+                    Geography = location,
+                    LCIAMethodID = lciaMethodID
+                };
             }
-            lcia = new LCIA { //FlowID = id, 
-                FlowUUID = uuid,
-                FlowName = name,
-                DirectionID = reqDirID,
-                Factor = meanValue,
-                Geography = location,
-                LCIAMethodID = lciaMethodID
-            };
             return lcia;
         }
 
@@ -406,7 +408,7 @@ namespace LcaDataLoader {
                 if (ilcdDb.AddIlcdEntity(lciaMethod, uuid)) {
                     List<LCIA> lciaList =
                         LoadedDocument.Root.Descendants(ElementName("characterisationFactors")).Elements(ElementName("factor")).Select(f =>
-                            CreateLCIA(ilcdDb, f, lciaMethod.ID)).ToList();
+                            CreateLCIA(ilcdDb, f, lciaMethod.ID, uuid)).ToList();
                     ilcdDb.AddEntities<LCIA>(lciaList);
 
                     isSaved = true;

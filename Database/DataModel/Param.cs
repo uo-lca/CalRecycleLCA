@@ -23,7 +23,7 @@ namespace LcaDataModel
             CharacterizationParams = new HashSet<CharacterizationParam>();
         }
 
-        [DatabaseGenerated(DatabaseGeneratedOption.None)]
+        //[DatabaseGenerated(DatabaseGeneratedOption.None)]
         public int ParamID { get; set; }
 
         public int? ParamTypeID { get; set; }
