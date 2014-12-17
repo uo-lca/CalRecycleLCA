@@ -36,9 +36,7 @@ namespace CalRecycleLCA.Services
         /// <returns></returns>
         public double? FlowConv(int? refFlowId, int inFlowId, int scenarioId = Scenario.MODEL_BASE_CASE_ID)
         {
-            if (refFlowId == null)
-                return 1;
-            else if (refFlowId == inFlowId)
+            if ((refFlowId == null) || (refFlowId == inFlowId) || (refFlowId == 0))
                 return 1;
             else
                 return _repository.FlowConv((int)refFlowId, inFlowId, scenarioId);
