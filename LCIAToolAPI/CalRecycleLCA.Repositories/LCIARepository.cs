@@ -95,6 +95,21 @@ namespace CalRecycleLCA.Repositories
             //.Where(x => x.DirectionID == inventory.Select(i => i.DirectionID).FirstOrDefault());
             //.Where(x => x.Geography == null);
         }
+
+        public static IEnumerable<LCIAFactorResource> QueryFactors(this IRepositoryAsync<LCIA> repository, 
+            int lciaMethodId)
+        {
+            return repository.Queryable()
+                .Where(k => k.LCIAMethodID == lciaMethodId)
+                .Where(k => k.FlowID != null)
+                .Select(k => new LCIAFactorResource() {
+                    LCIAMethodID = (int)k.LCIAMethodID,
+                    FlowID = (int)k.FlowID,
+                    Geography = k.Geography,
+                    DirectionID = k.DirectionID,
+                    Factor = k.Factor
+                });
+        }
     }
 }
 

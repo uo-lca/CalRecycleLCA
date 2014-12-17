@@ -463,6 +463,18 @@ namespace CalRecycleLCA.Services
         }
 
         /// <summary>
+        /// Get factors for a given LCIA method. Only return paired (i.e. non-null Flow) factors.
+        /// This could maybe be scenario-sensitive, as Characterization Params would change factors
+        /// on a scenario-specific basis.
+        /// </summary>
+        /// <param name="lciaMethodId"></param>
+        /// <returns></returns>
+        public IEnumerable<LCIAFactorResource> GetLCIAFactors(int lciaMethodId)
+        {
+            return _LCIAService.QueryFactors(lciaMethodId);
+        }
+
+        /// <summary>
         /// Execute fragment traversal and return computation results in FragmentFlowResource objects
         /// </summary>
         /// <param name="fragmentID">FragmentID filter</param>

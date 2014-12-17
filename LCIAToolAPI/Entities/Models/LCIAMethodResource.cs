@@ -28,4 +28,13 @@ namespace Entities.Models {
         public string UseAdvice { get; set; }
         public FlowPropertyResource ReferenceFlowProperty { get; set; }     
     }
+
+    public class LCIAFactorResource
+    {
+        public int LCIAMethodID { get; set; }
+        public string Geography { get; set; }
+        public int FlowID { get; set; }         // Process LCI flow
+        public int DirectionID { get; set; }
+        public double Factor { get; set; }      // CharacterizationParam value or LCIA factor
+    }
 }

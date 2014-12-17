@@ -232,6 +232,14 @@ namespace LCAToolAPI.API
             return _ResourceService.GetActiveLCIAMethodResources();
         }
 
+        [Route("api/lciamethods/{lciaMethodId:int}/factors")]
+        [Route("api/lciamethods/{lciaMethodId:int}/lciafactors")]
+        [HttpGet]
+        public IEnumerable<LCIAFactorResource> GetLCIAFactors(int lciaMethodId)
+        {
+            return _ResourceService.GetLCIAFactors(lciaMethodId);
+        }
+
         // Process metadata /////////////////////////////////////////////////////////
         [Route("api/processes")]
         [HttpGet]
