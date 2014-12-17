@@ -720,7 +720,6 @@ namespace CalRecycleLCA.Services
         /// <param name="scenarioID">Defaults to base scenario</param>
         /// <returns>Fragment LCIA results for given parameters</returns> 
         public LCIAResultResource GetFragmentLCIAResults(int fragmentID, int lciaMethodID, int scenarioID = Scenario.MODEL_BASE_CASE_ID) {
-            // IEnumerable<FragmentLCIAModel> results = _FragmentLCIAComputation.ComputeFragmentLCIA(fragmentID, scenarioID, lciaMethodID);
             IEnumerable<FragmentLCIAModel> aggResults = _FragmentLCIAComputation.ComputeFragmentLCIA(fragmentID, scenarioID, lciaMethodID)
                 .GroupBy(r => new
                 {
@@ -751,7 +750,15 @@ namespace CalRecycleLCA.Services
         /// <returns>List of LCIAResultResource objects</returns> 
         public IEnumerable<LCIAResultResource> GetFragmentLCIAResultsAllScenarios(int fragmentID, int lciaMethodID, int scenarioGroupID = 1)
         {
-            IEnumerable<Scenario> scenarios = _ScenarioService.Queryable().Where(s => s.ScenarioGroupID == scenarioGroupID);
+            IEnumerable<Scenario> scenarios = _ScenarioService.Queryable().Where(s => s.ScenarioGroupID == scenarioGroupID).ToList();
+            foreach (var k in scenarios)
+            {
+                // check to see if cache has been populated for each scenario
+                if (_ScoreCacheService.Queryable().Where(s => s.FragmentFlow.FragmentID == fragmentID)
+                    .Where(s => s.ScenarioID == k.ScenarioID)
+                    .Where(s => s.LCIAMethodID == lciaMethodID).ToList().Count() == 0)
+                    _FragmentLCIAComputation.FragmentLCIACompute(fragmentID, k.ScenarioID);
+            } 
             return scenarios.Select(s => GetFragmentLCIAResults(fragmentID, lciaMethodID, s.ScenarioID)).ToList();
         }
 
