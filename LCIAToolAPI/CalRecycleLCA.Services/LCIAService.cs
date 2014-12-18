@@ -13,8 +13,8 @@ namespace CalRecycleLCA.Services
 {
     public interface ILCIAService : IService<LCIA>
     {
-        IEnumerable<LCIAModel> ComputeLCIA(IEnumerable<InventoryModel> inventory, int lciaMethodId, int scenarioId = 0);
-        IEnumerable<LCIAModel> OldComputeLCIA(IEnumerable<InventoryModel> inventory, int lciaMethodId, int scenarioId = 0);
+        IEnumerable<LCIAModel> ComputeLCIA(IEnumerable<InventoryModel> inventory, int lciaMethodId, int scenarioId = Scenario.MODEL_BASE_CASE_ID);
+        IEnumerable<LCIAModel> OldComputeLCIA(IEnumerable<InventoryModel> inventory, int lciaMethodId, int scenarioId = Scenario.MODEL_BASE_CASE_ID);
     }
 
     public class LCIAService : Service<LCIA>, ILCIAService
@@ -27,11 +27,11 @@ namespace CalRecycleLCA.Services
             _repository = repository;            
         }
 
-        public IEnumerable<LCIAModel> ComputeLCIA(IEnumerable<InventoryModel> inventory, int lciaMethodId, int scenarioId = 0)
+        public IEnumerable<LCIAModel> ComputeLCIA(IEnumerable<InventoryModel> inventory, int lciaMethodId, int scenarioId = Scenario.MODEL_BASE_CASE_ID)
         {
             return _repository.ComputeLCIA(inventory, lciaMethodId, scenarioId);
         }
-        public IEnumerable<LCIAModel> OldComputeLCIA(IEnumerable<InventoryModel> inventory, int lciaMethodId, int scenarioId = 0)
+        public IEnumerable<LCIAModel> OldComputeLCIA(IEnumerable<InventoryModel> inventory, int lciaMethodId, int scenarioId = Scenario.MODEL_BASE_CASE_ID)
         {
             return _repository.OldComputeLCIA(inventory, lciaMethodId, scenarioId);
         }

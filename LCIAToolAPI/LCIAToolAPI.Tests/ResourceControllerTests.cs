@@ -324,7 +324,7 @@ _unitOfWork);
         {
             int processID = 1; 
             int lciaMethodID = 1;
-            int scenarioID = 0;
+            int scenarioID = Scenario.MODEL_BASE_CASE_ID;
 
             //We only set up the mock repositories that we need
             _lciaMethod = new LCIAMethod()
@@ -406,7 +406,7 @@ _unitOfWork);
               _processLCIAResult = new LCIAResultResource()
                      {
                                 LCIAMethodID=1,
-                                ScenarioID=0, 
+                                ScenarioID = Scenario.MODEL_BASE_CASE_ID, 
                                 LCIAScore = new List<AggregateLCIAResource>
                                    {
                                       new AggregateLCIAResource()
@@ -464,7 +464,7 @@ _unitOfWork);
             //compare again what we actually recieve from the method.
             _scenarios = new List<Scenario>
                      {
-                            new Scenario(){ScenarioID=0,Name="Model Base Case"},
+                            new Scenario(){ScenarioID=Scenario.MODEL_BASE_CASE_ID, Name="Model Base Case"},
                             new Scenario(){ScenarioID=2,Name="Process Substitution"}
 
                      }.ToList();

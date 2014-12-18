@@ -47,7 +47,7 @@ namespace CalRecycleLCA.Repositories
                 .Select(bg => new FragmentNodeResource
                 {
                     NodeTypeID = bg.NodeTypeID,
-                    ScenarioID = 0,
+                    ScenarioID = Scenario.MODEL_BASE_CASE_ID,
                     RefID = (int)bg.ILCDEntityID,
                     TermFlowID = (int)flowId
                 }).FirstOrDefault();

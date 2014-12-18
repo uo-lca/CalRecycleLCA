@@ -12,11 +12,11 @@ namespace LcaDataModel
     {
         public int ProcessEmissionParamID { get; set; }
 
-        public int? ParamID { get; set; } // should be non-nullable
+        public int ParamID { get; set; } 
 
-        public int? ProcessFlowID { get; set; } // should be non-nullable
+        public int ProcessFlowID { get; set; } 
 
-        public double? Value { get; set; } // should be non-nullable
+        public double Value { get; set; } 
 
         public virtual Param Param { get; set; }
 

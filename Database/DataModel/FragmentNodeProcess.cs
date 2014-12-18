@@ -14,7 +14,7 @@ namespace LcaDataModel
             ProcessSubstitutions = new HashSet<ProcessSubstitution>();
         } 
         
-        [DatabaseGenerated(DatabaseGeneratedOption.None)]
+        //[DatabaseGenerated(DatabaseGeneratedOption.None)]
         public int FragmentNodeProcessID { get; set; }
 
         public int? FragmentFlowID { get; set; }

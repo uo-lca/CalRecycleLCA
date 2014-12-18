@@ -12,11 +12,11 @@ namespace LcaDataModel
     {
         public int CharacterizationParamID { get; set; }
 
-        public int? ParamID { get; set; }
+        public int ParamID { get; set; }
 
-        public int? LCAID { get; set; }
+        public int? LCIAID { get; set; }
 
-        public double? Value { get; set; }
+        public double Value { get; set; }
 
         public virtual LCIA LCIA { get; set; }
 

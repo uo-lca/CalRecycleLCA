@@ -19,7 +19,7 @@ namespace LcaDataModel
             Scenarios = new HashSet<Scenario>();
         }
 
-        [DatabaseGenerated(DatabaseGeneratedOption.None)]
+        //[DatabaseGenerated(DatabaseGeneratedOption.None)]
         public int FragmentID { get; set; }
 
         [StringLength(255)]

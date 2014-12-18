@@ -137,16 +137,16 @@ The following tables are required:
    ParamType (enumeration)
     * ParamTypeID: [1 | 2 | 3 
       	     | 4 
-	     | 
-	     | 6 | 7 
-	     | 8 | 9
+	     | 5
+	     | 6 | 
+	     | 8 | 
 	     | 10 ]
 
     * Name: [Dependency | Conservation | Distribution
       	     | FlowProperty 
-	     | 
-	     | ProcessDissipation | NodeDissipation
-	     | ProcessEmission | NodeEmission
+	     | Composition
+	     | ProcessDissipation | SKIP
+	     | ProcessEmission | SKIP
 	     | LCIAFactor ]
 
     Different parameter types must be handled at different points in the
@@ -334,7 +334,8 @@ The following tables are required:
 
    ProcessDissipation
     * ProcessDissipationID
-    * ProcessFlowID
+    * ProcessID
+    * FlowPropertyEmissionID
     * EmissionFactor (0-1)
 
     * DocID
@@ -466,7 +467,7 @@ The following tables are required:
    FragmentStage
     * FragmentStageID
     * FragmentID
-    * StageName
+    * Name
 
     * DocID
 
@@ -545,9 +546,8 @@ The following tables are required:
 
     * DocID
 
-   ScenarioBackground - ### PLEASE REVIEW
-   [could be named BackgroundSubstitution]
-    * ScenarioBackgroundID
+   BackgroundSubstitution
+    * BackgroundSubstitutionID
     * ScenarioID
     * FlowID
     * DirectionID
@@ -577,24 +577,17 @@ The following tables are required:
     * Max -- determined at invocation (in frontend) except for types 4, 6,
       	     7, where it is always 1.
 
-   ScenarioParam - DELETE TABLE
-    * ScenarioParamID
-    * ScenarioID
-    * ParamID
-
    DependencyParam
     * DependencyParamID
     * ParamID (FK to Param, ParamTypeID must be 1, 2, or 3)
     * FragmentFlowID (was FragmentEdgeID) (FK to FragmentFlowID)
     * Value (float) unit value of param (phi=0) (aka scenario setting)
 
-   DistributionParam
-    X DistributionParamID - not needed
+   ConservationParam
     * DependencyParamID (FK to DependencyParamID, PK for this table)
-    * ConservationDependencyParamID (FK to DependencyParamID)
-
-      note: both DependencyParamID and ConservationDependencyParamID must
-      have the same ParamID [with ParamTypeID=2]
+    * FragmentFlowID (FK to FragmentFlow whose child flows are conserved)
+    * FlowPropertyID (FK to FlowProperty that is conserved)
+    * DirectionID (of FF pointed to by DependencyParam, w.r.t. parent)
 
    FlowPropertyParam
     * FlowPropertyParamID
@@ -602,10 +595,10 @@ The following tables are required:
     * FlowFlowPropertyID (FK)
     * Value (float) unit value of param (phi=0) (aka scenario setting)
 
-   CompositionParam -- DELETE TABLE
+   CompositionParam -- RESTORE TABLE!!!
     * CompositionParamID
     * ParamID (FK to Param, ParamTypeID must be 5)
-    * FlowFlowPropertyID (FK)
+    % CompositionDataID (FK)
     * Value (float) unit value of param (phi=0) (aka scenario setting)
 
     Note: types 4 and 5 both link to FlowFlowPropertyIDs; so type 5 is
@@ -724,7 +717,7 @@ The following tables are required:
 
     size of ScoreCache table = #(nodes) x #(scenarios) x #(LCIA  methods)
 
-   BackgroundCache 
+   NOT IMPLEMENTED:  BackgroundCache 
     * BackgroundCacheID
     * BackgroundID (FK)
     + ScenarioID (FK)

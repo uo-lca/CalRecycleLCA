@@ -20,7 +20,7 @@ namespace LcaDataModel
         public int? FragmentID { get; set; }
 
         [StringLength(255)]
-        public string StageName { get; set; } // should be just Name
+        public string Name { get; set; } 
 
         public virtual Fragment Fragment { get; set; }
 

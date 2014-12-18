@@ -14,7 +14,7 @@ namespace LcaDataModel
             FragmentSubstitutions = new HashSet<FragmentSubstitution>();
         }
 
-        [DatabaseGenerated(DatabaseGeneratedOption.None)]
+        //[DatabaseGenerated(DatabaseGeneratedOption.None)]
         public int FragmentNodeFragmentID { get; set; }
 
         public int? FragmentFlowID { get; set; }
