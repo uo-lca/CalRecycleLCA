@@ -15,7 +15,7 @@ Process LCIA View
 ------------------
 If a user navigates here from the navigation bar, then this view will not have
 scenario and fragment navigation context. In that state, the view
-should allow the user to select a process with elementary flows.
+should allow the user to select a scenario and select a process with elementary flows.
 
 ==================
 Issues / Questions

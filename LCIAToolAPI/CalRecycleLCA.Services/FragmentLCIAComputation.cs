@@ -252,7 +252,7 @@ namespace CalRecycleLCA.Services
 
         }
 
-        public IEnumerable<FragmentLCIAModel> ComputeFragmentLCIA(int? fragmentId, int? scenarioId, int? lciaMethodId)
+        public IEnumerable<FragmentLCIAModel> FragmentLCIA(int? fragmentId, int? scenarioId, int? lciaMethodId)
         {
             // for now: return one record per FragmentFlow
             var lcia = _fragmentFlowService.Queryable()
@@ -485,7 +485,7 @@ namespace CalRecycleLCA.Services
                 case 2:
                     foreach (var lciaMethodItem in needLciaMethods)
                     {
-                        var lcias = ComputeFragmentLCIA(fragmentNode.SubFragmentID, fragmentNode.ScenarioID, lciaMethodItem.LCIAMethodID);
+                        var lcias = FragmentLCIA(fragmentNode.SubFragmentID, fragmentNode.ScenarioID, lciaMethodItem.LCIAMethodID);
 
                         /*
                         if (lcias != null)

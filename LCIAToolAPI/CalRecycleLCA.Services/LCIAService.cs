@@ -15,6 +15,7 @@ namespace CalRecycleLCA.Services
     {
         IEnumerable<LCIAModel> ComputeLCIA(IEnumerable<InventoryModel> inventory, int lciaMethodId, int scenarioId = Scenario.MODEL_BASE_CASE_ID);
         IEnumerable<LCIAModel> OldComputeLCIA(IEnumerable<InventoryModel> inventory, int lciaMethodId, int scenarioId = Scenario.MODEL_BASE_CASE_ID);
+        IEnumerable<LCIAFactorResource> QueryFactors(int LCIAMethodID);
     }
 
     public class LCIAService : Service<LCIA>, ILCIAService
@@ -34,6 +35,11 @@ namespace CalRecycleLCA.Services
         public IEnumerable<LCIAModel> OldComputeLCIA(IEnumerable<InventoryModel> inventory, int lciaMethodId, int scenarioId = Scenario.MODEL_BASE_CASE_ID)
         {
             return _repository.OldComputeLCIA(inventory, lciaMethodId, scenarioId);
+        }
+
+        public IEnumerable<LCIAFactorResource> QueryFactors(int lciaMethodId)
+        {
+            return _repository.QueryFactors(lciaMethodId);
         }
     }
 }
