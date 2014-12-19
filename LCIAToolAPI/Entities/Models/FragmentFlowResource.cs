@@ -36,13 +36,17 @@ namespace Entities.Models {
         public string Name { get; set; }
         public string ShortName { get; set; }        
         public int NodeTypeID { get; set; }
-        public double NodeWeight { get; set; }
         public int? FlowID { get; set; }
         public int DirectionID { get; set; }
         public int? ParentFragmentFlowID { get; set; }
         //
-        // Properties from entities related to FragmentFlow
+        // derived from NodeCache
         //
+        public double? NodeWeight { get; set; }
+        //
+        // derived from termination
+        //
+        public bool? IsBackground { get; set; } // ResolveBackground sets this flag; stomps on NodeTypeID
         public int? ProcessID { get; set; }     // FragmentNodeProcess.ProcessID, when NodeType is Process
         public int? SubFragmentID { get; set; } // FragmentNodeFragment.SubFragmentID, when NodeType is Fragment
 

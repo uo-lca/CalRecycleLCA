@@ -299,7 +299,7 @@ namespace CalRecycleLCA.Services
 
             fragmentTraversalV2.Traverse((int)fragmentId, scenarioId);
 
-            var fragmentFlows = _fragmentFlowService.GetCachedFlows((int)fragmentId, scenarioId);
+            var fragmentFlows = _fragmentFlowService.LGetCachedFlows((int)fragmentId, scenarioId);
 
             foreach (var item in fragmentFlows)
             {

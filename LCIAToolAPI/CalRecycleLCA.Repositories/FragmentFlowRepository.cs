@@ -11,6 +11,11 @@ using Entities.Models;
 
 namespace CalRecycleLCA.Repositories
 {
+    /// <summary>
+    /// Note 'L' prefix is supposed to use lazy loading instead of eager loading. 
+    /// not sure whether it matters though.  could be that I waste all the advantage
+    /// in the way LGetFragmentNode* are constructed.
+    /// </summary>
     public static class FragmentFlowRepository
     {
 
@@ -38,6 +43,43 @@ namespace CalRecycleLCA.Repositories
                 ScenarioID = scenarioId,
                 ProcessID = fragmentNode.ProcessID,
                 TermFlowID = fragmentNode.FlowID
+            };
+        }
+
+        private static FragmentNodeResource LGetFragmentNodeProcess(this IRepositoryAsync<FragmentFlow> repository,
+            FragmentFlowResource ff, int scenarioId)
+        {
+            var Dflt = repository.GetRepository<FragmentNodeProcess>().Queryable()
+                .Where(f => f.FragmentFlowID == ff.FragmentFlowID)
+                .First();
+            IEnumerable<ProcessSubstitution> Subs = repository.GetRepository<ProcessSubstitution>().Queryable()
+                .Where(ps => ps.FragmentNodeProcessID == Dflt.FragmentNodeProcessID)
+                .Where(ps => ps.ScenarioID == scenarioId).ToList();
+            return new FragmentNodeResource()
+            {
+                RefID = Dflt.FragmentNodeProcessID,
+                ScenarioID = scenarioId,
+                NodeTypeID = ff.NodeTypeID,
+                ProcessID = Subs.Count() == 0 ? Dflt.ProcessID : Subs.First().ProcessID,
+                TermFlowID = Dflt.FlowID
+            };
+        }
+        private static FragmentNodeResource LGetFragmentNodeFragment(this IRepositoryAsync<FragmentFlow> repository,
+            FragmentFlowResource ff, int scenarioId)
+        {
+            var Dflt = repository.GetRepository<FragmentNodeFragment>().Queryable()
+                .Where(f => f.FragmentFlowID == ff.FragmentFlowID)
+                .First();
+            IEnumerable<FragmentSubstitution> Subs = repository.GetRepository<FragmentSubstitution>().Queryable()
+                .Where(ps => ps.FragmentNodeFragmentID == Dflt.FragmentNodeFragmentID)
+                .Where(ps => ps.ScenarioID == scenarioId).ToList();
+            return new FragmentNodeResource()
+            {
+                RefID = Dflt.FragmentNodeFragmentID,
+                ScenarioID = scenarioId,
+                NodeTypeID = ff.NodeTypeID,
+                SubFragmentID = Subs.Count() == 0 ? Dflt.SubFragmentID : Subs.First().SubFragmentID,
+                TermFlowID = Dflt.FlowID
             };
         }
 
@@ -80,6 +122,12 @@ namespace CalRecycleLCA.Repositories
                 .Include(k => k.FragmentNodeFragments.Select(p => p.FragmentSubstitutions))
                 .Select().ToList();
         }
+        public static IEnumerable<FragmentFlow> LGetFragmentFlows(this IRepositoryAsync<FragmentFlow> repository,
+            IEnumerable<int> ffids)
+        {
+            return repository.Queryable().Where(k => ffids.Contains(k.FragmentFlowID));
+        }
+
 
         public static IEnumerable<FragmentFlow> GetFlowsByFragment(this IRepositoryAsync<FragmentFlow> repository,
             int fragmentId)
@@ -90,6 +138,11 @@ namespace CalRecycleLCA.Repositories
                 //.Include(k => k.FragmentNodeFragments)
                 .Include(k => k.FragmentNodeFragments.Select(p => p.FragmentSubstitutions))
                 .Select().ToList();
+        }
+        public static IEnumerable<FragmentFlow> LGetFlowsByFragment(this IRepositoryAsync<FragmentFlow> repository,
+            int fragmentId)
+        {
+            return repository.Queryable().Where(k => k.FragmentID == fragmentId);
         }
 
         public static IEnumerable<FragmentFlow> GetCachedFlows(this IRepositoryAsync<FragmentFlow> repository,
@@ -103,6 +156,81 @@ namespace CalRecycleLCA.Repositories
                                 .Where(kk => kk.NodeCaches.Any(a => a.ScenarioID == scenarioId)).ToList();
         }
         
+        public static IEnumerable<FragmentFlowResource> LGetCachedFlows(this IRepositoryAsync<FragmentFlow> repository,
+            int fragmentId, int scenarioId)
+        {
+            var ff = repository.LGetFlowsByFragment(fragmentId)
+                .Join(repository.GetRepository<NodeCache>().Queryable().Where(nc => nc.ScenarioID == scenarioId),
+                    f => f.FragmentFlowID,
+                    nc => nc.FragmentFlowID,
+                    (f, nc) => new {f, nc})
+                .Select(fr => new FragmentFlowResource() {
+                FragmentFlowID = fr.f.FragmentFlowID,
+                FragmentStageID = fr.f.FragmentStageID,
+                Name = fr.f.Name,
+                ShortName = fr.f.ShortName,
+                NodeTypeID = fr.f.NodeTypeID,
+                FlowID = fr.f.FlowID,
+                DirectionID = fr.f.DirectionID,
+                ParentFragmentFlowID = fr.f.ParentFragmentFlowID,
+                NodeWeight = fr.nc.NodeWeight
+            }).ToList();
+            return ff;//.Where(f => f.NodeWeight != null);
+        }
+
+        public static FragmentNodeResource Terminate(this IRepositoryAsync<FragmentFlow> repository, 
+						     FragmentFlowResource ff, int scenarioId, bool doBackground)
+        {
+            var fragmentNode = new FragmentNodeResource();
+            int inFlowId;
+            switch (ff.NodeTypeID)
+            { 
+                case 1:
+                    {
+                        fragmentNode = repository.LGetFragmentNodeProcess(ff, scenarioId);
+                        break;
+                    }
+                case 2:
+                    {
+                        fragmentNode = repository.LGetFragmentNodeFragment(ff, scenarioId);
+                        break;
+                    }
+    	        case 3:
+	            {
+                    if (ff.FlowID == null)
+                    {
+                        throw new ArgumentNullException("FragmentFlow.FlowID must be set!");
+                    }
+                    fragmentNode.NodeTypeID = 3;
+                    fragmentNode.RefID = ff.FragmentFlowID;
+            		fragmentNode.ScenarioID = scenarioId;
+                    fragmentNode.TermFlowID = (int)ff.FlowID; 
+		            break;
+        	    }
+    	        default:
+	            {
+                    if (ff.FlowID == null)
+                    {
+                        throw new ArgumentNullException("FragmentFlow.FlowID must be set!");
+                    }
+                    else inFlowId = (int)ff.FlowID;
+                    if (doBackground)
+                    {
+                        fragmentNode = repository.GetRepository<Background>()
+                            .ResolveBackground(inFlowId, ff.DirectionID, scenarioId);
+                    }
+                    else
+                    {
+                        fragmentNode.RefID = ff.FragmentFlowID;
+                        fragmentNode.ScenarioID = scenarioId;
+                        fragmentNode.TermFlowID = inFlowId;
+                    }
+		            break;
+        	    }
+  	        }
+	        return fragmentNode;
+	    }
+
         ///** ************************
         public static FragmentNodeResource Terminate(this IRepositoryAsync<FragmentFlow> repository, 
 						     FragmentFlow ff, int scenarioId, bool doBackground)
@@ -175,7 +303,7 @@ namespace CalRecycleLCA.Repositories
         {
             var inFlow = repository.Queryable()
                 .Where(ff => ff.FragmentID == fragmentId)
-                .Where(ff => ff.FlowID == null).First();
+                .Where(ff => ff.ParentFragmentFlowID == null).First();
 
             var termFlow = repository.Terminate(inFlow, scenarioId, false).TermFlowID;
 
