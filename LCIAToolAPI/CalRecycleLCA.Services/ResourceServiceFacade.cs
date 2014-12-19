@@ -1063,6 +1063,19 @@ namespace CalRecycleLCA.Services
                             break;
                         }
 
+                    case 5:
+                        {
+                            //pending db update
+                            break;
+                        }
+
+                    case 6:
+                        {
+                            //pending db update
+                            break;
+                        }
+
+
                     case 8:
                         {
                             int processID = _ProcessFlowService.Queryable()

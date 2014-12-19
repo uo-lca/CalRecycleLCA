@@ -35,7 +35,7 @@ namespace LCAToolAPI.API
          "]}";
 
         private string addParamJSON = "{\"params\":[" +
-             "{\"paramTypeID\":\"4\",\"scenarioID\":\"1\", \"name\":\"Test Param\", \"value\":\"6.99\", \"fragmentFlowID\":\"243\", \"flowID\":\"373\", \"flowPropertyID\":\"373\", \"processID\":\"373\", \"lciaMethodID\":\"373\", \"conservation\":\"true\", \"dependencyParamID\":\"20\",}" +
+             "{\"paramTypeID\":\"9\",\"scenarioID\":\"1\", \"name\":\"Test Param\", \"value\":\"6.99\", \"fragmentFlowID\":\"243\", \"flowID\":\"31\", \"flowPropertyID\":\"23\", \"processID\":\"373\", \"lciaMethodID\":\"373\", \"conservation\":\"true\", \"dependencyParamID\":\"20\",}" +
              "]}";
 
         private string updateParamJSON = "{\"params\":[" +
