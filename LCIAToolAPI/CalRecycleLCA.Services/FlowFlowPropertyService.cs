@@ -53,15 +53,15 @@ namespace CalRecycleLCA.Services
         /// <returns></returns>
         public ICollection<FlowPropertyMagnitude> GetFlowPropertyMagnitudes(FragmentFlowResource ff, int scenarioId)
         {
-            IEnumerable<FlowPropertyMagnitude> ffpData = 
-                (ff.FlowID == null ? new List<FlowPropertyMagnitude>() 
-                : _repository.GetFlowPropertyMagnitudes((int)ff.FlowID, scenarioId));
+            ICollection<FlowPropertyMagnitude> ffpData = 
+                (ff.FlowID == null ? new List<FlowPropertyMagnitude>()
+                : _repository.GetFlowPropertyMagnitudes((int)ff.FlowID, scenarioId)).ToList();
             if (ff.NodeWeight != null)
                 foreach (var fp in ffpData)
                 {
                     fp.Magnitude *= (double)ff.NodeWeight;
                 }
-            return ffpData.ToList();
+            return ffpData;
 
 
         }
