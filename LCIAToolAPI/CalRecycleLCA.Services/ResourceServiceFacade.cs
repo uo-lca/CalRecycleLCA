@@ -249,7 +249,7 @@ namespace CalRecycleLCA.Services
                 ReferenceFlowProperty = Transform(lm.FlowProperty)
             };
         }
-
+        /*******************************
         private ICollection<FlowPropertyMagnitude> GetFlowPropertyMagnitudes(FragmentFlow ff, int scenarioID)
         {
             // MOVE TO REPO
@@ -295,6 +295,7 @@ namespace CalRecycleLCA.Services
             };
         }
 
+         * ****************/
         /// <summary>
         /// Transform Flow to FlowResource by joining with Category data
         /// </summary>
@@ -484,14 +485,20 @@ namespace CalRecycleLCA.Services
             /// NEED FIX--> terminate nodes in repository layer; eager-fetch only scenario NodeCaches
             /// see http://stackoverflow.com/questions/19386501/linq-to-entities-include-where-method
             _FragmentTraversalV2.Traverse(fragmentID, scenarioID);
-            var fragmentFlows = _FragmentFlowService.Query(q => q.FragmentID == fragmentID)
-                                                .Include(x => x.FragmentNodeFragments)
-                                                .Include(x => x.FragmentNodeProcesses)
-                                                .Include(x => x.NodeCaches)
-                                                .Include(x => x.Flow.FlowFlowProperties)
-                                                .Select().Where(x => x.NodeCaches.Count > 0).ToList();
-            var stopgap = fragmentFlows.Where(f => f.NodeCaches.Any(nc => nc.ScenarioID == scenarioID));
-            return stopgap.Select(ff => Transform(ff, scenarioID)).ToList();
+            var test = _FragmentFlowService.GetTerminatedFlows(fragmentID, scenarioID)
+                .ToList();
+            foreach (var ff in test)
+                ff.FlowPropertyMagnitudes = _FlowFlowPropertyService.GetFlowPropertyMagnitudes(ff, scenarioID);
+
+            //var fragmentFlows = _FragmentFlowService.Query(q => q.FragmentID == fragmentID)
+            //                                    .Include(x => x.FragmentNodeFragments)
+             //                                   .Include(x => x.FragmentNodeProcesses)
+              //                                  .Include(x => x.NodeCaches)
+               //                                 .Include(x => x.Flow.FlowFlowProperties)
+                //                                .Select().Where(x => x.NodeCaches.Count > 0).ToList();
+            //var stopgap = fragmentFlows.Where(f => f.NodeCaches.Any(nc => nc.ScenarioID == scenarioID))
+              //  .Select(ff => Transform(ff, scenarioID)).ToList();
+            return test;
         }
 
         /// <summary>

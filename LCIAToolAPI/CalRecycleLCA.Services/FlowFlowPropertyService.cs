@@ -7,12 +7,14 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using CalRecycleLCA.Repositories;
+using Entities.Models;
 
 namespace CalRecycleLCA.Services
 {
     public interface IFlowFlowPropertyService : IService<FlowFlowProperty>
     {
         double? FlowConv(int? myFlowId, int inFlowId, int scenarioId = Scenario.MODEL_BASE_CASE_ID);
+        ICollection<FlowPropertyMagnitude> GetFlowPropertyMagnitudes(FragmentFlowResource ff, int scenarioId);
     }
 
     public class FlowFlowPropertyService : Service<FlowFlowProperty>, IFlowFlowPropertyService
@@ -40,6 +42,28 @@ namespace CalRecycleLCA.Services
                 return 1;
             else
                 return _repository.FlowConv((int)refFlowId, inFlowId, scenarioId);
+        }
+
+        /// <summary>
+        /// Takes in a FragmentFlowResource and returns scenario-specific flow magnitudes for the flow. 
+        /// If the NodeWeight field is populated, the magnitudes are scaled by it.
+        /// </summary>
+        /// <param name="ff"></param>
+        /// <param name="scenarioId"></param>
+        /// <returns></returns>
+        public ICollection<FlowPropertyMagnitude> GetFlowPropertyMagnitudes(FragmentFlowResource ff, int scenarioId)
+        {
+            ICollection<FlowPropertyMagnitude> ffpData = 
+                (ff.FlowID == null ? new List<FlowPropertyMagnitude>()
+                : _repository.GetFlowPropertyMagnitudes((int)ff.FlowID, scenarioId)).ToList();
+            if (ff.NodeWeight != null)
+                foreach (var fp in ffpData)
+                {
+                    fp.Magnitude *= (double)ff.NodeWeight;
+                }
+            return ffpData;
+
+
         }
     }
 }

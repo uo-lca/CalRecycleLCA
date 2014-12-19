@@ -63,12 +63,12 @@ namespace CalRecycleLCA.Services
         {
             nodeCaches = new List<NodeCache>();
 
-            var fragmentFlows = _fragmentFlowService.GetFlowsByFragment(fragmentId);
+            var fragmentFlows = _fragmentFlowService.LGetFlowsByFragment(fragmentId);
             var dependencyParams = _dependencyParamService.Query(dp => dp.Param.ScenarioID == scenarioId).Select().ToList();
 
             float activity = 1;
 
-            int refFlow = fragmentFlows.Where(k => k.ParentFragmentFlow == null).First().FragmentFlowID;
+            int refFlow = fragmentFlows.Where(k => k.ParentFragmentFlowID == null).First().FragmentFlowID;
 
             var chk = _nodeCacheService
                 .Query(q => q.FragmentFlowID == refFlow && q.ScenarioID == scenarioId)
@@ -110,7 +110,8 @@ namespace CalRecycleLCA.Services
                                 IEnumerable<DependencyParam> ff_param,
                                 int fragmentFlowId, int scenarioId, double flowMagnitude)
         {
-            var theFragmentFlow = ff.Where(k => k.FragmentFlowID == fragmentFlowId).First();
+            var theFragmentFlow = _fragmentFlowService.GetResource(ff
+                .Where(k => k.FragmentFlowID == fragmentFlowId).First());
             
             FragmentNodeResource term = _fragmentFlowService.Terminate(theFragmentFlow,scenarioId); // don't bother to resolve background
 
