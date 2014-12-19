@@ -15,9 +15,14 @@ namespace CalRecycleLCA.Services
     {
         FragmentFlow GetFragmentFlow(int fragmentFlowId);
         IEnumerable<FragmentFlow> GetFragmentFlows(IEnumerable<int> ffids);
-        IEnumerable<FragmentFlow> GetFlowsByFragment(int fragmentId);
-        IEnumerable<FragmentFlow> GetCachedFlows(int fragmentId, int scenarioId = Scenario.MODEL_BASE_CASE_ID);
+        //IEnumerable<FragmentFlow> GetFlowsByFragment(int fragmentId);
+        IEnumerable<FragmentFlow> LGetFlowsByFragment(int fragmentId);
+        FragmentFlowResource GetResource(FragmentFlow ff);
+        //IEnumerable<FragmentFlow> GetCachedFlows(int fragmentId, int scenarioId = Scenario.MODEL_BASE_CASE_ID);
+        IEnumerable<FragmentFlowResource> LGetCachedFlows(int fragmentId, int scenarioId = Scenario.MODEL_BASE_CASE_ID);
+        IEnumerable<FragmentFlowResource> GetTerminatedFlows(int fragmentId, int scenarioId);
         FragmentNodeResource Terminate(FragmentFlow ff, int scenarioId, bool doBackground = false);
+        FragmentNodeResource Terminate(FragmentFlowResource ff, int scenarioId, bool doBackground = false);
         IEnumerable<InventoryModel> GetDependencies(int fragmentId, int flowId, int ex_directionId,
             out double inFlowMagnitude, int scenarioId = Scenario.MODEL_BASE_CASE_ID);
     }
@@ -60,16 +65,55 @@ namespace CalRecycleLCA.Services
         /// </summary>
         /// <param name="fragmentId"></param>
         /// <returns>list of FragmentFlows</returns>
-        public IEnumerable<FragmentFlow> GetFlowsByFragment(int fragmentId)
+        //public IEnumerable<FragmentFlow> GetFlowsByFragment(int fragmentId)
+        //{
+        //    return _repository.GetFlowsByFragment(fragmentId);
+        //}
+        public IEnumerable<FragmentFlow> LGetFlowsByFragment(int fragmentId)
         {
-            return _repository.GetFlowsByFragment(fragmentId);
+            return _repository.LGetFlowsByFragment(fragmentId);
         }
 
-        public IEnumerable<FragmentFlow> GetCachedFlows(int fragmentId, int scenarioId = Scenario.MODEL_BASE_CASE_ID)
+        /// <summary>
+        /// Create a FragmentFlowResource from FragmentFlow.  in the future: pop
+        /// </summary>
+        /// <param name="ff"></param>
+        /// <returns></returns>
+        public FragmentFlowResource GetResource(FragmentFlow ff)
         {
-            return _repository.GetCachedFlows(fragmentId, scenarioId);
+            return new FragmentFlowResource
+            {
+                FragmentFlowID = ff.FragmentFlowID,
+                FragmentStageID = ff.FragmentStageID,
+                Name = ff.Name,
+                ShortName = ff.ShortName,
+                NodeTypeID = ff.NodeTypeID,
+                FlowID = ff.FlowID,
+                DirectionID = ff.DirectionID,
+                ParentFragmentFlowID = ff.ParentFragmentFlowID
+            };
+        }
+        /// <summary>
+        /// For use by the Resource service to return all info about flows
+        /// </summary>
+        /// <param name="fragmentId"></param>
+        /// <param name="scenarioId"></param>
+        /// <returns></returns>
+        public IEnumerable<FragmentFlowResource> GetTerminatedFlows(int fragmentId, int scenarioId)
+        {
+            return LGetCachedFlows(fragmentId, scenarioId)
+                .Select(f => TerminateInPlace(f, scenarioId, true)).ToList();
         }
 
+        //public IEnumerable<FragmentFlow> GetCachedFlows(int fragmentId, int scenarioId = Scenario.MODEL_BASE_CASE_ID)
+        //{
+        //    return _repository.GetCachedFlows(fragmentId, scenarioId);
+        //}
+
+        public IEnumerable<FragmentFlowResource> LGetCachedFlows(int fragmentId, int scenarioId = Scenario.MODEL_BASE_CASE_ID)
+        {
+            return _repository.LGetCachedFlows(fragmentId, scenarioId);
+        }
         // ***********************************************
         // Methods to work with FragmentFlows
         // ***********************************************
@@ -88,6 +132,29 @@ namespace CalRecycleLCA.Services
 	    {
 	        return _repository.Terminate(ff, scenarioId, doBackground);
     	}
+        /// <summary>
+        /// Same again, but for non-eager-loading.
+        /// </summary>
+        /// <param name="ff"></param>
+        /// <param name="scenarioId"></param>
+        /// <param name="doBackground"></param>
+        /// <returns></returns>
+        public FragmentNodeResource Terminate(FragmentFlowResource ff, int scenarioId, bool doBackground = false)
+        {
+            return _repository.Terminate(ff, scenarioId, doBackground);
+        }
+
+        private FragmentFlowResource TerminateInPlace(FragmentFlowResource ff, int scenarioId, bool doBackground = false)
+        {
+            var fn = Terminate(ff, scenarioId, doBackground);
+            ff.ProcessID = fn.ProcessID;
+            ff.SubFragmentID = fn.SubFragmentID;
+            ff.IsBackground = (ff.NodeTypeID == 4);
+            ff.NodeTypeID = fn.NodeTypeID;
+            if (ff.FlowID == null)
+                ff.FlowID = fn.TermFlowID;
+            return ff;
+        }
 
         // ***********************************************
         // Helper / informational methods
