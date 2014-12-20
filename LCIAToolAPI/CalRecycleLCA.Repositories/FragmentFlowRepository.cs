@@ -47,10 +47,10 @@ namespace CalRecycleLCA.Repositories
         }
 
         private static FragmentNodeResource LGetFragmentNodeProcess(this IRepositoryAsync<FragmentFlow> repository,
-            FragmentFlowResource ff, int scenarioId)
+            int ffid, int scenarioId)
         {
             var Dflt = repository.GetRepository<FragmentNodeProcess>().Queryable()
-                .Where(f => f.FragmentFlowID == ff.FragmentFlowID)
+                .Where(f => f.FragmentFlowID == ffid)
                 .First();
             IEnumerable<ProcessSubstitution> Subs = repository.GetRepository<ProcessSubstitution>().Queryable()
                 .Where(ps => ps.FragmentNodeProcessID == Dflt.FragmentNodeProcessID)
@@ -59,16 +59,16 @@ namespace CalRecycleLCA.Repositories
             {
                 RefID = Dflt.FragmentNodeProcessID,
                 ScenarioID = scenarioId,
-                NodeTypeID = ff.NodeTypeID,
+                NodeTypeID = 1,
                 ProcessID = Subs.Count() == 0 ? Dflt.ProcessID : Subs.First().ProcessID,
                 TermFlowID = Dflt.FlowID
             };
         }
         private static FragmentNodeResource LGetFragmentNodeFragment(this IRepositoryAsync<FragmentFlow> repository,
-            FragmentFlowResource ff, int scenarioId)
+            int ffid, int scenarioId)
         {
             var Dflt = repository.GetRepository<FragmentNodeFragment>().Queryable()
-                .Where(f => f.FragmentFlowID == ff.FragmentFlowID)
+                .Where(f => f.FragmentFlowID == ffid)
                 .First();
             IEnumerable<FragmentSubstitution> Subs = repository.GetRepository<FragmentSubstitution>().Queryable()
                 .Where(ps => ps.FragmentNodeFragmentID == Dflt.FragmentNodeFragmentID)
@@ -77,7 +77,7 @@ namespace CalRecycleLCA.Repositories
             {
                 RefID = Dflt.FragmentNodeFragmentID,
                 ScenarioID = scenarioId,
-                NodeTypeID = ff.NodeTypeID,
+                NodeTypeID = 2,
                 SubFragmentID = Subs.Count() == 0 ? Dflt.SubFragmentID : Subs.First().SubFragmentID,
                 TermFlowID = Dflt.FlowID
             };
@@ -174,7 +174,7 @@ namespace CalRecycleLCA.Repositories
                 DirectionID = fr.f.DirectionID,
                 ParentFragmentFlowID = fr.f.ParentFragmentFlowID,
                 NodeWeight = fr.nc.NodeWeight
-            }).ToList();
+            });
             return ff;//.Where(f => f.NodeWeight != null);
         }
 
@@ -187,12 +187,12 @@ namespace CalRecycleLCA.Repositories
             { 
                 case 1:
                     {
-                        fragmentNode = repository.LGetFragmentNodeProcess(ff, scenarioId);
+                        fragmentNode = repository.LGetFragmentNodeProcess(ff.FragmentFlowID, scenarioId);
                         break;
                     }
                 case 2:
                     {
-                        fragmentNode = repository.LGetFragmentNodeFragment(ff, scenarioId);
+                        fragmentNode = repository.LGetFragmentNodeFragment(ff.FragmentFlowID, scenarioId);
                         break;
                     }
     	        case 3:
@@ -245,13 +245,13 @@ namespace CalRecycleLCA.Repositories
                 {
                     //fragmentNode = repository.GetRepository<FragmentNodeProcess>()
 		            //  .GetFragmentNodeProcess(ff.FragmentFlowID, scenarioId);
-                    fragmentNode = GetFragmentNodeProcess(ff, scenarioId);
+                    fragmentNode = repository.LGetFragmentNodeProcess(ff.FragmentFlowID, scenarioId);
 		            break;
                 }
     	        case 2:
 	            {
 		            fragmentNode = //repository.GetRepository<FragmentNodeFragment>()
-		                GetFragmentNodeSubFragment(ff, scenarioId);
+		                repository.LGetFragmentNodeFragment(ff.FragmentFlowID, scenarioId);
 		            break;
 	            }
     	        case 3:

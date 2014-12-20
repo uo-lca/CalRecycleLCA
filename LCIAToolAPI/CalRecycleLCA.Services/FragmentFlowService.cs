@@ -101,7 +101,7 @@ namespace CalRecycleLCA.Services
         /// <returns></returns>
         public IEnumerable<FragmentFlowResource> GetTerminatedFlows(int fragmentId, int scenarioId)
         {
-            return LGetCachedFlows(fragmentId, scenarioId)
+            return _repository.LGetCachedFlows(fragmentId, scenarioId)
                 .Select(f => TerminateInPlace(f, scenarioId, true)).ToList();
         }
 
@@ -112,7 +112,7 @@ namespace CalRecycleLCA.Services
 
         public IEnumerable<FragmentFlowResource> LGetCachedFlows(int fragmentId, int scenarioId = Scenario.MODEL_BASE_CASE_ID)
         {
-            return _repository.LGetCachedFlows(fragmentId, scenarioId);
+            return _repository.LGetCachedFlows(fragmentId, scenarioId).ToList();
         }
         // ***********************************************
         // Methods to work with FragmentFlows
