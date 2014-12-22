@@ -970,6 +970,16 @@ namespace CalRecycleLCA.Services
 
         }
 
+        /// <summary>
+        /// Retrieves a list of params belonging to a given scenario.
+        /// </summary>
+        /// <param name="scenarioId"></param>
+        /// <returns></returns>
+        public IEnumerable<ParamResource> GetParams(int scenarioId)
+        {
+            return _ParamService.GetParams(scenarioId);
+        }
+
         public void AddParam(string addParamJSON)
         {
             // Parse JSON into dynamic object

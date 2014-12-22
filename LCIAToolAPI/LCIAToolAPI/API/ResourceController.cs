@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
@@ -350,19 +351,29 @@ namespace LCAToolAPI.API
         }
 
     
-
-        [Route("api/addScenario")]
-        [AcceptVerbs("GET", "POST")]
-        [HttpPost]
-        public void AddScenario()
+        //[Authorize]
+        [Route("api/scenarios/{scenarioId}/params")]
+        [AcceptVerbs("GET")]
+        public IEnumerable<ParamResource> GetScenarioParams(int scenarioId)
         {
+            return _ResourceService.GetParams(scenarioId);
+        }
+
+        //[Authorize]
+        [Route("api/scenarios")]
+        [AcceptVerbs("POST")]
+        [HttpPost]
+        public void AddScenario(int scenarioId)
+        {
+            // need to authorize this
             _ResourceService.AddScenario(addScenarioJSON);
         }
 
-        [Route("api/updateScenario")]
-        [AcceptVerbs("GET", "POST")]
-        [HttpPost]
-        public void UpdateScenario()
+        [Authorize]
+        [Route("api/scenarios/{scenarioId}")]
+        [AcceptVerbs("PUT")]
+        [HttpPut]
+        public void UpdateScenario(int scenarioId)
         {
             _ResourceService.UpdateScenario(updateScenarioJSON);
         }

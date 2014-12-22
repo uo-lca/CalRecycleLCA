@@ -679,20 +679,30 @@ The following tables are required:
   Generated upon load or upon modification of a scenario.  When a scenario
   is modified (new parameter added, parameter removed, default
   parameterization changed), all affected cached entries should be deleted
-  and recomputed, including records in NodeCache matching the ScenarioID,
-  and all their descendents in ScoreCache.  
+  and recomputed.
 
-  The same applies when any Background record with a non-null ScenarioID is
-  updated.  If any scenario-generic background record is changed, I am
-  afraid the entire cache table must be wiped and recomputed, because of
-  the difficulty of determining which node scores depend on a given
-  background process.
+  ParamTypes 1-4 affect the NodeCache.  Because the NodeCache is
+  recursively computed, all NodeCache entries should be cleared when one or
+  more params of this type are created or modified.  ScoreCache values for
+  processes (FragmentFlow.NodeTypeID=1) do not need to be recomputed when
+  node cache values are cleared.  However, ScoreCache values for
+  subfragments (NodeTypeID = 2) are composite results from joining
+  NodeCache and ScoreCache, so they also need to be cleared when NodeCache
+  is cleared.
 
-  Recomputation for a given scenario can be triggered by traversing the
-  fragment with FragmentID 1, which always corresponds to the top-level
-  fragment, with the ScenarioID specified as argument.  That will activate
-  recursion to all subfragments touched by the scenario-- necessitating the
-  recomputation of all relevant entries in the cache tables.  
+  ParamTypes 5-10 only affect Process LCIA results, which do not depend on
+  the NodeCache.  When Params 5-10 are changed, all ScoreCache results for
+  the ScenarioID should be cleared and recomputed (for type 10, it is
+  possible to filter by LCIAMethod), but the NodeCache values are
+  unaffected.
+
+  After the params are updated and the required cache values are cleared,
+  the tables should be recomputed by calling FragmentTraversalV2.Traverse()
+  and FragmentLCIAComputation.ComputeFragmentLCIA() for the scenario and
+  its top-level fragment.
+
+  When substitutions are performed (Process, Fragment, or Background), the
+  whole cache should be cleared and recomputed for the scenario.
 
   Cache tables can be compared across implementations (i.e. Matlab, SQL) to
   validate the computations.
