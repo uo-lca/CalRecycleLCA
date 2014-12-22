@@ -31,6 +31,7 @@ namespace Entities.Models {
 
     public class LCIAFactorResource
     {
+        public int LCIAID { get; set; }
         public int LCIAMethodID { get; set; }
         public string Geography { get; set; }
         public int FlowID { get; set; }         // Process LCI flow
