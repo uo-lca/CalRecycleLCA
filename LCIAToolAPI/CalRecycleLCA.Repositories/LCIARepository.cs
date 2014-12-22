@@ -102,11 +102,12 @@ namespace CalRecycleLCA.Repositories
             return repository.Queryable()
                 .Where(k => k.LCIAMethodID == lciaMethodId)
                 .Where(k => k.FlowID != null)
+                .Where(k => String.IsNullOrEmpty(k.Geography) )
                 .Select(k => new LCIAFactorResource() {
                     LCIAID = k.LCIAID,
                     LCIAMethodID = (int)k.LCIAMethodID,
                     FlowID = (int)k.FlowID,
-                    Geography = k.Geography,
+                    //Geography = k.Geography,
                     DirectionID = k.DirectionID,
                     Factor = k.Factor
                 });
