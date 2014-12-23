@@ -360,6 +360,15 @@ namespace LCAToolAPI.API
         }
 
         //[Authorize]
+        [Route("api/scenarios/{scenarioId}/params/{paramId}")]
+        [AcceptVerbs("GET")]
+        public IEnumerable<ParamResource> GetScenarioParam(int scenarioId, int paramId)
+        {
+            // leakproof linq
+            return _ResourceService.GetParams(scenarioId).Where(k => k.ParamID == paramId);
+        }
+
+        //[Authorize]
         [Route("api/scenarios")]
         [AcceptVerbs("POST")]
         [HttpPost]
