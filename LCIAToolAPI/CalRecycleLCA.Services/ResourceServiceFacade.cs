@@ -740,10 +740,12 @@ namespace CalRecycleLCA.Services
         /// <returns>Fragment LCIA results for given parameters</returns> 
         public LCIAResultResource GetFragmentLCIAResults(int fragmentID, int lciaMethodID, int scenarioID = Scenario.MODEL_BASE_CASE_ID) {
             // check to see if cache has been populated for each scenario
+            /* disable this-- cache operations should not be API driven. Bug #101 is reopened.
             if (_ScoreCacheService.Queryable().Where(s => s.FragmentFlow.FragmentID == fragmentID)
                 .Where(s => s.ScenarioID == scenarioID)
                 .Where(s => s.LCIAMethodID == lciaMethodID).ToList().Count() == 0)
                 _FragmentLCIAComputation.FragmentLCIACompute(fragmentID, scenarioID);
+            * */
             IEnumerable<FragmentLCIAModel> aggResults = _FragmentLCIAComputation.FragmentLCIA(fragmentID, scenarioID, lciaMethodID)
                 .GroupBy(r => new
                 {
