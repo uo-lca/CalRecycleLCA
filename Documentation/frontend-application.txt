@@ -27,9 +27,6 @@ parameterized entities from the web API in that view. They will be needed in ord
 generate descriptor and original value. 
 In other views, the related entities are already loaded. 
 
-2. Would be helpful to have a summary of dependencies between parameters and
-results. In other words, for each parameter type, what type of result should be
-cleared from front-end cache when parameter is added/updated/deleted.
 
 ===============================================================================
 Mon Dec 8 2014
