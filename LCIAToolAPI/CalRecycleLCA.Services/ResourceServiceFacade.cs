@@ -858,8 +858,10 @@ namespace CalRecycleLCA.Services
             //_unitOfWork.SaveChanges();
         }
 
-        public void AddScenario(string addScenarioJSON)
+        public int AddScenario(string addScenarioJSON, int scenarioGroupId)
         {
+            /// this function is a big old mess.  Needs to generate a new ScenarioID, not accept it as input. 
+            /// Needs to create only one scenario and not a list.
             // Parse JSON into dynamic object
             JObject jsonScenarios = JObject.Parse(addScenarioJSON);
 
@@ -870,7 +872,6 @@ namespace CalRecycleLCA.Services
             {
                 scenarios.Add(new Scenario()
                 {
-                    ScenarioID = Convert.ToInt32((string)jsonScenario["scenarioID"]),
                     ScenarioGroupID = Convert.ToInt32((string)jsonScenario["scenarioGroupID"]),
                     TopLevelFragmentID = Convert.ToInt32((string)jsonScenario["topLevelFragmentID"]),
                     ActivityLevel = Convert.ToDouble((string)jsonScenario["activityLevel"]),
@@ -887,10 +888,11 @@ namespace CalRecycleLCA.Services
 
             _ScenarioService.InsertGraphRange(scenarios);
             _unitOfWork.SaveChanges();
+            return scenarios.First().ScenarioID;
 
         }
 
-        public void UpdateScenario(string updateScenarioJSON)
+        public void UpdateScenario(string updateScenarioJSON, int scenarioGroupId)
         {
             // Parse JSON into dynamic object
             JObject jsonScenarios = JObject.Parse(updateScenarioJSON);
