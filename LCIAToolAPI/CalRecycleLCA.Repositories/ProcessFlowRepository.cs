@@ -47,27 +47,14 @@ namespace CalRecycleLCA.Repositories
         /// <param name="flowId"></param>
         /// <param name="ex_directionId"></param>
         /// <returns></returns>
-        public static IEnumerable<InventoryModel> GetDependencies(this IRepositoryAsync<ProcessFlow> repository,
-            int processId, int flowId, int ex_directionId)
+        public static IEnumerable<ProcessFlow> GetProductFlows(this IRepositoryAsync<ProcessFlow> repository,
+            int processId)
         {
-            int myDirectionId = 1;
-            if (ex_directionId == 1)
-                myDirectionId = 2;
-
+            
             var Outflows = repository.Query(pf => pf.ProcessID == processId).Include(pf => pf.Flow).Select()
                 .Where(pf => pf.Flow.FlowTypeID == 1).ToList();
+            return Outflows;
 
-            int refPfId = Outflows
-                .Where(pf => pf.FlowID == flowId)
-                .Where(pf => pf.DirectionID == myDirectionId)
-                .First().ProcessFlowID;
-
-            return Outflows.Where(o => o.ProcessFlowID != refPfId)
-                .Select(a => new InventoryModel { 
-                    FlowID = a.FlowID,
-                    DirectionID = a.DirectionID,
-                    Result = a.Result
-                }).ToList();
         }
 
         public static IEnumerable<InventoryModel> GetEmissions(this IRepositoryAsync<ProcessFlow> repository,

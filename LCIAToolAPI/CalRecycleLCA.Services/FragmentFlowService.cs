@@ -159,7 +159,15 @@ namespace CalRecycleLCA.Services
         // ***********************************************
         // Helper / informational methods
         // ***********************************************
-        
+
+        private static int comp(int direction)
+        {
+            int compdir = 1;
+            if (direction == 1)
+                compdir = 2;
+            return compdir;
+        }
+
         /// <summary>
         /// Returns a list of fragment Inputs and Outputs as "dependencies" of a named
         /// input flow by pairing fragmentflows of type 3 with their FlowMagnitudes.  
@@ -169,17 +177,38 @@ namespace CalRecycleLCA.Services
         /// Calling function must supply an inflow, which represents the reference flow of 
         /// the fragment *instance*-- nominally the reference flow but not always.  All 
         /// other flows are modeled as dependencies regardless of flow direction.
+        /// 
+        /// The out param inFlowMagnitude reports the exchange value for the named inflow, equivalent to 
+        /// ProcessFlowService.FlowExchange()
         /// </summary>
         /// <param name="fragmentId"></param>
-        /// <param name="flowId"></param>
-        /// <param name="ex_directionId"></param>
+        /// <param name="flowId">FlowID of reference flow</param>
+        /// <param name="ex_directionId">Direction of reference flow with respect to *parent* node</param>
         /// <param name="inFlowMagnitude"></param>
         /// <param name="scenarioId"></param>
         /// <returns>list of InventoryModels (flow, direction, quantity)</returns>
         public IEnumerable<InventoryModel> GetDependencies(int fragmentId, int flowId, int ex_directionId,
             out double inFlowMagnitude, int scenarioId = Scenario.MODEL_BASE_CASE_ID)
         {
-            return _repository.GetDependencies(fragmentId, flowId, ex_directionId, out inFlowMagnitude, scenarioId);
+            var Outflows = _repository.GetProductFlows(fragmentId, scenarioId);
+            var myDirectionId = comp(ex_directionId);
+
+            // next thing to do is pull out the out inFlowMagnitude
+            var inFlow = Outflows.Where(o => o.FlowID == flowId)
+                .Where(o => o.DirectionID == myDirectionId).First();
+
+            inFlowMagnitude = (double)inFlow.Result; // out param
+
+            // short-circuit OR is correct: only exclude flows where both filters match
+            var cropOutflows = Outflows.Where(p => p.FlowID != inFlow.FlowID || p.DirectionID !=inFlow.DirectionID);
+
+            if ( (1 + cropOutflows.Count()) != Outflows.Count())
+                throw new ArgumentException("No inFlow found to exclude!");
+
+            return cropOutflows;
+
+
+
         }
     }
 }

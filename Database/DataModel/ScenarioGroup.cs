@@ -25,6 +25,8 @@ namespace LcaDataModel
 
         public int? VisibilityID { get; set; }
 
+        public string Secret { get; set; }
+
         public virtual ICollection<Scenario> Scenarios { get; set; }
 
         public virtual User User { get; set; }
