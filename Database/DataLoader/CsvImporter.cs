@@ -433,6 +433,7 @@ namespace LcaDataLoader {
                 ent.Name = row["Name"];
                 ent.OwnedBy = Convert.ToInt32(row["OwnedBy"]);
                 ent.VisibilityID = Convert.ToInt32(row["VisibilityID"]);
+                ent.Secret = row["Secret"];
                 isImported = isNew ? AddEntityWithVerification<ScenarioGroup>(dbContext, ent) : (dbContext.SaveChanges() > 0);
             }
             return isImported;
