@@ -318,25 +318,19 @@ namespace CalRecycleLCA.Repositories
         }
 
         /// <summary>
-        /// Given a fragment and a reference inflow, reports fragment InputOutput flows as dependencies. 
-        /// There is some complexity involved because of the desire to treat fragments as processes 
-        /// (i.e. to allow Fragments to be entered from any InputOutput and not just from the reference flow)
-        /// 
-        /// The out param inFlowMagnitude reports the exchange value for the named inflow, equivalent to 
-        /// ProcessFlowService.FlowExchange()
+        /// Given a fragment, reports fragment InputOutput flows as product flows. 
+        /// There is some complexity involved because the fragment's reference flow does not 
+        /// appear as an InputOutput and must be added with Union().  Then all individual node
+        /// outputs must be grouped by FlowID and direction.
+        /// Note that the NodeCache MUST be populated for this function to work.
         /// </summary>
         /// <param name="repository"></param>
         /// <param name="fragmentId"></param>
-        /// <param name="flowId"></param>
-        /// <param name="ex_directionId"></param>
-        /// <param name="inFlowMagnitude"></param>
         /// <param name="scenarioId"></param>
-        /// <returns></returns>
-        public static IEnumerable<InventoryModel> GetDependencies(this IRepositoryAsync<FragmentFlow> repository, 
-            int fragmentId, int flowId, int ex_directionId, out double inFlowMagnitude, int scenarioId)
+        /// <returns>InventoryModel (list)</returns>
+        public static IEnumerable<InventoryModel> GetProductFlows(this IRepositoryAsync<FragmentFlow> repository, 
+            int fragmentId, int scenarioId)
         {
-            int myDirectionId = comp(ex_directionId);
-
             // in order to proceed, we need to know the fragment's reference flow
             var fragRefFlow = GetInFlow(repository, fragmentId, scenarioId);
 
@@ -368,23 +362,7 @@ namespace CalRecycleLCA.Repositories
                         Result = group.Sum(a => a.Result)
                     }).ToList();
 
-            // wow! what a mouthful
-            // next thing to do is pull out the out inFlowMagnitude
-
-            var inFlow = Outflows.Where(o => o.FlowID == flowId)
-                .Where(o => o.DirectionID == myDirectionId).First();
-
-            inFlowMagnitude = (double)inFlow.Result; // out param
-
-            var cropOutflows = Outflows.Where(p => p != inFlow);
-
-            if (cropOutflows.Count() == Outflows.Count())
-                throw new ArgumentException("No inFlow found to exclude!");
-
-            return cropOutflows;
-
-
-
+            return Outflows;
         }
     }
 }

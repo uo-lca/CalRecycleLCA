@@ -34,9 +34,34 @@ namespace CalRecycleLCA.Services
             return _repository.FlowExchange(processId, flowId, ex_directionId);
         }
 
+        /// <summary>
+        /// Returns a list of "dependent" flows from a node with respect to a given reference flow. 
+        /// </summary>
+        /// <param name="processId"></param>
+        /// <param name="flowId">the reference FlowID</param>
+        /// <param name="ex_directionId">direction of the reference flow with respect to *parent*</param>
+        /// <returns></returns>
         public IEnumerable<InventoryModel> GetDependencies(int processId, int flowId, int ex_directionId)
         {
-            return _repository.GetDependencies(processId, flowId, ex_directionId);
+            var Outflows = _repository.GetProductFlows(processId);
+
+            int myDirectionId = 1;
+            if (ex_directionId == 1)
+                myDirectionId = 2;
+
+            int refPfId = Outflows
+                .Where(pf => pf.FlowID == flowId)
+                .Where(pf => pf.DirectionID == myDirectionId)
+                .First().ProcessFlowID;
+
+            return Outflows.Where(o => o.ProcessFlowID != refPfId)
+                .Select(a => new InventoryModel
+                {
+                    FlowID = a.FlowID,
+                    DirectionID = a.DirectionID,
+                    Result = a.Result
+                }).ToList();
+
         }
 
         public IEnumerable<InventoryModel> GetEmissions(int processId, int scenarioId = Scenario.MODEL_BASE_CASE_ID)
