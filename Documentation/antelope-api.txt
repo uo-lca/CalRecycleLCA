@@ -18,6 +18,7 @@ FragmentNodeResource
 
 ImpactCategoryResource
 LCIAMethodResource
+ + LCIAFactorResource
 
 LCIAResultResource
  + AggregateLCIAResource
@@ -176,7 +177,7 @@ lciaresults with lciamethods/{lmid}/lciaresults)
 
  GET api/processes/{pid}/lciaresults
 
- GET api/scenarios/{sid}/api/processes/{pid}/lciaresults
+ GET api/scenarios/{sid}/processes/{pid}/lciaresults
 
 * Contribution Analysis
 
