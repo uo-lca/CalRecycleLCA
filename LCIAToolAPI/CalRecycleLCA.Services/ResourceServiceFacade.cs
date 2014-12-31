@@ -518,6 +518,17 @@ namespace CalRecycleLCA.Services
         }
 
         /// <summary>
+        /// Get a single flow. should really do bounds-checking
+        /// </summary>
+        /// <param name="flowId"></param>
+        /// <returns></returns>
+        public IEnumerable<FlowResource> GetFlow(int flowId)
+        {
+            return _FlowService.Query(k => k.FlowID == flowId).Select()
+                .Select(k => Transform(k)).ToList();
+        }
+
+        /// <summary>
         /// Get list of flows related to a fragment (via FragmentFlow)
         /// </summary>
         /// <param name="fragmentID">FragmentID filter</param>

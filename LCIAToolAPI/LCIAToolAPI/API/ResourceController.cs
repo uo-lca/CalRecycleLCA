@@ -72,6 +72,13 @@ namespace LCAToolAPI.API
             return _ResourceService.GetFlows(flowtypeID);
         }
 
+        [Route("api/flows/{flowId}")]
+        [HttpGet]
+        public IEnumerable<FlowResource> GetFlow(int flowId)
+        {
+            return _ResourceService.GetFlow(flowId);
+        }
+
         /// <summary>
         /// List enumerated flow types.  1-- Intermediate.  2-- Elementary.
         /// </summary>
