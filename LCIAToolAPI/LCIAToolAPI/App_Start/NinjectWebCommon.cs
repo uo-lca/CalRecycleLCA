@@ -15,14 +15,14 @@ namespace LCAToolAPI.App_Start
     using System.Web.Http;
     using LcaDataModel;
     using Repository.Pattern.UnitOfWork;
-	using Repository.Pattern.Repositories;
-	using Repository.Pattern.Ef6;
-	using Service.Pattern;
-	using Repository.Pattern.DataContext;
-	using Repository.Pattern.Ef6.Factories;
+    using Repository.Pattern.Repositories;
+    using Repository.Pattern.Ef6;
+    using Service.Pattern;
+    using Repository.Pattern.DataContext;
+    using Repository.Pattern.Ef6.Factories;
     using XMLHandler;
 
-    public static class NinjectWebCommon 
+    public static class NinjectWebCommon
     {
         private static readonly Bootstrapper bootstrapper = new Bootstrapper();
         public static IKernel Kernel
@@ -104,6 +104,7 @@ namespace LCAToolAPI.App_Start
             kernel.Bind(typeof(IRepositoryAsync<Process>)).To(typeof(Repository<Process>));
             kernel.Bind(typeof(IRepositoryAsync<ProcessFlow>)).To(typeof(Repository<ProcessFlow>));
             kernel.Bind(typeof(IRepositoryAsync<Scenario>)).To(typeof(Repository<Scenario>));
+            kernel.Bind(typeof(IRepositoryAsync<ScenarioGroup>)).To(typeof(Repository<ScenarioGroup>));
             kernel.Bind(typeof(IRepositoryAsync<Param>)).To(typeof(Repository<Param>));
             kernel.Bind(typeof(IRepositoryAsync<NodeCache>)).To(typeof(Repository<NodeCache>));
             kernel.Bind(typeof(IRepositoryAsync<FragmentNodeProcess>)).To(typeof(Repository<FragmentNodeProcess>));
@@ -138,6 +139,7 @@ namespace LCAToolAPI.App_Start
             kernel.Bind<IProcessService>().To<ProcessService>();
             kernel.Bind<IProcessFlowService>().To<ProcessFlowService>();
             kernel.Bind<IScenarioService>().To<ScenarioService>();
+            kernel.Bind<IScenarioGroupService>().To<ScenarioGroupService>();
             kernel.Bind(typeof(INodeCacheService)).To(typeof(NodeCacheService));
             kernel.Bind(typeof(IFlowFlowPropertyService)).To(typeof(FlowFlowPropertyService));
             kernel.Bind(typeof(IProcessEmissionParamService)).To(typeof(ProcessEmissionParamService));

@@ -246,6 +246,7 @@
     <Content Include="Scripts\jquery-1.8.3.min.js" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="API\CalRecycleAuthorizeAttribute.cs" />
     <Compile Include="API\LCIAComputationController.cs" />
     <Compile Include="API\FragmentTraversalController.cs" />
     <Compile Include="API\ResourceController.cs" />

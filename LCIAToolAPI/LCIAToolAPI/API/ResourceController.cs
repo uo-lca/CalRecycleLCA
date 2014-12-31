@@ -46,13 +46,18 @@ namespace LCAToolAPI.API
         [Inject]
         private readonly IResourceServiceFacade _ResourceService;
 
-        public ResourceController(ResourceServiceFacade resourceService)
+        [Inject]
+        private readonly IScenarioGroupService _ScenarioGroupService;
+
+        public ResourceController(ResourceServiceFacade resourceService,
+            ScenarioGroupService scenarioGroupService)
         {
             if (resourceService == null)
             {
                 throw new ArgumentNullException("resourceService");
             }
             _ResourceService = resourceService;
+            _ScenarioGroupService = scenarioGroupService;
         }
 
         /// <summary>
@@ -112,14 +117,19 @@ namespace LCAToolAPI.API
         /// </summary>
         /// <returns></returns>
         [Route("api/scenarios/{scenarioId}")]
+        [CalRecycleAuthorize]
         [HttpGet]
         public ScenarioResource GetScenario(int scenarioId)
         {
+            
             // need auth here to determine remote user's scenario group.  
             // if unprivileged:
             //return _ResourceService.GetScenarios(userGroupID);
             // else:
-            return _ResourceService.GetScenarios().Where(k => k.ScenarioID == scenarioId).FirstOrDefault();
+            if (_ScenarioGroupService.CanGet(RequestContext))
+                return _ResourceService.GetScenarios().Where(k => k.ScenarioID == scenarioId).FirstOrDefault();
+            else
+                throw new HttpResponseException(HttpStatusCode.Unauthorized); 
         }
         
         /// <summary>

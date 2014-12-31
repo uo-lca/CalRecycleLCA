@@ -10,6 +10,8 @@ namespace LcaDataModel
     [Table("ScenarioGroup")]
     public partial class ScenarioGroup : Entity
     {
+        public const int BASE_SCENARIO_GROUP = 1;
+        
         public ScenarioGroup()
         {
             Scenarios = new HashSet<Scenario>();
