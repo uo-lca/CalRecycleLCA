@@ -37,6 +37,7 @@ namespace LCIAToolAPI.Tests
         private IProcessService _processService;
         private IProcessFlowService _processFlowService;
         private IScenarioService _scenarioService;
+        private IScenarioGroupService _scenarioGroupService;
         private INodeCacheService _nodeCacheService;
         //private IFragmentNodeProcessService _fragmentNodeProcessService;
         //private IFragmentNodeFragmentService _fragmentNodeFragmentService;
@@ -87,6 +88,7 @@ namespace LCIAToolAPI.Tests
         private Mock<IRepositoryAsync<Process>> _mockProcessRepository;
         private Mock<IRepositoryAsync<ProcessFlow>> _mockProcessFlowRepository;
         private Mock<IRepositoryAsync<Scenario>> _mockScenarioRepository;
+        private Mock<IRepositoryAsync<ScenarioGroup>> _mockScenarioGroupRepository;
         private Mock<IRepositoryAsync<NodeCache>> _mockNodeCacheRepository;
         private Mock<IRepositoryAsync<FragmentNodeProcess>> _mockFragmentNodeProcessRepository;
         private Mock<IRepositoryAsync<FragmentNodeFragment>> _mockFragmentNodeFragmentRepository;
@@ -124,6 +126,7 @@ namespace LCIAToolAPI.Tests
             _mockProcessRepository = new Mock<IRepositoryAsync<Process>>();
             _mockProcessFlowRepository = new Mock<IRepositoryAsync<ProcessFlow>>();
             _mockScenarioRepository = new Mock<IRepositoryAsync<Scenario>>();
+            _mockScenarioGroupRepository = new Mock<IRepositoryAsync<ScenarioGroup>>();
             _mockNodeCacheRepository = new Mock<IRepositoryAsync<NodeCache>>();
             _mockFragmentNodeProcessRepository = new Mock<IRepositoryAsync<FragmentNodeProcess>>();
             _mockFragmentNodeFragmentRepository = new Mock<IRepositoryAsync<FragmentNodeFragment>>();
@@ -160,6 +163,7 @@ namespace LCIAToolAPI.Tests
             _processService = new ProcessService(_mockProcessRepository.Object);
             _processFlowService = new ProcessFlowService(_mockProcessFlowRepository.Object);
             _scenarioService = new ScenarioService(_mockScenarioRepository.Object);
+            _scenarioGroupService = new ScenarioGroupService(_mockScenarioGroupRepository.Object);
             _nodeCacheService = new NodeCacheService(_mockNodeCacheRepository.Object);
             //_fragmentNodeProcessService = new FragmentNodeProcessService(_mockFragmentNodeProcessRepository.Object);
             //_fragmentNodeFragmentService = new FragmentNodeFragmentService(_mockFragmentNodeFragmentRepository.Object);
@@ -280,7 +284,7 @@ _unitOfWork);
             _mockFlowTypeRepository.Setup(m => m.Queryable()).Returns(_flowTypes.AsQueryable());
 
 
-            _resourceController = new ResourceController(_resourceServiceFacade);
+            _resourceController = new ResourceController(_resourceServiceFacade, _scenarioGroupService);
 
             //Act
             List<FlowTypeResource> result = _resourceController.GetFlowTypes().ToList();
@@ -308,7 +312,7 @@ _unitOfWork);
             _mockFlowTypeRepository.Setup(m => m.Queryable()).Returns(_flowTypes.AsQueryable());
 
 
-            _resourceController = new ResourceController(_resourceServiceFacade);
+            _resourceController = new ResourceController(_resourceServiceFacade, _scenarioGroupService);
 
             //Act
             List<FlowTypeResource> result = _resourceController.GetFlowTypes().ToList();
@@ -447,7 +451,7 @@ _unitOfWork);
                      
                      };
 
-            _resourceController = new ResourceController(_resourceServiceFacade);
+              _resourceController = new ResourceController(_resourceServiceFacade, _scenarioGroupService);
 
             //Act
             LCIAResultResource result = _resourceController.GetProcessLCIAResult(processID, lciaMethodID, scenarioID);
@@ -478,7 +482,7 @@ _unitOfWork);
             _mockScenarioRepository.Setup(m => m.Queryable()).Returns(_scenarios.AsQueryable());
 
 
-            _resourceController = new ResourceController(_resourceServiceFacade);
+            _resourceController = new ResourceController(_resourceServiceFacade, _scenarioGroupService);
 
             //Act
             List<ScenarioResource> result = _resourceController.GetScenarios().ToList();
@@ -507,7 +511,7 @@ _unitOfWork);
             _mockFragmentRepository.Setup(m => m.Queryable()).Returns(_fragments.AsQueryable());
 
 
-            _resourceController = new ResourceController(_resourceServiceFacade);
+            _resourceController = new ResourceController(_resourceServiceFacade, _scenarioGroupService);
 
             //Act
             List<FragmentResource> result = _resourceController.GetFragments().ToList();
@@ -536,7 +540,7 @@ _unitOfWork);
             _mockFragmentRepository.Setup(m => m.Find(fragmentID)).Returns(_fragment);
 
 
-            _resourceController = new ResourceController(_resourceServiceFacade);
+            _resourceController = new ResourceController(_resourceServiceFacade, _scenarioGroupService);
 
             //Act
             FragmentResource result = _resourceController.GetFragment(fragmentID);
@@ -566,7 +570,7 @@ _unitOfWork);
             _mockFragmentFlowRepository.Setup(m => m.Queryable()).Returns(_fragmentFlows.AsQueryable());
 
 
-            _resourceController = new ResourceController(_resourceServiceFacade);
+            _resourceController = new ResourceController(_resourceServiceFacade, _scenarioGroupService);
 
             //Act
             List<FragmentFlowResource> result = _resourceController.GetFragmentFlowResources(fragmentID).ToList();
@@ -597,7 +601,7 @@ _unitOfWork);
             //We only set up the mock repository that we need
             _mockFlowRepository.Setup(m => m.Queryable()).Returns(_flows.AsQueryable());
 
-            _resourceController = new ResourceController(_resourceServiceFacade);
+            _resourceController = new ResourceController(_resourceServiceFacade, _scenarioGroupService);
 
             //Act
             List<FlowResource> result = _resourceController.GetFlowsByFragment(fragmentID).ToList();
