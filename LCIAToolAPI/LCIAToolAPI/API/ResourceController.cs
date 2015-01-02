@@ -49,15 +49,14 @@ namespace LCAToolAPI.API
         [Inject]
         private readonly IScenarioGroupService _ScenarioGroupService;
 
-        public ResourceController(ResourceServiceFacade resourceService,
-            ScenarioGroupService scenarioGroupService)
+        public ResourceController(ResourceServiceFacade resourceService)
         {
             if (resourceService == null)
             {
                 throw new ArgumentNullException("resourceService");
             }
             _ResourceService = resourceService;
-            _ScenarioGroupService = scenarioGroupService;
+            //_ScenarioGroupService = scenarioGroupService;
         }
 
         /// <summary>
