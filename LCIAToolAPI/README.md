@@ -20,13 +20,189 @@ Resource routes are defined in [ResourceController.cs](https://github.com/uo-lca
 
 Resources are defined in [Models](https://github.com/uo-lca/CalRecycleLCA/tree/master/vs/LCIAToolAPI/Entities/Models)/*Resource.cs
 
+API Resources
+-------------
+
+The API aspires to HATEOAS, but for now is documented in LCIAToolAPI/README.md
+
+### Process
+
+GET:
+
+ api/processes 
+ api/processes/{processId}
+ api/processes/{pid}/processflows
+ api/processes/{pid}/flowproperties
+ api/processes/{pid}/lciaresults
+
+no PUT, POST, or DELETE.  Process data are referenced to ILCD-formatted
+data files by UUID.
+
+Processes from archives marked as private will not reveal processflows and
+will only reveal aggregated LCIA results.
+
+
+### Flow
+
+GET:
+
+ api/flows
+ api/flows/{flowId}
+
+ api/flowtypes 
+ api/flowtypes/[1-2]/flows 
+ api/flowtypes/[1-2]/processes - processes with (one or more) flows of type
+
+ 	       flowTypeID 1 = IntermediateFlow; 
+	       		  2 = ElementaryFlow
+
+no PUT, POST, or DELETE.  Process data are referenced to ILCD-formatted
+data files by UUID.
+
+
+
+
+### Fragment
+
+GET:
+
+ api/fragments
+ api/fragments/{fragmentId}
+ api/fragments/{fid}/fragmentstages
+ api/fragments/{fid}/stages (synonym)
+
+ api/fragments/{fid}/fragmentflows
+
+ api/fragments/{fid}/flowproperties
+ api/fragments/{fid}/flows
+
+ api/fragments/{fid}/lciaresults
+
+no PUT, POST, or DELETE.  Process data are referenced by UUID, but the
+reference is to CSV data.
+
+
+### LCIA Method
+
+GET:
+
+ api/lciamethods
+ api/lciamethods/{lciaMethodId}
+ api/lciamethods/{lciaMethodId}/lciafactors
+ api/lciamethods/{lciaMethodId}/factors (synonym)
+
+ api/impactcategories
+ api/impactcategories/{categoryId}/lciamethods
+
+no PUT, POST, or DELETE.  LCIA Method data are referenced to ILCD-formatted
+data files by UUID.
+
+
+### Scenario
+
+Access to scenario data is governed by the ScenarioGroupID.  All scenarios
+belonging to ScenarioGroupID = 1 may be viewed without authentication.
+
+Scenarios belonging to a group other than ScenarioGroupID 1 are private.
+
+CalRecycle's authentication server should give the client a token that
+identifies the user's ScenarioGroup membership.  The backend will then
+only reveal information about scenarios belonging to that group.
+
+For the time being, the ScenarioGroup table has a field called "Secret".
+API requests that require authorization will include a URL parameter called
+"auth".  If the parameter value matches an entry in ScenarioGroup.Secret,
+the matching ScenarioGroupID will be authorized.
+
+GET: 
+
+ (unauthorized)
+ api/scenariogroups - returns empty
+ api/scenarios - base scenario group
+ api/scenarios/{scenarioId}... - must belong to base scenario group
+
+ (authorized)
+ api/scenariogroups - returns authorized group
+ api/scenarios - belonging to authorized group
+ api/scenarios/{scenarioId}... - must belong to authorized group
+
+ api/scenarios/{sid}/params
+ api/scenarios/{sid}/params/{paramId}
+
+ api/scenarios/{sid}/nodesubstitutions
+ api/scenarios/{sid}/nodesubstitutions/{fragmentFlowId}
+
+Authorization is required for all POST, PUT, and DELETE.
+
+POST:
+
+ api/scenarios - create new scenario in authorized group
+
+ api/scenarios/{sid}/params - create new param in named scenario
+
+ api/scenarios/{sid}/nodesubstitutions/{fragmentFlowId} 
+ - create new node substitution.
+ - this is not really a POST
+
+
+PUT / DELETE:
+
+ api/scenarios/{sid} - update scenario
+
+ api/scenarios/{sid}/params/{pid} - update param
+
+ api/scenarios/{sid}/nodesubstitutions/{ffid} - update substitution
+
+
+
+
+### LCA Result Computations and Analysis
+
+All analysis routes can be filtered by LCIA method (i.e. replace
+lciaresults with lciamethods/{lmid}/lciaresults)
+
+* Process Analysis
+
+ GET api/processes/{pid}/lciaresults
+
+ GET api/scenarios/{sid}/processes/{pid}/lciaresults
+
+* Contribution Analysis
+
+  returns an LCIAResultResource (list) where results are grouped by
+  FragmentStages.
+
+ GET api/fragments/{fid}/fragmentflows
+ GET api/fragments/{fid}/lciaresults
+
+ GET api/scenarios/{sid}/fragments/{fid}/fragmentflows
+ GET api/scenarios/{sid}/fragments/{fid}/lciaresults
+
+* Sensitivity Analysis
+
+  Returns the same LCIAResultResource (additive with the above resource)
+  where the sensitivity of FragmentStages to the identified parameter.
+
+ GET api/scenarios/{sid}/params/{pid}/lciasensitivity
+ GET api/scenarios/{sid}/params/{pid}/fragments/{fid}/lciasensitivity
+
+ POST api/scenarios/{sid}/lciasensitivity
+ POST api/scenarios/{sid}/fragments/{fid}/lciasensitivity
+
+  in the POST case, report sensitivity to an ad hoc Param Resource
+  contained in POST data (may not be accurate for all param types)
+
+
+
+
+
 ### Output
 
 Get methods return entity properties in json format. Null properties are omitted.
 
 #### Examples
 
-http://kbcalr.isber.ucsb.edu/api/fragments
+http://publictest.calrecycle.ca.gov/LCAToolAPI/api/fragments
 
 <pre><code>
 [
@@ -92,426 +268,5 @@ http://kbcalr.isber.ucsb.edu/api/fragments
   }
 ]
 </pre></code>
-
-http://kbcalr.isber.ucsb.edu/api/fragments/8/fragmentflows
-
-<pre><code>
-[
-  {
-    "fragmentFlowID": 151,
-    "name": "UO_Transfer to DK",
-    "nodeTypeID": 3,
-    "flowID": 16,
-    "directionID": 2,
-    "parentFragmentFlowID": 152,
-    "linkMagnitudes": [
-      {
-        "flowPropertyID": 23,
-        "magnitude": 0.547163
-      }
-    ]
-  },
-  {
-    "fragmentFlowID": 152,
-    "name": "Scenario",
-    "nodeTypeID": 1,
-    "flowID": 373,
-    "directionID": 2,
-    "parentFragmentFlowID": 153,
-    "processID": 44,
-    "linkMagnitudes": [
-      {
-        "flowPropertyID": 23,
-        "magnitude": 1.0
-      }
-    ]
-  },
-  {
-    "fragmentFlowID": 153,
-    "name": "Local Collection Mixer",
-    "nodeTypeID": 2,
-    "directionID": 2,
-    "subFragmentID": 2
-  },
-  {
-    "fragmentFlowID": 154,
-    "name": "Used Oil Collected",
-    "nodeTypeID": 3,
-    "flowID": 860,
-    "directionID": 2,
-    "parentFragmentFlowID": 153,
-    "linkMagnitudes": [
-      {
-        "flowPropertyID": 12,
-        "magnitude": 1.0
-      }
-    ]
-  },
-  {
-    "fragmentFlowID": 155,
-    "name": "Inter-Facility Mixer",
-    "nodeTypeID": 2,
-    "flowID": 820,
-    "directionID": 1,
-    "parentFragmentFlowID": 152,
-    "subFragmentID": 3,
-    "linkMagnitudes": [
-      {
-        "flowPropertyID": 15,
-        "magnitude": 360.985
-      }
-    ]
-  },
-  {
-    "fragmentFlowID": 156,
-    "name": "Lost or Unknown",
-    "nodeTypeID": 3,
-    "flowID": 346,
-    "directionID": 2,
-    "parentFragmentFlowID": 152,
-    "linkMagnitudes": [
-      {
-        "flowPropertyID": 12,
-        "magnitude": 0.007113
-      }
-    ]
-  },
-  {
-    "fragmentFlowID": 157,
-    "name": "Recycled Oil Exported",
-    "nodeTypeID": 3,
-    "flowID": 699,
-    "directionID": 2,
-    "parentFragmentFlowID": 152,
-    "linkMagnitudes": [
-      {
-        "flowPropertyID": 12,
-        "magnitude": 0.101098
-      }
-    ]
-  },
-  {
-    "fragmentFlowID": 158,
-    "name": "Recycled Oil Reprocessed",
-    "nodeTypeID": 3,
-    "flowID": 475,
-    "directionID": 2,
-    "parentFragmentFlowID": 152,
-    "linkMagnitudes": [
-      {
-        "flowPropertyID": 12,
-        "magnitude": 0.916165
-      }
-    ]
-  },
-  {
-    "fragmentFlowID": 159,
-    "name": "UO_Exports",
-    "nodeTypeID": 3,
-    "flowID": 690,
-    "directionID": 2,
-    "parentFragmentFlowID": 152,
-    "linkMagnitudes": [
-      {
-        "flowPropertyID": 23,
-        "magnitude": 0.101098
-      }
-    ]
-  },
-  {
-    "fragmentFlowID": 160,
-    "name": "Waste Oil Preprocessing",
-    "nodeTypeID": 2,
-    "flowID": 675,
-    "directionID": 2,
-    "parentFragmentFlowID": 152,
-    "subFragmentID": 4,
-    "linkMagnitudes": [
-      {
-        "flowPropertyID": 31,
-        "magnitude": 0.08368
-      }
-    ]
-  },
-  {
-    "fragmentFlowID": 161,
-    "name": "Waste to Disposal",
-    "nodeTypeID": 3,
-    "flowID": 351,
-    "directionID": 2,
-    "parentFragmentFlowID": 160,
-    "linkMagnitudes": [
-      {
-        "flowPropertyID": 12,
-        "magnitude": 0.0079496
-      }
-    ]
-  },
-  {
-    "fragmentFlowID": 162,
-    "name": "Transfer Losses",
-    "nodeTypeID": 1,
-    "flowID": 766,
-    "directionID": 2,
-    "parentFragmentFlowID": 152,
-    "processID": 45,
-    "linkMagnitudes": [
-      {
-        "flowPropertyID": 23,
-        "magnitude": 0.013594
-      }
-    ]
-  },
-  {
-    "fragmentFlowID": 163,
-    "name": "Lost or Unknown",
-    "nodeTypeID": 3,
-    "flowID": 346,
-    "directionID": 2,
-    "parentFragmentFlowID": 162,
-    "linkMagnitudes": [
-      {
-        "flowPropertyID": 12,
-        "magnitude": 0.013594
-      }
-    ]
-  },
-  {
-    "fragmentFlowID": 164,
-    "name": "UO_Transfer to Evergreen",
-    "nodeTypeID": 3,
-    "flowID": 617,
-    "directionID": 2,
-    "parentFragmentFlowID": 152,
-    "linkMagnitudes": [
-      {
-        "flowPropertyID": 23,
-        "magnitude": 0.186743
-      }
-    ]
-  },
-  {
-    "fragmentFlowID": 165,
-    "name": "Haz Waste Landfill Output",
-    "nodeTypeID": 2,
-    "flowID": 649,
-    "directionID": 2,
-    "parentFragmentFlowID": 152,
-    "subFragmentID": 5,
-    "linkMagnitudes": [
-      {
-        "flowPropertyID": 23,
-        "magnitude": 0.005305
-      }
-    ]
-  },
-  {
-    "fragmentFlowID": 166,
-    "name": "Waste to Disposal",
-    "nodeTypeID": 3,
-    "flowID": 351,
-    "directionID": 2,
-    "parentFragmentFlowID": 165,
-    "linkMagnitudes": [
-      {
-        "flowPropertyID": 12,
-        "magnitude": 0.005305
-      }
-    ]
-  },
-  {
-    "fragmentFlowID": 167,
-    "name": "Haz Waste Incineration Output",
-    "nodeTypeID": 2,
-    "flowID": 622,
-    "directionID": 2,
-    "parentFragmentFlowID": 152,
-    "subFragmentID": 6,
-    "linkMagnitudes": [
-      {
-        "flowPropertyID": 23,
-        "magnitude": 0.001872
-      }
-    ]
-  },
-  {
-    "fragmentFlowID": 168,
-    "name": "Waste to Disposal",
-    "nodeTypeID": 3,
-    "flowID": 351,
-    "directionID": 2,
-    "parentFragmentFlowID": 167,
-    "linkMagnitudes": [
-      {
-        "flowPropertyID": 12,
-        "magnitude": 0.001872
-      }
-    ]
-  },
-  {
-    "fragmentFlowID": 169,
-    "name": "Wastewater to Treatment",
-    "nodeTypeID": 1,
-    "flowID": 672,
-    "directionID": 2,
-    "parentFragmentFlowID": 152,
-    "processID": 46,
-    "linkMagnitudes": [
-      {
-        "flowPropertyID": 23,
-        "magnitude": 0.055951
-      }
-    ]
-  },
-  {
-    "fragmentFlowID": 170,
-    "name": "Waste to Disposal",
-    "nodeTypeID": 3,
-    "flowID": 351,
-    "directionID": 2,
-    "parentFragmentFlowID": 169,
-    "linkMagnitudes": [
-      {
-        "flowPropertyID": 12,
-        "magnitude": 0.055951
-      }
-    ]
-  },
-  {
-    "fragmentFlowID": 171,
-    "name": "Waste water treatment (contains organic load)",
-    "nodeTypeID": 1,
-    "flowID": 602,
-    "directionID": 2,
-    "parentFragmentFlowID": 169,
-    "processID": 47,
-    "linkMagnitudes": [
-      {
-        "flowPropertyID": 23,
-        "magnitude": 0.055951
-      },
-      {
-        "flowPropertyID": 30,
-        "magnitude": 5.5951E-05
-      }
-    ]
-  },
-  {
-    "fragmentFlowID": 172,
-    "name": "Secondary fuel",
-    "nodeTypeID": 4,
-    "flowID": 421,
-    "directionID": 1,
-    "parentFragmentFlowID": 171,
-    "linkMagnitudes": [
-      {
-        "flowPropertyID": 24,
-        "magnitude": 8.18265E-08
-      }
-    ]
-  },
-  {
-    "fragmentFlowID": 173,
-    "name": "Secondary fuel renewable",
-    "nodeTypeID": 4,
-    "flowID": 683,
-    "directionID": 1,
-    "parentFragmentFlowID": 171,
-    "linkMagnitudes": [
-      {
-        "flowPropertyID": 24,
-        "magnitude": 7.84079E-09
-      }
-    ]
-  },
-  {
-    "fragmentFlowID": 174,
-    "name": "Used Oil Rejuvenation/Other",
-    "nodeTypeID": 1,
-    "flowID": 619,
-    "directionID": 2,
-    "parentFragmentFlowID": 152,
-    "processID": 48,
-    "linkMagnitudes": [
-      {
-        "flowPropertyID": 23,
-        "magnitude": 0.009339
-      }
-    ]
-  },
-  {
-    "fragmentFlowID": 175,
-    "name": "Rejuvenated Dielectric fluid",
-    "nodeTypeID": 3,
-    "flowID": 651,
-    "directionID": 2,
-    "parentFragmentFlowID": 174,
-    "linkMagnitudes": [
-      {
-        "flowPropertyID": 12,
-        "magnitude": 0.009339
-      }
-    ]
-  },
-  {
-    "fragmentFlowID": 176,
-    "name": "UO_Transfer to RFO",
-    "nodeTypeID": 3,
-    "flowID": 808,
-    "directionID": 2,
-    "parentFragmentFlowID": 152,
-    "linkMagnitudes": [
-      {
-        "flowPropertyID": 23,
-        "magnitude": 0.071822
-      }
-    ]
-  },
-  {
-    "fragmentFlowID": 177,
-    "name": "UO water fraction",
-    "nodeTypeID": 1,
-    "flowID": 782,
-    "directionID": 2,
-    "parentFragmentFlowID": 152,
-    "processID": 49,
-    "linkMagnitudes": [
-      {
-        "flowPropertyID": 31,
-        "magnitude": 0.175463
-      }
-    ]
-  },
-  {
-    "fragmentFlowID": 178,
-    "name": "Collected UO Water Content",
-    "nodeTypeID": 3,
-    "flowID": 655,
-    "directionID": 2,
-    "parentFragmentFlowID": 177,
-    "linkMagnitudes": [
-      {
-        "flowPropertyID": 12,
-        "magnitude": 0.175463
-      }
-    ]
-  },
-  {
-    "fragmentFlowID": 179,
-    "name": "Used Oil, for collection",
-    "nodeTypeID": 3,
-    "flowID": 446,
-    "directionID": 2,
-    "parentFragmentFlowID": 177,
-    "linkMagnitudes": [
-      {
-        "flowPropertyID": 23,
-        "magnitude": 0.175463
-      }
-    ]
-  }
-]
-</pre></code>
-
 
 
