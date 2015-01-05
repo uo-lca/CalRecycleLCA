@@ -12,7 +12,7 @@ namespace CalRecycleLCA.Services
         IEnumerable<LCIAMethodResource> GetActiveLCIAMethodResources(int? impactCategoryID = null);
         IEnumerable<LCIAFactorResource> GetLCIAFactors(int lciaMethodId);
         IEnumerable<ScenarioResource> GetScenarios();
-        IEnumerable<ScenarioResource> GetScenarios(int ScenarioGroupID);
+        IEnumerable<ScenarioResource> GetScenarios(int? ScenarioGroupID);
         IEnumerable<FragmentResource> GetFragmentResources();
         FragmentResource GetFragmentResource(int fragmentID);
         IEnumerable<FragmentFlowResource> GetFragmentFlowResources(int fragmentID, int scenarioID = Scenario.MODEL_BASE_CASE_ID);

@@ -5,6 +5,15 @@ using System.Text;
 using System.Threading.Tasks;
 
 namespace Entities.Models {
+
+
+    public class ScenarioGroupResource
+    {
+        public int ScenarioGroupID { get; set; }
+        public string Name { get; set; }
+    }
+
+
     /// <summary>
     /// Web API resource for Scenario information.
     /// </summary>
