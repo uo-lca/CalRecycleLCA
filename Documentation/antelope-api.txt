@@ -47,6 +47,9 @@ GET:
  api/processes/{pid}/flowproperties
  api/processes/{pid}/lciaresults
 
+ api/processes/{pid}/productflows - processflows of flowtypeID=1
+ api/processes/{pid}/emissions - processflows of flowtypeID=2
+
 no PUT, POST, or DELETE.  Process data are referenced to ILCD-formatted
 data files by UUID.
 
@@ -60,6 +63,7 @@ GET:
 
  api/flows
  api/flows/{flowId}
+ api/flows/{flowId}/flowproperties
 
  api/flowtypes 
  api/flowtypes/[1-2]/flows 
@@ -71,12 +75,12 @@ GET:
 no PUT, POST, or DELETE.  Process data are referenced to ILCD-formatted
 data files by UUID.
 
-
-
-
 Fragment
 
 GET:
+
+ api/fragmentstages
+ api/stages (synonym)
 
  api/fragments
  api/fragments/{fragmentId}
@@ -135,8 +139,8 @@ GET:
 
  (authorized)
  api/scenariogroups - returns authorized group
- api/scenarios - belonging to authorized group
- api/scenarios/{scenarioId}... - must belong to authorized group
+ api/scenarios - belonging to base or authorized group
+ api/scenarios/{scenarioId}... - must belong to base or authorized group
 
  api/scenarios/{sid}/params
  api/scenarios/{sid}/params/{paramId}
@@ -154,7 +158,7 @@ POST:
 
  api/scenarios/{sid}/nodesubstitutions/{fragmentFlowId} 
  - create new node substitution.
-
+ - this is not really a POST
 
 
 PUT / DELETE:
@@ -203,5 +207,6 @@ lciaresults with lciamethods/{lmid}/lciaresults)
 
   in the POST case, report sensitivity to an ad hoc Param Resource
   contained in POST data (may not be accurate for all param types)
+
 
 
