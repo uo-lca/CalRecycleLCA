@@ -29,11 +29,11 @@ The API aspires to HATEOAS, but for now is documented in LCIAToolAPI/README.md
 
 GET:
 
- api/processes 
- api/processes/{processId}
- api/processes/{pid}/processflows
- api/processes/{pid}/flowproperties
- api/processes/{pid}/lciaresults
+    api/processes 
+    api/processes/{processId}
+    api/processes/{pid}/processflows
+    api/processes/{pid}/flowproperties
+    api/processes/{pid}/lciaresults
 
 no PUT, POST, or DELETE.  Process data are referenced to ILCD-formatted
 data files by UUID.
@@ -46,12 +46,12 @@ will only reveal aggregated LCIA results.
 
 GET:
 
- api/flows
- api/flows/{flowId}
-
- api/flowtypes 
- api/flowtypes/[1-2]/flows 
- api/flowtypes/[1-2]/processes - processes with (one or more) flows of type
+    api/flows
+    api/flows/{flowId}
+    
+    api/flowtypes 
+    api/flowtypes/[1-2]/flows 
+    api/flowtypes/[1-2]/processes - processes with (one or more) flows of type
 
  	       flowTypeID 1 = IntermediateFlow; 
 	       		  2 = ElementaryFlow
@@ -66,17 +66,18 @@ data files by UUID.
 
 GET:
 
- api/fragments
- api/fragments/{fragmentId}
- api/fragments/{fid}/fragmentstages
- api/fragments/{fid}/stages (synonym)
-
- api/fragments/{fid}/fragmentflows
-
- api/fragments/{fid}/flowproperties
- api/fragments/{fid}/flows
-
- api/fragments/{fid}/lciaresults
+    api/fragments
+    api/fragments/{fragmentId}
+    api/fragments/{fid}/fragmentstages
+    api/fragments/{fid}/stages (synonym)
+     
+    api/fragments/{fid}/fragmentflows
+    
+    api/fragments/{fid}/flowproperties
+    api/fragments/{fid}/flows
+    
+    api/fragments/{fid}/lciaresults
+    
 
 no PUT, POST, or DELETE.  Process data are referenced by UUID, but the
 reference is to CSV data.
@@ -86,13 +87,13 @@ reference is to CSV data.
 
 GET:
 
- api/lciamethods
- api/lciamethods/{lciaMethodId}
- api/lciamethods/{lciaMethodId}/lciafactors
- api/lciamethods/{lciaMethodId}/factors (synonym)
-
- api/impactcategories
- api/impactcategories/{categoryId}/lciamethods
+    api/lciamethods
+    api/lciamethods/{lciaMethodId}
+    api/lciamethods/{lciaMethodId}/lciafactors
+    api/lciamethods/{lciaMethodId}/factors (synonym)
+    
+    api/impactcategories
+    api/impactcategories/{categoryId}/lciamethods
 
 no PUT, POST, or DELETE.  LCIA Method data are referenced to ILCD-formatted
 data files by UUID.
@@ -117,41 +118,42 @@ the matching ScenarioGroupID will be authorized.
 GET: 
 
  (unauthorized)
- api/scenariogroups - returns empty
- api/scenarios - base scenario group
- api/scenarios/{scenarioId}... - must belong to base scenario group
+    api/scenariogroups - returns empty
+    api/scenarios - base scenario group
+    api/scenarios/{scenarioId}... - must belong to base scenario group
 
  (authorized)
- api/scenariogroups - returns authorized group
- api/scenarios - belonging to authorized group
- api/scenarios/{scenarioId}... - must belong to authorized group
-
- api/scenarios/{sid}/params
- api/scenarios/{sid}/params/{paramId}
-
- api/scenarios/{sid}/nodesubstitutions
- api/scenarios/{sid}/nodesubstitutions/{fragmentFlowId}
-
+    api/scenariogroups - returns authorized group
+    api/scenarios - belonging to authorized group
+    api/scenarios/{scenarioId}... - must belong to authorized group
+    
+    api/scenarios/{sid}/params
+    api/scenarios/{sid}/params/{paramId}
+    
+    api/scenarios/{sid}/nodesubstitutions
+    api/scenarios/{sid}/nodesubstitutions/{fragmentFlowId}
+ 
+   
 Authorization is required for all POST, PUT, and DELETE.
 
 POST:
 
- api/scenarios - create new scenario in authorized group
+    api/scenarios - create new scenario in authorized group
 
- api/scenarios/{sid}/params - create new param in named scenario
+    api/scenarios/{sid}/params - create new param in named scenario
 
- api/scenarios/{sid}/nodesubstitutions/{fragmentFlowId} 
+    api/scenarios/{sid}/nodesubstitutions/{fragmentFlowId} 
  - create new node substitution.
  - this is not really a POST
 
 
 PUT / DELETE:
 
- api/scenarios/{sid} - update scenario
+    api/scenarios/{sid} - update scenario
 
- api/scenarios/{sid}/params/{pid} - update param
+    api/scenarios/{sid}/params/{pid} - update param
 
- api/scenarios/{sid}/nodesubstitutions/{ffid} - update substitution
+    api/scenarios/{sid}/nodesubstitutions/{ffid} - update substitution
 
 
 
@@ -163,34 +165,35 @@ lciaresults with lciamethods/{lmid}/lciaresults)
 
 * Process Analysis
 
- GET api/processes/{pid}/lciaresults
+    GET api/processes/{pid}/lciaresults
 
- GET api/scenarios/{sid}/processes/{pid}/lciaresults
+    GET api/scenarios/{sid}/processes/{pid}/lciaresults
 
 * Contribution Analysis
 
   returns an LCIAResultResource (list) where results are grouped by
   FragmentStages.
 
- GET api/fragments/{fid}/fragmentflows
- GET api/fragments/{fid}/lciaresults
-
- GET api/scenarios/{sid}/fragments/{fid}/fragmentflows
- GET api/scenarios/{sid}/fragments/{fid}/lciaresults
+    GET api/fragments/{fid}/fragmentflows
+    GET api/fragments/{fid}/lciaresults
+    
+    GET api/scenarios/{sid}/fragments/{fid}/fragmentflows
+    GET api/scenarios/{sid}/fragments/{fid}/lciaresults
 
 * Sensitivity Analysis
 
   Returns the same LCIAResultResource (additive with the above resource)
   where the sensitivity of FragmentStages to the identified parameter.
 
- GET api/scenarios/{sid}/params/{pid}/lciasensitivity
- GET api/scenarios/{sid}/params/{pid}/fragments/{fid}/lciasensitivity
-
- POST api/scenarios/{sid}/lciasensitivity
- POST api/scenarios/{sid}/fragments/{fid}/lciasensitivity
+    GET api/scenarios/{sid}/params/{pid}/lciasensitivity
+    GET api/scenarios/{sid}/params/{pid}/fragments/{fid}/lciasensitivity
+    
+    POST api/scenarios/{sid}/lciasensitivity
+    POST api/scenarios/{sid}/fragments/{fid}/lciasensitivity
 
   in the POST case, report sensitivity to an ad hoc Param Resource
-  contained in POST data (may not be accurate for all param types)
+  contained in POST data (may not be accurate for all param types) 
+  (does NOT get added to scenario)
 
 
 
