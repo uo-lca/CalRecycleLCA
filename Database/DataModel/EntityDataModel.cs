@@ -76,6 +76,12 @@ namespace LcaDataModel {
         protected override void OnModelCreating(DbModelBuilder modelBuilder) {
             modelBuilder.Conventions.Remove<OneToManyCascadeDeleteConvention>();
 
+            modelBuilder.Entity<BackgroundSubstitution>()
+                .HasRequired(e => e.Scenario)
+                .WithMany(e => e.BackgroundSubstitutions)
+                .HasForeignKey(e => e.ScenarioID)
+                .WillCascadeOnDelete(true);
+
             modelBuilder.Entity<Category>()
                 .Property(e => e.ExternalClassID)
                 .IsUnicode(false);
@@ -97,6 +103,12 @@ namespace LcaDataModel {
                 .Property(e => e.Delimiter)
                 .IsUnicode(false);
 
+            modelBuilder.Entity<CharacterizationParam>()
+                .HasRequired(e => e.Param)
+                .WithMany(e => e.CharacterizationParams)
+                .HasForeignKey(e => e.ParamID)
+                .WillCascadeOnDelete(true);
+
             modelBuilder.Entity<CompositionModel>()
                 .Property(e => e.Name)
                 .IsUnicode(false);
@@ -110,6 +122,23 @@ namespace LcaDataModel {
                 .HasMany(e => e.CompositionSubstitutions)
                 .WithRequired(d => d.SubstituteCompositionModel)
                 .HasForeignKey(d => d.SubstituteCompositionModelID);
+
+            modelBuilder.Entity<CompositionParam>()
+                .HasRequired(e => e.Param)
+                .WithMany(e => e.CompositionParams)
+                .HasForeignKey(e => e.ParamID)
+                .WillCascadeOnDelete(true);
+
+            modelBuilder.Entity<CompositionSubstitution>()
+                .HasRequired(e => e.Scenario)
+                .WithMany(e => e.CompositionSubstitutions)
+                .HasForeignKey(e => e.ScenarioID)
+                .WillCascadeOnDelete(true);
+
+            modelBuilder.Entity<ConservationParam>()
+                .HasRequired(e => e.DependencyParam)
+                .WithOptional(e => e.ConservationParam)
+                .WillCascadeOnDelete(true);
 
             modelBuilder.Entity<DataSource>()
                 .Property(e => e.Name)
@@ -134,6 +163,12 @@ namespace LcaDataModel {
             //    .HasRequired(e => e.ConservationDependencyParam)
             //    .WithMany(d => d.ConservationDistributionParams)
             //    .HasForeignKey(e => e.ConservationDependencyParamID);
+
+            modelBuilder.Entity<DependencyParam>()
+                .HasRequired(e => e.Param)
+                .WithMany(e => e.DependencyParams)
+                .HasForeignKey(e => e.ParamID)
+                .WillCascadeOnDelete(true);
 
             modelBuilder.Entity<Direction>()
                 .Property(e => e.Name)
@@ -166,6 +201,12 @@ namespace LcaDataModel {
                 .HasMany(e => e.LCIAMethods)
                 .WithOptional(e => e.FlowProperty)
                 .HasForeignKey(e => e.ReferenceQuantity);
+
+            modelBuilder.Entity<FlowPropertyParam>()
+                .HasRequired(e => e.Param)
+                .WithMany(e => e.FlowPropertyParams)
+                .HasForeignKey(e => e.ParamID)
+                .WillCascadeOnDelete(true);
 
             modelBuilder.Entity<FlowType>()
                 .Property(e => e.Name)
@@ -212,6 +253,12 @@ namespace LcaDataModel {
             modelBuilder.Entity<FragmentStage>()
                 .Property(e => e.Name)
                 .IsUnicode(false);
+
+            modelBuilder.Entity<FragmentSubstitution>()
+                .HasRequired(e => e.Scenario)
+                .WithMany(e => e.FragmentSubstitutions)
+                .HasForeignKey(e => e.ScenarioID)
+                .WillCascadeOnDelete(true);
 
             modelBuilder.Entity<ILCDEntity>()
                 .Property(e => e.UUID)
@@ -266,6 +313,12 @@ namespace LcaDataModel {
                 .Property(e => e.UseAdvice)
                 .IsUnicode(false);
 
+            modelBuilder.Entity<NodeCache>()
+                .HasRequired(e => e.Scenario)
+                .WithMany(e => e.NodeCaches)
+                .HasForeignKey(e => e.ScenarioID)
+                .WillCascadeOnDelete(true);
+
             modelBuilder.Entity<NodeType>()
                 .Property(e => e.Name)
                 .IsUnicode(false);
@@ -273,6 +326,12 @@ namespace LcaDataModel {
             modelBuilder.Entity<Param>()
                 .Property(e => e.Name)
                 .IsUnicode(false);
+
+            modelBuilder.Entity<Param>()
+                .HasRequired(e => e.Scenario)
+                .WithMany(e => e.Params)
+                .HasForeignKey(e => e.ScenarioID)
+                .WillCascadeOnDelete(true);
 
             //modelBuilder.Entity<Param>()
             //    .HasMany(p => p.BalanceParams)
@@ -300,6 +359,18 @@ namespace LcaDataModel {
                 .Property(e => e.Geography)
                 .IsUnicode(false);
 
+            modelBuilder.Entity<ProcessDissipationParam>()
+                .HasRequired(e => e.Param)
+                .WithMany(e => e.ProcessDissipationParams)
+                .HasForeignKey(e => e.ParamID)
+                .WillCascadeOnDelete(true);
+
+            modelBuilder.Entity<ProcessEmissionParam>()
+                .HasRequired(e => e.Param)
+                .WithMany(e => e.ProcessEmissionParams)
+                .HasForeignKey(e => e.ParamID)
+                .WillCascadeOnDelete(true);
+
             modelBuilder.Entity<ProcessFlow>()
                 .Property(e => e.Type)
                 .IsUnicode(false);
@@ -312,6 +383,12 @@ namespace LcaDataModel {
                 .Property(e => e.Geography)
                 .IsUnicode(false);
 
+            modelBuilder.Entity<ProcessSubstitution>()
+                .HasRequired(e => e.Scenario)
+                .WithMany(e => e.ProcessSubstitutions)
+                .HasForeignKey(e => e.ScenarioID)
+                .WillCascadeOnDelete(true);
+
             modelBuilder.Entity<ProcessType>()
                 .Property(e => e.Name)
                 .IsUnicode(false);
@@ -323,6 +400,12 @@ namespace LcaDataModel {
             modelBuilder.Entity<Scenario>()
                 .Property(e => e.Name)
                 .IsUnicode(false);
+
+            modelBuilder.Entity<ScoreCache>()
+                .HasRequired(e => e.Scenario)
+                .WithMany(e => e.ScoreCaches)
+                .HasForeignKey(e => e.ScenarioID)
+                .WillCascadeOnDelete(true);
 
             modelBuilder.Entity<ScenarioGroup>()
                 .Property(e => e.Name)

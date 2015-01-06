@@ -359,11 +359,14 @@ namespace CalRecycleLCA.Services
 
         public FragmentResource Transform(Fragment f)
         {
+            var term = _FragmentFlowService.GetInFlow(f.FragmentID);
             return new FragmentResource
             {
                 FragmentID = f.FragmentID,
                 Name = f.Name,
-                ReferenceFragmentFlowID = TransformNullable(f.ReferenceFragmentFlowID, "Fragment.ReferenceFragmentFlowID")
+                ReferenceFragmentFlowID = TransformNullable(f.ReferenceFragmentFlowID, "Fragment.ReferenceFragmentFlowID"),
+                TermFlowID = term.FlowID,
+                DirectionID = term.DirectionID
             };
         }
 
@@ -869,94 +872,82 @@ namespace CalRecycleLCA.Services
             //_unitOfWork.SaveChanges();
         }
 
-        public int AddScenario(string addScenarioJSON, int scenarioGroupId)
+        private ScenarioResource CheckTopLevelFragment(ScenarioResource scenario)
         {
-            /// this function is a big old mess.  Needs to generate a new ScenarioID, not accept it as input. 
-            /// Needs to create only one scenario and not a list.
-            // Parse JSON into dynamic object
-            JObject jsonScenarios = JObject.Parse(addScenarioJSON);
+            if (_FragmentService.Query(k => k.FragmentID == scenario.TopLevelFragmentID) == null)
+                return null;
 
-            List<Scenario> scenarios = new List<Scenario>();
-
-            // add each scenario to a list
-            foreach (var jsonScenario in jsonScenarios["scenarios"])
+            var term = _FragmentFlowService.GetInFlow(scenario.TopLevelFragmentID);
+            if (scenario.ReferenceFlowID == 0)
             {
-                scenarios.Add(new Scenario()
-                {
-                    ScenarioGroupID = Convert.ToInt32((string)jsonScenario["scenarioGroupID"]),
-                    TopLevelFragmentID = Convert.ToInt32((string)jsonScenario["topLevelFragmentID"]),
-                    ActivityLevel = Convert.ToDouble((string)jsonScenario["activityLevel"]),
-                    Name = (string)jsonScenario["name"],
-                    FlowID = Convert.ToInt32((string)jsonScenario["flowID"]),
-                    DirectionID = Convert.ToInt32((string)jsonScenario["directionID"])
-                });
+                scenario.ReferenceFlowID = term.FlowID;
             }
-
-            foreach (var scenario in scenarios)
+            else
             {
-                scenario.ObjectState = ObjectState.Added;
+                // alternative ReferenceFlowID is allowed only if it can be converted to the same units as term.FlowID
+                var conv = _FlowFlowPropertyService.FlowConv(scenario.ReferenceFlowID, term.FlowID);
+                if (conv == 0)
+                    return null; // must be commensurable
+                // else - nothing required
             }
-
-            _ScenarioService.InsertGraphRange(scenarios);
-            _unitOfWork.SaveChanges();
-            return scenarios.First().ScenarioID;
-
+            scenario.ReferenceDirectionID = term.DirectionID;
+            return scenario;
         }
 
-        public void UpdateScenario(string updateScenarioJSON, int scenarioGroupId)
+        public int AddScenario(ScenarioResource postScenario, int scenarioGroupId)
         {
-            // Parse JSON into dynamic object
-            JObject jsonScenarios = JObject.Parse(updateScenarioJSON);
-
-            List<Scenario> scenarios = new List<Scenario>();
-
-            // add each scenario to a list
-            foreach (var jsonScenario in jsonScenarios["scenarios"])
-            {
-                scenarios.Add(new Scenario()
-                {
-                    ScenarioID = Convert.ToInt32((string)jsonScenario["scenarioID"]),
-                    ScenarioGroupID = Convert.ToInt32((string)jsonScenario["scenarioGroupID"]),
-                    TopLevelFragmentID = Convert.ToInt32((string)jsonScenario["topLevelFragmentID"]),
-                    ActivityLevel = Convert.ToDouble((string)jsonScenario["activityLevel"]),
-                    Name = (string)jsonScenario["name"],
-                    FlowID = Convert.ToInt32((string)jsonScenario["flowID"]),
-                    DirectionID = Convert.ToInt32((string)jsonScenario["directionID"])
-                });
-            }
-
-            foreach (var scenario in scenarios)
-            {
-                scenario.ObjectState = ObjectState.Modified;
-                _ScenarioService.InsertOrUpdateGraph(scenario);
-            }
+            // request has already been authorized-- all we need to do is fill in the pieces
+            // ScenarioResource has fields:
+            //0  ScenarioID
+            //X  ScenarioGroupID
+            //R  TopLevelFragmentID
+            //?  ActivityLevel
+            //?  Name 
+            //?  ReferenceFlowID
+            //A  ReferenceDirectionID
+            //A  ScenarioGroupID 
+            // of these, ScenarioID is ignored; TopLevelFragmentID is required; ActivityLevel is optional; Name is optional.
+            // ScenarioGroupID is set; Reference flow + direction are set; ScenarioID is db-generated.
+            postScenario = CheckTopLevelFragment(postScenario);
+            if (postScenario == null)
+                return -1; // -1 should generate a 400 or 415 http error
+            
+            if (postScenario.Name == null)
+                postScenario.Name = "User-Generated Scenario";
+            if (postScenario.ActivityLevel == 0)
+                postScenario.ActivityLevel = 1;
+            postScenario.ScenarioGroupID = scenarioGroupId;
+            Scenario newScenario = _ScenarioService.NewScenario(postScenario);
             _unitOfWork.SaveChanges();
-
+            return newScenario.ScenarioID;
         }
 
-        public void DeleteScenario(string deleteScenarioJSON)
+        public bool UpdateScenario(int scenarioId, ScenarioResource putScenario)
         {
-            // Parse JSON into dynamic object
-            JObject jsonScenarios = JObject.Parse(deleteScenarioJSON);
-
-            List<Scenario> scenarios = new List<Scenario>();
-
-            // add each scenario to a list
-            foreach (var jsonScenario in jsonScenarios["scenarios"])
+            Scenario scenario;
+            if (putScenario.TopLevelFragmentID == 0 && putScenario.ReferenceFlowID == 0)
+                // just update details
+                scenario = _ScenarioService.UpdateScenarioDetails(scenarioId, putScenario);
+            else
             {
-                scenarios.Add(new Scenario()
-                {
-                    ScenarioID = Convert.ToInt32((string)jsonScenario["scenarioID"])
-                });
+                if (putScenario.TopLevelFragmentID == 0)
+                    putScenario.TopLevelFragmentID = _ScenarioService.Query(k => k.ScenarioID == scenarioId)
+                        .Select(k => k.TopLevelFragmentID).First();
+                putScenario = CheckTopLevelFragment(putScenario);
+                scenario = _ScenarioService.UpdateScenarioFlow(scenarioId, putScenario);
             }
-
-            foreach (var scenario in scenarios)
+            if (scenario != null)
             {
-                scenario.ObjectState = ObjectState.Deleted;
-                _ScenarioService.Delete(scenario.ScenarioID);
+                _unitOfWork.SaveChanges();
+                return true;
             }
+            return false;
+        }
+
+        public void DeleteScenario(int scenarioId)
+        {
+            _ScenarioService.DeleteScenario(scenarioId);
             _unitOfWork.SaveChanges();
-
         }
 
         public void DeleteParam(string deleteParamJSON)
