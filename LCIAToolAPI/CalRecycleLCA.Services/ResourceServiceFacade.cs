@@ -802,7 +802,7 @@ namespace CalRecycleLCA.Services
             return scenarios.Select(c => Transform(c)).ToList();
         }
 
-        public IEnumerable<ScenarioResource> GetScenarios(int userGroupID)
+        public IEnumerable<ScenarioResource> GetScenarios(int? userGroupID)
         {
             IEnumerable<Scenario> scenarios = _ScenarioService.Queryable()
                 .Where(c => (c.ScenarioGroupID == 1 || c.ScenarioGroupID == userGroupID));

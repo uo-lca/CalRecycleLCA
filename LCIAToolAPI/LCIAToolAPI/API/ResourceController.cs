@@ -101,12 +101,27 @@ namespace LCAToolAPI.API
         }
 
         /// <summary>
+        /// GET api/scenariogroups 
+        /// Get the scenario groups authorized by the connection.
+        /// </summary>
+        /// <returns></returns>
+        [Route("api/scenariogroup")]
+        [Route("api/scenariogroups")]
+        [CalRecycleAuthorize]
+        [HttpGet]
+        public IEnumerable<ScenarioGroupResource> GetScenarioGroups()
+        {
+            return _ScenarioGroupService.AuthorizedGroups(RequestContext);
+        }
+
+        /// <summary>
         /// GET api/scenarios
         /// Get the list of all scenarios eligible to be viewed given the connection's authorization.
         /// Note: authorization is presently not implemented.
         /// </summary>
         /// <returns></returns>
         [Route("api/scenarios")]
+        [CalRecycleAuthorize]
         [HttpGet]
         public IEnumerable<ScenarioResource> GetScenarios()
         {
@@ -114,7 +129,7 @@ namespace LCAToolAPI.API
             // if unprivileged:
             //return _ResourceService.GetScenarios(userGroupID);
             // else:
-            return _ResourceService.GetScenarios();
+            return _ResourceService.GetScenarios(_ScenarioGroupService.CheckAuthorizedGroup(RequestContext));
         }
 
         /// <summary>

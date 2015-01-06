@@ -7,6 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Web.Http.Controllers;
+using Entities.Models;
 
 namespace CalRecycleLCA.Services
 {
@@ -15,6 +16,7 @@ namespace CalRecycleLCA.Services
         bool CanGet(HttpRequestContext request);
         bool CanAlter(HttpRequestContext request);
         int? CheckAuthorizedGroup(HttpRequestContext request);
+        IEnumerable<ScenarioGroupResource> AuthorizedGroups(HttpRequestContext request);
     }
 
     public class ScenarioGroupService : Service<ScenarioGroup>, IScenarioGroupService
@@ -63,6 +65,15 @@ namespace CalRecycleLCA.Services
             return _repository.Queryable().Where(k => k.Secret == authString).Select(k => k.ScenarioGroupID).FirstOrDefault();
         }
 
+        public IEnumerable<ScenarioGroupResource> AuthorizedGroups(HttpRequestContext request)
+        {
+            string authString = Convert.ToString(request.RouteData.Values["authString"]);
+            return _repository.Queryable().Where(k => k.Secret == authString || k.ScenarioGroupID == 1).Select(k => new ScenarioGroupResource()
+            {
+                Name = k.Name,
+                ScenarioGroupID = k.ScenarioGroupID
+            });
+        }
     }
 }
 
