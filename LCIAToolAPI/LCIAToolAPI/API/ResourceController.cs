@@ -99,60 +99,6 @@ namespace LCAToolAPI.API
         {
             return _ResourceService.GetFlowProperties();
         }
-
-        /// <summary>
-        /// GET api/scenariogroups 
-        /// Get the scenario groups authorized by the connection.
-        /// </summary>
-        /// <returns></returns>
-        [Route("api/scenariogroup")]
-        [Route("api/scenariogroups")]
-        [CalRecycleAuthorize]
-        [HttpGet]
-        public IEnumerable<ScenarioGroupResource> GetScenarioGroups()
-        {
-            return _ScenarioGroupService.AuthorizedGroups(RequestContext);
-        }
-
-        /// <summary>
-        /// GET api/scenarios
-        /// Get the list of all scenarios eligible to be viewed given the connection's authorization.
-        /// Note: authorization is presently not implemented.
-        /// </summary>
-        /// <returns></returns>
-        [Route("api/scenarios")]
-        [CalRecycleAuthorize]
-        [HttpGet]
-        public IEnumerable<ScenarioResource> GetScenarios()
-        {
-            // need auth here to determine remote user's scenario group.  
-            // if unprivileged:
-            //return _ResourceService.GetScenarios(userGroupID);
-            // else:
-            return _ResourceService.GetScenarios(_ScenarioGroupService.CheckAuthorizedGroup(RequestContext));
-        }
-
-        /// <summary>
-        /// GET api/scenarios
-        /// Get the list of all scenarios eligible to be viewed given the connection's authorization.
-        /// Note: authorization is presently not implemented.
-        /// </summary>
-        /// <returns></returns>
-        [Route("api/scenarios/{scenarioId}")]
-        [CalRecycleAuthorize]
-        [HttpGet]
-        public ScenarioResource GetScenario(int scenarioId)
-        {
-            
-            // need auth here to determine remote user's scenario group.  
-            // if unprivileged:
-            //return _ResourceService.GetScenarios(userGroupID);
-            // else:
-            if (_ScenarioGroupService.CanGet(RequestContext))
-                return _ResourceService.GetScenarios().Where(k => k.ScenarioID == scenarioId).FirstOrDefault();
-            else
-                throw new HttpResponseException(HttpStatusCode.Unauthorized); 
-        }
         
         /// <summary>
         /// Get the list of all fragments in the DB.
@@ -178,28 +124,6 @@ namespace LCAToolAPI.API
             }
             return fr;
         }
-
-        // // Scenarios //////////////////////////////////////////////////////////////
-        // [Route("api/scenarios")]
-        // [HttpGet]
-        // public IEnumerable<ScenarioResource> GetScenarios(int userID) {
-        //     // need to get userID or scenarioGroupID from server auth
-        //     return _ResourceService.GetScenarios(userID);
-        // }
-
-        // [Route("api/scenarios/{scenarioID:int}/params")]
-        // [HttpGet]
-        // public IEnumerable<ScenarioResource> GetScenarioParams(int scenarioID) {
-        //     // need to get userID or scenarioGroupID from server auth
-        //     return _ResourceService.GetScenarioParams(scenarioID);
-        // }
-
-        // [Route("api/scenarios/{scenarioID:int}/substitutions")]
-        // [HttpGet]
-        // public IEnumerable<ScenarioSubstitutionResource> GetScenarioSubs(int scenarioID) {
-        //     // need to get userID or scenarioGroupID from server auth
-        //     return _ResourceService.GetScenarioSubs(scenarioID);
-        // }
 
         // Fragments //////////////////////////////////////////////////////////////
         /// <summary>
@@ -488,6 +412,60 @@ namespace LCAToolAPI.API
             return _ResourceService.GetParams(scenarioId).Where(k => k.ParamID == paramId).FirstOrDefault();
         }
 
+        /// <summary>
+        /// GET api/scenariogroups 
+        /// Get the scenario groups authorized by the connection.
+        /// </summary>
+        /// <returns></returns>
+        [Route("api/scenariogroup")]
+        [Route("api/scenariogroups")]
+        [CalRecycleAuthorize]
+        [HttpGet]
+        public IEnumerable<ScenarioGroupResource> GetScenarioGroups()
+        {
+            return _ScenarioGroupService.AuthorizedGroups(RequestContext);
+        }
+
+        /// <summary>
+        /// GET api/scenarios
+        /// Get the list of all scenarios eligible to be viewed given the connection's authorization.
+        /// Note: authorization is presently not implemented.
+        /// </summary>
+        /// <returns></returns>
+        [Route("api/scenarios")]
+        [CalRecycleAuthorize]
+        [HttpGet]
+        public IEnumerable<ScenarioResource> GetScenarios()
+        {
+            // need auth here to determine remote user's scenario group.  
+            // if unprivileged:
+            //return _ResourceService.GetScenarios(userGroupID);
+            // else:
+            return _ResourceService.GetScenarios(_ScenarioGroupService.CheckAuthorizedGroup(RequestContext));
+        }
+
+        /// <summary>
+        /// GET api/scenarios
+        /// Get the list of all scenarios eligible to be viewed given the connection's authorization.
+        /// Note: authorization is presently not implemented.
+        /// </summary>
+        /// <returns></returns>
+        [Route("api/scenarios/{scenarioId}")]
+        [CalRecycleAuthorize]
+        [HttpGet]
+        public ScenarioResource GetScenario(int scenarioId)
+        {
+
+            // need auth here to determine remote user's scenario group.  
+            // if unprivileged:
+            //return _ResourceService.GetScenarios(userGroupID);
+            // else:
+            if (_ScenarioGroupService.CanGet(RequestContext))
+                return _ResourceService.GetScenarios().Where(k => k.ScenarioID == scenarioId).FirstOrDefault();
+            else
+                throw new HttpResponseException(HttpStatusCode.Unauthorized);
+        }
+        
         //[Authorize]
         /// <summary>
         /// POST api/scenarios
@@ -496,15 +474,24 @@ namespace LCAToolAPI.API
         /// </summary>
         /// <param name="scenarioId"></param>
         /// <returns>ScenarioResource for created scenario</returns>
+        [CalRecycleAuthorize]
         [Route("api/scenarios")]
         [AcceptVerbs("POST")]
         [HttpPost]
-        public ScenarioResource AddScenario()
+        public ScenarioResource AddScenario([FromBody] ScenarioResource postdata)
         {
+            int scenarioId;
+            int? authGroup = _ScenarioGroupService.CheckAuthorizedGroup(RequestContext);
             // need to authorize this
-            int authorizedScenarioGroup = 1; // determine scenario group from authentication data
-            int scenarioId = _ResourceService.AddScenario(addScenarioJSON, authorizedScenarioGroup);
-            return GetScenario(scenarioId);
+            if (authGroup != 0 && authGroup != null)
+            {
+                var foo = Request.Content.ToString();
+                scenarioId = _ResourceService.AddScenario(postdata, (int)authGroup);
+                return _ResourceService.GetScenarios().Where(k => k.ScenarioID == scenarioId).FirstOrDefault(); 
+            }
+            else
+                throw new HttpResponseException(HttpStatusCode.Unauthorized); 
+
         }
 
         /// <summary>
@@ -512,29 +499,37 @@ namespace LCAToolAPI.API
         /// Update a scenario. Requires authorization. Return the updated scenario
         /// </summary>
         /// <param name="scenarioId"></param>
-        [Authorize]
+        [CalRecycleAuthorize]
         [Route("api/scenarios/{scenarioId}")]
         [AcceptVerbs("PUT")]
         [HttpPut]
-        public ScenarioResource UpdateScenario(int scenarioId)
+        public ScenarioResource UpdateScenario(int scenarioId, [FromBody] ScenarioResource putdata)
         {
-            int authorizedScenarioGroup = 1;
-            _ResourceService.UpdateScenario(updateScenarioJSON, authorizedScenarioGroup);
-            return GetScenario(scenarioId);
+            if (_ScenarioGroupService.CanAlter(RequestContext))
+            {
+                if (_ResourceService.UpdateScenario(scenarioId, putdata))
+                    return _ResourceService.GetScenarios().Where(k => k.ScenarioID == scenarioId).FirstOrDefault();
+                else
+                    return null;
+            }
+            else
+                throw new HttpResponseException(HttpStatusCode.Unauthorized);
         }
 
-        /*
         /// <summary>
         /// DELETE api/scenarios/{scenarioId}
-        /// not yet implemented
         /// </summary>
+        [CalRecycleAuthorize]
         [Route("api/scenarios/{scenarioId}")]
         [AcceptVerbs("DELETE")]
-        public void DeleteScenario()
+        public void DeleteScenario(int scenarioId)
         {
-            _ResourceService.DeleteScenario(deleteScenarioJSON);
+            if (_ScenarioGroupService.CanAlter(RequestContext))
+                _ResourceService.DeleteScenario(scenarioId);
+            else
+                throw new HttpResponseException(HttpStatusCode.Unauthorized); 
+
         }
-         * */
 
         /*
         /// <summary>
@@ -550,7 +545,6 @@ namespace LCAToolAPI.API
         {
             _ResourceService.DeleteParam(deleteParamJSON);
         }
-         * */
 
         /// <summary>
         /// POST api/scenarios/{scenarioId}/params

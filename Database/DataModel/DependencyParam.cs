@@ -10,11 +10,6 @@ namespace LcaDataModel
     [Table("DependencyParam")]
     public partial class DependencyParam : Entity
     {
-        public DependencyParam()
-        {
-            ConservationParams = new HashSet<ConservationParam>();
-        }
-
         //[DatabaseGenerated(DatabaseGeneratedOption.None)]
         public int DependencyParamID { get; set; }
 
@@ -28,6 +23,6 @@ namespace LcaDataModel
 
         public virtual Param Param { get; set; }
 
-        public virtual ICollection<ConservationParam> ConservationParams { get; set; }
+        public virtual ConservationParam ConservationParam { get; set; }
     }
 }

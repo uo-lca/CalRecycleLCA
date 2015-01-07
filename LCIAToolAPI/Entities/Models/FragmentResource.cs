@@ -20,5 +20,8 @@ namespace Entities.Models {
 
         public int  ReferenceFragmentFlowID { get; set; }
 
+        public int TermFlowID { get; set; }
+        public int DirectionID { get; set; }
+
     }
 }

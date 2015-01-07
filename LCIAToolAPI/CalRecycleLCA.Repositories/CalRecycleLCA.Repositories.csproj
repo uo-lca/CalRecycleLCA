@@ -51,6 +51,7 @@
     <Compile Include="ProcessFlowRepository.cs" />
     <Compile Include="ProcessRepository.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="ScenarioRepository.cs" />
     <Compile Include="ScoreCacheRepository.cs" />
   </ItemGroup>
   <ItemGroup>

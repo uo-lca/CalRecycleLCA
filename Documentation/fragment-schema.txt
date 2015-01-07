@@ -542,9 +542,17 @@ The following tables are required:
     + TopLevelFragmentID (FK to Fragment) - shown in initial view
     + ActivityLevel (float) - scaling of initial view
     + RefFlowID
-    + RefDirectionID
+    + RefDirectionID (from top level fragment perspective)
 
     * DocID
+
+    RefFlowID is nominally the TermFlow of the top-level fragment, but it
+    could be any flow that can be converted into the same unit as
+    the reference unit of the top-level fragment's TermFlow.  
+
+    RefDirectionID should report the flow's direction relative to the top
+    level fragment, in other words should complement the DirectionID entry
+    in the FragmentFlow table.
 
    BackgroundSubstitution
     * BackgroundSubstitutionID
