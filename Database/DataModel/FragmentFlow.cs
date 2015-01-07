@@ -19,8 +19,6 @@ namespace LcaDataModel
             FragmentNodeFragments = new HashSet<FragmentNodeFragment>();
             FragmentNodeProcesses = new HashSet<FragmentNodeProcess>();
             NodeCaches = new HashSet<NodeCache>();
-            NodeDissipationParams = new HashSet<NodeDissipationParam>();
-            NodeEmissionParams = new HashSet<NodeEmissionParam>();
             ScoreCaches = new HashSet<ScoreCache>();
         }
 
@@ -69,10 +67,6 @@ namespace LcaDataModel
         public virtual ICollection<FragmentNodeProcess> FragmentNodeProcesses { get; set; }
 
         public virtual ICollection<NodeCache> NodeCaches { get; set; }
-
-        public virtual ICollection<NodeDissipationParam> NodeDissipationParams { get; set; }
-
-        public virtual ICollection<NodeEmissionParam> NodeEmissionParams { get; set; }
 
         public virtual ICollection<ScoreCache> ScoreCaches { get; set; }
     }

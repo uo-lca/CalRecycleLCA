@@ -10,10 +10,12 @@ namespace CalRecycleLCA.Services
 {
     public interface IScoreCacheService : IService<ScoreCache>
     {
-        void ClearScoreCacheByScenario(int scenarioId = Scenario.MODEL_BASE_CASE_ID);
+        void ClearScoreCacheByScenario(int scenarioId);
 
-        void ClearScoreCacheByScenarioAndFragment(int scenarioId = Scenario.MODEL_BASE_CASE_ID, int fragmentId = 0);
+        //void ClearScoreCacheByScenarioAndFragment(int scenarioId = Scenario.MODEL_BASE_CASE_ID, int fragmentId = 0);
 
-        void ClearScoreCacheByScenarioAndLCIAMethod(int scenarioId = Scenario.MODEL_BASE_CASE_ID, int lciaMethodID = 0);
+        void ClearScoreCacheByScenarioAndLCIAMethod(int scenarioId, int lciaMethodID);
+
+        void ClearScoreCacheForSubFragments(int scenarioId);
     }
 }

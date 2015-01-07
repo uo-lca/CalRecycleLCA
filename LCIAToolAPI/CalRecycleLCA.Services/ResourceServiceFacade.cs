@@ -831,10 +831,12 @@ namespace CalRecycleLCA.Services
         /// </summary>
         public void ClearNodeCacheByScenario(int scenarioId = Scenario.MODEL_BASE_CASE_ID)
         {
-            _NodeCacheService.ClearNodeCacheByScenario(scenarioId);
-            _unitOfWork.SaveChanges();
+            CacheTracker cacheTracker = new CacheTracker();
+            cacheTracker.NodeCacheStale = true;
+            ImplementScenarioChanges(scenarioId, cacheTracker);
         }
 
+        /*
         /// <summary>
         /// Delete NodeCache data by ScenarioID and FragmentID
         /// </summary>
@@ -843,16 +845,19 @@ namespace CalRecycleLCA.Services
             _NodeCacheService.ClearNodeCacheByScenarioAndFragment(scenarioId, fragmentId);
             _unitOfWork.SaveChanges();
         }
+         * */
 
         /// <summary>
         /// Delete ScoreCache data by ScenarioId
         /// </summary>
-        public void ClearScoreCacheByScenario(int scenarioId = Scenario.MODEL_BASE_CASE_ID)
+        public void ClearScoreCacheByScenario(int scenarioId)
         {
-            _ScoreCacheService.ClearScoreCacheByScenario(scenarioId);
-            _unitOfWork.SaveChanges();
+            CacheTracker cacheTracker = new CacheTracker();
+            cacheTracker.ScoreCacheStale = true;
+            ImplementScenarioChanges(scenarioId, cacheTracker);
         }
 
+        /*
         /// <summary>
         /// Delete ScoreCache data by ScenarioID and FragmentID
         /// </summary>
@@ -861,15 +866,45 @@ namespace CalRecycleLCA.Services
             _ScoreCacheService.ClearScoreCacheByScenarioAndFragment(scenarioId, fragmentId);
             _unitOfWork.SaveChanges();
         }
-
+        */
         /// <summary>
         /// Delete ScoreCache data by ScenarioID and LCIAMethodID
         /// </summary>
-        public void ClearScoreCacheByScenarioAndLCIAMethod(int scenarioId = Scenario.MODEL_BASE_CASE_ID, int lciaMethodId = 0)
+        public void ClearScoreCacheByScenarioAndLCIAMethod(int scenarioId, int lciaMethodId)
         {
-            throw new NotImplementedException("need a way to repopulate cache afterwards-- maybe make this fragment-specific");
-            //_ScoreCacheService.ClearScoreCacheByScenarioAndLCIAMethod(scenarioId, lciaMethodId);
-            //_unitOfWork.SaveChanges();
+            CacheTracker cacheTracker = new CacheTracker();
+            cacheTracker.LCIAMethodsStale.Add(lciaMethodId);
+            ImplementScenarioChanges(scenarioId, cacheTracker);
+        }
+
+        private void ImplementScenarioChanges(int scenarioId, CacheTracker cacheTracker)
+        {
+            // first, we do the most surgical operations: clear LCIA method-specific results
+            //_unitOfWork.SetAutoDetectChanges(false);
+            if (cacheTracker.LCIAMethodsStale != null)
+            {
+                cacheTracker.Recompute = true; // set this explicitly
+                foreach (int method in cacheTracker.LCIAMethodsStale)
+                {
+                    _ScoreCacheService.ClearScoreCacheByScenarioAndLCIAMethod(scenarioId, method);
+                }
+            }
+            if (cacheTracker.NodeCacheStale)
+            {
+                // next, clear all computed fragment scores
+                _ScoreCacheService.ClearScoreCacheForSubFragments(scenarioId);
+                _NodeCacheService.ClearNodeCacheByScenario(scenarioId);
+            }
+            if (cacheTracker.ScoreCacheStale)
+                _ScoreCacheService.ClearScoreCacheByScenario(scenarioId);
+
+            //_unitOfWork.SetAutoDetectChanges(true);
+            _unitOfWork.SaveChanges(); // update database with changes
+            if (cacheTracker.Recompute)
+            {
+                int tlf = _ScenarioService.Query(k => k.ScenarioID == scenarioId).Select(k => k.TopLevelFragmentID).First();
+                _FragmentLCIAComputation.FragmentLCIACompute(tlf, scenarioId);
+            }
         }
 
         private ScenarioResource CheckTopLevelFragment(ScenarioResource scenario)
@@ -919,11 +954,13 @@ namespace CalRecycleLCA.Services
             postScenario.ScenarioGroupID = scenarioGroupId;
             Scenario newScenario = _ScenarioService.NewScenario(postScenario);
             _unitOfWork.SaveChanges();
+            _FragmentLCIAComputation.FragmentLCIACompute(newScenario.TopLevelFragmentID, newScenario.ScenarioID);
             return newScenario.ScenarioID;
         }
 
         public bool UpdateScenario(int scenarioId, ScenarioResource putScenario)
         {
+            CacheTracker cacheTracker = new CacheTracker();
             Scenario scenario;
             if (putScenario.TopLevelFragmentID == 0 && putScenario.ReferenceFlowID == 0)
                 // just update details
@@ -934,11 +971,11 @@ namespace CalRecycleLCA.Services
                     putScenario.TopLevelFragmentID = _ScenarioService.Query(k => k.ScenarioID == scenarioId)
                         .Select(k => k.TopLevelFragmentID).First();
                 putScenario = CheckTopLevelFragment(putScenario);
-                scenario = _ScenarioService.UpdateScenarioFlow(scenarioId, putScenario);
+                scenario = _ScenarioService.UpdateScenarioFlow(scenarioId, putScenario, ref cacheTracker);
             }
             if (scenario != null)
             {
-                _unitOfWork.SaveChanges();
+                ImplementScenarioChanges(scenario.ScenarioID, cacheTracker);
                 return true;
             }
             return false;
@@ -950,30 +987,16 @@ namespace CalRecycleLCA.Services
             _unitOfWork.SaveChanges();
         }
 
-        public void DeleteParam(string deleteParamJSON)
+        public void DeleteParam(int scenarioId, int paramId)
         {
-            // Parse JSON into dynamic object
-            JObject jsonParams = JObject.Parse(deleteParamJSON);
-
-            List<Param> paramList = new List<Param>();
-
-            // add each param to a list
-            foreach (var jsonParam in jsonParams["paramList"])
+            CacheTracker cacheTracker = new CacheTracker();
+            Param P = _ParamService.Query(k => k.ParamID == paramId).Include(k => k.CharacterizationParam.LCIA)
+                .Select().First();
+            if (P.ScenarioID == scenarioId)
             {
-                paramList.Add(new Param()
-                {
-                    ParamID = Convert.ToInt32((string)jsonParam["paramID"]),
-
-                });
+                _ParamService.DeleteParam(P, ref cacheTracker);
+                ImplementScenarioChanges(scenarioId, cacheTracker);
             }
-
-            foreach (var param in paramList)
-            {
-                param.ObjectState = ObjectState.Deleted;
-                _ParamService.Delete(param.ParamID);
-            }
-            _unitOfWork.SaveChanges();
-
         }
 
         /// <summary>
@@ -986,335 +1009,27 @@ namespace CalRecycleLCA.Services
             return _ParamService.GetParams(scenarioId);
         }
 
-        public void AddParam(string addParamJSON)
+        public IEnumerable<ParamResource> AddParam(int scenarioId, ParamResource postParam)
         {
-            // Parse JSON into dynamic object
-            JObject jsonParams = JObject.Parse(addParamJSON);
+            CacheTracker cacheTracker = new CacheTracker();
+            IEnumerable<Param> Ps = _ParamService.NewOrUpdateParam(scenarioId, postParam, ref cacheTracker);
+            ImplementScenarioChanges(scenarioId, cacheTracker);
+            return _ParamService.GetParamResource(Ps);
+        }
 
-            List<ParamResource> paramList = new List<ParamResource>();
-
-            // add each param resource to a list
-            foreach (var jsonParam in jsonParams["params"])
-            {
-                paramList.Add(new ParamResource()
-                {
-                    //ParamID = Convert.ToInt32((string)jsonParam["paramID"]),
-                    ParamTypeID = Convert.ToInt32((string)jsonParam["paramTypeID"]),
-                    ScenarioID = Convert.ToInt32((string)jsonParam["scenarioID"]),
-                    Name = (string)jsonParam["name"],
-                    Value = float.Parse((string)jsonParam["value"]),
-                    FragmentFlowID = Convert.ToInt32((string)jsonParam["fragmentFlowID"]),
-                    FlowID = Convert.ToInt32((string)jsonParam["flowID"]),
-                    FlowPropertyID = Convert.ToInt32((string)jsonParam["flowPropertyID"]),
-                    ProcessID = Convert.ToInt32((string)jsonParam["processID"]),
-                    LCIAMethodID = Convert.ToInt32((string)jsonParam["lciaMethodID"])
-                });
-            }
-
-            foreach (var paramResource in paramList)
-            {
-
-                Param param = new Param();
-                DependencyParam dParam = new DependencyParam();
-                FlowPropertyParam fpParam = new FlowPropertyParam();
-                ProcessEmissionParam peParam = new ProcessEmissionParam();
-                CharacterizationParam cParam = new CharacterizationParam();
-
-                switch (paramResource.ParamTypeID)
-                {
-                    case 1:
-                        {
-                            param.ParamTypeID = paramResource.ParamTypeID;
-                            param.ScenarioID = paramResource.ScenarioID;
-                            param.Name = paramResource.Name;
-                            param.ObjectState = ObjectState.Added;
-                            _ParamService.InsertOrUpdateGraph(param);
-                            _unitOfWork.SaveChanges();
-                            int paramId = param.ParamID;
-
-                            dParam.ParamID = paramId;
-                            dParam.FragmentFlowID = Convert.ToInt32(paramResource.FragmentFlowID);
-                            dParam.Value = paramResource.Value;
-                            dParam.ObjectState = ObjectState.Added;
-                            _DependencyParamService.InsertOrUpdateGraph(dParam);
-                            break;
-                        }
-                    case 2:
-                        {
-                            param.ParamTypeID = paramResource.ParamTypeID;
-                            param.ScenarioID = paramResource.ScenarioID;
-                            param.Name = paramResource.Name;
-                            param.ObjectState = ObjectState.Added;
-                            _ParamService.InsertOrUpdateGraph(param);
-                            _unitOfWork.SaveChanges();
-                            int paramId = param.ParamID;
-
-                            dParam.ParamID = paramId;
-                            dParam.FragmentFlowID = Convert.ToInt32(paramResource.FragmentFlowID);
-                            dParam.Value = paramResource.Value;
-
-                            dParam.ObjectState = ObjectState.Added;
-                            _DependencyParamService.InsertOrUpdateGraph(dParam);
-                            break;
-                        }
-
-                    case 3:
-                        {
-                            break;
-                        }
-
-                    case 4:
-                        {
-                            int flowFlowPropertyID = _FlowFlowPropertyService.Queryable()
-                                .Where(x => x.FlowID == paramResource.FlowID && x.FlowPropertyID == paramResource.FlowPropertyID)
-                                .FirstOrDefault()
-                                .FlowFlowPropertyID;
-
-                            param.ParamTypeID = paramResource.ParamTypeID;
-                            param.ScenarioID = paramResource.ScenarioID;
-                            param.Name = paramResource.Name;
-                            param.ObjectState = ObjectState.Added;
-                            _ParamService.InsertOrUpdateGraph(param);
-                            _unitOfWork.SaveChanges();
-                            int paramId = param.ParamID;
-
-                            fpParam.ParamID = paramId;
-                            fpParam.FlowFlowPropertyID = Convert.ToInt32(flowFlowPropertyID);
-
-                            fpParam.ObjectState = ObjectState.Added;
-                            _FlowPropertyParamService.InsertOrUpdateGraph(fpParam);
-                            break;
-                        }
-
-                    case 5:
-                        {
-                            //pending db update
-                            break;
-                        }
-
-                    case 6:
-                        {
-                            //pending db update
-                            break;
-                        }
-
-
-                    case 8:
-                        {
-                            int processID = _ProcessFlowService.Queryable()
-                                .Where(x => x.FlowID == paramResource.FlowID)
-                                .FirstOrDefault()
-                                .ProcessID;
-                            int processFlowID = _ProcessFlowService.Queryable()
-                                .Where(x => x.FlowID == paramResource.FlowID)
-                                .FirstOrDefault()
-                                .ProcessFlowID;
-
-                            param.ParamID = paramResource.ParamID;
-                            param.ParamTypeID = paramResource.ParamTypeID;
-                            param.ScenarioID = paramResource.ScenarioID;
-                            param.Name = paramResource.Name;
-                            param.ObjectState = ObjectState.Added;
-                            _ParamService.InsertOrUpdateGraph(param);
-                            _unitOfWork.SaveChanges();
-                            int paramId = param.ParamID;
-
-                            peParam.ParamID = paramId;
-                            peParam.ProcessFlowID = Convert.ToInt32(processFlowID);
-
-                            peParam.ObjectState = ObjectState.Added;
-                            _ProcessEmissionParamService.InsertOrUpdateGraph(peParam);
-                            break;
-                        }
-
-                    case 9:
-                        {
-                            int lciaID = _LCIAService.Queryable()
-                                .Where(x => x.FlowID == paramResource.FlowID)
-                                .FirstOrDefault()
-                                .LCIAID;
-
-                            param.ParamID = paramResource.ParamID;
-                            param.ParamTypeID = paramResource.ParamTypeID;
-                            param.ScenarioID = paramResource.ScenarioID;
-                            param.Name = paramResource.Name;
-                            param.ObjectState = ObjectState.Added;
-                            _ParamService.InsertOrUpdateGraph(param);
-                            _unitOfWork.SaveChanges();
-                            int paramId = param.ParamID;
-
-                            cParam.ParamID = paramId;
-                            cParam.LCIAID = Convert.ToInt32(lciaID);
-
-                            cParam.ObjectState = ObjectState.Added;
-                            _CharacterizationParamService.InsertOrUpdateGraph(cParam);
-                            break;
-                        }
-
-
-                }
-            }
-                _unitOfWork.SaveChanges();
-
-    }
-
-        public void UpdateParam(string updateParamJSON)
+        public IEnumerable<ParamResource> UpdateParam(int scenarioId, int paramId, ParamResource putParam)
         {
-            // Parse JSON into dynamic object
-            JObject jsonParams = JObject.Parse(updateParamJSON);
+            CacheTracker cacheTracker = new CacheTracker();
+            IEnumerable<Param> Ps = new List<Param>();
+            if (_ParamService.Query(k => k.ParamID == paramId).Select(k => k.ScenarioID).First() == scenarioId)
+                Ps = _ParamService.UpdateParam(paramId, putParam, ref cacheTracker);
+            else
+                Ps = _ParamService.NewOrUpdateParam(scenarioId, putParam, ref cacheTracker);
+            ImplementScenarioChanges(scenarioId, cacheTracker);
+            return _ParamService.GetParamResource(Ps);
+        }
 
-            List<ParamResource> paramList = new List<ParamResource>();
-
-            // add each param resource to a list
-            foreach (var jsonParam in jsonParams["params"])
-            {
-                paramList.Add(new ParamResource()
-                {
-                    ParamID = Convert.ToInt32((string)jsonParam["paramID"]),
-                    ParamTypeID = Convert.ToInt32((string)jsonParam["paramTypeID"]),
-                    ScenarioID = Convert.ToInt32((string)jsonParam["scenarioID"]),
-                    Name = (string)jsonParam["name"],
-                    Value = float.Parse((string)jsonParam["value"]),
-                    FragmentFlowID = Convert.ToInt32((string)jsonParam["fragmentFlowID"]),
-                    FlowID = Convert.ToInt32((string)jsonParam["flowID"]),
-                    FlowPropertyID = Convert.ToInt32((string)jsonParam["flowPropertyID"]),
-                    ProcessID = Convert.ToInt32((string)jsonParam["processID"]),
-                    LCIAMethodID = Convert.ToInt32((string)jsonParam["lciaMethodID"])
-                });
-            }
-
-            foreach (var paramResource in paramList)
-            {
-
-                Param param = new Param();
-                DependencyParam dParam = new DependencyParam();
-                FlowPropertyParam fpParam = new FlowPropertyParam();
-                ProcessEmissionParam peParam = new ProcessEmissionParam();
-                CharacterizationParam cParam = new CharacterizationParam();
-
-                switch (paramResource.ParamTypeID)
-                {
-                    case 1:
-                        {
-
-                            param.ParamID = paramResource.ParamID;
-                            param.ParamTypeID = paramResource.ParamTypeID;
-                            param.ScenarioID = paramResource.ScenarioID;
-                            param.Name = paramResource.Name;
-
-                            dParam.ParamID = paramResource.ParamID;
-                            dParam.FragmentFlowID = Convert.ToInt32(paramResource.FragmentFlowID);
-                            dParam.Value = paramResource.Value;
-
-                            param.ObjectState = ObjectState.Modified;
-                            _ParamService.InsertOrUpdateGraph(param);
-                            dParam.ObjectState = ObjectState.Modified;
-                            _DependencyParamService.InsertOrUpdateGraph(dParam);
-
-                            break;
-                        }
-                    case 2:
-                        {
-                            param.ParamID = paramResource.ParamID;
-                            param.ParamTypeID = paramResource.ParamTypeID;
-                            param.ScenarioID = paramResource.ScenarioID;
-                            param.Name = paramResource.Name;
-
-                            dParam.ParamID = paramResource.ParamID;
-                            dParam.FragmentFlowID = Convert.ToInt32(paramResource.FragmentFlowID);
-                            dParam.Value = paramResource.Value;
-
-                            param.ObjectState = ObjectState.Modified;
-                            _ParamService.InsertOrUpdateGraph(param);
-                            dParam.ObjectState = ObjectState.Modified;
-                            _DependencyParamService.InsertOrUpdateGraph(dParam);
-                            break;
-                        }
-
-                    case 3:
-                        {
-                            break;
-                        }
-
-                    case 4:
-                        {
-                            int flowFlowPropertyID = _FlowFlowPropertyService.Queryable()
-                                .Where(x => x.FlowID == paramResource.FlowID && x.FlowPropertyID == paramResource.FlowPropertyID)
-                                .FirstOrDefault()
-                                .FlowFlowPropertyID;
-
-                            param.ParamID = paramResource.ParamID;
-                            param.ParamTypeID = paramResource.ParamTypeID;
-                            param.ScenarioID = paramResource.ScenarioID;
-                            param.Name = paramResource.Name;
-
-                            fpParam.ParamID = paramResource.ParamID;
-                            fpParam.FlowFlowPropertyID = Convert.ToInt32(flowFlowPropertyID);
-
-                            param.ObjectState = ObjectState.Modified;
-                            _ParamService.InsertOrUpdateGraph(param);
-                            fpParam.ObjectState = ObjectState.Modified;
-                            _FlowPropertyParamService.InsertOrUpdateGraph(fpParam);
-                            break;
-                        }
-
-                    case 8:
-                        {
-                            int processID = _ProcessFlowService.Queryable()
-                                .Where(x => x.FlowID == paramResource.FlowID)
-                                .FirstOrDefault()
-                                .ProcessID;
-                            int processFlowID = _ProcessFlowService.Queryable()
-                                .Where(x => x.FlowID == paramResource.FlowID)
-                                .FirstOrDefault()
-                                .ProcessFlowID;
-
-                            param.ParamID = paramResource.ParamID;
-                            param.ParamTypeID = paramResource.ParamTypeID;
-                            param.ScenarioID = paramResource.ScenarioID;
-                            param.Name = paramResource.Name;
-
-                            peParam.ParamID = paramResource.ParamID;
-                            peParam.ProcessFlowID = Convert.ToInt32(processFlowID);
-
-                            param.ObjectState = ObjectState.Modified;
-                            _ParamService.InsertOrUpdateGraph(param);
-                            peParam.ObjectState = ObjectState.Modified;
-                            _ProcessEmissionParamService.InsertOrUpdateGraph(peParam);
-                            break;
-                        }
-
-                    case 9:
-                        {
-                            int lciaID = _LCIAService.Queryable()
-                                .Where(x => x.FlowID == paramResource.FlowID)
-                                .FirstOrDefault()
-                                .LCIAID;
-
-                            param.ParamID = paramResource.ParamID;
-                            param.ParamTypeID = paramResource.ParamTypeID;
-                            param.ScenarioID = paramResource.ScenarioID;
-                            param.Name = paramResource.Name;
-
-                            cParam.ParamID = paramResource.ParamID;
-                            cParam.LCIAID = Convert.ToInt32(lciaID);
-
-                            param.ObjectState = ObjectState.Modified;
-                            _ParamService.InsertOrUpdateGraph(param);
-                            cParam.ObjectState = ObjectState.Modified;
-                            _CharacterizationParamService.InsertOrUpdateGraph(cParam);
-                            break;
-                        }
-
-
-                }
-            }
-               
-
-          
-        
-    }
 
       #endregion  
-}
+    }
 }

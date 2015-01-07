@@ -132,6 +132,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Models\CacheTracker.cs" />
     <Compile Include="Models\ParamInstance.cs" />
     <Compile Include="Models\FragmentFlowResource.cs" />
     <Compile Include="Models\FragmentNodeResource.cs" />

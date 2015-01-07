@@ -31,16 +31,18 @@ namespace CalRecycleLCA.Services
         LCIAResultResource GetProcessLCIAResult(int processID, int lciaMethodID, int scenarioID = Scenario.MODEL_BASE_CASE_ID);
         IEnumerable<FlowTypeResource> GetFlowTypes();
         void ClearNodeCacheByScenario(int scenarioId);
-        void ClearNodeCacheByScenarioAndFragment(int scenarioId = Scenario.MODEL_BASE_CASE_ID, int fragmentId = 0);
-        void ClearScoreCacheByScenario(int scenarioId = Scenario.MODEL_BASE_CASE_ID);
-        void ClearScoreCacheByScenarioAndFragment(int scenarioId = Scenario.MODEL_BASE_CASE_ID, int fragmentId = 0);
-        void ClearScoreCacheByScenarioAndLCIAMethod(int scenarioId = Scenario.MODEL_BASE_CASE_ID, int lciaMethodId = 0);
+        //void ClearNodeCacheByScenarioAndFragment(int scenarioId = Scenario.MODEL_BASE_CASE_ID, int fragmentId = 0);
+        void ClearScoreCacheByScenario(int scenarioId);
+        //void ClearScoreCacheByScenarioAndFragment(int scenarioId = Scenario.MODEL_BASE_CASE_ID, int fragmentId = 0);
+        void ClearScoreCacheByScenarioAndLCIAMethod(int scenarioId, int lciaMethodId);
         IEnumerable<ParamResource> GetParams(int scenarioId);
         int AddScenario(ScenarioResource inScenario, int scenarioGroupId);
         bool UpdateScenario(int scenarioId, ScenarioResource inScenario);
         void DeleteScenario(int scenarioId);
         //void DeleteParam(string deleteParamJSON);
-        //void AddParam(string addParamJSON);
+        IEnumerable<ParamResource> AddParam(int scenarioId, ParamResource postParam);
+        IEnumerable<ParamResource> UpdateParam(int scenarioId, int paramId, ParamResource postParam);
+        void DeleteParam(int scenarioId, int paramId);
         //void UpdateParam(string updateParamJSON);
     }
 }
