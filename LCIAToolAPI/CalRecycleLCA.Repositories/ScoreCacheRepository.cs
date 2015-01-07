@@ -10,7 +10,7 @@ namespace CalRecycleLCA.Repositories
 {
     public static class ScoreCacheRepository
     {
-        public static void ClearScoreCacheByScenario(this IRepositoryAsync<ScoreCache> repository, int scenarioId = Scenario.MODEL_BASE_CASE_ID)
+        public static void ClearScoreCacheByScenario(this IRepositoryAsync<ScoreCache> repository, int scenarioId)
         {
             var scoreCaches = repository.GetRepository<ScoreCache>().Queryable().Where(sc => sc.ScenarioID == scenarioId).ToList();
 
@@ -20,6 +20,7 @@ namespace CalRecycleLCA.Repositories
             });
         }
 
+        /*
         public static void ClearScoreCacheByScenarioAndFragment(this IRepositoryAsync<ScoreCache> repository, int scenarioId = Scenario.MODEL_BASE_CASE_ID, int fragmentId = 0)
         {
             //get scoreCaches by scenarioId
@@ -41,7 +42,22 @@ namespace CalRecycleLCA.Repositories
             });
         }
 
-        public static void ClearScoreCacheByScenarioAndLCIAMethod(this IRepositoryAsync<ScoreCache> repository, int scenarioId = Scenario.MODEL_BASE_CASE_ID, int lciaMethodID = 0)
+         * */
+
+        public static void ClearScoreCacheForSubFragments(this IRepositoryAsync<ScoreCache> repository, int scenarioId)
+        {
+            var scoreCaches = repository.GetRepository<ScoreCache>().Queryable()
+                .Where(sc => sc.ScenarioID == scenarioId)
+                .Where(sc => sc.FragmentFlow.NodeTypeID == 2)
+                .ToList();
+
+            scoreCaches.ForEach(x =>
+                {
+                    repository.Delete(x.ScoreCacheID);
+                });
+        }
+
+        public static void ClearScoreCacheByScenarioAndLCIAMethod(this IRepositoryAsync<ScoreCache> repository, int scenarioId, int lciaMethodID)
         {
             //get scoreCaches by scenarioId and LCIAMethod
             var scoreCaches = repository.GetRepository<ScoreCache>().Queryable()

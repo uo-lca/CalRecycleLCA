@@ -334,6 +334,7 @@ namespace LCAToolAPI.API
             _ResourceService.ClearNodeCacheByScenario(scenarioId);
         }
 
+        /*
         /// <summary>
         /// Clear NodeCache data by ScenarioID and FragmentID
         /// </summary>
@@ -345,6 +346,7 @@ namespace LCAToolAPI.API
         {
             _ResourceService.ClearNodeCacheByScenarioAndFragment(scenarioId, fragmentId);
         }
+        */
 
         /// <summary>
         /// Clear ScoreCache data by ScenarioID
@@ -357,6 +359,7 @@ namespace LCAToolAPI.API
             _ResourceService.ClearScoreCacheByScenario(scenarioId);
         }
 
+        /*
         /// <summary>
         /// Clear ScoreCache data by ScenarioID and FragmentID
         /// </summary>
@@ -368,6 +371,7 @@ namespace LCAToolAPI.API
         {
             _ResourceService.ClearScoreCacheByScenarioAndFragment(scenarioId, fragmentId);
         }
+         * */
 
         /// <summary>
         /// Clear ScoreCache data by ScenarioID and LCIAMethodID
@@ -472,7 +476,6 @@ namespace LCAToolAPI.API
         /// Creates a new scenario. not yet tested. Scenario group should be determined during authorization,
         /// and checked for consistency with post data.
         /// </summary>
-        /// <param name="scenarioId"></param>
         /// <returns>ScenarioResource for created scenario</returns>
         [CalRecycleAuthorize]
         [Route("api/scenarios")]
@@ -545,34 +548,52 @@ namespace LCAToolAPI.API
         {
             _ResourceService.DeleteParam(deleteParamJSON);
         }
+         * */
 
         /// <summary>
         /// POST api/scenarios/{scenarioId}/params
         /// Create a new param belonging to the named Scenario. must be authenticated-- Scenario.ScenarioGroupID must 
         /// match the authorizedScenarioGroup;
         /// </summary>
+        [CalRecycleAuthorize]
         [Route("api/scenarios/{scenarioId}/params")]
         [AcceptVerbs("POST")]
         [HttpPost]
-        public void AddParam(int scenarioId)
+        public IEnumerable<ParamResource> AddParam(int scenarioId, [FromBody] ParamResource postParam)
         {
-            //authorizedScenarioGroup = _Scenario
-            _ResourceService.AddParam(addParamJSON);
+            if (_ScenarioGroupService.CanAlter(RequestContext))
+                return _ResourceService.AddParam(scenarioId, postParam);
+            else
+                throw new HttpResponseException(HttpStatusCode.Unauthorized);
         }
 
-        /*
         /// <summary>
         /// PUT api/scenarios/{scenarioId}/params/{paramId}
         /// Update param.  not yet implemented.
         /// </summary>
+        [CalRecycleAuthorize]
         [Route("api/scenarios/{scenarioId}/params/{paramId}")]
         [AcceptVerbs("PUT")]
         [HttpPost]
-        public void UpdateParam()
+        public IEnumerable<ParamResource> UpdateParam(int scenarioId, int paramId, [FromBody] ParamResource putParam)
         {
-            _ResourceService.UpdateParam(updateParamJSON);
+            if (_ScenarioGroupService.CanAlter(RequestContext))
+                return _ResourceService.UpdateParam(scenarioId, paramId, putParam);
+            else
+                throw new HttpResponseException(HttpStatusCode.Unauthorized);
         }
-         * */
+
+        [CalRecycleAuthorize]
+        [Route("api/scenarios/{scenarioId}/params/{paramId}")]
+        [AcceptVerbs("DELETE")]
+        [HttpPost]
+        public void DeleteParam(int scenarioId, int paramId, [FromBody] ParamResource putParam)
+        {
+            if (_ScenarioGroupService.CanAlter(RequestContext))
+                _ResourceService.DeleteParam(scenarioId, paramId);
+            else
+                throw new HttpResponseException(HttpStatusCode.Unauthorized);
+        }
 
         /* TODO:
          * 

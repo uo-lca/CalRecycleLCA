@@ -29,11 +29,19 @@ namespace CalRecycleLCA.Repositories
         }
 
         public static Scenario UpdateScenarioFlow(this IRepositoryAsync<Scenario> repository, 
-            int scenarioId, ScenarioResource put)
+            int scenarioId, ScenarioResource put, ref CacheTracker cacheTracker)
         {
             Scenario scenario = repository.Query(k => k.ScenarioID == scenarioId).Select().First();
-            scenario.TopLevelFragmentID = put.TopLevelFragmentID;
-            scenario.FlowID = put.ReferenceFlowID;
+            if (scenario.TopLevelFragmentID != put.TopLevelFragmentID)
+            {
+                scenario.TopLevelFragmentID = put.TopLevelFragmentID;
+                cacheTracker.Recompute = true;
+            }
+            if (scenario.FlowID != put.ReferenceFlowID)
+            {
+                scenario.FlowID = put.ReferenceFlowID;
+                cacheTracker.NodeCacheStale = true;
+            }
             scenario.DirectionID = put.ReferenceDirectionID;
             return scenario;
         }

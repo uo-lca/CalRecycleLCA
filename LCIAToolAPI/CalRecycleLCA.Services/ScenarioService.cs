@@ -14,7 +14,7 @@ namespace CalRecycleLCA.Services
     public interface IScenarioService : IService<Scenario>
     {
         Scenario NewScenario(ScenarioResource scenario);
-        Scenario UpdateScenarioFlow(int scenarioId, ScenarioResource scenario);
+        Scenario UpdateScenarioFlow(int scenarioId, ScenarioResource scenario, ref CacheTracker cacheTracker);
         Scenario UpdateScenarioDetails(int scenarioId, ScenarioResource scenario);
         void DeleteScenario(int scenarioId);
     }
@@ -34,9 +34,9 @@ namespace CalRecycleLCA.Services
             return _repository.PostScenario(post);
         }
 
-        public Scenario UpdateScenarioFlow(int scenarioId, ScenarioResource put)
+        public Scenario UpdateScenarioFlow(int scenarioId, ScenarioResource put, ref CacheTracker cacheTracker)
         {
-            Scenario scenario = _repository.UpdateScenarioFlow(scenarioId, put);
+            Scenario scenario = _repository.UpdateScenarioFlow(scenarioId, put, ref cacheTracker);
             return _repository.UpdateScenario(scenario, put);
         }
 
