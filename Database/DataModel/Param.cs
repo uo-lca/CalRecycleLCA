@@ -13,14 +13,8 @@ namespace LcaDataModel
         public Param()
         {
             DependencyParams = new HashSet<DependencyParam>();
-            FlowPropertyParams = new HashSet<FlowPropertyParam>();
 
             CompositionParams = new HashSet<CompositionParam>();
-            ProcessDissipationParams = new HashSet<ProcessDissipationParam>();
-            NodeDissipationParams = new HashSet<NodeDissipationParam>();
-            ProcessEmissionParams = new HashSet<ProcessEmissionParam>();
-            NodeEmissionParams = new HashSet<NodeEmissionParam>();
-            CharacterizationParams = new HashSet<CharacterizationParam>();
         }
 
         //[DatabaseGenerated(DatabaseGeneratedOption.None)]
@@ -44,18 +38,14 @@ namespace LcaDataModel
         
         public virtual ICollection<DependencyParam> DependencyParams { get; set; }
 
-        public virtual ICollection<FlowPropertyParam> FlowPropertyParams { get; set; }
+        public virtual FlowPropertyParam FlowPropertyParam { get; set; }
 
         public virtual ICollection<CompositionParam> CompositionParams { get; set; }
 
-        public virtual ICollection<ProcessDissipationParam> ProcessDissipationParams { get; set; }
+        public virtual ProcessDissipationParam ProcessDissipationParam { get; set; }
 
-        public virtual ICollection<NodeDissipationParam> NodeDissipationParams { get; set; }
+        public virtual ProcessEmissionParam ProcessEmissionParam { get; set; }
 
-        public virtual ICollection<ProcessEmissionParam> ProcessEmissionParams { get; set; }
-
-        public virtual ICollection<NodeEmissionParam> NodeEmissionParams { get; set; }
-
-        public virtual ICollection<CharacterizationParam> CharacterizationParams { get; set; }
+        public virtual CharacterizationParam CharacterizationParam { get; set; }
     }
 }

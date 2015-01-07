@@ -89,8 +89,6 @@
     <Compile Include="LCIAMethod.cs" />
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="NodeCache.cs" />
-    <Compile Include="NodeDissipationParam.cs" />
-    <Compile Include="NodeEmissionParam.cs" />
     <Compile Include="NodeType.cs" />
     <Compile Include="Param.cs" />
     <Compile Include="ParamType.cs" />

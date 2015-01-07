@@ -49,8 +49,6 @@ namespace LcaDataModel {
         public virtual DbSet<LCIA> LCIAs { get; set; }
         public virtual DbSet<LCIAMethod> LCIAMethods { get; set; }
         public virtual DbSet<NodeCache> NodeCaches { get; set; }
-        public virtual DbSet<NodeDissipationParam> NodeDissipationParams { get; set; }
-        public virtual DbSet<NodeEmissionParam> NodeEmissionParams { get; set; }
         public virtual DbSet<NodeType> NodeTypes { get; set; }
         public virtual DbSet<Param> Params { get; set; }
         public virtual DbSet<ParamType> ParamTypes { get; set; }
@@ -105,8 +103,7 @@ namespace LcaDataModel {
 
             modelBuilder.Entity<CharacterizationParam>()
                 .HasRequired(e => e.Param)
-                .WithMany(e => e.CharacterizationParams)
-                .HasForeignKey(e => e.ParamID)
+                .WithOptional(e => e.CharacterizationParam)
                 .WillCascadeOnDelete(true);
 
             modelBuilder.Entity<CompositionModel>()
@@ -204,8 +201,7 @@ namespace LcaDataModel {
 
             modelBuilder.Entity<FlowPropertyParam>()
                 .HasRequired(e => e.Param)
-                .WithMany(e => e.FlowPropertyParams)
-                .HasForeignKey(e => e.ParamID)
+                .WithOptional(e => e.FlowPropertyParam)
                 .WillCascadeOnDelete(true);
 
             modelBuilder.Entity<FlowType>()
@@ -361,14 +357,12 @@ namespace LcaDataModel {
 
             modelBuilder.Entity<ProcessDissipationParam>()
                 .HasRequired(e => e.Param)
-                .WithMany(e => e.ProcessDissipationParams)
-                .HasForeignKey(e => e.ParamID)
+                .WithOptional(e => e.ProcessDissipationParam)
                 .WillCascadeOnDelete(true);
 
             modelBuilder.Entity<ProcessEmissionParam>()
                 .HasRequired(e => e.Param)
-                .WithMany(e => e.ProcessEmissionParams)
-                .HasForeignKey(e => e.ParamID)
+                .WithOptional(e => e.ProcessEmissionParam)
                 .WillCascadeOnDelete(true);
 
             modelBuilder.Entity<ProcessFlow>()
