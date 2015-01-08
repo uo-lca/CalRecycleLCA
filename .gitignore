@@ -154,3 +154,6 @@ $RECYCLE.BIN/
 # Mac desktop service store files
 .DS_Store
 /Database/packages
+
+# nuget exe should be downloaded
+NuGet.exe
