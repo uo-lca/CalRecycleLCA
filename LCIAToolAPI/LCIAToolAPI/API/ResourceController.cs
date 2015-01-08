@@ -5,6 +5,7 @@ using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Web.Http;
+using System.Web.Http.Cors;
 using Ninject;
 using Entities.Models;
 using CalRecycleLCA.Services;
@@ -15,7 +16,9 @@ namespace LCAToolAPI.API
     /// <summary>
     /// Controller for web API resources
     /// All routes used by the front-end visualizations will be defined here.
+    /// Enabling CORS to accept all comers-- control access at the IP or host layer.
     /// </summary>
+    [EnableCors(origins: "*", headers: "*", methods: "*")]
     public class ResourceController : ApiController
     {
         // mockup JSON that would be sent from Sabina's AngularJs app.

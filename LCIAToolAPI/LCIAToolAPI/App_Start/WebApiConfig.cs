@@ -16,6 +16,7 @@ namespace LCIAToolAPI.App_Start
     {
         public static void Register(HttpConfiguration config)
         {
+            config.EnableCors();
 
             var json = config.Formatters.JsonFormatter;
             //json.SerializerSettings.PreserveReferencesHandling = Newtonsoft.Json.PreserveReferencesHandling.Objects;
@@ -27,9 +28,6 @@ namespace LCIAToolAPI.App_Start
             //var jsonMediaTypeFormatter = new JsonMediaTypeFormatter();
             //jsonMediaTypeFormatter.SerializerSettings = serializerSettings;
             //GlobalConfiguration.Configuration.Formatters.Insert(0, jsonMediaTypeFormatter);
-
-
-
             GlobalConfiguration.Configuration.Formatters.JsonFormatter.SerializerSettings = new JsonSerializerSettings();
             GlobalConfiguration.Configuration.Formatters.JsonFormatter.SerializerSettings.NullValueHandling = NullValueHandling.Ignore;
             GlobalConfiguration.Configuration.Formatters.JsonFormatter.SerializerSettings.ContractResolver = 
