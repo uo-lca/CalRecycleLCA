@@ -6,6 +6,9 @@ namespace LCAToolAPI.App_Start
 
     using Ninject.Web;
 
+    /// <summary>
+    /// 
+    /// </summary>
     public static class NinjectWeb 
     {
         /// <summary>

@@ -7,13 +7,34 @@ using LCIAToolAPI.Areas.RouteDebugger.Components;
 
 namespace LCIAToolAPI.Areas.RouteDebugger
 {
+    /// <summary>
+    /// 
+    /// </summary>
     public static class RequestHelper
     {
+        /// <summary>
+        /// 
+        /// </summary>
         public static readonly string InspectHeaderName = "RouteInspecting";
+        /// <summary>
+        /// 
+        /// </summary>
         public static readonly string RouteDataCache = "RD_ROUTEDATA";
+        /// <summary>
+        /// 
+        /// </summary>
         public static readonly string RoutesCache = "RD_ROUTES";
+        /// <summary>
+        /// 
+        /// </summary>
         public static readonly string ControllerCache = "RD_CONTROLLER";
+        /// <summary>
+        /// 
+        /// </summary>
         public static readonly string ActionCache = "RD_ACTION";
+        /// <summary>
+        /// 
+        /// </summary>
         public static readonly string SelectedController = "RD_SELECTED_CONTROLLER";
 
         /// <summary>

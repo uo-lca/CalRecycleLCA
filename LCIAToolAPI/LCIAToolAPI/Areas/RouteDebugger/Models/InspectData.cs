@@ -3,8 +3,15 @@ using System.Net.Http;
 
 namespace LCIAToolAPI.Areas.RouteDebugger.Models
 {
+    /// <summary>
+    /// 
+    /// </summary>
     public class InspectData
     {
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="request"></param>
         public InspectData(HttpRequestMessage request)
         {
             if (request.Properties.ContainsKey(RequestHelper.ActionCache))
@@ -32,17 +39,29 @@ namespace LCIAToolAPI.Areas.RouteDebugger.Models
                 SelectedController = request.Properties[RequestHelper.SelectedController] as string;
             }
         }
-
+        /// <summary>
+        /// 
+        /// </summary>
         public ActionSelectionLog Action { get; set; }
-
+        /// <summary>
+        /// 
+        /// </summary>
         public ControllerSelectionInfo[] Controller { get; set; }
-
+        /// <summary>
+        /// 
+        /// </summary>
         public RouteInfo[] Routes { get; set; }
-
+        /// <summary>
+        /// 
+        /// </summary>
         public RouteDataInfo RouteData { get; set; }
-
+        /// <summary>
+        /// 
+        /// </summary>
         public HttpStatusCode RealHttpStatus { get; set; }
-
+        /// <summary>
+        /// 
+        /// </summary>
         public string SelectedController { get; set; }
     }
 }

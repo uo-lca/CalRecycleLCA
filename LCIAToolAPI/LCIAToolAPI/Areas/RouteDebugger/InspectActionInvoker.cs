@@ -19,11 +19,21 @@ namespace LCIAToolAPI.Areas.RouteDebugger
     {
         private IHttpActionInvoker _innerInvoker;
 
+        /// <summary>
+        /// constructor initializes members
+        /// </summary>
+        /// <param name="innerInvoker">an IHttpActionInvoker provider</param>
         public InspectActionInvoker(IHttpActionInvoker innerInvoker)
         {
             _innerInvoker = innerInvoker;
         }
 
+        /// <summary>
+        /// Perform the inspection asynchronously.
+        /// </summary>
+        /// <param name="actionContext">an HttpActionContext</param>
+        /// <param name="cancellationToken">a CancellationToken </param>
+        /// <returns></returns>
         public Task<HttpResponseMessage> InvokeActionAsync(HttpActionContext actionContext, CancellationToken cancellationToken)
         {
             if (actionContext.Request.IsInspectRequest())

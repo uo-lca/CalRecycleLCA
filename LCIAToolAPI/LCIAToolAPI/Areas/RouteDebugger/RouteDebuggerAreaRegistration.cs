@@ -3,8 +3,14 @@ using System.Web.Mvc;
 
 namespace LCIAToolAPI.Areas.RouteDebugger
 {
+    /// <summary>
+    /// 
+    /// </summary>
     public class RouteDebuggerAreaRegistration : AreaRegistration
     {
+        /// <summary>
+        /// 
+        /// </summary>
         public override string AreaName
         {
             get
@@ -12,7 +18,10 @@ namespace LCIAToolAPI.Areas.RouteDebugger
                 return "RouteDebugger";
             }
         }
-
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="context"></param>
         public override void RegisterArea(AreaRegistrationContext context)
         {
             context.MapRoute(

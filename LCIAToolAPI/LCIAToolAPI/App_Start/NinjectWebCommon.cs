@@ -22,9 +22,15 @@ namespace LCAToolAPI.App_Start
     using Repository.Pattern.Ef6.Factories;
     using XMLHandler;
 
+    /// <summary>
+    /// 
+    /// </summary>
     public static class NinjectWebCommon
     {
         private static readonly Bootstrapper bootstrapper = new Bootstrapper();
+        /// <summary>
+        /// 
+        /// </summary>
         public static IKernel Kernel
         {
             get
@@ -158,6 +164,10 @@ namespace LCAToolAPI.App_Start
             kernel.Bind<ITestGenericService>().To<TestGenericService>();
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="configuration"></param>
         public static void RegisterNinject(HttpConfiguration configuration)
         {
             // Set Web API Resolver

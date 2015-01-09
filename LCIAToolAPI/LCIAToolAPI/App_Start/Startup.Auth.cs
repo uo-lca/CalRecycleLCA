@@ -5,9 +5,16 @@ using Owin;
 
 namespace LCIAToolAPI
 {
+    /// <summary>
+    /// 
+    /// </summary>
     public partial class Startup {
 
         // For more information on configuring authentication, please visit http://go.microsoft.com/fwlink/?LinkId=301883
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="app"></param>
         public void ConfigureAuth(IAppBuilder app)
         {
             // Enable the application to use a cookie to store information for the signed in user

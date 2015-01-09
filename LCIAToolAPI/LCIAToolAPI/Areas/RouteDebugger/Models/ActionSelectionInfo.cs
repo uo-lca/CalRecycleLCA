@@ -9,17 +9,27 @@ namespace LCIAToolAPI.Areas.RouteDebugger.Models
     /// </summary>
     public class ActionSelectionInfo
     {
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="descriptor"></param>
         public ActionSelectionInfo(HttpActionDescriptor descriptor)
         {
             ActionName = descriptor.ActionName;
             SupportedHttpMethods = descriptor.SupportedHttpMethods.ToArray();
             Parameters = descriptor.GetParameters().Select(p => new HttpParameterDescriptorInfo(p)).ToArray();
         }
-
+        /// <summary>
+        /// 
+        /// </summary>
         public string ActionName { get; set; }
-
+        /// <summary>
+        /// 
+        /// </summary>
         public HttpMethod[] SupportedHttpMethods { get; set; }
-
+        /// <summary>
+        /// 
+        /// </summary>
         public HttpParameterDescriptorInfo[] Parameters { get; set; }
 
         /// <summary>

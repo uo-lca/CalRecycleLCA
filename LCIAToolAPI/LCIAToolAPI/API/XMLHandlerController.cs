@@ -11,12 +11,19 @@ using XMLHandler;
 
 namespace LCAToolAPI.API
 {
+    /// <summary>
+    /// this is ultimately supposed to provide access to the XML files (except for processes that are protected).
+    /// </summary>
     public class XMLHandlerController : ApiController
     {
         [Inject]
         private readonly IFlowTestService _flowTestService;
 
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="flowTestService"></param>
         public XMLHandlerController(IFlowTestService flowTestService)
         {
             if (flowTestService == null)
@@ -27,7 +34,10 @@ namespace LCAToolAPI.API
             _flowTestService = flowTestService;
         }
 
-        //GET api/<controller>
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns></returns>
         [Route("api/xmlhandler")]
         [System.Web.Http.AcceptVerbs("GET", "POST")]
         [System.Web.Http.HttpGet]

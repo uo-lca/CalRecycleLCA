@@ -12,8 +12,15 @@ using Newtonsoft.Json.Converters;
 
 namespace LCIAToolAPI.App_Start
 {
+    /// <summary>
+    /// Main config for Web API controller
+    /// </summary>
     public class WebApiConfig
     {
+        /// <summary>
+        /// register Web API controller
+        /// </summary>
+        /// <param name="config">HttpConfiguration </param>
         public static void Register(HttpConfiguration config)
         {
             config.EnableCors();

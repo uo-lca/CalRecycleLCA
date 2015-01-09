@@ -21,37 +21,18 @@ namespace LCAToolAPI.API
     [EnableCors(origins: "*", headers: "*", methods: "*")]
     public class ResourceController : ApiController
     {
-        // mockup JSON that would be sent from Sabina's AngularJs app.
-        private string addScenarioJSON = "{\"scenarios\":[" +
-             "{\"scenarioID\":\"3\",\"scenarioGroupID\":\"1\",\"topLevelFragmentID\":\"8\",\"activityLevel\":\"8300\", \"name\":\"Test Scenario\", \"flowID\":\"373\", \"directionID\":\"2\"}" +
-             "]}";
-
-        private string updateScenarioJSON = "{\"scenarios\":[" +
-           "{\"scenarioID\":\"3\",\"scenarioGroupID\":\"1\",\"topLevelFragmentID\":\"8\",\"activityLevel\":\"8500\", \"name\":\"Test Scenario\", \"flowID\":\"373\", \"directionID\":\"2\"}" +
-           "]}";
-
-        private string deleteScenarioJSON = "{\"scenarios\":[" +
-         "{\"scenarioID\":\"3\"}" +
-         "]}";
-
-        private string deleteParamJSON = "{\"params\":[" +
-         "{\"paramID\":\"3\"}" +
-         "]}";
-
-        private string addParamJSON = "{\"params\":[" +
-             "{\"paramTypeID\":\"9\",\"scenarioID\":\"1\", \"name\":\"Test Param\", \"value\":\"6.99\", \"fragmentFlowID\":\"243\", \"flowID\":\"31\", \"flowPropertyID\":\"23\", \"processID\":\"373\", \"lciaMethodID\":\"373\", \"conservation\":\"true\", \"dependencyParamID\":\"20\",}" +
-             "]}";
-
-        private string updateParamJSON = "{\"params\":[" +
-          "{\"paramID\":\"10\", \"paramTypeID\":\"1\",\"scenarioID\":\"1\", \"name\":\"Test Param\", \"value\":\"6.99\", \"fragmentFlowID\":\"243\", \"flowID\":\"373\", \"flowPropertyID\":\"373\", \"processID\":\"373\", \"lciaMethodID\":\"373\", \"conservation\":\"true\", \"dependencyParamID\":\"20\",}" +
-          "]}";
-
         [Inject]
         private readonly IResourceServiceFacade _ResourceService;
 
         [Inject]
         private readonly IScenarioGroupService _ScenarioGroupService;
 
+
+        /// <summary>
+        /// Dependency injection
+        /// </summary>
+        /// <param name="resourceService">provides all services except authorization</param>
+        /// <param name="scenarioGroupService">provides authorization</param>
         public ResourceController(IResourceServiceFacade resourceService,
             IScenarioGroupService scenarioGroupService)
         {
@@ -75,6 +56,11 @@ namespace LCAToolAPI.API
             return _ResourceService.GetFlows(flowtypeID);
         }
 
+        /// <summary>
+        /// flow by ID
+        /// </summary>
+        /// <param name="flowId">int</param>
+        /// <returns>list of FlowResource</returns>
         [Route("api/flows/{flowId}")]
         [HttpGet]
         public IEnumerable<FlowResource> GetFlow(int flowId)
@@ -274,22 +260,50 @@ namespace LCAToolAPI.API
         }
 
         // Process metadata /////////////////////////////////////////////////////////
+        /// <summary>
+        /// List of processes
+        /// </summary>
+        /// <returns>list of ProcessResource</returns>
         [Route("api/processes")]
         [HttpGet]
         public IEnumerable<ProcessResource> GetProcesses() {
             return _ResourceService.GetProcesses();
         }
 
-        // list processes having any of the specified flowtypeID 
-        // 1=elementary, for identifying flows with emissions
+        /// <summary>
+        /// an individual process
+        /// </summary>
+        /// <param name="processId"></param>
+        /// <returns></returns>
+        [Route("api/processes/{processId}")]
+        [HttpGet]
+        public IEnumerable<ProcessResource> GetProcess(int processId)
+        {
+            return _ResourceService.GetProcesses().Where(k => k.ProcessID == processId).ToList();
+        }
+
+        // 
+        // 
+        /// <summary>
+        /// list processes having any of the specified flowtypeID 
+        /// 1=intermediate should return all processes
+        /// 2 will return only processes with emissions
+        /// </summary>
+        /// <param name="flowTypeID">1=intermediate; 2=elementary</param>
+        /// <returns></returns>
         [Route("api/flowtypes/{flowTypeID:int}/processes")]
         [HttpGet]
         public IEnumerable<ProcessResource> GetProcesses(int flowTypeID) {
             return _ResourceService.GetProcesses(flowTypeID);
         }
 
-        // list definite (i.e. quantity-bearing) flows associated with a process
-        // access control needed here
+        
+        /// <summary>
+        /// list definite (i.e. quantity-bearing) flows associated with a process
+        /// (privacy protected in ProcessService)
+        /// </summary>
+        /// <param name="processID"></param>
+        /// <returns>ProcessFlowResource list</returns>
         [Route("api/processes/{processID:int}/processflows")]
         [HttpGet]
         public IEnumerable<ProcessFlowResource> GetProcessFlows(int processID) {
@@ -311,6 +325,12 @@ namespace LCAToolAPI.API
 
         // report LCIA results as a table 
         // access control needed here
+        /// <summary>
+        /// Report detailed process LCIA results for a specific method. (privacy protected in service layer)
+        /// </summary>
+        /// <param name="processID">the process ID</param>
+        /// <param name="lciaMethodID">the LCIAMethod ID</param>
+        /// <returns>ProcessFlowResource list</returns>
         [Route("api/processes/{processID:int}/lciamethods/{lciaMethodID:int}/lciaresults")]
         [HttpGet]
         public LCIAResultResource GetProcessLCIAResult(int processID, int lciaMethodID)
@@ -318,12 +338,23 @@ namespace LCAToolAPI.API
             return _ResourceService.GetProcessLCIAResult(processID, lciaMethodID);
         }
 
-        // as above w/ scenario
+
+        /// <summary>
+        /// As above with scenario. 
+        /// </summary>
+        /// <param name="processID"></param>
+        /// <param name="lciaMethodID"></param>
+        /// <param name="scenarioID"></param>
+        /// <returns></returns>
+        [CalRecycleAuthorize]
         [Route("api/scenarios/{scenarioID:int}/processes/{processID:int}/lciamethods/{lciaMethodID:int}/lciaresults")]
         [HttpGet]
         public LCIAResultResource GetProcessLCIAResult(int processID, int lciaMethodID, int scenarioID)
         {
-            return _ResourceService.GetProcessLCIAResult(processID, lciaMethodID, scenarioID);
+            if (_ScenarioGroupService.CanGet(RequestContext))
+                return _ResourceService.GetProcessLCIAResult(processID, lciaMethodID, scenarioID);
+            else
+                return null;
         }
 
         /// <summary>
@@ -376,11 +407,13 @@ namespace LCAToolAPI.API
         }
          * */
 
+        
         /// <summary>
         /// Clear ScoreCache data by ScenarioID and LCIAMethodID
+        /// 
         /// </summary>
         /// <param name="scenarioId"></param>
-        /// <param name="fragmentId"></param>
+        /// <param name="lciaMethodId"></param>
         [Route("api/scenarios/{scenarioID:int}/lciamethods/{lciaMethodID:int}/clearscorecaches")]
         [HttpPost]
         public void ClearScoreCacheByScenarioAndLCIAMethod(int scenarioId, int lciaMethodId)
@@ -505,6 +538,8 @@ namespace LCAToolAPI.API
         /// Update a scenario. Requires authorization. Return the updated scenario
         /// </summary>
         /// <param name="scenarioId"></param>
+        /// <param name="putdata"></param>
+        /// <returns></returns>
         [CalRecycleAuthorize]
         [Route("api/scenarios/{scenarioId}")]
         [AcceptVerbs("PUT")]
@@ -586,6 +621,12 @@ namespace LCAToolAPI.API
                 throw new HttpResponseException(HttpStatusCode.Unauthorized);
         }
 
+        /// <summary>
+        /// Delete a param.  must be authorized for the scenario.
+        /// </summary>
+        /// <param name="scenarioId"></param>
+        /// <param name="paramId"></param>
+        /// <param name="putParam"></param>
         [CalRecycleAuthorize]
         [Route("api/scenarios/{scenarioId}/params/{paramId}")]
         [AcceptVerbs("DELETE")]

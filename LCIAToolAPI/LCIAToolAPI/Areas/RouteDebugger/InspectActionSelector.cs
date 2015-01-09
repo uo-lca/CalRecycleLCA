@@ -20,16 +20,30 @@ namespace LCIAToolAPI.Areas.RouteDebugger
     {
         private IHttpActionSelector _innerSelector;
 
+        /// <summary>
+        /// constructor initializes members
+        /// </summary>
+        /// <param name="innerSelector">an IHttpActionSelector</param>
         public InspectActionSelector(IHttpActionSelector innerSelector)
         {
             _innerSelector = innerSelector;
         }
 
+        /// <summary>
+        /// a lookup table of actions ?
+        /// </summary>
+        /// <param name="controllerDescriptor">an HttpControllerDescriptor </param>
+        /// <returns>ILookup of string, HttpActionDescriptor </returns>
         public ILookup<string, HttpActionDescriptor> GetActionMapping(HttpControllerDescriptor controllerDescriptor)
         {
             return _innerSelector.GetActionMapping(controllerDescriptor);
         }
 
+        /// <summary>
+        /// select an action
+        /// </summary>
+        /// <param name="controllerContext">HttpControllerContext </param>
+        /// <returns>HttpActionDescriptor</returns>
         public HttpActionDescriptor SelectAction(HttpControllerContext controllerContext)
         {
             var request = controllerContext.Request;

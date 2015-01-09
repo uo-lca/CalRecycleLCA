@@ -20,6 +20,12 @@ namespace LCIAToolAPI.Areas.RouteDebugger
     /// </summary>
     public class InspectHandler : DelegatingHandler
     {
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="request"></param>
+        /// <param name="cancellationToken"></param>
+        /// <returns></returns>
         protected override async Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken)
         {
             if (request.IsInspectRequest())

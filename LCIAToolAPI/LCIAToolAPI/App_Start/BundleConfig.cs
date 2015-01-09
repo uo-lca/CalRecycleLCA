@@ -7,9 +7,17 @@ using System.Web.UI;
 
 namespace LCIAToolAPI
 {
+    /// <summary>
+    /// 
+    /// </summary>
     public class BundleConfig
     {
+        
         // For more information on Bundling, visit http://go.microsoft.com/fwlink/?LinkID=303951
+        /// <summary>
+        /// I don't think we're using this and would really like to take it out
+        /// </summary>
+        /// <param name="bundles"></param>
         public static void RegisterBundles(BundleCollection bundles)
         {
             bundles.Add(new ScriptBundle("~/bundles/WebFormsJs").Include(

@@ -20,16 +20,29 @@ namespace LCIAToolAPI.Areas.RouteDebugger
     {
         private IHttpControllerSelector _innerSelector;
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="innerSelector"></param>
         public InspectControllerSelector(IHttpControllerSelector innerSelector)
         {
             _innerSelector = innerSelector;
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns></returns>
         public IDictionary<string, HttpControllerDescriptor> GetControllerMapping()
         {
             return _innerSelector.GetControllerMapping();
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="request"></param>
+        /// <returns></returns>
         public HttpControllerDescriptor SelectController(HttpRequestMessage request)
         {
             if (request.IsInspectRequest())

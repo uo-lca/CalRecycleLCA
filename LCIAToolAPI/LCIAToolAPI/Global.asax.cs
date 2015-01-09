@@ -18,8 +18,16 @@ using LCAToolAPI.App_Start;
 
 namespace LCIAToolAPI
 {
+    /// <summary>
+    /// 
+    /// </summary>
     public class Global : System.Web.HttpApplication
     {
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         protected void Application_Start(object sender, EventArgs e)
         {
             // Not compatible with attribute routing.
@@ -30,27 +38,56 @@ namespace LCIAToolAPI
             NinjectWebCommon.RegisterNinject(GlobalConfiguration.Configuration);
         }
 
-
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         protected void Session_Start(object sender, EventArgs e)
         {
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         protected void Application_BeginRequest(object sender, EventArgs e)
         {
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         protected void Application_AuthenticateRequest(object sender, EventArgs e)
         {
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         protected void ApplicationError(object sender, EventArgs e)
         {
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         protected void Session_End(object sender, EventArgs e)
         {
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         protected void Application_End(object sender, EventArgs e)
         {
         }

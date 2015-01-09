@@ -13,7 +13,10 @@ namespace LCIAToolAPI.Areas.RouteDebugger.Models
     public class ActionSelectionLog
     {
         private Dictionary<HttpActionDescriptor, ActionSelectionInfo> _actionDescriptors;
-
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="actions"></param>
         public ActionSelectionLog(IEnumerable<HttpActionDescriptor> actions)
         {
             _actionDescriptors = new Dictionary<HttpActionDescriptor, ActionSelectionInfo>();
@@ -23,11 +26,17 @@ namespace LCIAToolAPI.Areas.RouteDebugger.Models
                 _actionDescriptors[each] = new ActionSelectionInfo(each);
             }
         }
-
+        /// <summary>
+        /// 
+        /// </summary>
         public string ActionName { get; set; }
-
+        /// <summary>
+        /// 
+        /// </summary>
         public HttpMethod HttpMethod { get; set; }
-
+        /// <summary>
+        /// 
+        /// </summary>
         public ActionSelectionInfo[] ActionSelections
         {
             get
