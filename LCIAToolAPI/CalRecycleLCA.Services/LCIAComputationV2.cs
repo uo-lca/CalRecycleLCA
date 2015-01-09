@@ -129,7 +129,7 @@ namespace CalRecycleLCA.Services
             ************* */
         }
 
-        public IEnumerable<LCIAModel> LCIACompute(int processId, int scenarioId)
+        public IEnumerable<LCIAResult> LCIACompute(int processId, int scenarioId)
         {
             //var lciaMethods = from u in _lciaService.Queryable().AsEnumerable()
             //            select new LCIAModel
@@ -146,20 +146,20 @@ namespace CalRecycleLCA.Services
 
         }
 
-        public IEnumerable<LCIAModel> ProcessLCIA(int? processId, IEnumerable<int> lciaMethods, int? scenarioId)
+        public IEnumerable<LCIAResult> ProcessLCIA(int? processId, IEnumerable<int> lciaMethods, int? scenarioId)
         {
             var inventory = ComputeProcessLCI(processId, scenarioId);
             //IEnumerable<LCIAModel> lcias=null;
-            List<LCIAModel> lciaMethodScores = new List<LCIAModel>();
-            double total;
+            List<LCIAResult> lciaResults = new List<LCIAResult>();
             foreach (var lciaMethodId in lciaMethods.ToList())
             {
                 
-                var lcias= ComputeProcessLCIA(inventory, lciaMethodId, scenarioId).ToList();
-
+                var lcias= ComputeProcessLCIA(inventory, lciaMethodId, scenarioId);
+                lciaResults.Add(lcias);
+                /*
                 if (lcias.Count() == 0)
                 {
-                    lciaMethodScores.Add(new LCIAModel()
+                    lciaResults.Add(new LCIAModel()
                     {
                         LCIAMethodID = lciaMethodId,
                         Result = 0.0
@@ -167,29 +167,12 @@ namespace CalRecycleLCA.Services
                 }
                 else
                 {
-                   //get list of scores for each lcia in the lciamethoditem
-                   /*scores = lcias.ToList()
-                        .GroupBy(t => new
-                     {
-                         t.LCIAMethodID,
-                         Result = t.LCIAResult,
-                         t.DirectionID,
-                         t.FlowID
-                     })
-                     .Select(group => new LCIAModel
-                     {
-                         LCIAResult = group.Key.Result,
-                         DirectionID = group.Key.DirectionID,
-                         FlowID = group.Key.FlowID,
-                         LCIAMethodID = group.Key.LCIAMethodID
-                     });
-                    */
                    //get the sum of all the lcia scores in the lciamethoditem.
                    total = Convert.ToDouble(lcias.Sum(x => x.Result));
                    //direction = Convert.ToInt32(scores.Select(x => x.DirectionID).FirstOrDefault());
 
                    //add the sum of the scores to a list for each lciamethoditem
-                   lciaMethodScores.Add(new LCIAModel()
+                   lciaResults.Add(new LCIAModel()
                    {
                        LCIAMethodID = lciaMethodId,
                        Result = total
@@ -197,9 +180,10 @@ namespace CalRecycleLCA.Services
                    });
                    
                }
+                */
 
             }
-            return lciaMethodScores;
+            return lciaResults;
         }
 
         //inventory in pseudocode
@@ -228,17 +212,14 @@ namespace CalRecycleLCA.Services
 
         }
 
-        private IEnumerable<LCIAModel> ComputeProcessLCIA(IEnumerable<InventoryModel> inventory, int lciaMethodId, int? scenarioId)
+        private LCIAResult ComputeProcessLCIA(IEnumerable<InventoryModel> inventory, int lciaMethodId, int? scenarioId)
         {
             // var sw = Stopwatch.StartNew();
-            IEnumerable<LCIAModel> lcias;
+            LCIAResult lcias;
             if (scenarioId == null)
-                lcias = _lciaService.ComputeLCIA(inventory, lciaMethodId).ToList();
+                lcias = _lciaService.ComputeLCIA(inventory, lciaMethodId);
             else
-                lcias = _lciaService.ComputeLCIA(inventory, lciaMethodId, (int)scenarioId).ToList();
-
-            foreach (var item in lcias)
-                item.Result = (item.Quantity * item.Factor);
+                lcias = _lciaService.ComputeLCIA(inventory, lciaMethodId, (int)scenarioId);
 
             // var t = sw.ElapsedMilliseconds;
             // sw.Stop();

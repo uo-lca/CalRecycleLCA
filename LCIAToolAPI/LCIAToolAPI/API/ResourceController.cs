@@ -45,6 +45,22 @@ namespace LCAToolAPI.API
         }
 
         /// <summary>
+        /// In lieu of HATEOAS, here's a list of all the routes.
+        /// </summary>
+        /// <returns>Link to documentation.</returns>
+        [Route("api")]
+        [HttpGet]
+        public Link GetHelp()
+        {
+            return new Link
+            {
+                Rel = "help",
+                Title = "CalRecycle LCA Data API Documentation",
+                Href = "../Help"
+            };
+        }
+
+        /// <summary>
         /// List all flows in the database.
         /// </summary>
         /// <returns></returns>
@@ -88,7 +104,30 @@ namespace LCAToolAPI.API
         {
             return _ResourceService.GetFlowProperties();
         }
-        
+
+        /// <summary>
+        /// one flow property
+        /// </summary>
+        /// <param name="fpid"></param>
+        /// <returns></returns>
+        [Route("api/flowproperties/{fpid}")]
+        [HttpGet]
+        public IEnumerable<FlowPropertyResource> GetFlowProperties(int fpid)
+        {
+            return _ResourceService.GetFlowProperties().Where(k => k.FlowPropertyID == fpid).ToList();
+        }
+
+        /// <summary>
+        /// List specific flowproperties for a flow
+        /// </summary>
+        /// <returns>FlowPropertyMagnitude list</returns>
+        [Route("api/flows/{flowId}/flowproperties")]
+        [HttpGet]
+        public IEnumerable<FlowPropertyMagnitude> GetFlowFlowProperties(int flowId)
+        {
+            return _ResourceService.GetFlowFlowProperties(flowId);
+        }
+
         /// <summary>
         /// Get the list of all fragments in the DB.
         /// </summary>
@@ -117,18 +156,35 @@ namespace LCAToolAPI.API
         // Fragments //////////////////////////////////////////////////////////////
         /// <summary>
         /// Returns a list of FragmentFlows belonging to a fragment.. i.e. the links in the 
-        /// fragment tree structure.  Optionally specify a scenarioID.
+        /// fragment tree structure.  .
+        /// </summary>
+        /// <param name="fragmentID"></param>
+        /// <returns>FragmentFlowResource array</returns>
+        [Route("api/fragments/{fragmentID:int}/fragmentflows")]
+        [HttpGet]
+        public IEnumerable<FragmentFlowResource> GetFragmentFlowResources(int fragmentID) {
+            // Use default scenario
+            return _ResourceService.GetFragmentFlowResources(fragmentID); 
+        }
+
+        /// <summary>
+        /// scenario-specific.
         /// </summary>
         /// <param name="fragmentID"></param>
         /// <param name="scenarioID"></param>
-        /// <returns>FragmentFlowResource array</returns>
-        [Route("api/fragments/{fragmentID:int}/fragmentflows")]
+        /// <returns></returns>
+        [CalRecycleAuthorize]
         [Route("api/scenarios/{scenarioID:int}/fragments/{fragmentID:int}/fragmentflows")]
         [HttpGet]
-        public IEnumerable<FragmentFlowResource> GetFragmentFlowResources(int fragmentID, int scenarioID = Scenario.MODEL_BASE_CASE_ID) {
-            // Use default scenario
-            return _ResourceService.GetFragmentFlowResources(fragmentID, scenarioID); 
+        public IEnumerable<FragmentFlowResource> GetFragmentFlowResources(int fragmentID, int scenarioID = Scenario.MODEL_BASE_CASE_ID)
+        {
+            if (_ScenarioGroupService.CanGet(RequestContext))
+                return _ResourceService.GetFragmentFlowResources(fragmentID, scenarioID);
+            else
+                return null;
         }
+
+        
         /*
         [Route("api/scenarios/{scenarioID:int}/fragments/{fragmentID:int}/fragmentflows")]
         [HttpGet]
@@ -187,10 +243,27 @@ namespace LCAToolAPI.API
         /// <param name="fragmentID"></param>
         /// <param name="lciaMethodID"></param>
         /// <returns>LCIAResultResource (list)</returns>
+        [CalRecycleAuthorize]
         [Route("api/fragments/{fragmentID:int}/lciamethods/{lciaMethodID:int}/lciaresults")]
         [HttpGet]
         public IEnumerable<LCIAResultResource> GetFragmentLCIAResultsAllScenarios(int fragmentID, int lciaMethodID) {
-             return _ResourceService.GetFragmentLCIAResultsAllScenarios(fragmentID, lciaMethodID);
+            int authGroup = (int)_ScenarioGroupService.CheckAuthorizedGroup(RequestContext);
+            if (authGroup == 0)
+                return _ResourceService.GetFragmentLCIAResultsAllScenarios(fragmentID, lciaMethodID);
+            else
+                return _ResourceService.GetFragmentLCIAResultsAllScenarios(fragmentID, lciaMethodID, authGroup);
+        }
+
+        /// <summary>
+        /// Fragment LCIA results across all methods under base scenario
+        /// </summary>
+        /// <param name="fragmentID"></param>
+        /// <returns>LCIAResultResource list</returns>
+        [Route("api/fragments/{fragmentID:int}/lciaresults")]
+        [HttpGet]
+        public IEnumerable<LCIAResultResource> GetFragmentLCIAResultsAllMethods(int fragmentID)
+        {
+            return _ResourceService.GetFragmentLCIAResultsAllMethods(fragmentID);
         }
 
         /// <summary>
@@ -202,10 +275,31 @@ namespace LCAToolAPI.API
         /// <param name="lciaMethodID"></param>
         /// <param name="scenarioID"></param>
         /// <returns>LCIAResultResource</returns>
+        [CalRecycleAuthorize]
         [Route("api/scenarios/{scenarioID:int}/fragments/{fragmentID:int}/lciamethods/{lciaMethodID:int}/lciaresults")]
         [HttpGet]
         public LCIAResultResource GetFragmentLCIAResults(int fragmentID, int lciaMethodID, int scenarioID) {
-            return _ResourceService.GetFragmentLCIAResults(fragmentID, lciaMethodID, scenarioID);
+            if (_ScenarioGroupService.CanGet(RequestContext))
+                return _ResourceService.GetFragmentLCIAResults(fragmentID, lciaMethodID, scenarioID);
+            else
+                return null;
+        }
+
+        /// <summary>
+        /// Fragment LCIA results, all methods, for a given scenario
+        /// </summary>
+        /// <param name="fragmentID"></param>
+        /// <param name="scenarioID"></param>
+        /// <returns>LCIAResultResource list</returns>
+        [CalRecycleAuthorize]
+        [Route("api/scenarios/{scenarioID:int}/fragments/{fragmentID:int}/lciaresults")]
+        [HttpGet]
+        public IEnumerable<LCIAResultResource> GetFragmentLCIAResultsAllMethods(int fragmentID, int scenarioID)
+        {
+            if (_ScenarioGroupService.CanGet(RequestContext))
+                return _ResourceService.GetFragmentLCIAResultsAllMethods(fragmentID, scenarioID);
+            else
+                return null;
         }
 
         // LCIA Metadata ////////////////////////////////////////////////////////////
@@ -241,6 +335,19 @@ namespace LCAToolAPI.API
         [HttpGet]
         public IEnumerable<LCIAMethodResource> GetLCIAMethodResources() {
             return _ResourceService.GetActiveLCIAMethodResources();
+        }
+
+        /// <summary>
+        /// GET api/lciamethods
+        /// List all LCIA methods.
+        /// </summary>
+        /// <param name="lciaMethodId"></param>
+        /// <returns></returns>
+        [Route("api/lciamethods/{lciaMethodId}")]
+        [HttpGet]
+        public IEnumerable<LCIAMethodResource> GetLCIAMethodResource(int lciaMethodId)
+        {
+            return _ResourceService.GetActiveLCIAMethodResources().Where(k => k.LCIAMethodID == lciaMethodId).ToList();
         }
 
         /// <summary>
@@ -323,6 +430,18 @@ namespace LCAToolAPI.API
             return _ResourceService.GetFlowPropertiesByProcess(processID);
         }
 
+        /// <summary>
+        /// LCIA results for all methods
+        /// </summary>
+        /// <param name="processID"></param>
+        /// <returns>LCIAResultResource list</returns>
+        [Route("api/processes/{processID:int}/lciaresults")]
+        [HttpGet]
+        public IEnumerable<LCIAResultResource> GetProcessLCIAResults(int processID)
+        {
+            return _ResourceService.GetProcessLCIAResults(processID);
+        }
+
         // report LCIA results as a table 
         // access control needed here
         /// <summary>
@@ -338,6 +457,20 @@ namespace LCAToolAPI.API
             return _ResourceService.GetProcessLCIAResult(processID, lciaMethodID);
         }
 
+
+        /// <summary>
+        /// As above with scenario. 
+        /// </summary>
+        /// <param name="processId"></param>
+        /// <param name="scenarioId"></param>
+        /// <returns>LCIAResultResource list</returns>
+        [CalRecycleAuthorize]
+        [Route("api/scenarios/{scenarioId}/processes/{processId:int}/lciaresults")]
+        [HttpGet]
+        public IEnumerable<LCIAResultResource> GetProcessLCIAResults(int processId, int scenarioId)
+        {
+            return _ResourceService.GetProcessLCIAResults(processId, scenarioId);
+        }
 
         /// <summary>
         /// As above with scenario. 

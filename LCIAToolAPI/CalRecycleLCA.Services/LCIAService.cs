@@ -13,8 +13,8 @@ namespace CalRecycleLCA.Services
 {
     public interface ILCIAService : IService<LCIA>
     {
-        IEnumerable<LCIAModel> ComputeLCIA(IEnumerable<InventoryModel> inventory, int lciaMethodId, int scenarioId = Scenario.MODEL_BASE_CASE_ID);
-        IEnumerable<LCIAModel> OldComputeLCIA(IEnumerable<InventoryModel> inventory, int lciaMethodId, int scenarioId = Scenario.MODEL_BASE_CASE_ID);
+        LCIAResult ComputeLCIA(IEnumerable<InventoryModel> inventory, int lciaMethodId, int scenarioId = Scenario.MODEL_BASE_CASE_ID);
+        //IEnumerable<LCIAModel> OldComputeLCIA(IEnumerable<InventoryModel> inventory, int lciaMethodId, int scenarioId = Scenario.MODEL_BASE_CASE_ID);
         IEnumerable<LCIAFactorResource> QueryFactors(int LCIAMethodID);
     }
 
@@ -28,9 +28,18 @@ namespace CalRecycleLCA.Services
             _repository = repository;            
         }
 
-        public IEnumerable<LCIAModel> ComputeLCIA(IEnumerable<InventoryModel> inventory, int lciaMethodId, int scenarioId = Scenario.MODEL_BASE_CASE_ID)
+        public LCIAResult ComputeLCIA(IEnumerable<InventoryModel> inventory, int lciaMethodId, int scenarioId = Scenario.MODEL_BASE_CASE_ID)
         {
-            return _repository.ComputeLCIA(inventory, lciaMethodId, scenarioId);
+            ICollection<LCIAModel> model = _repository.ComputeLCIA(inventory, lciaMethodId, scenarioId)
+                .Where(k => String.IsNullOrEmpty(k.Geography)).ToList();
+            foreach (var k in model)
+                k.Result = k.Quantity * k.Factor;
+            return new LCIAResult
+            {
+                LCIAMethodID = lciaMethodId,
+                ScenarioID = scenarioId,
+                LCIADetail = model
+            };
         }
         public IEnumerable<LCIAModel> OldComputeLCIA(IEnumerable<InventoryModel> inventory, int lciaMethodId, int scenarioId = Scenario.MODEL_BASE_CASE_ID)
         {

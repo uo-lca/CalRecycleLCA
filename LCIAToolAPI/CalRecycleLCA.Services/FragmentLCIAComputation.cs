@@ -447,7 +447,7 @@ namespace CalRecycleLCA.Services
                         {
                             double score = scores
                                 .Where(x => x.LCIAMethodID == lciaMethodId)
-                                .Select(x => Convert.ToDouble(x.Result)).FirstOrDefault();
+                                .Select(x => Convert.ToDouble(x.Total)).FirstOrDefault();
 
                             //ScoreCache scoreCache = new ScoreCache();
                             //scoreCache.ScenarioID = fragmentNode.ScenarioID;

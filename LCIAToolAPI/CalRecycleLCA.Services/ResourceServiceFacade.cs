@@ -428,6 +428,24 @@ namespace CalRecycleLCA.Services
             };
         }
 
+        public LCIAResultResource Transform(LCIAResult m, int processId)
+        {
+            return new LCIAResultResource
+            {
+                LCIAMethodID = m.LCIAMethodID,
+                ScenarioID = (int)m.ScenarioID,
+                LCIAScore = new List<AggregateLCIAResource>
+                { new AggregateLCIAResource 
+                    {
+                        ProcessID = processId,
+                        CumulativeResult = m.Total,
+                        LCIADetail = new List<DetailedLCIAResource>()
+                    }
+                }
+            };
+        }
+
+
         public ScenarioResource Transform(Scenario s)
         {
             return new ScenarioResource
@@ -601,6 +619,16 @@ namespace CalRecycleLCA.Services
                 .Select(fp => Transform(fp)).ToList();
         }
 
+        public IEnumerable<FlowPropertyMagnitude> GetFlowFlowProperties(int flowId)
+        {
+            return _FlowFlowPropertyService.Query(k => k.FlowID == flowId)
+                .Select(k => new FlowPropertyMagnitude()
+                {
+                    FlowPropertyID = (int)k.FlowPropertyID,
+                    Magnitude = (double)k.MeanValue
+                });
+        }
+
         /// <summary>
         /// Get list of flow properties related to a process (via FlowFlowProperty and ProcessFlow)
         /// </summary>
@@ -715,28 +743,34 @@ namespace CalRecycleLCA.Services
         public LCIAResultResource GetProcessLCIAResult(int processId, int lciaMethodId, int scenarioId = Scenario.MODEL_BASE_CASE_ID) {
             var lciaMethod = new List<int> { lciaMethodId };
                 //IEnumerable<InventoryModel> inventory = _LCIAComputation.ComputeProcessLCI(processID, scenarioID);
-                IEnumerable<LCIAModel> lciaDetail = _LCIAComputation.ProcessLCIA(processId, lciaMethod, scenarioId)
-                    .Where(l => String.IsNullOrEmpty(l.Geography));
+                LCIAResult lciaResult = _LCIAComputation.ProcessLCIA(processId, lciaMethod, scenarioId).First();
                 // var privacy_flag = _ProcessService.Query(p => p.ProcessID == processID)
                 //     .Include(p => p.ILCDEntity.DataSource)
                 //     .Select(p => p.ILCDEntity.DataSource.VisibilityID).First() == 2;
-                var lciaScore = new AggregateLCIAResource
+                var lciaAgg = new AggregateLCIAResource
                     {
                         ProcessID = processId,
-                        CumulativeResult = (double)lciaDetail.Sum(a => a.Result),
+                        CumulativeResult = (double)lciaResult.Total,
                         LCIADetail = (_ProcessService.IsPrivate(processId)
                             ? new List<DetailedLCIAResource>()
-                            : lciaDetail.Select(m => Transform(m)).ToList())
+                            : lciaResult.LCIADetail.Select(m => Transform(m)).ToList())
                     };  
-                var lciaResult = new LCIAResultResource
+                var lciaResource = new LCIAResultResource
                 {
                     LCIAMethodID = lciaMethodId,
                     ScenarioID = scenarioId,
-                    LCIAScore = new List<AggregateLCIAResource>() { lciaScore }
+                    LCIAScore = new List<AggregateLCIAResource>() { lciaAgg }
                 };
-                return lciaResult;
+                return lciaResource;
         }
 
+        
+        public IEnumerable<LCIAResultResource> GetProcessLCIAResults(int processId, int scenarioId = Scenario.MODEL_BASE_CASE_ID)
+        {
+            IEnumerable<LCIAResult> lciaResults = _LCIAComputation.LCIACompute(processId, scenarioId);
+            return lciaResults.Select(m => Transform(m, processId));
+        }
+        
         /// <summary>
         /// Execute Fragment LCIA and return computation result as FragmentLCIAResource object
         /// </summary>
@@ -774,7 +808,7 @@ namespace CalRecycleLCA.Services
         }
 
         /// <summary>
-        /// Execute Fragment LCIA and return computation results in FragmentLCIAResource objects
+        /// Execute Fragment LCIA and return computation results in FragmentLCIAResource objects-- one lcia method, all scenarios
         /// </summary>
         /// <param name="fragmentID"></param>
         /// <param name="lciaMethodID"></param>
@@ -786,6 +820,18 @@ namespace CalRecycleLCA.Services
             return scenarios.Select(s => GetFragmentLCIAResults(fragmentID, lciaMethodID, s.ScenarioID)).ToList();
         }
 
+        /// <summary>
+        /// Execute Fragment LCIA and return computation results in FragmentLCIAResource objects-- one scenario, all LCIA methods
+        /// </summary>
+        /// <param name="fragmentID"></param>
+        /// <param name="lciaMethodID"></param>
+        /// <param name="scenarioGroupID">Scenario group of the user making request</param>
+        /// <returns>List of LCIAResultResource objects</returns> 
+        public IEnumerable<LCIAResultResource> GetFragmentLCIAResultsAllMethods(int fragmentID, int scenarioId = Scenario.MODEL_BASE_CASE_ID)
+        {
+            IEnumerable<int> lciaMethods = _LciaMethodService.QueryActiveMethods().Select(x => x.LCIAMethodID).ToList();
+            return lciaMethods.Select(s => GetFragmentLCIAResults(fragmentID, s, scenarioId)).ToList();
+        }
 
         /// <summary>
         /// Get scenario types, with optional ScenarioGroup argument to constrain the ScenarioIDs returned

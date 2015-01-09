@@ -37,6 +37,8 @@ namespace Entities.Models {
         public int LCIAMethodID { get; set; }
         public int ScenarioID { get; set; }
 
+        public double Total { get { return LCIAScore.Sum(m => m.CumulativeResult); } }
+
 	    public ICollection<AggregateLCIAResource> LCIAScore  { get; set; }
     }
 }

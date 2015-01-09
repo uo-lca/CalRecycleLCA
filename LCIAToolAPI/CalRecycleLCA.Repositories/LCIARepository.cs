@@ -31,11 +31,9 @@ namespace CalRecycleLCA.Repositories
                 .SelectMany(s => s.parameter.DefaultIfEmpty(),
                     (s, parameter) => new LCIAModel
                     {
-                        ScenarioID = scenarioId,
-                        LCIAMethodID = (int)s.lcias.l.LCIAMethodID,
                         FlowID = (int)s.lcias.l.FlowID,
                         DirectionID = s.lcias.l.DirectionID,
-                        Quantity = s.lcias.i.Result,
+                        Quantity = (double)s.lcias.i.Result, // inventory table
                         Factor = parameter == null ? s.lcias.l.Factor : parameter.Value,
                         Geography = s.lcias.l.Geography,
                         CharacterizationParam = parameter == null ? null : new ParamInstance
@@ -76,11 +74,9 @@ namespace CalRecycleLCA.Repositories
            .SelectMany(s => s.parameters.DefaultIfEmpty()
            , (s, parameters) => new LCIAModel
            {
-               ScenarioID = scenarioId,
-               LCIAMethodID = s.characterizationParams.LCIAMethodID,
                FlowID = s.characterizationParams.FlowID,
                DirectionID = s.characterizationParams.DirectionID,
-               Quantity = s.characterizationParams.Quantity,
+               Quantity = (double)s.characterizationParams.Quantity,
                Geography = s.characterizationParams.Geography,
                CharacterizationParam = parameters == null ? null : new ParamInstance
                {

@@ -22,13 +22,16 @@ namespace CalRecycleLCA.Services
         IEnumerable<FragmentStageResource> GetStagesByFragment(int fragmentID = 0);
         IEnumerable<ProcessFlowResource> GetProcessFlows(int processID);
         IEnumerable<FlowPropertyResource> GetFlowProperties();
+        IEnumerable<FlowPropertyMagnitude> GetFlowFlowProperties(int flowId);
         IEnumerable<FlowPropertyResource> GetFlowPropertiesByFragment(int fragmentID);
         IEnumerable<FlowPropertyResource> GetFlowPropertiesByProcess(int processID);
         LCIAResultResource GetFragmentLCIAResults(int fragmentID, int lciaMethodID, int scenarioID = Scenario.MODEL_BASE_CASE_ID);
         IEnumerable<LCIAResultResource> GetFragmentLCIAResultsAllScenarios(int fragmentID, int lciaMethodID, int scenarioGroupID = 1);
+        IEnumerable<LCIAResultResource> GetFragmentLCIAResultsAllMethods(int fragmentID, int scenarioID = Scenario.MODEL_BASE_CASE_ID);
         IEnumerable<ProcessResource> GetProcesses(int? flowTypeID = null);
         IEnumerable<ImpactCategoryResource> GetImpactCategories();
         LCIAResultResource GetProcessLCIAResult(int processID, int lciaMethodID, int scenarioID = Scenario.MODEL_BASE_CASE_ID);
+        IEnumerable<LCIAResultResource> GetProcessLCIAResults(int processID, int scenarioID = Scenario.MODEL_BASE_CASE_ID);
         IEnumerable<FlowTypeResource> GetFlowTypes();
         void ClearNodeCacheByScenario(int scenarioId);
         //void ClearNodeCacheByScenarioAndFragment(int scenarioId = Scenario.MODEL_BASE_CASE_ID, int fragmentId = 0);
