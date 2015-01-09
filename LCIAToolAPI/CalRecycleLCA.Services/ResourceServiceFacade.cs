@@ -409,7 +409,7 @@ namespace CalRecycleLCA.Services
                 DirectionID = TransformNullable(m.DirectionID, "LCIAModel.DirectionID"),
                 Quantity = Convert.ToDouble(m.Quantity),
                 Factor = Convert.ToDouble(m.Factor),
-                Result = Convert.ToDouble(m.LCIAResult)
+                Result = Convert.ToDouble(m.Result)
             };
         }
 
@@ -712,37 +712,29 @@ namespace CalRecycleLCA.Services
         /// Work around problem in LCIA computation: should be filtering out LCIA with Geography 
         /// </summary>
         /// <returns>LCIAResultResource or null if lciaMethodID not found</returns> 
-        public LCIAResultResource GetProcessLCIAResult(int processID, int lciaMethodID, int scenarioID = Scenario.MODEL_BASE_CASE_ID) {
-            LCIAMethod lciaMethod = _LciaMethodService.Find(lciaMethodID);
-            if (lciaMethod == null)
-            {
-                // TODO: figure how to handle this sort of error
-                return null;
-            }
-            else
-            {
-                IEnumerable<InventoryModel> inventory = _LCIAComputation.ComputeProcessLCI(processID, scenarioID);
-                IEnumerable<LCIAModel> lciaDetail = _LCIAComputation.ComputeProcessLCIA(inventory, lciaMethod, scenarioID)
+        public LCIAResultResource GetProcessLCIAResult(int processId, int lciaMethodId, int scenarioId = Scenario.MODEL_BASE_CASE_ID) {
+            var lciaMethod = new List<int> { lciaMethodId };
+                //IEnumerable<InventoryModel> inventory = _LCIAComputation.ComputeProcessLCI(processID, scenarioID);
+                IEnumerable<LCIAModel> lciaDetail = _LCIAComputation.ProcessLCIA(processId, lciaMethod, scenarioId)
                     .Where(l => String.IsNullOrEmpty(l.Geography));
                 // var privacy_flag = _ProcessService.Query(p => p.ProcessID == processID)
                 //     .Include(p => p.ILCDEntity.DataSource)
                 //     .Select(p => p.ILCDEntity.DataSource.VisibilityID).First() == 2;
                 var lciaScore = new AggregateLCIAResource
                     {
-                        ProcessID = processID,
-                        CumulativeResult = (double)lciaDetail.Sum(a => a.LCIAResult),
-                        LCIADetail = (_ProcessService.IsPrivate(processID)
+                        ProcessID = processId,
+                        CumulativeResult = (double)lciaDetail.Sum(a => a.Result),
+                        LCIADetail = (_ProcessService.IsPrivate(processId)
                             ? new List<DetailedLCIAResource>()
                             : lciaDetail.Select(m => Transform(m)).ToList())
                     };  
                 var lciaResult = new LCIAResultResource
                 {
-                    LCIAMethodID = lciaMethodID,
-                    ScenarioID = scenarioID,
+                    LCIAMethodID = lciaMethodId,
+                    ScenarioID = scenarioId,
                     LCIAScore = new List<AggregateLCIAResource>() { lciaScore }
                 };
                 return lciaResult;
-            }
         }
 
         /// <summary>

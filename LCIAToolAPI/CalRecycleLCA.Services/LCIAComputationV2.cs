@@ -129,7 +129,7 @@ namespace CalRecycleLCA.Services
             ************* */
         }
 
-        public IEnumerable<FragmentLCIAModel> LCIACompute(int processId, int scenarioId)
+        public IEnumerable<LCIAModel> LCIACompute(int processId, int scenarioId)
         {
             //var lciaMethods = from u in _lciaService.Queryable().AsEnumerable()
             //            select new LCIAModel
@@ -139,29 +139,29 @@ namespace CalRecycleLCA.Services
 
             //return lciaMethods;
 
-            var lciaMethods = _lciaMethodService.QueryActiveMethods().ToList();
+            var lciaMethods = _lciaMethodService.QueryActiveMethods().Select(x => x.LCIAMethodID).ToList();
 
             var result = ProcessLCIA(processId, lciaMethods, scenarioId);
             return result;
 
         }
 
-        public IEnumerable<FragmentLCIAModel> ProcessLCIA(int? processId, IEnumerable<LCIAMethod> lciaMethods, int? scenarioId)
+        public IEnumerable<LCIAModel> ProcessLCIA(int? processId, IEnumerable<int> lciaMethods, int? scenarioId)
         {
             var inventory = ComputeProcessLCI(processId, scenarioId);
             //IEnumerable<LCIAModel> lcias=null;
-            List<FragmentLCIAModel> lciaMethodScores = new List<FragmentLCIAModel>();
+            List<LCIAModel> lciaMethodScores = new List<LCIAModel>();
             double total;
-            foreach (var lciaMethodItem in lciaMethods.ToList())
+            foreach (var lciaMethodId in lciaMethods.ToList())
             {
                 
-                var lcias= ComputeProcessLCIA(inventory, lciaMethodItem, scenarioId).ToList();
+                var lcias= ComputeProcessLCIA(inventory, lciaMethodId, scenarioId).ToList();
 
                 if (lcias.Count() == 0)
                 {
-                    lciaMethodScores.Add(new FragmentLCIAModel()
+                    lciaMethodScores.Add(new LCIAModel()
                     {
-                        LCIAMethodID = lciaMethodItem.LCIAMethodID,
+                        LCIAMethodID = lciaMethodId,
                         Result = 0.0
                     });
                 }
@@ -185,13 +185,13 @@ namespace CalRecycleLCA.Services
                      });
                     */
                    //get the sum of all the lcia scores in the lciamethoditem.
-                   total = Convert.ToDouble(lcias.Sum(x => x.LCIAResult));
+                   total = Convert.ToDouble(lcias.Sum(x => x.Result));
                    //direction = Convert.ToInt32(scores.Select(x => x.DirectionID).FirstOrDefault());
 
                    //add the sum of the scores to a list for each lciamethoditem
-                   lciaMethodScores.Add(new FragmentLCIAModel()
+                   lciaMethodScores.Add(new LCIAModel()
                    {
-                       LCIAMethodID = lciaMethodItem.LCIAMethodID,
+                       LCIAMethodID = lciaMethodId,
                        Result = total
                        //NodeLCIAResults = lcias
                    });
@@ -228,17 +228,17 @@ namespace CalRecycleLCA.Services
 
         }
 
-        public IEnumerable<LCIAModel> ComputeProcessLCIA(IEnumerable<InventoryModel> inventory, LCIAMethod lciaMethodItem, int? scenarioId)
+        private IEnumerable<LCIAModel> ComputeProcessLCIA(IEnumerable<InventoryModel> inventory, int lciaMethodId, int? scenarioId)
         {
             // var sw = Stopwatch.StartNew();
             IEnumerable<LCIAModel> lcias;
             if (scenarioId == null)
-                lcias = _lciaService.ComputeLCIA(inventory, lciaMethodItem.LCIAMethodID).ToList();
+                lcias = _lciaService.ComputeLCIA(inventory, lciaMethodId).ToList();
             else
-                lcias = _lciaService.ComputeLCIA(inventory, lciaMethodItem.LCIAMethodID, (int)scenarioId).ToList();
+                lcias = _lciaService.ComputeLCIA(inventory, lciaMethodId, (int)scenarioId).ToList();
 
             foreach (var item in lcias)
-                item.LCIAResult = (item.Quantity * item.Factor);
+                item.Result = (item.Quantity * item.Factor);
 
             // var t = sw.ElapsedMilliseconds;
             // sw.Stop();

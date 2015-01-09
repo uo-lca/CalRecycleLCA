@@ -32,7 +32,7 @@ namespace CalRecycleLCA.Repositories
                     (s, parameter) => new LCIAModel
                     {
                         ScenarioID = scenarioId,
-                        LCIAMethodID = s.lcias.l.LCIAMethodID,
+                        LCIAMethodID = (int)s.lcias.l.LCIAMethodID,
                         FlowID = (int)s.lcias.l.FlowID,
                         DirectionID = s.lcias.l.DirectionID,
                         Quantity = s.lcias.i.Result,

@@ -72,7 +72,7 @@ namespace LCAToolAPI.API
         [Route("api/processes/{ProcessID}/scenarios/{scenarioID}/compute")]
         [System.Web.Http.AcceptVerbs("GET")]
         [System.Web.Http.HttpGet]
-        public IEnumerable<FragmentLCIAModel> LCIACompute(int processId, int scenarioId)
+        public IEnumerable<LCIAModel> LCIACompute(int processId, int scenarioId)
         {
             return _lciaComputationV2.LCIACompute(processId, scenarioId);
         }

@@ -247,7 +247,7 @@ namespace CalRecycleLCA.Services
         public void FragmentLCIACompute(int fragmentId, int scenarioId)
         {
 
-            var lciaMethods = _lciaMethodService.QueryActiveMethods().ToList();
+            var lciaMethods = _lciaMethodService.QueryActiveMethods().Select(x => x.LCIAMethodID).ToList();
             FragmentFlowLCIA(fragmentId, scenarioId, lciaMethods);//.ToList();
 
         }
@@ -277,7 +277,7 @@ namespace CalRecycleLCA.Services
             return lcia;
         }
 
-        public void FragmentFlowLCIA(int? fragmentId, int scenarioId, IEnumerable<LCIAMethod> lciaMethods)
+        private void FragmentFlowLCIA(int? fragmentId, int scenarioId, IEnumerable<int> lciaMethods)
         {
             // set score cache for fragment / scenario / method: iterate through
             // fragmentflows 
@@ -402,7 +402,7 @@ namespace CalRecycleLCA.Services
         // {
         //   error('not implemented');
         //}
-        public void SetScoreCache(int fragmentFlowId, FragmentNodeResource fragmentNode, IEnumerable<LCIAMethod> lciaMethods)
+        public void SetScoreCache(int fragmentFlowId, FragmentNodeResource fragmentNode, IEnumerable<int> lciaMethods)
         {
             //disable this until results have been cached - to increase performance
             _unitOfWork.SetAutoDetectChanges(false);
@@ -415,7 +415,7 @@ namespace CalRecycleLCA.Services
                                                                 && x.FragmentFlowID == fragmentFlowId).AsEnumerable()
                                                         .Select(y => y.LCIAMethodID);
 
-            IEnumerable<LCIAMethod> needLciaMethods = lciaMethods.Where(m => !haveLciaMethods.Contains(m.LCIAMethodID));
+            IEnumerable<int> needLciaMethods = lciaMethods.Where(m => !haveLciaMethods.Contains(m));
 
             //IEnumerable<int> needLciaMethods = tmpLciaMethods.Except(haveLciaMethods);
 
@@ -441,19 +441,13 @@ namespace CalRecycleLCA.Services
 
                     var scores = lciaComputation.ProcessLCIA(fragmentNode.ProcessID, needLciaMethods, fragmentNode.ScenarioID);
 
-                    foreach (var lciaMethodItem in needLciaMethods.AsQueryable())
+                    foreach (var lciaMethodId in needLciaMethods.AsQueryable())
                     {
-                        double impactScore = 0;
-                        if (scores.Any(s => s.LCIAMethodID == lciaMethodItem.LCIAMethodID))
+                        if (scores.Any(s => s.LCIAMethodID == lciaMethodId))
                         {
-                            var score = scores
-                                .Where(x => x.LCIAMethodID == lciaMethodItem.LCIAMethodID)
-                                .Select(x => new ScoreCache
-                                    {
-                                        ImpactScore = Convert.ToDouble(x.Result)
-                                    }).FirstOrDefault();
-
-                            impactScore = Convert.ToDouble(score.ImpactScore);
+                            double score = scores
+                                .Where(x => x.LCIAMethodID == lciaMethodId)
+                                .Select(x => Convert.ToDouble(x.Result)).FirstOrDefault();
 
                             //ScoreCache scoreCache = new ScoreCache();
                             //scoreCache.ScenarioID = fragmentNode.ScenarioID;
@@ -467,8 +461,8 @@ namespace CalRecycleLCA.Services
                             {
                                 ScenarioID = fragmentNode.ScenarioID,
                                 FragmentFlowID = fragmentFlowId,
-                                LCIAMethodID = lciaMethodItem.LCIAMethodID,
-                                ImpactScore = impactScore
+                                LCIAMethodID = lciaMethodId,
+                                ImpactScore = score
                             });
 
                         }
@@ -483,9 +477,9 @@ namespace CalRecycleLCA.Services
 
                     break;
                 case 2:
-                    foreach (var lciaMethodItem in needLciaMethods)
+                    foreach (var lciaMethodId in needLciaMethods)
                     {
-                        var lcias = FragmentLCIA(fragmentNode.SubFragmentID, fragmentNode.ScenarioID, lciaMethodItem.LCIAMethodID);
+                        var lcias = FragmentLCIA(fragmentNode.SubFragmentID, fragmentNode.ScenarioID, lciaMethodId);
 
                         /*
                         if (lcias != null)
@@ -512,7 +506,7 @@ namespace CalRecycleLCA.Services
                         {
                             ScenarioID = fragmentNode.ScenarioID,
                             FragmentFlowID = fragmentFlowId,
-                            LCIAMethodID = lciaMethodItem.LCIAMethodID,
+                            LCIAMethodID = lciaMethodId,
                             ImpactScore = Convert.ToDouble(lcias.Sum(a => a.Result))
                         });
                     }

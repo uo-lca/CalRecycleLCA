@@ -12,8 +12,8 @@ namespace CalRecycleLCA.Services
     {
         IEnumerable<InventoryModel> ComputeProcessLCI(int? processId, int? scenarioId);
         IEnumerable<ProcessFlow> ComputeProcessDissipation(int processId, int scenarioId);
-        IEnumerable<LCIAModel> ComputeProcessLCIA(IEnumerable<InventoryModel> inventory, LCIAMethod lciaMethodItem, int? scenarioId);
-        IEnumerable<FragmentLCIAModel> LCIACompute(int processId, int scenarioId);
-        IEnumerable<FragmentLCIAModel> ProcessLCIA(int? processId, IEnumerable<LCIAMethod> lciaMethods, int? scenarioId);
+        //IEnumerable<LCIAModel> ComputeProcessLCIA(IEnumerable<InventoryModel> inventory, LCIAMethod lciaMethodItem, int? scenarioId);
+        IEnumerable<LCIAModel> LCIACompute(int processId, int scenarioId);
+        IEnumerable<LCIAModel> ProcessLCIA(int? processId, IEnumerable<int> lciaMethods, int? scenarioId);
     }
 }
