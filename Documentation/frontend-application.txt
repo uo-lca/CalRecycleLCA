@@ -1,4 +1,74 @@
-===============================================================================
+======================================================================================================================
+Wed Jan 14 2015
+
+Summary of UI discussions today and Monday.
+
+==========
+Parameters
+==========
+
+No need to display Param Type or Name.
+List of all scenario parameters should display type and name of related resource(s).
+
+Parameters can be added, deleted, and updated in views of related data.
+
+Param Type          Related Data
+----------          --------------
+10                  LCIA Characterization Factors
+1                   Fragment Flows (with Process Node parent)
+10, 6, 8            Process LCIA details
+
+UI for making parameter changes should be consistent across views.
+Display table where each row has related entity name(s), base value, param value, and button to delete param.
+Should be able to sort table by column.
+Ideally, user would be able to create param and update value of param in the table row,
+without navigation to another view.
+
+-----
+Issue
+-----
+Web API and UI would be simple if parameters could be added, updated, and deleted individually. However, that is
+inefficient if backend rebuilds cache after every change. BK will explore alternatives.
+
+===============
+Fragment Sankey
+===============
+
+This view should have a scenario selector. Then, a route to the view could appear in top-level navigation bar.
+Name it "Fragment Flows".
+
+Remove background flows?
+
+User should be able to navigate from a fragment process node to a table of child fragment flows that includes related
+dependency params. User should be able to add, update, and delete dependency params in that view.
+
+Since there is more than one navigation route from a process node, put links in the tool tip for
+ * Process LCIA
+ * Dependency Params
+
+-----------------
+New Fragment View
+-----------------
+Displays fragment structure in node-link graph.
+Has fragment navigation capability.
+
+Not sure this view is still needed since we decided to add a route to fragment flow dependency params from the
+sankey view.
+
+=============
+Process LCIA
+=============
+
+Bar Chart Legend - remove Param column. Add Factor, Quantity columns.
+Use bold font on every value that is derived from parameter.
+
+Add Details button to each panel where LCIA result details are available.
+Detailed Process LCIA view includes a row for every result detail (including very small and negative values).
+Each row displays LCIA Factor, Process Flow Quantity values + related param values.
+Activity level is not applied in this view.
+Params can be added, updated and deleted. Impact of changes will be seen when user returns to Process LCIA view.
+
+======================================================================================================================
 Thur Dec 11 2014
 by SB
 
