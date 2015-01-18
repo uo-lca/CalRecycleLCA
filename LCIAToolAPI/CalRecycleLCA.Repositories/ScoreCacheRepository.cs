@@ -12,7 +12,7 @@ namespace CalRecycleLCA.Repositories
     {
         public static void ClearScoreCacheByScenario(this IRepositoryAsync<ScoreCache> repository, int scenarioId)
         {
-            var scoreCaches = repository.GetRepository<ScoreCache>().Queryable().Where(sc => sc.ScenarioID == scenarioId).ToList();
+            var scoreCaches = repository.Queryable().Where(sc => sc.ScenarioID == scenarioId).ToList();
 
             scoreCaches.ForEach(x =>
             {
@@ -69,6 +69,14 @@ namespace CalRecycleLCA.Repositories
             {
                 repository.Delete(x.ScoreCacheID);
             });
+        }
+
+        public static IEnumerable<ScoreCache> GetScenarioCaches(this IRepositoryAsync<ScoreCache> repository, int fragmentId, int scenarioId)
+        {
+            return repository.Queryable()
+                .Where(sc => sc.ScenarioID == scenarioId)
+                .Where(sc => sc.FragmentFlow.FragmentID == fragmentId);
+                
         }
     }
 }

@@ -30,8 +30,6 @@ namespace CalRecycleLCA.Services
         // LcaDataModel services
         //
         [Inject]
-        private readonly ICategoryService _CategoryService;
-        [Inject]
         private readonly IClassificationService _ClassificationService;
         [Inject]
         private readonly IFragmentService _FragmentService;
@@ -62,24 +60,14 @@ namespace CalRecycleLCA.Services
         [Inject]
         private readonly IParamService _ParamService;
         [Inject]
-        private readonly IDependencyParamService _DependencyParamService;
-        [Inject]
         private readonly IFlowFlowPropertyService _FlowFlowPropertyService;
         [Inject]
-        private readonly IFlowPropertyParamService _FlowPropertyParamService;
-        [Inject]
-        private readonly IProcessEmissionParamService _ProcessEmissionParamService;
-        [Inject]
         private readonly ILCIAService _LCIAService;
-        [Inject]
-        private readonly ICharacterizationParamService _CharacterizationParamService;
         [Inject]
         private readonly IUnitOfWork _unitOfWork;
         //
         // Traversal and Computation components
         //
-        [Inject]
-        private readonly IFragmentTraversalV2 _FragmentTraversalV2;
         [Inject]
         private readonly IFragmentLCIAComputation _FragmentLCIAComputation;
         [Inject]
@@ -101,12 +89,10 @@ namespace CalRecycleLCA.Services
         /// Constructor for use with Ninject dependency injection
         /// </summary>
         public ResourceServiceFacade(
-                               ICategoryService categoryService,
                                IClassificationService classificationService,
                                IFragmentService fragmentService,
                                IFragmentFlowService fragmentFlowService,
-                               IFragmentStageService fragmentStageService,   
-                               IFragmentTraversalV2 fragmentTraversalV2,
+                               IFragmentStageService fragmentStageService,
                                IFragmentLCIAComputation fragmentLCIAComputation,
                                IFlowService flowService,
                                IFlowPropertyService flowPropertyService,
@@ -120,21 +106,15 @@ namespace CalRecycleLCA.Services
                                INodeCacheService nodeCacheService,
                                IScoreCacheService scoreCacheService,
                                IParamService paramService,
-                               IDependencyParamService dependencyParamService,
                                IFlowFlowPropertyService flowFlowPropertyService,
-                               IFlowPropertyParamService flowPropertyParamService,
-                               IProcessEmissionParamService processEmissionParamService,
                                ILCIAService lciaService,
-                               ICharacterizationParamService characterizationParamService,
                                IUnitOfWork unitOfWork) 
         {
-            _CategoryService = verifiedDependency(categoryService);
             _ClassificationService = verifiedDependency(classificationService);
             _FragmentService = verifiedDependency(fragmentService);
             _FragmentFlowService = verifiedDependency(fragmentFlowService);
             _FragmentStageService = verifiedDependency(fragmentStageService);
             _FragmentLCIAComputation = verifiedDependency(fragmentLCIAComputation);
-            _FragmentTraversalV2 = verifiedDependency(fragmentTraversalV2);         
             _FlowService = verifiedDependency(flowService);
             _FlowPropertyService = verifiedDependency(flowPropertyService);
             _FlowTypeService = verifiedDependency(flowTypeService);
@@ -147,12 +127,8 @@ namespace CalRecycleLCA.Services
             _NodeCacheService = verifiedDependency(nodeCacheService);
             _ScoreCacheService = verifiedDependency(scoreCacheService);
             _ParamService = verifiedDependency(paramService);
-            _DependencyParamService = verifiedDependency(dependencyParamService);
             _FlowFlowPropertyService = verifiedDependency(flowFlowPropertyService);
-            _FlowPropertyParamService = verifiedDependency(flowPropertyParamService);
-            _ProcessEmissionParamService = verifiedDependency(processEmissionParamService);
             _LCIAService = verifiedDependency(lciaService);
-            _CharacterizationParamService = verifiedDependency(characterizationParamService);
             _unitOfWork = verifiedDependency(unitOfWork);
         }
         #endregion
@@ -505,7 +481,7 @@ namespace CalRecycleLCA.Services
         public IEnumerable<FragmentFlowResource> GetFragmentFlowResources(int fragmentID, int scenarioID = Scenario.MODEL_BASE_CASE_ID) {
             /// NEED FIX--> terminate nodes in repository layer; eager-fetch only scenario NodeCaches
             /// see http://stackoverflow.com/questions/19386501/linq-to-entities-include-where-method
-            _FragmentTraversalV2.Traverse(fragmentID, scenarioID);
+            _FragmentLCIAComputation.FragmentTraverse(fragmentID, scenarioID);
             var test = _FragmentFlowService.GetTerminatedFlows(fragmentID, scenarioID)
                 .ToList();
             foreach (var ff in test)
@@ -890,9 +866,11 @@ namespace CalRecycleLCA.Services
         /// </summary>
         public void ClearScoreCacheByScenario(int scenarioId)
         {
+            //_unitOfWork.SetAutoDetectChanges(false); 
             CacheTracker cacheTracker = new CacheTracker();
             cacheTracker.ScoreCacheStale = true;
             ImplementScenarioChanges(scenarioId, cacheTracker);
+            //_unitOfWork.SetAutoDetectChanges(true);
         }
 
         /*
@@ -917,8 +895,10 @@ namespace CalRecycleLCA.Services
 
         private void ImplementScenarioChanges(int scenarioId, CacheTracker cacheTracker)
         {
+            var sw = new CounterTimer();
+            sw.CStart();
             // first, we do the most surgical operations: clear LCIA method-specific results
-            //_unitOfWork.SetAutoDetectChanges(false);
+            _unitOfWork.SetAutoDetectChanges(false);
             if (cacheTracker.LCIAMethodsStale != null)
             {
                 cacheTracker.Recompute = true; // set this explicitly
@@ -927,22 +907,28 @@ namespace CalRecycleLCA.Services
                     _ScoreCacheService.ClearScoreCacheByScenarioAndLCIAMethod(scenarioId, method);
                 }
             }
+            sw.Click("methods");
             if (cacheTracker.NodeCacheStale)
             {
                 // next, clear all computed fragment scores
                 _ScoreCacheService.ClearScoreCacheForSubFragments(scenarioId);
                 _NodeCacheService.ClearNodeCacheByScenario(scenarioId);
             }
+            sw.Click("node");
             if (cacheTracker.ScoreCacheStale)
                 _ScoreCacheService.ClearScoreCacheByScenario(scenarioId);
 
-            //_unitOfWork.SetAutoDetectChanges(true);
+            sw.Click("score");
             _unitOfWork.SaveChanges(); // update database with changes
+            _unitOfWork.SetAutoDetectChanges(true);
+            sw.Click("save");
             if (cacheTracker.Recompute)
             {
                 int tlf = _ScenarioService.Query(k => k.ScenarioID == scenarioId).Select(k => k.TopLevelFragmentID).First();
-                _FragmentLCIAComputation.FragmentLCIACompute(tlf, scenarioId);
+                _FragmentLCIAComputation.FragmentLCIAComputeSave(tlf, scenarioId);
             }
+            sw.CStop();
+            return;
         }
 
         private ScenarioResource CheckTopLevelFragment(ScenarioResource scenario)
@@ -992,7 +978,7 @@ namespace CalRecycleLCA.Services
             postScenario.ScenarioGroupID = scenarioGroupId;
             Scenario newScenario = _ScenarioService.NewScenario(postScenario);
             _unitOfWork.SaveChanges();
-            _FragmentLCIAComputation.FragmentLCIACompute(newScenario.TopLevelFragmentID, newScenario.ScenarioID);
+            _FragmentLCIAComputation.FragmentLCIAComputeSave(newScenario.TopLevelFragmentID, newScenario.ScenarioID);
             return newScenario.ScenarioID;
         }
 

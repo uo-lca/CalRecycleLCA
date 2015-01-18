@@ -26,10 +26,8 @@ namespace CalRecycleLCA.Services
         private readonly IFlowFlowPropertyService _flowFlowPropertyService;
         [Inject]
         private readonly IDependencyParamService _dependencyParamService;
-        [Inject]
-        private readonly IUnitOfWork _unitOfWork;
 
-        private List<NodeCache> nodeCaches;
+        private List<NodeCacheModel> nodeCaches;
 
 
         public FragmentTraversalV2(
@@ -37,18 +35,17 @@ namespace CalRecycleLCA.Services
             INodeCacheService nodeCacheService,
             IProcessFlowService processFlowService,
             IFlowFlowPropertyService flowFlowPropertyService,
-            IDependencyParamService dependencyParamService,
-            IUnitOfWork unitOfWork)
+            IDependencyParamService dependencyParamService)
         {
             _fragmentFlowService = fragmentFlowService;
             _nodeCacheService = nodeCacheService;
             _processFlowService = processFlowService;
             _flowFlowPropertyService = flowFlowPropertyService;
             _dependencyParamService = dependencyParamService;
-            _unitOfWork = unitOfWork;
+
+            nodeCaches = new List<NodeCacheModel>();
+
         }
-
-
 
         /// <summary>
         /// Traverse a fragment by recursively following fragmentflow links.
@@ -59,41 +56,20 @@ namespace CalRecycleLCA.Services
         /// <param name="fragmentId"></param>
         /// <param name="scenarioId"></param>
         /// <returns></returns>
-        public bool Traverse(int fragmentId, int scenarioId = Scenario.MODEL_BASE_CASE_ID)
+        public IEnumerable<NodeCacheModel> Traverse(int fragmentId, int scenarioId = Scenario.MODEL_BASE_CASE_ID)
         {
-            nodeCaches = new List<NodeCache>();
+            // we only enter this function if traversal is required.
 
             var fragmentFlows = _fragmentFlowService.LGetFlowsByFragment(fragmentId);
             var dependencyParams = _dependencyParamService.Query(dp => dp.Param.ScenarioID == scenarioId).Select().ToList();
 
             float activity = 1;
 
-            int refFlow = fragmentFlows.Where(k => k.ParentFragmentFlowID == null).First().FragmentFlowID;
+            int refFlow = fragmentFlows.Where(k => k.ParentFragmentFlowID == null).Select(k => k.FragmentFlowID).First();
 
-            var chk = _nodeCacheService
-                .Query(q => q.FragmentFlowID == refFlow && q.ScenarioID == scenarioId)
-                .Select()
-                .Count();
+            NodeRecurse(fragmentFlows, dependencyParams, refFlow, scenarioId, activity);
 
-            if (chk == 0)
-            {
-                _unitOfWork.SetAutoDetectChanges(false);
-                NodeRecurse(fragmentFlows, dependencyParams, refFlow, scenarioId, activity);
-
-                foreach (var nodeCache in nodeCaches)
-                {
-                    nodeCache.ObjectState = ObjectState.Added;
-                }
-                _nodeCacheService.InsertGraphRange(nodeCaches);
-                _unitOfWork.SaveChanges();
-                _unitOfWork.SetAutoDetectChanges(true);
-                return true;
-            }
-            else
-            {
-                return false;
-            }
-
+            return nodeCaches;
 
         }
 
@@ -110,6 +86,10 @@ namespace CalRecycleLCA.Services
                                 IEnumerable<DependencyParam> ff_param,
                                 int fragmentFlowId, int scenarioId, double flowMagnitude)
         {
+            // TODO: enable the following and remove IsCached check in GetScenarioProductFlows
+            //if (nodeCaches.Any(n => n.FragmentFlowID == fragmentFlowId))
+              //  return; // bail out!
+
             var theFragmentFlow = _fragmentFlowService.GetResource(ff
                 .Where(k => k.FragmentFlowID == fragmentFlowId).First());
             
@@ -150,13 +130,6 @@ namespace CalRecycleLCA.Services
                 // reconciliation error.
                 // interim solution: relax the reconciliation requirement as long as there are
                 // more outFlows than outLinks. (i.e. allow unlinked outFlows to be cutoff)
-                // Background: when designing fragments in Matlab, I allowed the user to exclude 
-                // process flows that were not desired to be included in the fragment, rendering 
-                // them in effect as cutoff flows.
-                // Problem: during traversal, these flows will still show up in outFlows, causing 
-                // reconciliation error.
-                // interim solution: relax the reconciliation requirement as long as there are
-                // more outFlows than outLinks. (i.e. allow unlinked outFlows to be treated as cutoffs)
                 if (outLinks.Count() > outFlows.Count()) // TODO -- this should be !=
                 {
                     throw new ArgumentException("OutFlows and OutLinks don't reconcile!");
@@ -189,8 +162,12 @@ namespace CalRecycleLCA.Services
             //_nodeCacheService.InsertOrUpdateGraph(nodeCache);
 
             
-            nodeCaches.Add(new NodeCache()
+            nodeCaches.Add(new NodeCacheModel()
             {
+                FragmentID = theFragmentFlow.FragmentID,
+                NodeTypeID = theFragmentFlow.NodeTypeID,
+                FlowID = theFragmentFlow.FlowID,
+                DirectionID = theFragmentFlow.DirectionID,
                 FragmentFlowID = fragmentFlowId,
                 ScenarioID = scenarioId,
                 FlowMagnitude = flowMagnitude,
@@ -230,18 +207,27 @@ namespace CalRecycleLCA.Services
                     }
                 case 2:
                     {
-                        IFragmentTraversalV2 recursive_traversal = new FragmentTraversalV2(_fragmentFlowService,
-                            _nodeCacheService,
-                            _processFlowService,
-                            _flowFlowPropertyService,
-                            _dependencyParamService,
-                            _unitOfWork);
-                        // fragment-- all together
-                        // first, traverse the fragment -- store results in cache
-                        recursive_traversal.Traverse((int)term.SubFragmentID, term.ScenarioID);
-                        // access the cache to determine outflow amounts
-                        Outflows = _fragmentFlowService.GetDependencies((int)term.SubFragmentID,term.TermFlowID,ex_directionId,
-                            out flow_exch, term.ScenarioID);
+                        // does the subfragment exist in the cache? if so, use that
+                        if (_nodeCacheService.IsCached((int)term.SubFragmentID,term.ScenarioID))
+                            Outflows = _fragmentFlowService.GetDependencies((int)term.SubFragmentID, term.TermFlowID, ex_directionId,
+                                out flow_exch, term.ScenarioID);
+                        else
+                        {
+                            // have we already traversed this subfragment in this unit of work?
+                            int subFragRefFlow = _fragmentFlowService
+                                .Query(k => k.FragmentID == term.SubFragmentID && k.ParentFragmentFlowID == null)
+                                .Select(k => k.FragmentFlowID).First();
+                            if (!nodeCaches.Any(k => k.FragmentFlowID == subFragRefFlow))
+                            {
+                                // if not, we need to
+                                Traverse((int)term.SubFragmentID, term.ScenarioID);
+                            }
+                            // access the cache to determine outflow amounts
+                            //Outflows = _fragmentFlowService.GetDependencies((int)term.SubFragmentID,term.TermFlowID,ex_directionId,
+                            //    out flow_exch, term.ScenarioID);
+                            Outflows = GetDependencies((int)term.SubFragmentID, term.TermFlowID, ex_directionId,
+                                out flow_exch, term.ScenarioID);
+                        }
                         break;
                     }
                 default:
@@ -252,208 +238,64 @@ namespace CalRecycleLCA.Services
                     }
             }
             return Outflows;
-        }            
-            
-    }
-}
-
-
-/* *********************
-        public IEnumerable<NodeFlowModel> GetScenarioProductFlows(IEnumerable<FragmentFlow> theFragmentFlow, int scenarioId)
-        {
-            int nodeTypeID = Convert.ToInt32(theFragmentFlow.Select(x => x.NodeTypeID).FirstOrDefault());
-            int theFragmentFlowId = theFragmentFlow.Select(x => x.FragmentFlowID).FirstOrDefault();
-            int? fragmentId = theFragmentFlow.FirstOrDefault().FragmentID;
-
-            IEnumerable<NodeFlowModel> nodeFlowModel = null;
-
-            switch (nodeTypeID)
-            {
-                case 1: //process
-
-                    //get the process id
-                    int? processId = _fragmentNodeProcessService.GetFragmentNodeProcessId(theFragmentFlowId).ProcessID;
-
-                    //old query for processId before I implemented extension method to query for ProcessID, SubFragmentID and TermFlowID
-                    //int? processId = theFragmentFlow
-                    //    .Join(_fragmentNodeProcessService.Queryable(), p => p.FragmentFlowID, pc => pc.FragmentFlowID, (p, pc) => new { p, pc })
-                    //    .FirstOrDefault()
-                    //    .pc.ProcessID;
-                    ////also needs left outer join on substitution but we don't have those tables yet.
-                    ////add this later when the substitution tables have been added
-                    ////if Subs is not null
-                    ////    process_id = Subs;
-                    ////else
-                    ////    process_id = Default;
-
-                    nodeFlowModel = _processFlowService.Queryable()
-                        .Join(_flowService.Queryable(), p => p.FlowID, pc => pc.FlowID, (p, pc) => new { p, pc })
-                        .Where(x => x.p.ProcessID == processId)
-                        .Where(x => x.pc.FlowTypeID == 1)
-                          .Select(nfm => new NodeFlowModel
-                          {
-                              FlowID = nfm.p.FlowID,
-                              DirectionID = nfm.p.DirectionID,
-                              Result = nfm.p.Result
-                          });
-
-
-
-                    break;
-                case 3:
-                case 4: //InputOutput and Background
-
-                    var updatedirection = theFragmentFlow.Select(x => x.DirectionID).FirstOrDefault();
-
-                    switch (updatedirection)
-                    {
-                        case 1:
-                            updatedirection = 2;
-                            break;
-                        case 2:
-                            updatedirection = 1;
-                            break;
-                    }
-
-                    nodeFlowModel = theFragmentFlow.Select(t => new NodeFlowModel
-                    {
-                        FlowID = t.FlowID,
-                        DirectionID = updatedirection,
-                        Result = 1
-                    });
-                    break;
-                case 2: //fragment
-
-                    //get the sub fragment id
-                    int? subFragmentId = _fragmentNodeFragmentService.GetFragmentNodeSubFragmentId(theFragmentFlowId).SubFragmentID;
-
-                    ////old query for subFragmentId before I implemented extension method to query for ProcessID, SubFragmentID and TermFlowID
-                    //int? subFragmentId = theFragmentFlow
-                    //    .Join(_fragmentNodeFragmentService.Queryable(), p => p.FragmentFlowID, pc => pc.FragmentFlowID, (p, pc) => new { p, pc })
-                    //    .FirstOrDefault()
-                    //    .pc.SubFragmentID;
-                    ////also needs left outer join on substitution but we don't have those tables yet.
-                    ////add this later when the substitution tables have been added
-                    ////if Subs is not null
-                    ////fragment_id = Subs;
-                    ////else
-                    ////fragment_id = Default;
-
-
-
-
-                    Traverse(subFragmentId, scenarioId);
-
-
-                    var fragmentNodeFlows = _fragmentFlowService.Queryable().ToList()
-                         .Where(x => x.FragmentFlowID == theFragmentFlow.Select(y => y.FragmentFlowID).FirstOrDefault())
-                        //.Where(x => x.FragmentID == fragmentId)
-                        .Join(_fragmentNodeFragmentService.Queryable(), p => p.FragmentFlowID, pc => pc.FragmentFlowID, (p, pc) => new { p, pc })
-
-                        .Join(_fragmentService.Queryable(), p => p.pc.SubFragmentID, pc => pc.FragmentID, (p, pc) => new { p, pc })
-                         .Select(a => new NodeFlowModel
-                    {
-                        FragmentFlowID = a.pc.ReferenceFragmentFlowID,
-                        FlowID = a.p.pc.FlowID,
-                        DirectionID = a.p.p.DirectionID,
-                        FragmentID = a.p.p.FragmentID,
-                        NodeTypeID = a.p.p.NodeTypeID
-                    })
-                    .Union(_fragmentFlowService.Queryable().Select(
-                    b => new NodeFlowModel
-                    {
-                        FragmentFlowID = b.FragmentFlowID,
-                        FlowID = b.FlowID,
-                        DirectionID = b.DirectionID,
-                        FragmentID = b.FragmentID,
-                        NodeTypeID = b.NodeTypeID
-                    })
-                    .Where(x => x.FragmentID == subFragmentId && x.NodeTypeID == 3))
-                    .ToList();
-
-
-                   
-
-                    // next we need to modify the table to fix the reference flow (FlowID = null) and
-                    // make it appear like an InputOutput flow
-                    fragmentNodeFlows = fragmentNodeFlows.ToList();
-                    foreach (var item in fragmentNodeFlows)
-                    {
-                        if (item.FragmentID == fragmentId)
-                        {
-                            switch (item.DirectionID)
-                            {
-                                case 1:
-                                    item.DirectionID = 2;
-                                    break;
-                                case 2:
-                                    item.DirectionID = 1;
-                                    break;
-                            }
-                        }
-                    }
-
-                    nodeFlowModel = fragmentNodeFlows
-                        .Join(_nodeCacheService.Queryable(), p => p.FragmentFlowID, pc => pc.FragmentFlowID, (p, pc) => new { p, pc })
-                        .Where(x => x.pc.ScenarioID == scenarioId)
-             .GroupBy(t => new
-             {
-                 t.p.FlowID,
-                 t.p.DirectionID,
-                 t.pc.FlowMagnitude,
-                 t.pc.FragmentFlowID
-             })
-             .Select(group => new NodeFlowModel
-             {
-                 FlowID = group.Key.FlowID,
-                 DirectionID = group.Key.DirectionID,
-                 Result = group.Sum(a => a.pc.FlowMagnitude),
-                 FragmentFlowID = group.Key.FragmentFlowID
-             });
-
-                    break;
-
-            }
-
-            return nodeFlowModel;
-
         }
 
-        public int? GetTermFlow(IEnumerable<FragmentFlow> theFragmentFlow)
+
+        private static int comp(int direction)
         {
-            int nodeTypeID = Convert.ToInt32(theFragmentFlow.Select(x => x.NodeTypeID).FirstOrDefault());
-            int theFragmentFlowId = theFragmentFlow.Select(x => x.FragmentFlowID).FirstOrDefault();
+            int compdir = 1;
+            if (direction == 1)
+                compdir = 2;
+            return compdir;
+        }
 
-            int? termFlowId = 0;
-            switch (nodeTypeID)
-            {
-                case 3:
-                case 4:
-                    termFlowId = theFragmentFlow.Select(x => x.FlowID).FirstOrDefault();
-                    break;
 
-                case 1:
-                    termFlowId = _fragmentNodeProcessService.GetFragmentNodeProcessId(theFragmentFlowId).TermFlowID;
+        private IEnumerable<InventoryModel> GetDependencies(int fragmentId, int flowId, int ex_directionId,
+            out double inFlowMagnitude, int scenarioId = Scenario.MODEL_BASE_CASE_ID)
+        {
+            // private re-implementation of _FragmentFlowService.GetDependencies that uses local nodeCaches
+            var fragRefFlow = _fragmentFlowService.GetInFlow(fragmentId);
 
-                    ////old query for termFlowId before I implemented extension method to query for ProcessID, SubFragmentID and TermFlowID
-                    //var termFlowProcess = theFragmentFlow.Join(_fragmentNodeProcessService.Queryable(), p => p.FragmentFlowID, pc => pc.FragmentFlowID, (p, pc) => new { p, pc })
-                    //.Select(x => x.pc.FlowID).FirstOrDefault();
-                    //termFlowId = Convert.ToInt32(termFlowProcess.Value);
-                    break;
+            var Outflows = nodeCaches
+                .Where(ff => ff.FragmentID == fragmentId) // fragment flows belonging to this fragment
+                .Where(ff => ff.FlowID != null)           // reference flow (null FlowID) is .Unioned below
+                .Where(ff => ff.NodeTypeID == 3)          // of type InputOutput
+                .Select(a => new InventoryModel
+                    {
+                        FlowID = (int)a.FlowID,
+                        DirectionID = a.DirectionID,
+                        Result = a.FlowMagnitude
+                    }).ToList()                         // into List<InventoryModel>
+                .Union(new List<InventoryModel> { fragRefFlow }) // add fragment ReferenceFlow
+                .GroupBy(a => new                   // group by Flow and Direction
+                    {
+                        a.FlowID,
+                        a.DirectionID
+                    })
+                .Select(group => new InventoryModel
+                    {
+                        FlowID = group.Key.FlowID,
+                        DirectionID = group.Key.DirectionID,
+                        Result = group.Sum(a => a.Result)
+                    }).ToList();
 
-                case 2:
-                    termFlowId = _fragmentNodeFragmentService.GetFragmentNodeSubFragmentId(theFragmentFlowId).TermFlowID;
+            var myDirectionId = comp(ex_directionId);
 
-                    //old query for termFlowId before I implemented extension method to query for ProcessID, SubFragmentID and TermFlowID
-                    //var termFlowFragment = theFragmentFlow.Join(_fragmentNodeFragmentService.Queryable(), p => p.FragmentFlowID, pc => pc.FragmentFlowID, (p, pc) => new { p, pc })
-                    //.Select(x => x.pc.FlowID).FirstOrDefault();
-                    //termFlowId = Convert.ToInt32(termFlowFragment.Value);
-                    break;
-            }
+            // next thing to do is pull out the out inFlowMagnitude
+            var inFlow = Outflows.Where(o => o.FlowID == flowId)
+                .Where(o => o.DirectionID == myDirectionId).First();
 
-            return termFlowId;
+            inFlowMagnitude = (double)inFlow.Result; // out param
+
+            // short-circuit OR is correct: only exclude flows where both filters match
+            var cropOutflows = Outflows.Where(p => p.FlowID != inFlow.FlowID || p.DirectionID !=inFlow.DirectionID);
+
+            if ( (1 + cropOutflows.Count()) != Outflows.Count())
+                throw new ArgumentException("No inFlow found to exclude!");
+
+            return cropOutflows;
 
         }
     }
 }
-*************** */
+

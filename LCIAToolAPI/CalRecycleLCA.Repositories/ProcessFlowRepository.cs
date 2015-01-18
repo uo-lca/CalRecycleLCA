@@ -16,12 +16,17 @@ namespace CalRecycleLCA.Repositories
         public static double? FlowExchange(this IRepositoryAsync<ProcessFlow> repository,
 					  int processId, int flowId, int ex_directionId)
         {
+            return repository.Queryable()
+                .Where(pf => pf.ProcessID == processId)
+                .Where(pf => pf.FlowID == flowId)
+                .Where(pf => pf.DirectionID != ex_directionId)
+                .Select(pf => pf.Result).FirstOrDefault();
+            /* *********
             var my_val = repository.Query(pf => pf.ProcessID == processId)
                 .Select()
                 .Where(pf => pf.FlowID == flowId)
-		        .Where(pf => pf.DirectionID != ex_directionId).FirstOrDefault();
+                .Where(pf => pf.DirectionID != ex_directionId).FirstOrDefault();
 
-            /* *********
                 if (scenarioId != Scenario.MODEL_BASE_CASE_ID && pf.Flow.FlowTypeID == 2) // params only apply to elem flows
                 {
                     var pf_param = repository.GetRepository<FlowPropertyParam>()
@@ -35,7 +40,7 @@ namespace CalRecycleLCA.Repositories
                 }
             ***** */
 
-            return my_val.Result;
+            //return my_val.Result;
         }
 
         /// <summary>
@@ -50,10 +55,12 @@ namespace CalRecycleLCA.Repositories
         public static IEnumerable<ProcessFlow> GetProductFlows(this IRepositoryAsync<ProcessFlow> repository,
             int processId)
         {
-            
-            var Outflows = repository.Query(pf => pf.ProcessID == processId).Include(pf => pf.Flow).Select()
+            return repository.Queryable()
+                .Where(pf => pf.ProcessID == processId)
                 .Where(pf => pf.Flow.FlowTypeID == 1).ToList();
-            return Outflows;
+            //var Outflows = repository.Query(pf => pf.ProcessID == processId).Include(pf => pf.Flow).Select()
+            //    .Where(pf => pf.Flow.FlowTypeID == 1).ToList();
+            //return Outflows;
 
         }
 

@@ -94,21 +94,39 @@ namespace LCAToolAPI.API
         }
 
         /// <summary>
-        /// api/fragments/{FragmentID}/scenarios/{scenarioID}/compute
-        /// Diagnostic function to trigger cache population for a given fragment + scenario
-        /// This should be made non-accessible and replaced with automatic backend computation. see #101
+        /// Diagnostic function to compute score cache entries for a given fragment and scenario
+        /// but not write them to the cache.
+        /// </summary>
+        /// <param name="fragmentId"></param>
+        /// <param name="scenarioId"></param>
+        [Route("api/fragments/{FragmentID}/scenarios/{scenarioID}/lcia")]
+        [System.Web.Http.AcceptVerbs("GET", "POST")]
+        [System.Web.Http.HttpGet]
+        public IEnumerable<ScoreCache> LCIAFragmentCompute(int fragmentId, int scenarioId)
+        {
+            var sw = Stopwatch.StartNew();
+            var scores = _fragmentLCIAComputation.FragmentLCIAComputeNoSave(fragmentId, scenarioId);
+            sw.Stop();
+            return scores;
+        }
+
+        /// <summary>
+        /// Diagnostic function to compute a fragment and write both traversal and LCIA results to cache
+        /// as needed.  This should be used for testing only; user-generated scenarios should be computed 
+        /// via the UpdateScenario mechanism in ResourceServiceFacade; base scenarios should be populated
+        /// at initialization (TODO) and never deleted.
         /// </summary>
         /// <param name="fragmentId"></param>
         /// <param name="scenarioId"></param>
         [Route("api/fragments/{FragmentID}/scenarios/{scenarioID}/compute")]
         [System.Web.Http.AcceptVerbs("GET", "POST")]
         [System.Web.Http.HttpGet]
-        public void LCIAFragmentCompute(int fragmentId, int scenarioId)
+        public void LCIAFragmentComputeSave(int fragmentId, int scenarioId)
         {
             var sw = Stopwatch.StartNew();
-            _fragmentLCIAComputation.FragmentLCIACompute(fragmentId, scenarioId);
+            _fragmentLCIAComputation.FragmentLCIAComputeSave(fragmentId, scenarioId);
             sw.Stop();
-            return;
+            return;// scores;
         }
 
         // Diagnostic functions

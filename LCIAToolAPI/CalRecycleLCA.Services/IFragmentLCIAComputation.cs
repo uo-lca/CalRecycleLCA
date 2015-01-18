@@ -10,7 +10,9 @@ namespace CalRecycleLCA.Services
 {
     public interface IFragmentLCIAComputation
     {
-        void FragmentLCIACompute(int fragmentId, int scenarioId);
+        IEnumerable<NodeCache> FragmentTraverse(int fragmentId, int scenarioId = Scenario.MODEL_BASE_CASE_ID);
+        IEnumerable<ScoreCache> FragmentLCIAComputeNoSave(int fragmentId, int scenarioId);
+        void FragmentLCIAComputeSave(int fragmentId, int scenarioId);
         //void FragmentFlowLCIA(int? fragmentId, int scenarioId, IEnumerable<int> lciaMethods);
         IEnumerable<FragmentLCIAModel> FragmentLCIA(int? fragmentId, int? scenarioId, int? lciaMethodId);
     }

@@ -40,5 +40,22 @@ namespace CalRecycleLCA.Repositories
                 repository.Delete(x.NodeCache.NodeCacheID);
             });
         }
+
+        /// <summary>
+        /// Uses the fragment's reference flow as an indicator that the fragment has been traversed
+        /// </summary>
+        /// <param name="repository"></param>
+        /// <param name="fragmentId"></param>
+        /// <param name="scenarioId"></param>
+        /// <returns></returns>
+        public static bool IsCached(this IRepositoryAsync<NodeCache> repository, int fragmentId, int scenarioId)
+        {
+            var refFlow = repository.GetRepository<FragmentFlow>().Queryable()
+                .Where(ff => ff.FragmentID == fragmentId)
+                .Where(ff => ff.ParentFragmentFlowID == null)
+                .Select(ff => ff.FragmentFlowID).First();
+            return (repository.Query(k => k.FragmentFlowID == refFlow && k.ScenarioID == scenarioId)
+                .Select().ToList().Count() > 0);
+        }
     }
 }

@@ -187,36 +187,22 @@ namespace LCIAToolAPI.Tests
 
             //methods that resource service facade is dependent on.
             _fragmentTraversalV2 = new FragmentTraversalV2(
-_fragmentFlowService,
-_nodeCacheService,
-_processFlowService,
-_flowFlowPropertyService,
-_dependencyParamService,
-_unitOfWork);
+                _fragmentFlowService,
+                _nodeCacheService,
+                _processFlowService,
+                _flowFlowPropertyService,
+                _dependencyParamService);
 
-            _fragmentLCIAComputation = new FragmentLCIAComputation(_fragmentFlowService,
-            _scoreCacheService,
-            _nodeCacheService,
+            _fragmentLCIAComputation = new FragmentLCIAComputation(_fragmentTraversalV2,
+                _lciaComputation,
+                _fragmentFlowService,
+                _scoreCacheService,
+                _nodeCacheService,
             //_fragmentNodeProcessService,
             //_processSubstitutionService,
             //_fragmentNodeFragmentService,
             //_fragmentSubstitutionService,
-            _lciaMethodService,
-            _backgroundService,
-            _processFlowService,
-            _processEmissionParamService,
-            _flowService,
-            _flowFlowPropertyService,
-            _flowPropertyParamService,
-            _flowPropertyEmissionService,
-            _processDissipationService,
-            _processDissipationParamService,
-            _lciaService,
-            _characterizationParamService,
-            _paramService,
-            _dependencyParamService,
-            _fragmentService,
-            _processService,
+                _lciaMethodService,
             _unitOfWork);
 
             _lciaComputation = new LCIAComputationV2(_processFlowService,
@@ -232,12 +218,11 @@ _unitOfWork);
             //_characterizationParamService,
             //_paramService);
 
-            _resourceServiceFacade = new ResourceServiceFacade(_categoryService,
+            _resourceServiceFacade = new ResourceServiceFacade(
                                _classificationService,
                                _fragmentService,
                                _fragmentFlowService,
                                _fragmentStageService,
-                               _fragmentTraversalV2,
                                _fragmentLCIAComputation,
                                _flowService,
                                _flowPropertyService,
@@ -251,12 +236,8 @@ _unitOfWork);
                                _nodeCacheService, 
                                _scoreCacheService,
                                _paramService,
-                               _dependencyParamService,
                                _flowFlowPropertyService,
-                               _flowPropertyParamService,
-                               _processEmissionParamService,
                                _lciaService,
-                               _characterizationParamService,
                                _unitOfWork);
 
         }

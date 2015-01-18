@@ -8,6 +8,7 @@ using System.Net;
 using System.Net.Http;
 using System.Web.Http;
 using CalRecycleLCA.Services;
+using Entities.Models;
 
 namespace LCAToolAPI.API
 {
@@ -18,21 +19,21 @@ namespace LCAToolAPI.API
     {
 
         [Inject]
-        private readonly IFragmentTraversalV2 _fragmentTraversalV2;
+        private readonly IFragmentLCIAComputation _fragmentLciaComputation;
 
         /// <summary>
         /// Constructor for Fragment traversal diagnostic controller.
         /// Assigns a local private IFragmentTraversalV2 object via dependency injection.
         /// </summary>
         /// <param name="fragmentTraversalV2">via dependency injection</param>
-        public FragmentTraversalController(IFragmentTraversalV2 fragmentTraversalV2)
+        public FragmentTraversalController(IFragmentLCIAComputation fragmentLciaComputation)
         {
-            if (fragmentTraversalV2 == null)
+            if (fragmentLciaComputation == null)
             {
                 throw new ArgumentNullException("fragmentTraversalV2 is null");
             }
 
-            _fragmentTraversalV2 = fragmentTraversalV2;
+            _fragmentLciaComputation = fragmentLciaComputation;
 
         }
 
@@ -48,12 +49,12 @@ namespace LCAToolAPI.API
         [Route("api/fragments/{fragmentID}/scenarios/{scenarioID}/traverse")]
         [System.Web.Http.AcceptVerbs("GET", "POST")]
         [System.Web.Http.HttpGet]
-        public void Traversal(int fragmentID, int scenarioID)
+        public IEnumerable<NodeCache> Traversal(int fragmentID, int scenarioID)
         {
             Stopwatch sw = Stopwatch.StartNew();
-            _fragmentTraversalV2.Traverse(fragmentID, scenarioID);
+            var nodeCaches = _fragmentLciaComputation.FragmentTraverse(fragmentID, scenarioID);
             sw.Stop();
-            return;
+            return nodeCaches;
         }
 
         //// GET api/<controller>

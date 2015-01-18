@@ -41,6 +41,11 @@ namespace CalRecycleLCA.Services
         {
             _repository.ClearScoreCacheByScenarioAndLCIAMethod(scenarioId, lciaMethodID);
         }
+
+        public IEnumerable<ScoreCache> GetScenarioCaches(int fragmentId, int scenarioId = Scenario.MODEL_BASE_CASE_ID)
+         {
+             return _repository.GetScenarioCaches(fragmentId, scenarioId);
+         }
     }
 
 }

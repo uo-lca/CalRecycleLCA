@@ -16,82 +16,46 @@ namespace CalRecycleLCA.Services
     public class FragmentLCIAComputation : IFragmentLCIAComputation
     {
         [Inject]
+        private readonly IFragmentTraversalV2 _fragmentTraversalV2;
+        [Inject]
+        private readonly ILCIAComputationV2 _lciaComputationV2;
+        [Inject]
         private readonly IFragmentFlowService _fragmentFlowService;
         [Inject]
         private readonly INodeCacheService _nodeCacheService;
         [Inject]
-        private readonly IService<ScoreCache> _scoreCacheService;
-        //[Inject]
-        //private readonly IFragmentNodeProcessService _fragmentNodeProcessService;
-        //[Inject]
-        //private readonly IProcessSubstitutionService _processSubstitutionService;
-        //[Inject]
-        //private readonly IFragmentNodeFragmentService _fragmentNodeFragmentService;
-        //[Inject]
-        //private readonly IFragmentSubstitutionService _fragmentSubstitutionService;
+        private readonly IScoreCacheService _scoreCacheService;
         [Inject]
         private readonly ILCIAMethodService _lciaMethodService;
-        // [Inject]
-        // private readonly IScenarioBackgroundService _scenarioBackgroundService;
-        [Inject]
-        private readonly IBackgroundService _backgroundService;
-        [Inject]
-        private readonly IProcessFlowService _processFlowService;
-        [Inject]
-        private readonly IProcessEmissionParamService _processEmissionParamService;
-        [Inject]
-        private readonly IFlowService _flowService;
-        [Inject]
-        private readonly IFlowFlowPropertyService _flowFlowPropertyService;
-        [Inject]
-        private readonly IFlowPropertyParamService _flowPropertyParamService;
-        [Inject]
-        private readonly IFlowPropertyEmissionService _flowPropertyEmissionService;
-        [Inject]
-        private readonly IProcessDissipationService _processDissipationService;
-        [Inject]
-        private readonly IProcessDissipationParamService _processDissipationParamService;
-        [Inject]
-        private readonly ILCIAService _lciaService;
-        [Inject]
-        private readonly ICharacterizationParamService _characterizationParamService;
-        [Inject]
-        private readonly IParamService _paramService;
-        [Inject]
-        private readonly IDependencyParamService _dependencyParamService;
-        [Inject]
-        private readonly IFragmentService _fragmentService;
-        [Inject]
-        private readonly IProcessService _processService;
         [Inject]
         private readonly IUnitOfWork _unitOfWork;
 
-        public FragmentLCIAComputation(IFragmentFlowService fragmentFlowService,
+
+        // diagnostics
+        private CounterTimer sw_local, sw_ff, sw_cache, sw_lcia, sw_traverse;
+        private List<ScoreCache> currentCache;
+
+
+        public FragmentLCIAComputation(IFragmentTraversalV2 fragmentTraversalV2,
+            ILCIAComputationV2 lciaComputationV2,
+            IFragmentFlowService fragmentFlowService,
             IScoreCacheService scoreCacheService,
             INodeCacheService nodeCacheService,
-            //IFragmentNodeProcessService fragmentNodeProcessService,
-            //IProcessSubstitutionService processSubstitutionService,
-            //IFragmentNodeFragmentService fragmentNodeFragmentService,
-            //IFragmentSubstitutionService fragmentSubstitutionService,
             ILCIAMethodService lciaMethodService,
-            // IScenarioBackgroundService scenarioBackgroundService,
-            IBackgroundService backgroundService,
-            IProcessFlowService processFlowService,
-            IProcessEmissionParamService processEmissionParamService,
-            IFlowService flowService,
-            IFlowFlowPropertyService flowFlowPropertyService,
-            IFlowPropertyParamService flowPropertyParamService,
-            IFlowPropertyEmissionService flowPropertyEmissionService,
-            IProcessDissipationService processDissipationService,
-            IProcessDissipationParamService processDissipationParamService,
-            ILCIAService lciaService,
-            ICharacterizationParamService characterizationParamService,
-            IParamService paramService,
-            IDependencyParamService dependencyParamService,
-            IFragmentService fragmentService,
-            IProcessService processService,
             IUnitOfWork unitOfWork)
         {
+            if (fragmentTraversalV2 == null)
+            {
+                throw new ArgumentNullException("fragmentTraversalV2 is null");
+            }
+            _fragmentTraversalV2 = fragmentTraversalV2;
+
+            if (lciaComputationV2 == null)
+            {
+                throw new ArgumentNullException("lciaComputationV2 is null");
+            }
+            _lciaComputationV2 = lciaComputationV2;
+
             if (fragmentFlowService == null)
             {
                 throw new ArgumentNullException("fragmentFlowService is null");
@@ -109,109 +73,6 @@ namespace CalRecycleLCA.Services
                 throw new ArgumentNullException("nodeCacheService is null");
             }
             _nodeCacheService = nodeCacheService;
-            /*
-            if (fragmentNodeProcessService == null)
-            {
-                throw new ArgumentNullException("fragmentNodeProcessService is null");
-            }
-            _fragmentNodeProcessService = fragmentNodeProcessService;
-
-            if (processSubstitutionService == null)
-            {
-                throw new ArgumentNullException("processSubstitutionService is null");
-            }
-            _processSubstitutionService = processSubstitutionService;
-
-            if (fragmentNodeFragmentService == null)
-            {
-                throw new ArgumentNullException("fragmentNodeFragmentService is null");
-            }
-            _fragmentNodeFragmentService = fragmentNodeFragmentService;
-
-            if (fragmentSubstitutionService == null)
-            {
-                throw new ArgumentNullException("fragmentSubstitutionService is null");
-            }
-            _fragmentSubstitutionService = fragmentSubstitutionService;
-            */
-            // if (scenarioBackgroundService == null)
-            // {
-            //     throw new ArgumentNullException("scenarioBackgroundService is null");
-            // }
-            // _scenarioBackgroundService = scenarioBackgroundService;
-
-
-            if (backgroundService == null)
-            {
-                throw new ArgumentNullException("backgroundService is null");
-            }
-            _backgroundService = backgroundService;
-
-            if (processFlowService == null)
-            {
-                throw new ArgumentNullException("processFlowService is null");
-            }
-            _processFlowService = processFlowService;
-
-            if (processEmissionParamService == null)
-            {
-                throw new ArgumentNullException("processEmissionParamService is null");
-            }
-            _processEmissionParamService = processEmissionParamService;
-
-            if (flowService == null)
-            {
-                throw new ArgumentNullException("flowService is null");
-            }
-            _flowService = flowService;
-
-            if (flowFlowPropertyService == null)
-            {
-                throw new ArgumentNullException("flowFlowPropertyService is null");
-            }
-            _flowFlowPropertyService = flowFlowPropertyService;
-
-            if (flowPropertyParamService == null)
-            {
-                throw new ArgumentNullException("flowPropertyParamService is null");
-            }
-            _flowPropertyParamService = flowPropertyParamService;
-
-            if (flowPropertyEmissionService == null)
-            {
-                throw new ArgumentNullException("flowPropertyEmissionService is null");
-            }
-            _flowPropertyEmissionService = flowPropertyEmissionService;
-
-            if (processDissipationService == null)
-            {
-                throw new ArgumentNullException("processDissipationService is null");
-            }
-            _processDissipationService = processDissipationService;
-
-            if (processDissipationParamService == null)
-            {
-                throw new ArgumentNullException("processDissipationParamService is null");
-            }
-            _processDissipationParamService = processDissipationParamService;
-
-            if (lciaService == null)
-            {
-                throw new ArgumentNullException("lciaService is null");
-            }
-            _lciaService = lciaService;
-
-            if (characterizationParamService == null)
-            {
-                throw new ArgumentNullException("characterizationParamService is null");
-            }
-            _characterizationParamService = characterizationParamService;
-
-            if (paramService == null)
-            {
-                throw new ArgumentNullException("paramService is null");
-            }
-            _paramService = paramService;
 
             if (lciaMethodService == null)
             {
@@ -219,36 +80,93 @@ namespace CalRecycleLCA.Services
             }
             _lciaMethodService = lciaMethodService;
 
-            if (dependencyParamService == null)
-            {
-                throw new ArgumentNullException("dependencyParamService is null");
-            }
-            _dependencyParamService = dependencyParamService;
-
-            if (fragmentService == null)
-            {
-                throw new ArgumentNullException("fragmentService is null");
-            }
-            _fragmentService = fragmentService;
-
-            if (processService == null)
-            {
-                throw new ArgumentNullException("processService is null");
-            }
-            _processService = processService;
-
             if (unitOfWork == null)
             {
                 throw new ArgumentNullException("unitOfWork is null");
             }
             _unitOfWork = unitOfWork;
+
+            sw_local = new CounterTimer();
+            sw_ff = new CounterTimer();
+            sw_cache = new CounterTimer();
+            sw_lcia = new CounterTimer();
+            sw_traverse = new CounterTimer();
+
+            currentCache = new List<ScoreCache>();
         }
 
-        public void FragmentLCIACompute(int fragmentId, int scenarioId)
+        public IEnumerable<NodeCache> FragmentTraverse(int fragmentId, int scenarioId = Scenario.MODEL_BASE_CASE_ID)
         {
+            // this will eventually become private after diagnostics are done
+            if (_nodeCacheService.IsCached(fragmentId, scenarioId))
+                return _nodeCacheService.Queryable()
+                    //.Where(nc => nc.FragmentFlow.FragmentID == fragmentId)
+                    .Where(nc => nc.ScenarioID == scenarioId).ToList();
+            else
+            {
+                var nodeCaches = _fragmentTraversalV2.Traverse((int)fragmentId, scenarioId).Select(k => new NodeCache
+                {
+                    FragmentFlowID = k.FragmentFlowID,
+                    ScenarioID = k.ScenarioID,
+                    FlowMagnitude = k.FlowMagnitude,
+                    NodeWeight = k.NodeWeight,
+                    ObjectState = ObjectState.Added
+                });
+                _unitOfWork.SetAutoDetectChanges(false);
+                _nodeCacheService.InsertGraphRange(nodeCaches);
+                _unitOfWork.SaveChanges();
+                _unitOfWork.SetAutoDetectChanges(true);
+                
+                return nodeCaches;
+            }
+
+
+        }
+
+
+
+
+        public IEnumerable<ScoreCache> FragmentLCIAComputeNoSave(int fragmentId, int scenarioId)
+        {
+            sw_local.CStart();
+
+            FragmentTraverse(fragmentId, scenarioId);
+            sw_local.Click("traversal");
+            
+            var lciaMethods = _lciaMethodService.QueryActiveMethods().Select(x => x.LCIAMethodID).ToList();
+            sw_local.Click("lcia");
+
+            var newCaches = FragmentFlowLCIA(fragmentId, scenarioId, lciaMethods);//.ToList();
+
+            sw_local.CStop();
+            sw_ff.CStop();
+            sw_cache.CStop();
+            sw_lcia.CStop();
+
+            return newCaches;
+            
+
+
+        }
+
+        public void FragmentLCIAComputeSave(int fragmentId, int scenarioId)
+        {
+            sw_local.CStart();
+
+            FragmentTraverse(fragmentId, scenarioId);
+            sw_local.Click("traversal");
 
             var lciaMethods = _lciaMethodService.QueryActiveMethods().Select(x => x.LCIAMethodID).ToList();
-            FragmentFlowLCIA(fragmentId, scenarioId, lciaMethods);//.ToList();
+            sw_local.Click("lcia");
+
+            FragmentFlowLCIA(fragmentId, scenarioId, lciaMethods, true);//.ToList();
+
+            sw_local.CStop();
+            sw_ff.CStop();
+            sw_cache.CStop();
+            sw_lcia.CStop();
+
+            return;
 
         }
 
@@ -277,169 +195,84 @@ namespace CalRecycleLCA.Services
             return lcia;
         }
 
-        private void FragmentFlowLCIA(int? fragmentId, int scenarioId, IEnumerable<int> lciaMethods)
+        private IEnumerable<ScoreCache> FragmentFlowLCIA(int fragmentId, int scenarioId, IEnumerable<int> lciaMethods,
+            bool save = false)
         {
             // set score cache for fragment / scenario / method: iterate through
             // fragmentflows 
+            currentCache.AddRange(_scoreCacheService.GetScenarioCaches(fragmentId, scenarioId).ToList());
 
+            sw_local.Click("caches");
 
-            // this does nothing if traversal has already been completed - FIGURE OUT THIS PART ON THURSDAY
-            FragmentTraversalV2 fragmentTraversalV2 = new FragmentTraversalV2(//_flowService,
-                            _fragmentFlowService,
-                            _nodeCacheService,
-                //_fragmentNodeProcessService,
-                            _processFlowService,
-                //_fragmentNodeFragmentService,
-                            _flowFlowPropertyService,
-                            _dependencyParamService,
-                //_flowPropertyParamService,
-                //_fragmentService,
-                //_paramService,
-                            _unitOfWork);
+            List<ScoreCache> scoreCaches = new List<ScoreCache>();
 
-            fragmentTraversalV2.Traverse((int)fragmentId, scenarioId);
+            var fragmentFlows = _fragmentFlowService.GetLCIAFlows(fragmentId);
 
-            var fragmentFlows = _fragmentFlowService.LGetCachedFlows((int)fragmentId, scenarioId);
+            sw_local.Click("GTF");
+
 
             foreach (var item in fragmentFlows)
             {
-                if (item.FlowID == null)
-                    item.FlowID = 0; // TODO: this should be set to whatever is the fragment's inflow-- ??
+                
+                sw_ff.CStart();
+                //if (item.FlowID == null)
+                  //  item.FlowID = 0; // TODO: this should be set to whatever is the fragment's inflow-- ??
 
                 var fragmentNode = _fragmentFlowService.Terminate(item, scenarioId, true); // true => do Background 
-
+                sw_ff.CStop();
+                
                 if (fragmentNode.NodeTypeID == 2)
                 {
                     //recursive LCIA computation, results to cache
-                    FragmentFlowLCIA(fragmentNode.SubFragmentID, fragmentNode.ScenarioID, lciaMethods);
+                    sw_local.Click("recurse " + Convert.ToString((int)fragmentNode.SubFragmentID));
+                    FragmentFlowLCIA((int)fragmentNode.SubFragmentID, scenarioId, lciaMethods, save);
                 }
 
-                SetScoreCache(item.FragmentFlowID, fragmentNode, lciaMethods);
+                scoreCaches.AddRange(GetScoreCaches(item.FragmentFlowID, fragmentNode, lciaMethods));
 
             }
 
-            return; // fragmentFlows
-            /*                  .Select(x => new FragmentLCIAModel
-                              {
-                                  FragmentFlowID = x.FragmentFlowID,
-                                  NodeTypeID = x.NodeTypeID,
-                                  FlowID = x.FlowID,
-                                  DirectionID = x.DirectionID
-                              });
-             * */
+            if (scoreCaches.Count() > 0 && save == true)
+            {
+                sw_cache.CStart();
+                //disable this until results have been cached - doesn't seem to increase performance
+                //_unitOfWork.SetAutoDetectChanges(false);
+                _scoreCacheService.InsertGraphRange(scoreCaches);
+
+                _unitOfWork.SaveChanges();
+                //enable this after results have been cached -  it was turned off to increase performance
+                //_unitOfWork.SetAutoDetectChanges(true);
+                sw_cache.CStop();
+            }
+
+            return scoreCaches; 
         }
 
 
-        /* *************
-        public ResolveBackgroundModel ResolveBackground(int? flowId, int? directionId, int? scenarioId, int? nodeTypeId)
-        {
-            IEnumerable<ResolveBackgroundModel> background = null;
-            int targetId;
-            background = _scenarioBackgroundService.Queryable()
-                .Where(x => x.ScenarioID == scenarioId)
-                .Where(x => x.FlowID == flowId)
-                .Where(x => x.DirectionID == directionId)
-               .Select(bg => new ResolveBackgroundModel
-               {
-                   NodeTypeID = bg.NodeTypeID,
-                   ILCDEntityID = bg.ILCDEntityID
-               });
-
-            if (background.Count() == 0)
-            {
-                background = _backgroundService.Queryable()
-                .Where(x => x.FlowID == flowId)
-                .Where(x => x.DirectionID == directionId)
-               .Select(bg => new ResolveBackgroundModel
-               {
-                   NodeTypeID = bg.NodeTypeID,
-                   ILCDEntityID = bg.ILCDEntityID
-               });
-
-                if (background.Count() == 0)
-                {
-                    throw new ArgumentNullException("background is null");
-                }
-            }
-
-            nodeTypeId = Convert.ToInt32(background.Select(x => x.NodeTypeID).FirstOrDefault());
-
-            //if (nodeTypeId == 5)
-            //{
-            //    targetId = 0;
-            //}
-            //else
-            //{
-            //    targetId = Convert.ToInt32(background.Select(x => x.TargetID).FirstOrDefault());
-            //}
-
-
-            switch (nodeTypeId)
-            {
-                case 1:
-                    targetId = _processService.Queryable().Where(x => x.ILCDEntityID == background.Select(y => y.ILCDEntityID).FirstOrDefault())
-                    .Select(z=> (int)z.ProcessID).FirstOrDefault();
-                    break;
-                case 2:
-                    targetId = _fragmentService.Queryable().Where(x => x.ILCDEntityID == background.Select(y => y.ILCDEntityID).FirstOrDefault())
-                    .Select(z => (int)z.FragmentID).FirstOrDefault();
-                    break;
-                default:
-                    targetId = 0;
-                        break;
-            }
-
-
-            ResolveBackgroundModel resolveBackground = new ResolveBackgroundModel();
-            resolveBackground.NodeTypeID = nodeTypeId;
-            resolveBackground.TargetID = targetId;
-            return resolveBackground;
-
-        }
-        ************* */
 
         //   public void SetScoreCache(int? targetId, int? nodeTypeId, IEnumerable<LCIAMethod> lciaMethods, int scenarioId, int fragmentFlowId)
         // {
         //   error('not implemented');
         //}
-        public void SetScoreCache(int fragmentFlowId, FragmentNodeResource fragmentNode, IEnumerable<int> lciaMethods)
+        public IEnumerable<ScoreCache> GetScoreCaches(int fragmentFlowId, FragmentNodeResource fragmentNode, IEnumerable<int> lciaMethods)
         {
-            //disable this until results have been cached - to increase performance
-            _unitOfWork.SetAutoDetectChanges(false);
+            List<ScoreCache> scoreCachesInProgress = new List<ScoreCache>();
 
-            List<ScoreCache> processScoreCaches = new List<ScoreCache>();
-            List<ScoreCache> fragmentScoreCaches = new List<ScoreCache>();
+            sw_lcia.CStart();
 
-            IEnumerable<int> haveLciaMethods = _scoreCacheService.Queryable()
-                                                        .Where(x => x.ScenarioID == fragmentNode.ScenarioID
-                                                                && x.FragmentFlowID == fragmentFlowId).AsEnumerable()
-                                                        .Select(y => y.LCIAMethodID);
+            IEnumerable<int> haveLciaMethods = currentCache.Where(x => x.FragmentFlowID == fragmentFlowId)
+                                                        .Select(x => x.LCIAMethodID);
 
             IEnumerable<int> needLciaMethods = lciaMethods.Where(m => !haveLciaMethods.Contains(m));
 
-            //IEnumerable<int> needLciaMethods = tmpLciaMethods.Except(haveLciaMethods);
-
-            if (needLciaMethods == null)
-                return;
+            if (needLciaMethods.Count() == 0)
+                return scoreCachesInProgress;
 
             switch (fragmentNode.NodeTypeID)
             {
                 case 1:
 
-                    LCIAComputationV2 lciaComputation = new LCIAComputationV2(_processFlowService,
-                        //_processEmissionParamService,
-                        _lciaMethodService,
-                        //_flowService,
-                        //_flowFlowPropertyService,
-                        //_flowPropertyParamService,
-                        //_flowPropertyEmissionService,
-                        //_processDissipationService,
-                        //_processDissipationParamService,
-                        _lciaService);
-                    //_characterizationParamService,
-                    //_paramService);
-
-                    var scores = lciaComputation.ProcessLCIA(fragmentNode.ProcessID, needLciaMethods, fragmentNode.ScenarioID);
+                    var scores = _lciaComputationV2.ProcessLCIA(fragmentNode.ProcessID, needLciaMethods, fragmentNode.ScenarioID);
 
                     foreach (var lciaMethodId in needLciaMethods.AsQueryable())
                     {
@@ -447,33 +280,23 @@ namespace CalRecycleLCA.Services
                         {
                             double score = scores
                                 .Where(x => x.LCIAMethodID == lciaMethodId)
-                                .Select(x => Convert.ToDouble(x.Total)).FirstOrDefault();
+                                .Select(x => Convert.ToDouble(x.Total)).First();
 
-                            //ScoreCache scoreCache = new ScoreCache();
-                            //scoreCache.ScenarioID = fragmentNode.ScenarioID;
-                            //scoreCache.FragmentFlowID = fragmentFlowId;
-                            //scoreCache.LCIAMethodID = lciaMethodItem.LCIAMethodID;
-                            //scoreCache.ImpactScore = impactScore;
-                            //scoreCache.ObjectState = ObjectState.Added;
-                            //_scoreCacheService.InsertOrUpdateGraph(scoreCache);
-
-                            processScoreCaches.Add(new ScoreCache()
+                            scoreCachesInProgress.Add(new ScoreCache()
                             {
                                 ScenarioID = fragmentNode.ScenarioID,
                                 FragmentFlowID = fragmentFlowId,
                                 LCIAMethodID = lciaMethodId,
-                                ImpactScore = score
+                                ImpactScore = score,
                             });
 
                         }
-
                     }
 
-                    foreach (var processScoreCache in processScoreCaches)
+                    foreach (var processScoreCache in scoreCachesInProgress)
                     {
                         processScoreCache.ObjectState = ObjectState.Added;
                     }
-                    _scoreCacheService.InsertGraphRange(processScoreCaches);
 
                     break;
                 case 2:
@@ -481,28 +304,7 @@ namespace CalRecycleLCA.Services
                     {
                         var lcias = FragmentLCIA(fragmentNode.SubFragmentID, fragmentNode.ScenarioID, lciaMethodId);
 
-                        /*
-                        if (lcias != null)
-                        {
-                            var lciaScore = lcias.ToList()
-                        .GroupBy(t => new
-                        {
-                            t.Result
-                        })
-                     .Select(group => new LCIAModel
-                     {
-                         LCIAResult = group.Sum(a => a.Result)
-                     });
-                        */
-                        //ScoreCache scoreCache = new ScoreCache();
-                        //scoreCache.ScenarioID = fragmentNode.ScenarioID;
-                        //scoreCache.FragmentFlowID = fragmentFlowId;
-                        //scoreCache.LCIAMethodID = lciaMethodItem.LCIAMethodID;
-                        //scoreCache.ImpactScore = Convert.ToDouble(lcias.Sum(a => a.Result));
-                        //scoreCache.ObjectState = ObjectState.Added;
-                        //_scoreCacheService.InsertOrUpdateGraph(scoreCache);
-
-                        fragmentScoreCaches.Add(new ScoreCache()
+                        scoreCachesInProgress.Add(new ScoreCache()
                         {
                             ScenarioID = fragmentNode.ScenarioID,
                             FragmentFlowID = fragmentFlowId,
@@ -511,18 +313,16 @@ namespace CalRecycleLCA.Services
                         });
                     }
 
-                    foreach (var fragmentScoreCache in fragmentScoreCaches)
+                    foreach (var fragmentScoreCache in scoreCachesInProgress)
                     {
                         fragmentScoreCache.ObjectState = ObjectState.Added;
                     }
-                    _scoreCacheService.InsertGraphRange(fragmentScoreCaches);
-
                     break;
             }  /* end of switch NodeType */
 
-            _unitOfWork.SaveChanges();
-            //enable this after results have been cached -  it was turned off to increase performance
-            _unitOfWork.SetAutoDetectChanges(true);
+            sw_lcia.CStop();
+
+            return scoreCachesInProgress;
         } /* end of SetScoreCache */
     }
 }

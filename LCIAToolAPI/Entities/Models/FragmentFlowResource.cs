@@ -16,6 +16,22 @@ namespace Entities.Models {
 
     }
 
+    /// <summary>
+    /// Used to store local nodecaches prior to DB insert.
+    /// This could be folded into FragmentNodeResource -- which should really be named FragmentNodeModel
+    /// </summary>
+    public class NodeCacheModel
+    {
+        public int FragmentID { get; set; }
+        public int NodeTypeID { get; set; }
+        public int? FlowID { get; set; }
+        public int DirectionID { get; set; }
+        public int FragmentFlowID { get; set; }
+        public int ScenarioID { get; set; }
+        public double NodeWeight { get; set; }
+        public double? FlowMagnitude { get; set; }
+    }
+
     public class FragmentStageResource
     {
         public int FragmentStageID { get; set; }
@@ -31,6 +47,7 @@ namespace Entities.Models {
         //
         // FragmentFlow Properties
         //
+        public int FragmentID { get; set; }
         public int FragmentFlowID { get; set; }
         public int? FragmentStageID { get; set; }
         public string Name { get; set; }

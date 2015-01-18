@@ -15,8 +15,9 @@ namespace CalRecycleLCA.Services
     {
         FragmentFlow GetFragmentFlow(int fragmentFlowId);
         IEnumerable<FragmentFlow> GetFragmentFlows(IEnumerable<int> ffids);
-        //IEnumerable<FragmentFlow> GetFlowsByFragment(int fragmentId);
+        IEnumerable<FragmentFlow> GetFlowsByFragment(int fragmentId);
         IEnumerable<FragmentFlow> LGetFlowsByFragment(int fragmentId);
+        IEnumerable<FragmentFlow> GetLCIAFlows(int fragmentId);
         FragmentFlowResource GetResource(FragmentFlow ff);
         //IEnumerable<FragmentFlow> GetCachedFlows(int fragmentId, int scenarioId = Scenario.MODEL_BASE_CASE_ID);
         IEnumerable<FragmentFlowResource> LGetCachedFlows(int fragmentId, int scenarioId = Scenario.MODEL_BASE_CASE_ID);
@@ -66,10 +67,10 @@ namespace CalRecycleLCA.Services
         /// </summary>
         /// <param name="fragmentId"></param>
         /// <returns>list of FragmentFlows</returns>
-        //public IEnumerable<FragmentFlow> GetFlowsByFragment(int fragmentId)
-        //{
-        //    return _repository.GetFlowsByFragment(fragmentId);
-        //}
+        public IEnumerable<FragmentFlow> GetFlowsByFragment(int fragmentId)
+        {
+            return _repository.GetFlowsByFragment(fragmentId);
+        }
         public IEnumerable<FragmentFlow> LGetFlowsByFragment(int fragmentId)
         {
             return _repository.LGetFlowsByFragment(fragmentId);
@@ -84,6 +85,7 @@ namespace CalRecycleLCA.Services
         {
             return new FragmentFlowResource
             {
+                FragmentID = (int)ff.FragmentID,
                 FragmentFlowID = ff.FragmentFlowID,
                 FragmentStageID = ff.FragmentStageID,
                 Name = ff.Name,
@@ -216,5 +218,11 @@ namespace CalRecycleLCA.Services
 
 
         }
+
+        public IEnumerable<FragmentFlow> GetLCIAFlows(int fragmentId)
+        {
+            return _repository.GetLCIAFlows(fragmentId);
+        }
+
     }
 }
