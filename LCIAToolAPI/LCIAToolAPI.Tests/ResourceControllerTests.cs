@@ -65,6 +65,7 @@ namespace LCIAToolAPI.Tests
         private ResourceServiceFacade _resourceServiceFacade;
         private ResourceController _resourceController;
 
+        private List<DataSource> _dataSources;
         private List<FlowType> _flowTypes;
         private LCIAResultResource _processLCIAResult;
         private LCIAMethod _lciaMethod;
@@ -74,6 +75,7 @@ namespace LCIAToolAPI.Tests
         private List<FragmentFlow> _fragmentFlows;
         private List<Flow> _flows;
         private List<Process> _processes;
+        private List<ILCDEntity> _ilcdEntities;
         
         private Mock<IRepositoryAsync<Category>> _mockCategoryRepository;
         private Mock<IRepositoryAsync<Classification>> _mockClassificationRepository;
@@ -113,21 +115,21 @@ namespace LCIAToolAPI.Tests
         [TestInitialize]
         public void SetUp()
         {
-            _mockFlowTypeRepository = new Mock<IRepositoryAsync<FlowType>>();
             _mockCategoryRepository = new Mock<IRepositoryAsync<Category>>();
             _mockClassificationRepository = new Mock<IRepositoryAsync<Classification>>();
+            _mockFlowRepository = new Mock<IRepositoryAsync<Flow>>();
+            _mockFlowPropertyRepository = new Mock<IRepositoryAsync<FlowProperty>>();
+            _mockFlowTypeRepository = new Mock<IRepositoryAsync<FlowType>>();
             _mockFragmentRepository = new Mock<IRepositoryAsync<Fragment>>();
             _mockFragmentFlowRepository = new Mock<IRepositoryAsync<FragmentFlow>>();
             _mockFragmentStageRepository = new Mock<IRepositoryAsync<FragmentStage>>();
-            _mockFlowRepository = new Mock<IRepositoryAsync<Flow>>();
-            _mockFlowPropertyRepository = new Mock<IRepositoryAsync<FlowProperty>>();
             _mockImpactCategoryRepository = new Mock<IRepositoryAsync<ImpactCategory>>();
             _mockLCIAMethodRepository = new Mock<IRepositoryAsync<LCIAMethod>>();
+            _mockNodeCacheRepository = new Mock<IRepositoryAsync<NodeCache>>();
             _mockProcessRepository = new Mock<IRepositoryAsync<Process>>();
             _mockProcessFlowRepository = new Mock<IRepositoryAsync<ProcessFlow>>();
             _mockScenarioRepository = new Mock<IRepositoryAsync<Scenario>>();
             _mockScenarioGroupRepository = new Mock<IRepositoryAsync<ScenarioGroup>>();
-            _mockNodeCacheRepository = new Mock<IRepositoryAsync<NodeCache>>();
             _mockFragmentNodeProcessRepository = new Mock<IRepositoryAsync<FragmentNodeProcess>>();
             _mockFragmentNodeFragmentRepository = new Mock<IRepositoryAsync<FragmentNodeFragment>>();
             _mockFlowFlowPropertyRepository = new Mock<IRepositoryAsync<FlowFlowProperty>>();
@@ -193,18 +195,6 @@ namespace LCIAToolAPI.Tests
                 _flowFlowPropertyService,
                 _dependencyParamService);
 
-            _fragmentLCIAComputation = new FragmentLCIAComputation(_fragmentTraversalV2,
-                _lciaComputation,
-                _fragmentFlowService,
-                _scoreCacheService,
-                _nodeCacheService,
-            //_fragmentNodeProcessService,
-            //_processSubstitutionService,
-            //_fragmentNodeFragmentService,
-            //_fragmentSubstitutionService,
-                _lciaMethodService,
-            _unitOfWork);
-
             _lciaComputation = new LCIAComputationV2(_processFlowService,
                 //_processEmissionParamService,
             _lciaMethodService,
@@ -217,6 +207,18 @@ namespace LCIAToolAPI.Tests
             _lciaService);
             //_characterizationParamService,
             //_paramService);
+
+            _fragmentLCIAComputation = new FragmentLCIAComputation(_fragmentTraversalV2,
+                _lciaComputation,
+                _fragmentFlowService,
+                _scoreCacheService,
+                _nodeCacheService,
+            //_fragmentNodeProcessService,
+            //_processSubstitutionService,
+            //_fragmentNodeFragmentService,
+            //_fragmentSubstitutionService,
+                _lciaMethodService,
+            _unitOfWork);
 
             _resourceServiceFacade = new ResourceServiceFacade(
                                _classificationService,
@@ -348,6 +350,27 @@ namespace LCIAToolAPI.Tests
             _mockLCIAMethodRepository.Setup(m => m.Find(lciaMethodID)).Returns(_lciaMethod);
 
             //We only set up the mock repositories that we need
+
+            _dataSources = new List<DataSource>
+            {
+                new DataSource() {
+                    DataSourceID = 4,
+                    Name = "Mock Data Source",
+                    VisibilityID = 1
+                }
+            };
+
+            _ilcdEntities = new List<ILCDEntity>
+            {
+                new ILCDEntity() {
+                    ILCDEntityID = 1,
+                    UUID = "01c96a9f-aeb1-4c5f-bc36-5de9638799f9",
+                    Version	= "00.00.000",
+                    DataSourceID = 4,
+                    DataTypeID = 3
+                }
+            };
+            
             _processes = new List<Process>
                      {
                             new Process(){   ProcessID = 1,
@@ -357,7 +380,7 @@ namespace LCIAToolAPI.Tests
                 ReferenceTypeID = 1,
                 ProcessTypeID = 5,
                 ReferenceFlowID = null,
-                ILCDEntityID = 1264}
+                ILCDEntityID = 1}
 
                      }.ToList();
 
@@ -374,10 +397,12 @@ namespace LCIAToolAPI.Tests
                    }).ToList();
 
 
-            //_mockProcessRepository.Setup(m => m.GetRepository<Process>().Query(p => p.ProcessID == processID).Select().FirstOrDefault().Returns(_processes.AsQueryable()));
+            _mockProcessRepository.Setup(m => m.Queryable()).Returns(_processes.AsQueryable());
+            //_mockIlcdEntityRepository.Setup(m => m.Queryable()).Returns(_ilcdEntities.AsQueryable());
+            //_mockDataSourceRepository.Setup(m => m.Queryable()).Returns(_dataSources.AsQueryable());
             _processService = new ProcessService(_mockProcessRepository.Object);
             //Act
-            _processService.IsPrivate(processID);
+            _processService.IsPrivate(processID); // do not know how to accomplish this query with a mock repository layer
             //Assert
             _mockProcessRepository.Verify();
 

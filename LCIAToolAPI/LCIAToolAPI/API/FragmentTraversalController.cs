@@ -25,7 +25,7 @@ namespace LCAToolAPI.API
         /// Constructor for Fragment traversal diagnostic controller.
         /// Assigns a local private IFragmentTraversalV2 object via dependency injection.
         /// </summary>
-        /// <param name="fragmentTraversalV2">via dependency injection</param>
+        /// <param name="fragmentLciaComputation">via dependency injection</param>
         public FragmentTraversalController(IFragmentLCIAComputation fragmentLciaComputation)
         {
             if (fragmentLciaComputation == null)
