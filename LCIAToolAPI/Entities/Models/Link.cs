@@ -12,4 +12,10 @@ namespace Entities.Models
         public string Href { get; set; }
         public string Title { get; set; }
     }
+
+    public class Contact
+    {
+        public string Name { get; set; }
+        public string Email { get; set; }
+    }
 }

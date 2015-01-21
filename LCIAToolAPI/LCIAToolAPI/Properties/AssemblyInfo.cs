@@ -29,7 +29,11 @@ using System.Runtime.InteropServices;
 //      Build Number
 //      Revision
 //
+// Documentation for current build: LCIAToolAPI Version History
+//  1.0.x.x - initial roll-out (9 Jan 2015)
+//  1.1.x.x - Web API Documentation (20 Jan 2015)
+//
 // You can specify all the values or you can default the Revision and Build Numbers 
 // by using the '*' as shown below:
-[assembly: AssemblyVersion("1.0.0.0")]
+[assembly: AssemblyVersion("1.1.*")]
 [assembly: AssemblyFileVersion("1.0.0.0")]

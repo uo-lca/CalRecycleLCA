@@ -134,6 +134,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Models\ApiInfo.cs" />
     <Compile Include="Models\CacheTracker.cs" />
     <Compile Include="Models\Link.cs" />
     <Compile Include="Models\ParamInstance.cs" />

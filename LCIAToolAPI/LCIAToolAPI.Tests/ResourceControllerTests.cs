@@ -64,6 +64,7 @@ namespace LCIAToolAPI.Tests
         private ILCIAComputationV2 _lciaComputation;
         private ResourceServiceFacade _resourceServiceFacade;
         private ResourceController _resourceController;
+        private DocuService _docuService;
 
         private List<DataSource> _dataSources;
         private List<FlowType> _flowTypes;
@@ -242,6 +243,11 @@ namespace LCIAToolAPI.Tests
                                _lciaService,
                                _unitOfWork);
 
+            _docuService = new DocuService();
+
+            _resourceController = new ResourceController(_resourceServiceFacade, _scenarioGroupService, _docuService);
+
+
         }
 
 
@@ -266,8 +272,6 @@ namespace LCIAToolAPI.Tests
             //We only set up the mock repository that we need
             _mockFlowTypeRepository.Setup(m => m.Queryable()).Returns(_flowTypes.AsQueryable());
 
-
-            _resourceController = new ResourceController(_resourceServiceFacade, _scenarioGroupService);
 
             //Act
             List<FlowTypeResource> result = _resourceController.GetFlowTypes().ToList();
@@ -294,8 +298,6 @@ namespace LCIAToolAPI.Tests
             //We only set up the mock repository that we need
             _mockFlowTypeRepository.Setup(m => m.Queryable()).Returns(_flowTypes.AsQueryable());
 
-
-            _resourceController = new ResourceController(_resourceServiceFacade, _scenarioGroupService);
 
             //Act
             List<FlowTypeResource> result = _resourceController.GetFlowTypes().ToList();
@@ -457,8 +459,6 @@ namespace LCIAToolAPI.Tests
                      
                      };
 
-              _resourceController = new ResourceController(_resourceServiceFacade, _scenarioGroupService);
-
             //Act
             LCIAResultResource result = _resourceController.GetProcessLCIAResult(processID, lciaMethodID, scenarioID);
             Assert.AreEqual(_processLCIAResult.LCIAMethodID, result.LCIAMethodID); 
@@ -487,9 +487,6 @@ namespace LCIAToolAPI.Tests
             //We only set up the mock repository that we need
             _mockScenarioRepository.Setup(m => m.Queryable()).Returns(_scenarios.AsQueryable());
 
-
-            _resourceController = new ResourceController(_resourceServiceFacade, _scenarioGroupService);
-
             //Act
             List<ScenarioResource> result = _resourceController.GetScenarios().ToList();
             Assert.AreEqual(_scenarioResources[0].Name, result[0].Name);
@@ -517,8 +514,6 @@ namespace LCIAToolAPI.Tests
             _mockFragmentRepository.Setup(m => m.Queryable()).Returns(_fragments.AsQueryable());
 
 
-            _resourceController = new ResourceController(_resourceServiceFacade, _scenarioGroupService);
-
             //Act
             List<FragmentResource> result = _resourceController.GetFragments().ToList();
             Assert.AreEqual(_fragmentResources[0].Name, result[0].Name);
@@ -544,9 +539,6 @@ namespace LCIAToolAPI.Tests
            
             //We only set up the mock repository that we need
             _mockFragmentRepository.Setup(m => m.Find(fragmentID)).Returns(_fragment);
-
-
-            _resourceController = new ResourceController(_resourceServiceFacade, _scenarioGroupService);
 
             //Act
             FragmentResource result = _resourceController.GetFragment(fragmentID);
@@ -574,9 +566,6 @@ namespace LCIAToolAPI.Tests
 
             //We only set up the mock repository that we need
             _mockFragmentFlowRepository.Setup(m => m.Queryable()).Returns(_fragmentFlows.AsQueryable());
-
-
-            _resourceController = new ResourceController(_resourceServiceFacade, _scenarioGroupService);
 
             //Act
             List<FragmentFlowResource> result = _resourceController.GetFragmentFlowResources(fragmentID).ToList();
@@ -606,8 +595,6 @@ namespace LCIAToolAPI.Tests
 
             //We only set up the mock repository that we need
             _mockFlowRepository.Setup(m => m.Queryable()).Returns(_flows.AsQueryable());
-
-            _resourceController = new ResourceController(_resourceServiceFacade, _scenarioGroupService);
 
             //Act
             List<FlowResource> result = _resourceController.GetFlowsByFragment(fragmentID).ToList();
