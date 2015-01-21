@@ -597,12 +597,7 @@ namespace CalRecycleLCA.Services
 
         public IEnumerable<FlowPropertyMagnitude> GetFlowFlowProperties(int flowId)
         {
-            return _FlowFlowPropertyService.Query(k => k.FlowID == flowId)
-                .Select(k => new FlowPropertyMagnitude()
-                {
-                    FlowPropertyID = (int)k.FlowPropertyID,
-                    Magnitude = (double)k.MeanValue
-                });
+            return _FlowFlowPropertyService.GetFlowPropertyMagnitudes(flowId);
         }
 
         /// <summary>

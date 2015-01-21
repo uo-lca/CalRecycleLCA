@@ -60,6 +60,7 @@ namespace CalRecycleLCA.Repositories
                     (s, parameter) => new FlowPropertyMagnitude
                     {
                         FlowPropertyID = (int)s.factors.FlowPropertyID,
+                        Unit = s.factors.FlowProperty.UnitGroup.UnitConversion.Unit,
                         Magnitude = parameter == null ? (double)s.factors.MeanValue : parameter.Value
                     });
         }
