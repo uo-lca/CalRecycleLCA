@@ -157,3 +157,7 @@ $RECYCLE.BIN/
 
 # nuget exe should be downloaded
 NuGet.exe
+
+# auto-generated version file
+LCIAToolAPI/LCIAToolAPI/version.txt
+

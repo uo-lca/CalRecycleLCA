@@ -95,6 +95,7 @@ namespace LCAToolAPI.App_Start
             kernel.Bind<ILCIAComputationV2>().To<LCIAComputationV2>();
             kernel.Bind<IFragmentLCIAComputation>().To<FragmentLCIAComputation>();
             kernel.Bind<IResourceServiceFacade>().To<ResourceServiceFacade>();
+            kernel.Bind<IDocuService>().To<DocuService>();
             kernel.Bind<IFlowTestService>().To<FlowTestService>();
 
             kernel.Bind(typeof(IRepositoryAsync<Category>)).To(typeof(Repository<Category>));

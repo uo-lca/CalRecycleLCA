@@ -1,7 +1,9 @@
 ﻿using System;
+using System.IO;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using System.Text;
 using System.Net;
 using System.Net.Http;
 using System.Web.Http;
@@ -27,14 +29,31 @@ namespace LCAToolAPI.API
         [Inject]
         private readonly IScenarioGroupService _ScenarioGroupService;
 
+        [Inject]
+        private readonly IDocuService _DocuService;
+
+        private String ToolVersion()
+        {
+            string gitVersion = String.Empty;
+            using (Stream stream = System.Reflection.Assembly.GetExecutingAssembly()
+                    .GetManifestResourceStream("LCAToolAPI." + "version.txt"))
+            using (StreamReader reader = new StreamReader(stream))
+            {
+                gitVersion = reader.ReadToEnd();
+            }
+            return gitVersion.TrimEnd('\r' , '\n');
+
+        }
 
         /// <summary>
         /// Dependency injection
         /// </summary>
         /// <param name="resourceService">provides all services except authorization</param>
         /// <param name="scenarioGroupService">provides authorization</param>
+        /// <param name="docuService">provides documentary information</param>
         public ResourceController(IResourceServiceFacade resourceService,
-            IScenarioGroupService scenarioGroupService)
+            IScenarioGroupService scenarioGroupService,
+            IDocuService docuService)
         {
             if (resourceService == null)
             {
@@ -42,22 +61,33 @@ namespace LCAToolAPI.API
             }
             _ResourceService = resourceService;
             _ScenarioGroupService = scenarioGroupService;
+            _DocuService = docuService;
         }
 
         /// <summary>
-        /// In lieu of HATEOAS, here's a list of all the routes.
+        /// In lieu of HATEOAS, here's a link to documentation. 
         /// </summary>
         /// <returns>Link to documentation.</returns>
         [Route("api")]
+        [Route("api/api")]
+        [Route("api/help")]
         [HttpGet]
-        public Link GetHelp()
+        public ApiInfo GetHelp()
         {
-            return new Link
-            {
-                Rel = "help",
-                Title = "CalRecycle LCA Data API Documentation",
-                Href = "../Help"
-            };
+            var apiInfo = _DocuService.ApiInfo(RequestContext);
+            apiInfo.Version = ToolVersion();
+            return apiInfo;
+        }
+
+        /// <summary>
+        /// Returns a plain string containing the API version from git describe.
+        /// </summary>
+        /// <returns></returns>
+        [Route("api/version")]
+        [HttpGet]
+        public String GetVersion()
+        {
+            return ToolVersion();
         }
 
         /// <summary>
