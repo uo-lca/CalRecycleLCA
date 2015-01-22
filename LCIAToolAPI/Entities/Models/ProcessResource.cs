@@ -13,7 +13,15 @@ namespace Entities.Models {
     /// Maintains Pascal case of properties in EF model. These are automatically converted to
     /// camel case during JSON serialization.
     /// </summary>
-    public class ProcessResource {
+    public class ProcessResource : Resource {
+
+        public ProcessResource()
+        {
+            base.Links = new List<Link>();
+            base.ResourceType = "Process";
+        }
+
+        public override int ID { get { return ProcessID; }}
 
         public int ProcessID { get; set; }
 
@@ -25,11 +33,13 @@ namespace Entities.Models {
 
         public int? ReferenceTypeID { get; set; }
 
-        public int ProcessTypeID { get; set; }
+        //public int ProcessTypeID { get; set; }
 
         public int? ReferenceFlowID { get; set; }
 
-        public string Version { get; set; } // ILCDEntity.Version
+        public string DataSource { get; set; }
+
+        public bool isPrivate { get; set; }
 
         public bool hasElementaryFlows { get; set; }
     }

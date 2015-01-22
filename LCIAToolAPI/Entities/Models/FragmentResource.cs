@@ -22,6 +22,7 @@ namespace Entities.Models {
 
         public int TermFlowID { get; set; }
         public int DirectionID { get; set; }
+        public string Direction { get; set; }
 
     }
 }

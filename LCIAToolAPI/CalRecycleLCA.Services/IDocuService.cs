@@ -14,5 +14,6 @@ namespace CalRecycleLCA.Services
     {
         ApiInfo ApiInfo(HttpRequestContext request);
         Version ApiVersion();
+        List<Link> ResourceLinks(HttpActionContext action, Resource resource);
     }
 }

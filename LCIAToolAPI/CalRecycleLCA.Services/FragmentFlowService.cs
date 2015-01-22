@@ -91,8 +91,10 @@ namespace CalRecycleLCA.Services
                 Name = ff.Name,
                 ShortName = ff.ShortName,
                 NodeTypeID = ff.NodeTypeID,
+                NodeType = Enum.GetName(typeof(NodeTypeEnum), (NodeTypeEnum)ff.NodeTypeID),
                 FlowID = ff.FlowID,
                 DirectionID = ff.DirectionID,
+                Direction = Enum.GetName(typeof(DirectionEnum), (DirectionEnum)ff.DirectionID),
                 ParentFragmentFlowID = ff.ParentFragmentFlowID
             };
         }
@@ -159,6 +161,7 @@ namespace CalRecycleLCA.Services
             ff.SubFragmentID = fn.SubFragmentID;
             ff.IsBackground = (ff.NodeTypeID == 4);
             ff.NodeTypeID = fn.NodeTypeID;
+            ff.NodeType = Enum.GetName(typeof(NodeTypeEnum), (NodeTypeEnum) ff.NodeTypeID);
             if (ff.FlowID == null)
                 ff.FlowID = fn.TermFlowID;
             return ff;

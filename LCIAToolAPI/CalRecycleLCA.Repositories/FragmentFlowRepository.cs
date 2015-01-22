@@ -182,8 +182,10 @@ namespace CalRecycleLCA.Repositories
                 Name = fr.f.Name,
                 ShortName = fr.f.ShortName,
                 NodeTypeID = fr.f.NodeTypeID,
+                NodeType = Enum.GetName(typeof(NodeTypeEnum),(NodeTypeEnum)fr.f.NodeTypeID),
                 FlowID = fr.f.FlowID,
                 DirectionID = fr.f.DirectionID,
+                Direction = Enum.GetName(typeof(DirectionEnum), (DirectionEnum)fr.f.DirectionID),
                 ParentFragmentFlowID = fr.f.ParentFragmentFlowID,
                 NodeWeight = fr.nc.NodeWeight
             });
@@ -320,6 +322,7 @@ namespace CalRecycleLCA.Repositories
                     FragmentID = fragmentId,
                     FragmentFlowID = ff.FragmentFlowID,
                     NodeTypeID = ff.NodeTypeID,
+                    NodeType = ff.NodeType.Name,
                     FlowID = ff.FlowID,
                     DirectionID = ff.DirectionID
                 }).First();

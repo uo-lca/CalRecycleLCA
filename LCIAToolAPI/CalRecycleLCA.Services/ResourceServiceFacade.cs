@@ -222,7 +222,9 @@ namespace CalRecycleLCA.Services
                 Normalization = TransformNullable(lm.Normalization, "LCIAMethod.Normalization"),
                 Weighting = TransformNullable(lm.Weighting, "LCIAMethod.Weighting"),
                 UseAdvice = lm.UseAdvice,
-                ReferenceFlowProperty = Transform(lm.FlowProperty)
+                ReferenceFlowProperty = _FlowPropertyService.GetResource((int)lm.ReferenceQuantity),
+                UUID = lm.ILCDEntity.UUID,
+                Version = lm.ILCDEntity.Version
             };
         }
         /*******************************
@@ -318,6 +320,7 @@ namespace CalRecycleLCA.Services
             };
         }
 
+        /*
         public FlowPropertyResource Transform(FlowProperty fp)
         {
             string unitName = "";
@@ -332,7 +335,7 @@ namespace CalRecycleLCA.Services
                 ReferenceUnit = unitName
             };
         }
-
+        */
         public FragmentResource Transform(Fragment f)
         {
             var term = _FragmentFlowService.GetInFlow(f.FragmentID);
@@ -342,7 +345,8 @@ namespace CalRecycleLCA.Services
                 Name = f.Name,
                 ReferenceFragmentFlowID = TransformNullable(f.ReferenceFragmentFlowID, "Fragment.ReferenceFragmentFlowID"),
                 TermFlowID = term.FlowID,
-                DirectionID = term.DirectionID
+                DirectionID = term.DirectionID,
+                Direction = Enum.GetName(typeof(DirectionEnum), (DirectionEnum)term.DirectionID)
             };
         }
 
@@ -353,7 +357,7 @@ namespace CalRecycleLCA.Services
                 ProcessID = p.ProcessID,
                 Name = p.Name,
                 Geography = p.Geography,
-                ProcessTypeID = TransformNullable(p.ProcessTypeID, "Process.ProcessTypeID"),
+                //ProcessTypeID = TransformNullable(p.ProcessTypeID, "Process.ProcessTypeID"),
                 ReferenceTypeID = p.ReferenceTypeID,
                 ReferenceFlowID = p.ReferenceFlowID,
                 ReferenceYear = p.ReferenceYear,
@@ -369,6 +373,7 @@ namespace CalRecycleLCA.Services
                 // ProcessFlowID = pf.ProcessFlowID,
                 Flow = Transform(pf.Flow),
                 DirectionID = TransformNullable(pf.DirectionID, "ProcessFlow.DirectionID"),
+                Direction = Enum.GetName(typeof(DirectionEnum), (DirectionEnum)pf.DirectionID),
                 VarName = pf.VarName,
                 Magnitude = TransformNullable(pf.Magnitude, "ProcessFlow.Magnitude"),
                 Result = TransformNullable(pf.Result, "ProcessFlow.Result"),
@@ -383,6 +388,7 @@ namespace CalRecycleLCA.Services
                 //LCIAMethodID = TransformNullable(m.LCIAMethodID, "LCIAModel.LCIAMethodID"),
                 FlowID = TransformNullable(m.FlowID, "LCIAModel.FlowID"),
                 DirectionID = TransformNullable(m.DirectionID, "LCIAModel.DirectionID"),
+                Direction = Enum.GetName(typeof(DirectionEnum), (DirectionEnum)m.DirectionID),
                 Quantity = Convert.ToDouble(m.Quantity),
                 Factor = Convert.ToDouble(m.Factor),
                 Result = Convert.ToDouble(m.Result)
@@ -432,7 +438,8 @@ namespace CalRecycleLCA.Services
                 TopLevelFragmentID = s.TopLevelFragmentID,
                 ActivityLevel = Convert.ToDouble(s.ActivityLevel),
                 ReferenceFlowID = s.FlowID,
-                ReferenceDirectionID = s.DirectionID
+                ReferenceDirectionID = s.DirectionID,
+                ReferenceDirection = Enum.GetName(typeof(DirectionEnum), (DirectionEnum)s.DirectionID)
             };
         }
         #endregion
@@ -506,12 +513,7 @@ namespace CalRecycleLCA.Services
         /// <returns>List of FlowResource objects</returns>
         public IEnumerable<FlowResource> GetFlows(int flowtypeID)
         {
-            if (flowtypeID == 0)
-                return _FlowService.Query().Select()
-                    .Select(f => Transform(f)).ToList();
-            else
-                return _FlowService.Query(f => f.FlowTypeID == flowtypeID).Select()
-                    .Select(f => Transform(f)).ToList();
+            return _FlowService.GetFlows(flowtypeID);
         }
 
         /// <summary>
@@ -521,8 +523,7 @@ namespace CalRecycleLCA.Services
         /// <returns></returns>
         public IEnumerable<FlowResource> GetFlow(int flowId)
         {
-            return _FlowService.Query(k => k.FlowID == flowId).Select()
-                .Select(k => Transform(k)).ToList();
+            return _FlowService.GetFlow(flowId);
         }
 
         /// <summary>
@@ -532,11 +533,11 @@ namespace CalRecycleLCA.Services
         /// <returns>List of FlowResource objects</returns>
         public IEnumerable<FlowResource> GetFlowsByFragment(int fragmentID)
         {
+            return _FlowService.GetFlowsByFragment(fragmentID);
             //return GetFlows(typeof(FragmentFlow), fragmentID);
-            return _FlowService.Query(f => f.FragmentFlows.Any(ff => ff.FragmentID == fragmentID))
-                .Include(x => x.FragmentFlows)
+/*            return _FlowService.Query(f => f.FragmentFlows.Any(ff => ff.FragmentID == fragmentID))
                 .Select()
-                .Select(f => Transform(f)).ToList();
+                .Select(f => Transform(f)).ToList();*/
             // return flowQuery.Select(f => Transform(f)).ToList();
         }
 
@@ -589,10 +590,7 @@ namespace CalRecycleLCA.Services
         /// <returns></returns>
         public IEnumerable<FlowPropertyResource> GetFlowProperties()
         {
-            return _FlowPropertyService.Query()
-                .Include(fp => fp.UnitGroup.UnitConversion)
-                .Select()
-                .Select(fp => Transform(fp)).ToList();
+            return _FlowPropertyService.GetAllResources();
         }
 
         public IEnumerable<FlowPropertyMagnitude> GetFlowFlowProperties(int flowId)
@@ -605,6 +603,7 @@ namespace CalRecycleLCA.Services
         /// </summary>
         public IEnumerable<FlowPropertyResource> GetFlowPropertiesByProcess(int processID)
         {
+            return _FlowPropertyService.GetFlowPropertiesByProcess(processID);
             //IEnumerable<FlowProperty> flowProperties = _FlowPropertyService.Query()
             //    .Include(fp => fp.UnitGroup.UnitConversion)
             //    .Filter(fp => fp.Flows.Any(f => f.ProcessFlows.Any(pf => pf.ProcessID == processID)))
@@ -613,13 +612,13 @@ namespace CalRecycleLCA.Services
                 .Include(pf => pf.Flow.FlowFlowProperties)
                 .GroupBy(x => x.Flow.FlowFlowProperties.Select(f => f.FlowPropertyID))
                 .Select(x => x.Flow.FlowFlowProperties.Select(f => f.FlowPropertyID));
-              */  
             var flowProperties = _FlowPropertyService
                 .Query(fp => fp.Flows.Any(f => f.ProcessFlows.Any(pf => pf.ProcessID == processID)))
                 .Include(fp => fp.UnitGroup.UnitConversion)
                 //.Include(fp => fp.Flows.Select(p => p.ProcessFlows)) 
                 .Select().ToList();
             return flowProperties.Select(fp => Transform(fp)).ToList();
+              */
         }
 
         /// <summary>
@@ -629,12 +628,13 @@ namespace CalRecycleLCA.Services
         /// <returns>List of FlowPropertyResource objects</returns>
         public IEnumerable<FlowPropertyResource> GetFlowPropertiesByFragment(int fragmentID)
         {
-            var flowProperties = _FlowPropertyService
+            return _FlowPropertyService.GetFlowPropertiesByFragment(fragmentID);
+/*            var flowProperties = _FlowPropertyService
                 .Query(fp => fp.Flows.Any(f => f.FragmentFlows.Any(ff => ff.FragmentID == fragmentID)))
                 .Include(fp => fp.UnitGroup.UnitConversion)
                 //.Include(fp => fp.Flows.Select(f => f.FragmentFlows))
                 .Select().ToList();
-            return flowProperties.Select(fp => Transform(fp)).ToList();
+            return flowProperties.Select(fp => Transform(fp)).ToList(); */
         }
 
          /// <summary>
@@ -671,10 +671,10 @@ namespace CalRecycleLCA.Services
         /// </summary>
         /// <param name="flowTypeID">Optional process flow type filter</param>
         /// <returns>List of ProcessResource objects</returns>
-        public IEnumerable<ProcessResource> GetProcesses(int? flowTypeID = null)
+        public IEnumerable<ProcessResource> GetProcesses(int flowTypeID = 0)
         {
-
-            var emisProcesses = _ProcessService.Query(p => p.ProcessFlows.Any(pf => pf.Flow.FlowTypeID == 2))
+            return _ProcessService.GetProcesses(flowTypeID);
+/*            var emisProcesses = _ProcessService.Query(p => p.ProcessFlows.Any(pf => pf.Flow.FlowTypeID == 2))
                 .Select(x => x.ProcessID).ToList();
             
             IEnumerable<ProcessResource> pData = _ProcessService.Query()
@@ -687,8 +687,18 @@ namespace CalRecycleLCA.Services
                 return pData.Where(p => p.hasElementaryFlows).ToList();
             else
                 return pData.ToList();
+ * */
         }
 
+        /// <summary>
+        /// Single process
+        /// </summary>
+        /// <param name="processId"></param>
+        /// <returns></returns>
+        public IEnumerable<ProcessResource> GetProcess(int processId)
+        {
+            return _ProcessService.GetProcess(processId);
+        }
 
         /// <summary>
         /// Get ImpactCategory data and transform to API resource model
@@ -800,7 +810,7 @@ namespace CalRecycleLCA.Services
         /// <returns>List of LCIAResultResource objects</returns> 
         public IEnumerable<LCIAResultResource> GetFragmentLCIAResultsAllMethods(int fragmentID, int scenarioId = Scenario.MODEL_BASE_CASE_ID)
         {
-            IEnumerable<int> lciaMethods = _LciaMethodService.QueryActiveMethods().Select(x => x.LCIAMethodID).ToList();
+            IEnumerable<int> lciaMethods = _LciaMethodService.QueryActiveMethods();
             return lciaMethods.Select(s => GetFragmentLCIAResults(fragmentID, s, scenarioId)).ToList();
         }
 
@@ -945,6 +955,7 @@ namespace CalRecycleLCA.Services
                 // else - nothing required
             }
             scenario.ReferenceDirectionID = term.DirectionID;
+            scenario.ReferenceDirection = Enum.GetName(typeof(DirectionEnum), (DirectionEnum)term.DirectionID);
             return scenario;
         }
 

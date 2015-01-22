@@ -13,7 +13,15 @@ namespace Entities.Models {
     /// and reference to flow property for ease of use
     /// 
     /// </summary>
-    public class LCIAMethodResource {
+    public class LCIAMethodResource : Resource {
+        public LCIAMethodResource()
+        {
+            base.Links = new List<Link>();
+            base.ResourceType = "LCIAMethod";
+        }
+
+        public override int ID { get { return LCIAMethodID; } }
+        
         public int LCIAMethodID { get; set; }
         public string Name { get; set; }
         public string Methodology { get; set; }
@@ -36,6 +44,7 @@ namespace Entities.Models {
         public string Geography { get; set; }
         public int FlowID { get; set; }         // Process LCI flow
         public int DirectionID { get; set; }
+        public string Direction { get; set; }
         public double Factor { get; set; }      // CharacterizationParam value or LCIA factor
     }
 }

@@ -11,7 +11,7 @@ namespace CalRecycleLCA.Services
 {
     public interface ILCIAMethodService : IService<LCIAMethod>
     {
-        IEnumerable<LCIAMethod> QueryActiveMethods();
+        List<int> QueryActiveMethods();
         IEnumerable<LCIAMethod> FetchActiveMethods();
     }
 
@@ -45,9 +45,10 @@ namespace CalRecycleLCA.Services
         /// by direct request.
         /// </summary>
         /// <returns></returns>
-        public IEnumerable<LCIAMethod> QueryActiveMethods()
+        public List<int> QueryActiveMethods()
         {
-            return _repository.Queryable().Where(k => activeMethods.Contains(k.LCIAMethodID));
+            return _repository.Queryable().Where(k => activeMethods.Contains(k.LCIAMethodID))
+                .Select(k => k.LCIAMethodID).ToList();
         }
         /// <summary>
         /// Just like QueryActiveMethods except it pre-fetches the needed data for the 
@@ -58,7 +59,7 @@ namespace CalRecycleLCA.Services
         {
             return _repository.Query(k => activeMethods.Contains(k.LCIAMethodID))
                                                 .Include(x => x.IndicatorType)
-                                                .Include(x => x.FlowProperty.UnitGroup.UnitConversion)
+                                                .Include(x => x.ILCDEntity)
                                                 .Select();
         }
     }

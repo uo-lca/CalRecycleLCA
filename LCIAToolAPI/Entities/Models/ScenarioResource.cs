@@ -25,6 +25,7 @@ namespace Entities.Models {
         public int TopLevelFragmentID { get; set; }
         public double ActivityLevel { get; set; }
         public int ReferenceFlowID { get; set; }
+        public string ReferenceDirection { get; set; }
         public int ReferenceDirectionID { get; set; }
 
         // ScenarioGroup.Name
@@ -81,7 +82,7 @@ namespace Entities.Models {
     public class BackgroundSubstutitionResource {
         public int ScenarioID { get; set ; }
         public int FlowID { get; set; }
-        public int DirectionID { get; set; }
+        public string Direction { get; set; }
         public int SubstituteILCDEntityID { get; set; }
     }
 

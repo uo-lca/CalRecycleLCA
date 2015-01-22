@@ -133,7 +133,7 @@ namespace CalRecycleLCA.Services
             FragmentTraverse(fragmentId, scenarioId);
             sw_local.Click("traversal");
             
-            var lciaMethods = _lciaMethodService.QueryActiveMethods().Select(x => x.LCIAMethodID).ToList();
+            var lciaMethods = _lciaMethodService.QueryActiveMethods();
             sw_local.Click("lcia");
 
             var newCaches = FragmentFlowLCIA(fragmentId, scenarioId, lciaMethods);//.ToList();
@@ -156,7 +156,7 @@ namespace CalRecycleLCA.Services
             FragmentTraverse(fragmentId, scenarioId);
             sw_local.Click("traversal");
 
-            var lciaMethods = _lciaMethodService.QueryActiveMethods().Select(x => x.LCIAMethodID).ToList();
+            var lciaMethods = _lciaMethodService.QueryActiveMethods();
             sw_local.Click("lcia");
 
             FragmentFlowLCIA(fragmentId, scenarioId, lciaMethods, true);//.ToList();

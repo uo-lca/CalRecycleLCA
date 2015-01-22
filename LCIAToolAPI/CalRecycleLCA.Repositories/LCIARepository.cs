@@ -105,6 +105,7 @@ namespace CalRecycleLCA.Repositories
                     FlowID = (int)k.FlowID,
                     //Geography = k.Geography,
                     DirectionID = k.DirectionID,
+                    Direction = k.Direction.Name,
                     Factor = k.Factor
                 });
         }

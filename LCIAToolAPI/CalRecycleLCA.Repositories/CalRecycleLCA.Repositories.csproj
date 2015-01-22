@@ -45,6 +45,8 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="BackgroundRepository.cs" />
+    <Compile Include="FlowPropertyRepository.cs" />
+    <Compile Include="FlowRepository.cs" />
     <Compile Include="ParamRepository.cs" />
     <Compile Include="LCIARepository.cs" />
     <Compile Include="FlowFlowPropertyRepository.cs" />

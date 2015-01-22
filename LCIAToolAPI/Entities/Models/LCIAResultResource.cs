@@ -10,7 +10,8 @@ namespace Entities.Models {
     /// </summary>
     public class DetailedLCIAResource {
         public int FlowID { get; set; }         // Process LCI flow
-        public int DirectionID { get; set; }    
+        public int DirectionID { get; set; }
+        public string Direction { get; set; }
         public double Quantity { get; set; }    // Process LCI result
         public double Factor { get; set; }      // CharacterizationParam value or LCIA factor
         public double Result { get; set; }      // Quantity * Factor

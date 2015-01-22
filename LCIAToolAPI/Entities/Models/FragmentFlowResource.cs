@@ -54,8 +54,10 @@ namespace Entities.Models {
         public string Name { get; set; }
         public string ShortName { get; set; }        
         public int NodeTypeID { get; set; }
+        public string NodeType { get; set; }
         public int? FlowID { get; set; }
         public int DirectionID { get; set; }
+        public string Direction { get; set; }
         public int? ParentFragmentFlowID { get; set; }
         //
         // derived from NodeCache

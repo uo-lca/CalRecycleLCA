@@ -430,6 +430,7 @@ namespace LCIAToolAPI.Tests
                                                      {
                                                           FlowID = 168,
                                                           DirectionID = 2,
+                                                          Direction = "Output",
                                                           Quantity = 3E-06,
                                                           Factor = 0.000171,
                                                           Result = 5.1300000000000009E-10
@@ -438,6 +439,7 @@ namespace LCIAToolAPI.Tests
                                                      {
                                                           FlowID = 398,
                                                           DirectionID = 2,
+                                                          Direction = "Output",
                                                           Quantity = 6.93E-07,
                                                           Factor = 0.0168,
                                                           Result = 1.16424E-08
@@ -446,6 +448,7 @@ namespace LCIAToolAPI.Tests
                                                      {
                                                           FlowID = 1014,
                                                           DirectionID = 2,
+                                                          Direction = "Output",
                                                           Quantity = 1.35E-06,
                                                           Factor = 4.19E-05,
                                                           Result = 5.6565E-11
