@@ -1,7 +1,10 @@
-<alert ng-show="alert" type="{{alert.type}}">{{alert.msg}}</alert>
-<div class="panel panel-default">
-    <div class="panel-heading" ng-style="{'background-color' : lciaMethod.getDefaultColor()}">LCIA Method</div>
-    <div class="panel-body">
+<accordion close-others="false">
+    <accordion-group is-open="accordionStatus.attributesOpen">
+        <accordion-heading>
+            LCIA Method Attributes
+            <i class="pull-right glyphicon"
+               ng-class="{'glyphicon-chevron-down': accordionStatus.attributesOpen, 'glyphicon-chevron-right': !accordionStatus.attributesOpen}"></i>
+        </accordion-heading>
         <dl class="dl-horizontal">
             <dt>Name</dt>
             <dd>{{lciaMethod["name"]}}</dd>
@@ -28,23 +31,18 @@
             <dt>Reference Quantity</dt>
             <dd>{{lciaMethod["referenceFlowProperty"]["name"]}}</dd>
         </dl>
-    </div>
-</div>
+    </accordion-group>
+</accordion>
 <div class="panel panel-default">
-    <div class="panel-heading">LCIA Characterization Factors</div>
-    <div class="panel-body">
-        <table class="table table-condensed">
-            <thead>
-            <tr><th>Flow Category</th><th>Flow Name</th><th>Factor</th></tr>
-            </thead>
-            <tbody>
-            <tr ng-repeat="f in lciaFactors">
-                <td>{{f.category}}</td>
-                <td>{{f.name}}</td>
-                <td>{{f.factor | numFormat}}</td>
-            </tr>
-            </tbody>
-        </table>
+    <div class="panel-heading">
+        <span class="panel-title">LCIA Characterization Factors</span>
+        <span class="pull-right">
+            <label for="selectScenario">Scenario</label>
+            <select id="selectScenario" ng-model="paramScenario"
+                    ng-options="scenario.name for scenario in scenarios"
+                    ng-change="onScenarioChange()"></select>
+        </span>
     </div>
+    <div class="gridStyle" ng-grid="gridOptions"></div>
 </div>
 
