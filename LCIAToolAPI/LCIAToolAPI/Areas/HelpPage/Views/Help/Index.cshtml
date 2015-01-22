@@ -6,7 +6,7 @@
 @model Collection<ApiDescription>
 
 @{
-    ViewBag.Title = "ASP.NET Web API Help Page";
+    ViewBag.Title = "CalRecycle - Used Oil LCA - Data API";
 
     // Group APIs by controller
     ILookup<HttpControllerDescriptor, ApiDescription> apiGroups = Model.ToLookup(api => api.ActionDescriptor.ControllerDescriptor);
@@ -25,7 +25,16 @@
         <div class="content-wrapper">
             <h2>Introduction</h2>
             <p>
-                Provide a general description of your APIs here.
+                This is the documentation for the API portion CalRecycle Used Oil LCA online tool project.  
+                The purpose of the project is to make life cycle inventory (LCI) information and impact 
+                assessment (LCIA) results of the SB 546 Used Oil LCA study available to the public.  The API portion
+                is the "backend" of the project, which makes the data available.  It is accompanied by a "Frontend"
+                component for visualizing the information, which can be found <a href="../../lcatoolfrontend">here</a>.
+            </p>
+            <p>
+                This API provides information that is (a) stateless and (b) self-documenting (REST design model).  The 
+                user accesses data by requesting resources by specifying them as URIs.  This page documents the different
+                resources available for query.
             </p>
         </div>
     </section>
