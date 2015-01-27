@@ -394,7 +394,7 @@ namespace LCIAToolAPI.Tests
                        ReferenceYear = x.ReferenceYear,
                        Geography = x.Geography,
                        ReferenceTypeID = x.ReferenceTypeID,
-                       ProcessTypeID = Convert.ToInt32(x.ProcessTypeID),
+                       //ProcessTypeID = Convert.ToInt32(x.ProcessTypeID),
                        ReferenceFlowID=x.ReferenceFlowID
                    }).ToList();
 
