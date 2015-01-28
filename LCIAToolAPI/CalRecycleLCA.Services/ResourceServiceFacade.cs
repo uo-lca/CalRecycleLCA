@@ -491,8 +491,8 @@ namespace CalRecycleLCA.Services
             _FragmentLCIAComputation.FragmentTraverse(fragmentID, scenarioID);
             var test = _FragmentFlowService.GetTerminatedFlows(fragmentID, scenarioID)
                 .ToList();
-            foreach (var ff in test)
-                ff.FlowPropertyMagnitudes = _FlowFlowPropertyService.GetFlowPropertyMagnitudes(ff, scenarioID);
+            //foreach (var ff in test)
+            //    ff.FlowPropertyMagnitudes = _FlowFlowPropertyService.GetFlowPropertyMagnitudes(ff, scenarioID);
 
             //var fragmentFlows = _FragmentFlowService.Query(q => q.FragmentID == fragmentID)
             //                                    .Include(x => x.FragmentNodeFragments)

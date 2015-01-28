@@ -14,7 +14,7 @@ namespace CalRecycleLCA.Services
     public interface IFlowFlowPropertyService : IService<FlowFlowProperty>
     {
         double? FlowConv(int? myFlowId, int inFlowId, int scenarioId = Scenario.MODEL_BASE_CASE_ID);
-        ICollection<FlowPropertyMagnitude> GetFlowPropertyMagnitudes(FragmentFlowResource ff, int scenarioId);
+        //ICollection<FlowPropertyMagnitude> GetFlowPropertyMagnitudes(NodeCacheModel ff, int scenarioId);
         ICollection<FlowPropertyMagnitude> GetFlowPropertyMagnitudes(int flowId, int scenarioId = Scenario.MODEL_BASE_CASE_ID);
     }
 
@@ -50,26 +50,28 @@ namespace CalRecycleLCA.Services
             return _repository.GetFlowPropertyMagnitudes(flowId, scenarioId).ToList();
         }
         
+        /*
         /// <summary>
         /// Takes in a FragmentFlowResource and returns scenario-specific flow magnitudes for the flow. 
         /// If the NodeWeight field is populated, the magnitudes are scaled by it.
         /// </summary>
-        /// <param name="ff"></param>
+        /// <param name="ncm"></param>
         /// <param name="scenarioId"></param>
         /// <returns></returns>
-        public ICollection<FlowPropertyMagnitude> GetFlowPropertyMagnitudes(FragmentFlowResource ff, int scenarioId)
+        public ICollection<FlowPropertyMagnitude> GetFlowPropertyMagnitudes(NodeCacheModel ncm, int scenarioId)
         {
             ICollection<FlowPropertyMagnitude> ffpData = 
-                (ff.FlowID == null ? new List<FlowPropertyMagnitude>()
-                : _repository.GetFlowPropertyMagnitudes((int)ff.FlowID, scenarioId)).ToList();
-            if (ff.NodeWeight != null)
+                (ncm.FlowID == null ? new List<FlowPropertyMagnitude>()
+                : _repository.GetFlowPropertyMagnitudes((int)ncm.FlowID, scenarioId)).ToList();
+            if (ncm.FlowMagnitude != null)
                 foreach (var fp in ffpData)
                 {
-                    fp.Magnitude *= (double)ff.NodeWeight;
+                    fp.Magnitude *= (double)ncm.FlowMagnitude;
                 }
             return ffpData;
 
 
         }
+         * */
     }
 }

@@ -21,17 +21,17 @@ namespace CalRecycleLCA.Repositories
     public static class BackgroundRepository
     {
         ///** ************************
-        public static FragmentNodeResource ResolveBackground(this IRepository<Background> repository, 
+        public static FlowTerminationModel ResolveBackground(this IRepository<Background> repository, 
 						     int? flowId, int directionId, int scenarioId)
 	    {
-            var background = new FragmentNodeResource();
+            var background = new FlowTerminationModel();
             int targetId;
 
             background = repository.GetRepository<BackgroundSubstitution>().Queryable()
                 .Where(x => x.ScenarioID == scenarioId)
                 .Where(x => x.FlowID == flowId)
                 .Where(x => x.DirectionID == directionId)
-               .Select(bg => new FragmentNodeResource
+               .Select(bg => new FlowTerminationModel
                {
                    NodeTypeID = bg.NodeTypeID,
                    ScenarioID = scenarioId,
@@ -44,7 +44,7 @@ namespace CalRecycleLCA.Repositories
                 background = repository.GetRepository<Background>().Queryable()
                 .Where(x => x.FlowID == flowId)
                 .Where(x => x.DirectionID == directionId)
-                .Select(bg => new FragmentNodeResource
+                .Select(bg => new FlowTerminationModel
                 {
                     NodeTypeID = bg.NodeTypeID,
                     ScenarioID = scenarioId,

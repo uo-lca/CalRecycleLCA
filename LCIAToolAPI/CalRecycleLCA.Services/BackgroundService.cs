@@ -13,7 +13,7 @@ namespace CalRecycleLCA.Services
 {
     public interface IBackgroundService : IService<Background>
     {
-        FragmentNodeResource ResolveBackground(int? flowId, int directionId, int scenarioId);
+        FlowTerminationModel ResolveBackground(int? flowId, int directionId, int scenarioId);
     }
 
     public class BackgroundService : Service<Background>, IBackgroundService
@@ -26,7 +26,7 @@ namespace CalRecycleLCA.Services
             _repository = repository;
         }
 
-        public FragmentNodeResource ResolveBackground(int? flowId, int directionId, int scenarioId)
+        public FlowTerminationModel ResolveBackground(int? flowId, int directionId, int scenarioId)
         {
             return _repository.ResolveBackground(flowId, directionId, scenarioId);
         }

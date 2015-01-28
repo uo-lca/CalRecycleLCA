@@ -90,10 +90,10 @@ namespace CalRecycleLCA.Services
             //if (nodeCaches.Any(n => n.FragmentFlowID == fragmentFlowId))
               //  return; // bail out!
 
-            var theFragmentFlow = _fragmentFlowService.GetResource(ff
+            var theFragmentFlow = _fragmentFlowService.GetNodeModel(ff
                 .Where(k => k.FragmentFlowID == fragmentFlowId).First());
             
-            FragmentNodeResource term = _fragmentFlowService.Terminate(theFragmentFlow,scenarioId); // don't bother to resolve background
+            FlowTerminationModel term = _fragmentFlowService.Terminate(theFragmentFlow,scenarioId, true); // don't bother to resolve background
 
             // first, calculate node weight
             double? flow_conv = _flowFlowPropertyService.FlowConv(theFragmentFlow.FlowID, term.TermFlowID, scenarioId);
@@ -164,11 +164,11 @@ namespace CalRecycleLCA.Services
             
             nodeCaches.Add(new NodeCacheModel()
             {
-                FragmentID = theFragmentFlow.FragmentID,
+                FragmentID = (int)theFragmentFlow.FragmentID,
+                FragmentFlowID = fragmentFlowId,
                 NodeTypeID = theFragmentFlow.NodeTypeID,
                 FlowID = theFragmentFlow.FlowID,
                 DirectionID = theFragmentFlow.DirectionID,
-                FragmentFlowID = fragmentFlowId,
                 ScenarioID = scenarioId,
                 FlowMagnitude = flowMagnitude,
                 NodeWeight = nodeWeight
@@ -187,7 +187,7 @@ namespace CalRecycleLCA.Services
         /// <param name="ex_directionId">Direction of the physical flow with respect to the *parent*</param>
         /// <param name="flow_exch">out param set equal to the inflow's exchange</param>
         /// <returns></returns>
-        public IEnumerable<InventoryModel> GetScenarioProductFlows(FragmentNodeResource term, int ex_directionId, out double flow_exch)
+        public IEnumerable<InventoryModel> GetScenarioProductFlows(FlowTerminationModel term, int ex_directionId, out double flow_exch)
         {
             IEnumerable<InventoryModel> Outflows;
             switch (term.NodeTypeID)

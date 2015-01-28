@@ -109,7 +109,6 @@
     <Compile Include="IDocuService.cs" />
     <Compile Include="IResourceServiceFacade.cs" />
     <Compile Include="IScoreCacheService.cs" />
-    <Compile Include="ITestGenericService.cs" />
     <Compile Include="LCIAComputationV2.cs" />
     <Compile Include="LCIAMethodService.cs" />
     <Compile Include="LCIAService.cs" />
@@ -126,7 +125,6 @@
     <Compile Include="ScenarioGroupService.cs" />
     <Compile Include="ScenarioService.cs" />
     <Compile Include="ScoreCacheService.cs" />
-    <Compile Include="TestGenericService.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\Database\DataModel\LcaDataModel.csproj">

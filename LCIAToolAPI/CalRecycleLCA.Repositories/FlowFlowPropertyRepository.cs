@@ -47,8 +47,8 @@ namespace CalRecycleLCA.Repositories
             return flow_conv;
         }
 
-        public static IEnumerable<FlowPropertyMagnitude> GetFlowPropertyMagnitudes(this IRepositoryAsync<FlowFlowProperty> repository,
-            int flowId, int scenarioId)
+        public static IEnumerable<FlowPropertyMagnitude> GetFlowPropertyMagnitudes(this IRepository<FlowFlowProperty> repository,
+            int flowId, int scenarioId, double scale = 1.0)
         {
             return repository.Queryable().Where(fp => fp.FlowID == flowId)
                 .GroupJoin(repository.GetRepository<FlowPropertyParam>().Queryable()
@@ -61,7 +61,7 @@ namespace CalRecycleLCA.Repositories
                     {
                         FlowPropertyID = (int)s.factors.FlowPropertyID,
                         Unit = s.factors.FlowProperty.UnitGroup.UnitConversion.Unit,
-                        Magnitude = parameter == null ? (double)s.factors.MeanValue : parameter.Value
+                        Magnitude = parameter == null ? scale * (double)s.factors.MeanValue : scale * parameter.Value
                     });
         }
     }

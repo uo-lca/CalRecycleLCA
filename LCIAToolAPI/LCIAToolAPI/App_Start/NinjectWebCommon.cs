@@ -162,7 +162,6 @@ namespace LCAToolAPI.App_Start
             kernel.Bind<IFlowPropertyParamService>().To<FlowPropertyParamService>();
 
 
-            kernel.Bind<ITestGenericService>().To<TestGenericService>();
         }
 
         /// <summary>

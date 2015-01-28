@@ -218,7 +218,13 @@ namespace CalRecycleLCA.Services
                 //if (item.FlowID == null)
                   //  item.FlowID = 0; // TODO: this should be set to whatever is the fragment's inflow-- ??
 
+                // case 1: terminate FF directly -- judged FASTER 346-425 ms
                 var fragmentNode = _fragmentFlowService.Terminate(item, scenarioId, true); // true => do Background 
+                // case 2: terminate via GetResource -- judged SLOWER 533-582 ms
+                //var fragmentNode = _fragmentFlowService.Terminate(_fragmentFlowService.GetResource(item), scenarioId, true);
+                // propagate to Traversal
+
+
                 sw_ff.CStop();
                 
                 if (fragmentNode.NodeTypeID == 2)
@@ -254,7 +260,7 @@ namespace CalRecycleLCA.Services
         // {
         //   error('not implemented');
         //}
-        public IEnumerable<ScoreCache> GetScoreCaches(int fragmentFlowId, FragmentNodeResource fragmentNode, IEnumerable<int> lciaMethods)
+        public IEnumerable<ScoreCache> GetScoreCaches(int fragmentFlowId, FlowTerminationModel fragmentNode, IEnumerable<int> lciaMethods)
         {
             List<ScoreCache> scoreCachesInProgress = new List<ScoreCache>();
 

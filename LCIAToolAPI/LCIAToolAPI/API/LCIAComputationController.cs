@@ -22,8 +22,8 @@ namespace LCAToolAPI.API
         private readonly ILCIAComputationV2 _lciaComputationV2;
         [Inject]
         private readonly IFragmentLCIAComputation _fragmentLCIAComputation;
-        [Inject]
-        private readonly ITestGenericService _testService;
+        //[Inject]
+        //private readonly ITestGenericService _testService;
 
         /// <summary>
         /// Constructor for LCIA computation diagnostic controller.  Creates computation objects 
@@ -31,11 +31,9 @@ namespace LCAToolAPI.API
         /// </summary>
         /// <param name="lciaComputationV2">via dependency injection</param>
         /// <param name="fragmentLCIAComputation">via dependency injection</param>
-        /// <param name="testGenericService">via dependency injection</param>
         public LCIAComputationController(
             ILCIAComputationV2 lciaComputationV2, 
-            IFragmentLCIAComputation fragmentLCIAComputation,
-            ITestGenericService testGenericService)
+            IFragmentLCIAComputation fragmentLCIAComputation)
         {
 
             if (lciaComputationV2 == null)
@@ -52,12 +50,14 @@ namespace LCAToolAPI.API
 
             _fragmentLCIAComputation = fragmentLCIAComputation;
 
+            /*
             if (testGenericService == null)
             {
                 throw new ArgumentNullException("testGenericService is null");
             }
 
             _testService = testGenericService;
+             * */
         }
 
         //GET api/<controller>
@@ -129,6 +129,8 @@ namespace LCAToolAPI.API
             return;// scores;
         }
 
+
+        /*
         // Diagnostic functions
         /// <summary>
         /// api/fragmentflows/{fragmentFlowID}/scenarios/{scenarioID}/node
@@ -160,7 +162,7 @@ namespace LCAToolAPI.API
         {
             return _testService.GetDependencies(fragmentFlowID, scenarioID);
         }
-
+        */
 
 
        
