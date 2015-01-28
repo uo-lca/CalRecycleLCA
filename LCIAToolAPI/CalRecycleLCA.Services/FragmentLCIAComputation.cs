@@ -28,13 +28,15 @@ namespace CalRecycleLCA.Services
         [Inject]
         private readonly ILCIAMethodService _lciaMethodService;
         [Inject]
+        private readonly IFragmentService _fragmentService;
+        [Inject]
         private readonly IUnitOfWork _unitOfWork;
 
 
         // diagnostics
         private CounterTimer sw_local, sw_ff, sw_cache, sw_lcia, sw_traverse;
         private List<ScoreCache> currentCache;
-
+        private bool[] fragsThisRound;
 
         public FragmentLCIAComputation(IFragmentTraversalV2 fragmentTraversalV2,
             ILCIAComputationV2 lciaComputationV2,
@@ -42,6 +44,7 @@ namespace CalRecycleLCA.Services
             IScoreCacheService scoreCacheService,
             INodeCacheService nodeCacheService,
             ILCIAMethodService lciaMethodService,
+            IFragmentService fragmentService,
             IUnitOfWork unitOfWork)
         {
             if (fragmentTraversalV2 == null)
@@ -80,6 +83,12 @@ namespace CalRecycleLCA.Services
             }
             _lciaMethodService = lciaMethodService;
 
+            if (fragmentService == null)
+            {
+                throw new ArgumentNullException("fragmentService is null");
+            }
+            _fragmentService = fragmentService;
+
             if (unitOfWork == null)
             {
                 throw new ArgumentNullException("unitOfWork is null");
@@ -93,6 +102,8 @@ namespace CalRecycleLCA.Services
             sw_traverse = new CounterTimer();
 
             currentCache = new List<ScoreCache>();
+
+            fragsThisRound = new bool[_fragmentService.Count()+1];
         }
 
         public IEnumerable<NodeCache> FragmentTraverse(int fragmentId, int scenarioId = Scenario.MODEL_BASE_CASE_ID)
@@ -198,13 +209,17 @@ namespace CalRecycleLCA.Services
         private IEnumerable<ScoreCache> FragmentFlowLCIA(int fragmentId, int scenarioId, IEnumerable<int> lciaMethods,
             bool save = false)
         {
+            List<ScoreCache> scoreCaches = new List<ScoreCache>();
+
+            if (fragsThisRound[fragmentId])
+                return scoreCaches; // already done this frag this round.
+            fragsThisRound[fragmentId] = true;
+
             // set score cache for fragment / scenario / method: iterate through
             // fragmentflows 
             currentCache.AddRange(_scoreCacheService.GetScenarioCaches(fragmentId, scenarioId).ToList());
 
             sw_local.Click("caches");
-
-            List<ScoreCache> scoreCaches = new List<ScoreCache>();
 
             var fragmentFlows = _fragmentFlowService.GetLCIAFlows(fragmentId);
 

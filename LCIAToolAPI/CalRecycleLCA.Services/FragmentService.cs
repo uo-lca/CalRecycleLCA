@@ -11,14 +11,21 @@ namespace CalRecycleLCA.Services
 {
     public interface IFragmentService : IService<Fragment>
     {
+        int Count();
     }
 
     public class FragmentService : Service<Fragment>, IFragmentService
     {
+        private IRepositoryAsync<Fragment> _repository;
         public FragmentService(IRepositoryAsync<Fragment> repository)
             : base(repository)
         {
+            _repository = repository;
+        }
 
+        public int Count()
+        {
+            return _repository.Queryable().Count();
         }
     }
 }
