@@ -100,11 +100,9 @@ namespace CalRecycleLCA.Repositories
                 .Where(k => k.FlowID != null)
                 .Where(k => String.IsNullOrEmpty(k.Geography) )
                 .Select(k => new LCIAFactorResource() {
-                    LCIAID = k.LCIAID,
                     LCIAMethodID = (int)k.LCIAMethodID,
                     FlowID = (int)k.FlowID,
                     //Geography = k.Geography,
-                    DirectionID = k.DirectionID,
                     Direction = k.Direction.Name,
                     Factor = k.Factor
                 });

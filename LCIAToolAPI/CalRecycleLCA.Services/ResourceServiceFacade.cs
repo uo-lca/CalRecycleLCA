@@ -222,6 +222,7 @@ namespace CalRecycleLCA.Services
                 Normalization = TransformNullable(lm.Normalization, "LCIAMethod.Normalization"),
                 Weighting = TransformNullable(lm.Weighting, "LCIAMethod.Weighting"),
                 UseAdvice = lm.UseAdvice,
+                ReferenceFlowPropertyID = (int)lm.ReferenceQuantity,
                 ReferenceFlowProperty = _FlowPropertyService.GetResource((int)lm.ReferenceQuantity),
                 UUID = lm.ILCDEntity.UUID,
                 Version = lm.ILCDEntity.Version
@@ -345,7 +346,6 @@ namespace CalRecycleLCA.Services
                 Name = f.Name,
                 ReferenceFragmentFlowID = TransformNullable(f.ReferenceFragmentFlowID, "Fragment.ReferenceFragmentFlowID"),
                 TermFlowID = term.FlowID,
-                DirectionID = term.DirectionID,
                 Direction = Enum.GetName(typeof(DirectionEnum), (DirectionEnum)term.DirectionID)
             };
         }
@@ -372,7 +372,6 @@ namespace CalRecycleLCA.Services
             {
                 // ProcessFlowID = pf.ProcessFlowID,
                 Flow = Transform(pf.Flow),
-                DirectionID = TransformNullable(pf.DirectionID, "ProcessFlow.DirectionID"),
                 Direction = Enum.GetName(typeof(DirectionEnum), (DirectionEnum)pf.DirectionID),
                 VarName = pf.VarName,
                 Magnitude = TransformNullable(pf.Magnitude, "ProcessFlow.Magnitude"),
@@ -387,7 +386,6 @@ namespace CalRecycleLCA.Services
             {
                 //LCIAMethodID = TransformNullable(m.LCIAMethodID, "LCIAModel.LCIAMethodID"),
                 FlowID = TransformNullable(m.FlowID, "LCIAModel.FlowID"),
-                DirectionID = TransformNullable(m.DirectionID, "LCIAModel.DirectionID"),
                 Direction = Enum.GetName(typeof(DirectionEnum), (DirectionEnum)m.DirectionID),
                 Quantity = Convert.ToDouble(m.Quantity),
                 Factor = Convert.ToDouble(m.Factor),
@@ -438,7 +436,6 @@ namespace CalRecycleLCA.Services
                 TopLevelFragmentID = s.TopLevelFragmentID,
                 ActivityLevel = Convert.ToDouble(s.ActivityLevel),
                 ReferenceFlowID = s.FlowID,
-                ReferenceDirectionID = s.DirectionID,
                 ReferenceDirection = Enum.GetName(typeof(DirectionEnum), (DirectionEnum)s.DirectionID)
             };
         }
@@ -954,7 +951,6 @@ namespace CalRecycleLCA.Services
                     return null; // must be commensurable
                 // else - nothing required
             }
-            scenario.ReferenceDirectionID = term.DirectionID;
             scenario.ReferenceDirection = Enum.GetName(typeof(DirectionEnum), (DirectionEnum)term.DirectionID);
             return scenario;
         }

@@ -34,16 +34,15 @@ namespace Entities.Models {
         public bool Normalization { get; set; }
         public bool Weighting { get; set; }
         public string UseAdvice { get; set; }
+        public int ReferenceFlowPropertyID { get; set; }
         public FlowPropertyResource ReferenceFlowProperty { get; set; }     
     }
 
     public class LCIAFactorResource
     {
-        public int LCIAID { get; set; }
         public int LCIAMethodID { get; set; }
         public string Geography { get; set; }
         public int FlowID { get; set; }         // Process LCI flow
-        public int DirectionID { get; set; }
         public string Direction { get; set; }
         public double Factor { get; set; }      // CharacterizationParam value or LCIA factor
     }

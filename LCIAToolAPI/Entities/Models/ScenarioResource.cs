@@ -26,7 +26,6 @@ namespace Entities.Models {
         public double ActivityLevel { get; set; }
         public int ReferenceFlowID { get; set; }
         public string ReferenceDirection { get; set; }
-        public int ReferenceDirectionID { get; set; }
 
         // ScenarioGroup.Name
         public int ScenarioGroupID { get; set; }

@@ -151,10 +151,10 @@ namespace CalRecycleLCA.Services
         {
             return _repository.Terminate(new NodeCacheModel() 
             { 
-                NodeTypeID = ff.NodeTypeID,
+                NodeTypeID = Convert.ToInt32(Enum.Parse(typeof(NodeTypeEnum),ff.NodeType)),
                 FragmentFlowID = ff.FragmentFlowID,
                 FlowID = ff.FlowID,
-                DirectionID = ff.DirectionID
+                DirectionID = Convert.ToInt32(Enum.Parse(typeof(DirectionEnum),ff.Direction)),
             }, scenarioId, doBackground);
         }
 
@@ -173,9 +173,8 @@ namespace CalRecycleLCA.Services
             var fn = Terminate(ff, scenarioId, doBackground);
             ff.ProcessID = fn.ProcessID;
             ff.SubFragmentID = fn.SubFragmentID;
-            ff.IsBackground = (ff.NodeTypeID == 4);
-            ff.NodeTypeID = fn.NodeTypeID;
-            ff.NodeType = Enum.GetName(typeof(NodeTypeEnum), (NodeTypeEnum)ff.NodeTypeID);
+            ff.IsBackground = (ff.NodeType == "Background");
+            ff.NodeType = Enum.GetName(typeof(NodeTypeEnum), (NodeTypeEnum)fn.NodeTypeID);
             if (ff.FlowID == null)
                 ff.FlowID = fn.TermFlowID;
             return ff;

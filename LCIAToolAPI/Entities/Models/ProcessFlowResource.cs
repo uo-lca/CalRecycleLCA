@@ -20,7 +20,6 @@ namespace Entities.Models {
 
         // public int ProcessFlowID { get; set; } // not necessary; may expose information
         public FlowResource Flow { get; set; }
-        public int DirectionID { get; set; }
         public string Direction { get; set; }
         public string VarName { get; set; }
         public double Magnitude { get; set; }

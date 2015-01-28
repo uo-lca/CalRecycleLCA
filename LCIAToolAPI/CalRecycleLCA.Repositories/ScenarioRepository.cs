@@ -21,7 +21,7 @@ namespace CalRecycleLCA.Repositories
                 ActivityLevel = post.ActivityLevel,
                 TopLevelFragmentID = post.TopLevelFragmentID,
                 FlowID = post.ReferenceFlowID,
-                DirectionID = post.ReferenceDirectionID
+                DirectionID = Convert.ToInt32(Enum.Parse(typeof(DirectionEnum),post.ReferenceDirection))
             };
             scenario.ObjectState = ObjectState.Added;
             repository.Insert(scenario);
@@ -42,7 +42,7 @@ namespace CalRecycleLCA.Repositories
                 scenario.FlowID = put.ReferenceFlowID;
                 cacheTracker.NodeCacheStale = true;
             }
-            scenario.DirectionID = put.ReferenceDirectionID;
+            scenario.DirectionID = Convert.ToInt32(Enum.Parse(typeof(DirectionEnum),put.ReferenceDirection));
             return scenario;
         }
 

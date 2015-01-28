@@ -33,8 +33,6 @@ namespace Entities.Models {
 
         public int? ReferenceTypeID { get; set; }
 
-        //public int ProcessTypeID { get; set; }
-
         public int? ReferenceFlowID { get; set; }
 
         public string DataSource { get; set; }
