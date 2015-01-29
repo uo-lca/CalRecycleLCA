@@ -103,7 +103,9 @@ namespace LcaDataModel {
 
             modelBuilder.Entity<CharacterizationParam>()
                 .HasRequired(e => e.Param)
-                .WithOptional(e => e.CharacterizationParam)
+                // Unable to implement 0..1 on the other side of the relationship here
+                .WithMany(e => e.CharacterizationParams) 
+                .HasForeignKey(e => e.ParamID)
                 .WillCascadeOnDelete(true);
 
             modelBuilder.Entity<CompositionModel>()

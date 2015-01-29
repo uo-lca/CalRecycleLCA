@@ -293,12 +293,15 @@ namespace CalRecycleLCA.Repositories
                             .Where(k => k.LCIAMethodID == post.LCIAMethodID)
                             .Select(k => k.LCIAID)
                             .First();
-                        P.CharacterizationParam = new CharacterizationParam()
+                        // P.CharacterizationParam = new CharacterizationParam()
+                        CharacterizationParam cp = new CharacterizationParam()
                             {
                                 LCIAID = cfp,
                                 Value = post.Value,
+                                Param = P,
                                 ObjectState = ObjectState.Added
                             };
+                        P.CharacterizationParams.Add(cp);
                         cacheTracker.LCIAMethodsStale.Add((int)post.LCIAMethodID);
                         break;
                     }

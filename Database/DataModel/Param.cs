@@ -6,6 +6,7 @@ namespace LcaDataModel
     using System.ComponentModel.DataAnnotations;
     using System.ComponentModel.DataAnnotations.Schema;
     using System.Data.Entity.Spatial;
+    using System.Linq;
 
     [Table("Param")]
     public partial class Param : Entity
@@ -13,6 +14,8 @@ namespace LcaDataModel
         public Param()
         {
             DependencyParams = new HashSet<DependencyParam>();
+
+            CharacterizationParams = new HashSet<CharacterizationParam>();
 
             CompositionParams = new HashSet<CompositionParam>();
         }
@@ -46,6 +49,15 @@ namespace LcaDataModel
 
         public virtual ProcessEmissionParam ProcessEmissionParam { get; set; }
 
-        public virtual CharacterizationParam CharacterizationParam { get; set; }
+        //
+        // Relationship between Param and CharacterizationParam should be subclass,
+        // and the cardinality should be (0 or 1) to 1. 
+        // The following is a stop-gap until model is revised.
+        //
+        public virtual ICollection<CharacterizationParam> CharacterizationParams { get; set; }
+        [NotMapped]
+        public virtual CharacterizationParam CharacterizationParam {
+            get { return CharacterizationParams.FirstOrDefault(); }
+        }
     }
 }
