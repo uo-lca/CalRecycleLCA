@@ -330,9 +330,9 @@ namespace CalRecycleLCA.Repositories
                 .Include(k => k.DependencyParams)
                 .Include(k => k.FlowPropertyParams)
                 .Include(k => k.CompositionParams)
-                .Include(k => k.ProcessDissipationParams)
-                .Include(k => k.ProcessEmissionParams)
-                .Include(k => k.CharacterizationParam.LCIA)
+                .Include(k => k.ProcessDissipationParam)
+                .Include(k => k.ProcessEmissionParam)
+                .Include(k => k.CharacterizationParams)
                 .Select().First();
             if (put.Name != null)
                 P.Name = put.Name;
@@ -403,9 +403,13 @@ namespace CalRecycleLCA.Repositories
                         }
                     case 10:
                         {
+                            int lmid = repository.GetRepository<LCIA>().Queryable()
+                                                .Where(k => k.LCIAID == P.CharacterizationParam.LCIAID)
+                                                .Select(k => k.LCIAMethodID)
+                                                .First();
                             P.CharacterizationParam.Value = put.Value;
                             P.CharacterizationParam.ObjectState = ObjectState.Modified;
-                            cacheTracker.LCIAMethodsStale.Add((int)P.CharacterizationParam.LCIA.LCIAMethodID);
+                            cacheTracker.LCIAMethodsStale.Add(lmid);
                             break;
                         }
                 }
