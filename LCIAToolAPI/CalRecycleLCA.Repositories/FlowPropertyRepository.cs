@@ -19,7 +19,7 @@ namespace CalRecycleLCA.Repositories
             if (fp.UnitGroup == null)
                 unit = "null";
             else
-                unit = fp.UnitGroup.UnitConversion.Unit;
+                unit = fp.UnitGroup.ReferenceUnit;
             return new FlowPropertyResource
             {
                 FlowPropertyID = fp.FlowPropertyID,
@@ -35,7 +35,7 @@ namespace CalRecycleLCA.Repositories
             //return repository.Queryable().ToResource();
             return repository.Query()
                 .Include(fp => fp.ILCDEntity)
-                .Include(fp => fp.UnitGroup.UnitConversion)
+                .Include(fp => fp.UnitGroup)
                 .Select()
                 .Select( fp => ToResource(fp)).ToList();
         }
@@ -44,7 +44,7 @@ namespace CalRecycleLCA.Repositories
         {
             return repository.Query(fp => fp.Flows.Any(f => f.ProcessFlows.Any(pf => pf.ProcessID == processId)))
                 .Include(fp => fp.ILCDEntity)
-                .Include(fp => fp.UnitGroup.UnitConversion)
+                .Include(fp => fp.UnitGroup)
                 .Select()
                 .Select(fp => ToResource(fp)).ToList();
 
@@ -54,7 +54,7 @@ namespace CalRecycleLCA.Repositories
         {
             return repository.Query(fp => fp.Flows.Any(f => f.FragmentFlows.Any(ff => ff.FragmentID == fragmentId)))
                 .Include(fp => fp.ILCDEntity)
-                .Include(fp => fp.UnitGroup.UnitConversion)
+                .Include(fp => fp.UnitGroup)
                 .Select()
                 .Select(fp => ToResource(fp)).ToList();
         }

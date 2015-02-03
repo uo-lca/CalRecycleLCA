@@ -17,7 +17,7 @@ namespace LcaDataModel
 
         public int LCIAID { get; set; }
 
-        public int? LCIAMethodID { get; set; }
+        public int LCIAMethodID { get; set; }
 
         public int? FlowID { get; set; }
 

@@ -21,7 +21,7 @@ namespace LcaDataModel
 
         public int FlowPropertyEmissionID { get; set; }
 
-        public double? EmissionFactor { get; set; }
+        public double EmissionFactor { get; set; }
 
         public virtual Process Process { get; set; }
 

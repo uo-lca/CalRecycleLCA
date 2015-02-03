@@ -30,9 +30,9 @@ namespace LcaDataModel
         [StringLength(15)]
         public string VarName { get; set; }
 
-        public double? Magnitude { get; set; }
+        public double Magnitude { get; set; }
 
-        public double? Result { get; set; }
+        public double Result { get; set; }
 
         public double? STDev { get; set; }
 

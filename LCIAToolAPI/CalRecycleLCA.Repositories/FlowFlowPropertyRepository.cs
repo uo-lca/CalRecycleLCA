@@ -32,7 +32,7 @@ namespace CalRecycleLCA.Repositories
                     my_val.MeanValue = fp_param.Value;
             }
 
-            return (double)my_val.MeanValue;
+            return my_val.MeanValue;
         }
 
         public static double? FlowConv(this IRepositoryAsync<FlowFlowProperty> repository,
@@ -59,9 +59,9 @@ namespace CalRecycleLCA.Repositories
                     .SelectMany(s => s.parameter.DefaultIfEmpty(),
                     (s, parameter) => new FlowPropertyMagnitude
                     {
-                        FlowPropertyID = (int)s.factors.FlowPropertyID,
-                        Unit = s.factors.FlowProperty.UnitGroup.UnitConversion.Unit,
-                        Magnitude = parameter == null ? scale * (double)s.factors.MeanValue : scale * parameter.Value
+                        FlowPropertyID = s.factors.FlowPropertyID,
+                        Unit = s.factors.FlowProperty.UnitGroup.ReferenceUnit,
+                        Magnitude = parameter == null ? scale * s.factors.MeanValue : scale * parameter.Value
                     });
         }
     }

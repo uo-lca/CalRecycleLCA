@@ -34,9 +34,9 @@ namespace LcaDataModel
         [Index("IX_UUID_Version", 2, IsUnique = true)]
         public string Version { get; set; }
 
-        public int? DataSourceID { get; set; }
+        public int DataSourceID { get; set; }
 
-        public int? DataTypeID { get; set; }
+        public int DataTypeID { get; set; }
 
         // Inverse navigation
         public virtual ICollection<Background> Backgrounds { get; set; }

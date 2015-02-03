@@ -25,11 +25,12 @@ namespace LcaDataModel
         [StringLength(250)]
         public string Name { get; set; }
 
+        // must be nullable because of data import issues caused by self-reference -see CsvImporter.UpdateCategory()
         public int? CategorySystemID { get; set; }
 
         public int? ParentCategoryID { get; set; }
 
-        public int? HierarchyLevel { get; set; }
+        public int HierarchyLevel { get; set; }
 
         public virtual ICollection<Category> Category1 { get; set; }
 

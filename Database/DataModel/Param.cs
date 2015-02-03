@@ -30,7 +30,7 @@ namespace LcaDataModel
         //[DatabaseGenerated(DatabaseGeneratedOption.None)]
         public int ParamID { get; set; }
 
-        public int? ParamTypeID { get; set; }
+        public int ParamTypeID { get; set; }
 
         public int ScenarioID { get; set; }
 

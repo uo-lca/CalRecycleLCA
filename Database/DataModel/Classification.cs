@@ -13,9 +13,9 @@ namespace LcaDataModel
         [DatabaseGenerated(DatabaseGeneratedOption.None)]
         public int ClassificationID { get; set; }
 
-        public int? CategoryID { get; set; }
+        public int CategoryID { get; set; }
 
-        public int? ILCDEntityID { get; set; }
+        public int ILCDEntityID { get; set; }
 
         public virtual Category Category { get; set; }
 

@@ -10,6 +10,7 @@ namespace LcaDataModel
     [Table("UnitConversion")]
     public partial class UnitConversion : Entity
     {
+
         public UnitConversion()
         {
             UnitGroups = new HashSet<UnitGroup>();
@@ -20,7 +21,7 @@ namespace LcaDataModel
         [StringLength(30)]
         public string Unit { get; set; }
 
-        public int? UnitGroupID { get; set; }
+        public int UnitGroupID { get; set; }
 
         [StringLength(500)]
         public string LongName { get; set; }

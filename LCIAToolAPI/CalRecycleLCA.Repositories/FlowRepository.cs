@@ -32,14 +32,14 @@ namespace CalRecycleLCA.Repositories
                                                 .Include(c => c.Category)
                                                 .Select();
 
-            maxHL = classes.Max(c => Convert.ToInt32(c.Category.HierarchyLevel));
+            maxHL = classes.Max(c => c.Category.HierarchyLevel);
             categoryName = classes.Where(c => c.Category.HierarchyLevel == maxHL).Single().Category.Name;
 
             return new FlowResource
             {
                 FlowID = f.FlowID,
                 Name = f.Name,
-                FlowTypeID = (int)f.FlowTypeID,
+                FlowTypeID = f.FlowTypeID,
                 ReferenceFlowPropertyID = (int)f.ReferenceFlowProperty,
                 CASNumber = f.CASNumber,
                 Category = categoryName,

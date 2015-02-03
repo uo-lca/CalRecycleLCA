@@ -133,7 +133,7 @@ namespace LcaDataLoader {
                         LongName = (string)el.Element(ElementName("generalComment"))
                     };
                 if ( el.Attribute("dataSetInternalID").Value == refID) {
-                    unitGroup.UnitConversion = uc;
+                    unitGroup.ReferenceUnit = uc.Unit;
                 }
                 ucList.Add(uc);
             }
@@ -150,7 +150,7 @@ namespace LcaDataLoader {
                     new FlowFlowProperty {
                         FlowID = flow.FlowID,
                         FlowPropertyID = GetFlowPropertyID(ilcdDb, fp),
-                        MeanValue = (double?)fp.Element(ElementName("meanValue")),
+                        MeanValue = (double)fp.Element(ElementName("meanValue")),
                         StDev = (double?)fp.Element(ElementName("relativeStandardDeviation95In"))
                     }).ToList();
         }
@@ -329,14 +329,14 @@ namespace LcaDataLoader {
         /// <param name="ilcdDb">Database context wrapper object</param>
         /// <param name="fpElement">Element containing referenceToFlowPropertyDataSet</param>
         /// <returns>Entity ID, if the UUID was extracted and a loaded entity ID was found, otherwise null</returns>
-        private int? GetFlowPropertyID(DbContextWrapper ilcdDb, XElement fpElement) {
+        private int GetFlowPropertyID(DbContextWrapper ilcdDb, XElement fpElement) {
             string fpUUID = fpElement.Element(ElementName("referenceToFlowPropertyDataSet")).Attribute("refObjectId").Value;
             int fpID;
             if (ilcdDb.FindRefIlcdEntityID<FlowProperty>( fpUUID, out fpID)) {
                 return fpID;
             }
             else {
-                return null;
+                throw new ArgumentNullException("fpID","FlowProperty UUID not found.");
             }
         }
 
@@ -386,7 +386,7 @@ namespace LcaDataLoader {
                 lciaMethod.Methodology = GetElementValue(ElementName("methodology"));
                 lookupName = GetElementValue(ElementName("impactCategory"));
                 if (lookupName != null) {
-                    lciaMethod.ImpactCategoryID = ilcdDb.LookupEntityID<ImpactCategory>(lookupName);
+                    lciaMethod.ImpactCategoryID = (int)ilcdDb.LookupEntityID<ImpactCategory>(lookupName);
                 }
                 lciaMethod.ImpactIndicator = GetElementValue(ElementName("impactIndicator"));
                 lookupName = GetElementValue(ElementName("typeOfDataSet"));
@@ -403,7 +403,7 @@ namespace LcaDataLoader {
                 Debug.Assert(refUUID != null);
                 int refID;
                 if (ilcdDb.FindRefIlcdEntityID<FlowProperty>(refUUID, out refID)) {
-                    lciaMethod.ReferenceQuantity = refID;
+                    lciaMethod.ReferenceFlowPropertyID = refID;
                 }
                 if (ilcdDb.AddIlcdEntity(lciaMethod, uuid)) {
                     List<LCIA> lciaList =

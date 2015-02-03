@@ -22,6 +22,7 @@ namespace CalRecycleLCA.Services
         IEnumerable<FragmentFlow> GetLCIAFlows(int fragmentId);          // EAGER
         FlowTerminationModel Terminate(FragmentFlow ff, int scenarioId, bool doBackground = false); // used by EAGER 
 
+        int GetReferenceFlowID(int fragmentId);
         InventoryModel GetInFlow(int fragmentId);
         IEnumerable<InventoryModel> GetDependencies(int fragmentId, int flowId, int ex_directionId,
             out double inFlowMagnitude, int scenarioId = Scenario.MODEL_BASE_CASE_ID);
@@ -92,7 +93,7 @@ namespace CalRecycleLCA.Services
         {
             return new NodeCacheModel
             {
-                FragmentID = (int)ff.FragmentID,
+                FragmentID = ff.FragmentID,
                 FragmentFlowID = ff.FragmentFlowID,
                 NodeTypeID = ff.NodeTypeID,
                 FlowID = ff.FlowID,
@@ -183,6 +184,14 @@ namespace CalRecycleLCA.Services
         // ***********************************************
         // Helper / informational methods
         // ***********************************************
+
+        public int GetReferenceFlowID(int fragmentId)
+        {
+            return _repository.Queryable()
+                .Where(k => k.FragmentID == fragmentId)
+                .Where(k => k.ParentFragmentFlowID == null)
+                .Select(k => k.FragmentFlowID).First();
+        }
 
         private static int comp(int direction)
         {

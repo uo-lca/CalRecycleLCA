@@ -21,16 +21,14 @@ namespace LcaDataModel
         [StringLength(100)]
         public string Name { get; set; }
 
-        public int? ReferenceUnitConversionID { get; set; }
+        public string ReferenceUnit { get; set; }
 
-        public int? ILCDEntityID { get; set; }
+        public int ILCDEntityID { get; set; }
 
         public virtual ICollection<FlowProperty> FlowProperties { get; set; }
 
         public virtual ILCDEntity ILCDEntity { get; set; }
 
         public virtual ICollection<UnitConversion> UnitConversions { get; set; }
-
-        public virtual UnitConversion UnitConversion { get; set; }
     }
 }

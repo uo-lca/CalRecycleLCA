@@ -198,8 +198,8 @@ namespace LcaDataModel {
 
             modelBuilder.Entity<FlowProperty>()
                 .HasMany(e => e.LCIAMethods)
-                .WithOptional(e => e.FlowProperty)
-                .HasForeignKey(e => e.ReferenceQuantity);
+                .WithRequired(e => e.FlowProperty)
+                .HasForeignKey(e => e.ReferenceFlowPropertyID);
 
             modelBuilder.Entity<FlowPropertyParam>()
                 .HasRequired(e => e.Param)
@@ -216,14 +216,16 @@ namespace LcaDataModel {
                 .Property(e => e.Name)
                 .IsUnicode(false);
 
+            /*
             modelBuilder.Entity<Fragment>()
                 .HasMany(e => e.FragmentFlows)
-                .WithOptional(e => e.Fragment)
+                .WithRequired(e => e.Fragment)
                 .HasForeignKey(e => e.FragmentID);
+             * */
 
             modelBuilder.Entity<Fragment>()
                 .HasMany(e => e.FragmentNodeFragments)
-                .WithOptional(e => e.SubFragment)
+                .WithRequired(e => e.SubFragment)
                 .HasForeignKey(e => e.SubFragmentID);
 
             modelBuilder.Entity<Fragment>()
@@ -239,11 +241,6 @@ namespace LcaDataModel {
             modelBuilder.Entity<FragmentFlow>()
                 .Property(e => e.Name)
                 .IsUnicode(false);
-
-            modelBuilder.Entity<FragmentFlow>()
-                .HasMany(e => e.Fragments)
-                .WithOptional(e => e.FragmentFlow)
-                .HasForeignKey(e => e.ReferenceFragmentFlowID);
 
             modelBuilder.Entity<FragmentFlow>()
                 .HasMany(e => e.ChildFragmentFlows)
@@ -419,18 +416,13 @@ namespace LcaDataModel {
                 .Property(e => e.LongName)
                 .IsUnicode(true);
 
-            modelBuilder.Entity<UnitConversion>()
-                .HasMany(e => e.UnitGroups)
-                .WithOptional(e => e.UnitConversion)
-                .HasForeignKey(e => e.ReferenceUnitConversionID);
-
             modelBuilder.Entity<UnitGroup>()
                 .Property(e => e.Name)
                 .IsUnicode(false);
 
             modelBuilder.Entity<UnitGroup>()
                 .HasMany(e => e.UnitConversions)
-                .WithOptional(e => e.UnitGroup)
+                .WithRequired(e => e.UnitGroup)
                 .HasForeignKey(e => e.UnitGroupID);
 
             modelBuilder.Entity<User>()

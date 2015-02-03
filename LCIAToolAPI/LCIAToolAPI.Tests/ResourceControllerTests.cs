@@ -331,7 +331,7 @@ namespace LCIAToolAPI.Tests
                 Normalization=false,
                 Weighting=false,
                 UseAdvice = "Recommended to do a sensitivity analysis by separately calculating the human toxicity results using (i) recommended and interim characterization factors, and (ii) recommended characterization factors only. No factors are listed for particulate matter as there is a specific impact category for that.",
-                ReferenceQuantity=222,
+                ReferenceFlowPropertyID=222,
                 ILCDEntityID=1756
             };
 
@@ -501,8 +501,8 @@ namespace LCIAToolAPI.Tests
             //compare again what we actually recieve from the method.
             _fragments = new List<Fragment>
                      {
-                            new Fragment(){FragmentID=5,Name="Haz Waste Incineration Output", ReferenceFragmentFlowID=138},
-                            new Fragment(){FragmentID=9,Name="Used oil in Wastewater treatment plant", ReferenceFragmentFlowID=191}
+                            new Fragment(){FragmentID=5,Name="Haz Waste Incineration Output"},
+                            new Fragment(){FragmentID=9,Name="Used oil in Wastewater treatment plant"}
 
                      }.ToList();
 
@@ -532,8 +532,7 @@ namespace LCIAToolAPI.Tests
             _fragment = new Fragment()
             {
                 FragmentID = 1,
-                Name = "Electricity, at grid",
-                ReferenceFragmentFlowID=1
+                Name = "Electricity, at grid"
             };
 
 

@@ -20,7 +20,7 @@ namespace LcaDataModel
 
         public int FlowID { get; set; }
 
-        public double? Scale { get; set; }
+        public double Scale { get; set; }
 
         public virtual Flow Flow { get; set; }
 

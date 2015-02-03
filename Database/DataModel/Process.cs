@@ -35,7 +35,7 @@ namespace LcaDataModel
 
         public int? ReferenceFlowID { get; set; }
 
-        public int? ILCDEntityID { get; set; }
+        public int ILCDEntityID { get; set; }
 
         public virtual Flow Flow { get; set; }
 

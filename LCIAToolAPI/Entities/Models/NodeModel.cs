@@ -29,7 +29,7 @@ namespace Entities.Models
         public int FragmentFlowID { get; set; }
         public int ScenarioID { get; set; }
         public double NodeWeight { get; set; }
-        public double? FlowMagnitude { get; set; }
+        public double FlowMagnitude { get; set; }
     }
 
 }

@@ -27,7 +27,7 @@ namespace CalRecycleLCA.Repositories
                             .Select(k => new ParamResource()
                         {
                             ParamID = p.ParamID,
-                            ParamTypeID = (int)p.ParamTypeID,
+                            ParamTypeID = p.ParamTypeID,
                             ScenarioID = p.ScenarioID,
                             Name = p.Name,
                             FragmentFlowID = k.FragmentFlowID,
@@ -42,7 +42,7 @@ namespace CalRecycleLCA.Repositories
                             .Select(k => new ParamResource()
                         {
                             ParamID = p.ParamID,
-                            ParamTypeID = (int)p.ParamTypeID,
+                            ParamTypeID = p.ParamTypeID,
                             ScenarioID = p.ScenarioID,
                             Name = p.Name,
                             FlowID = k.FlowFlowProperty.FlowID,
@@ -58,11 +58,11 @@ namespace CalRecycleLCA.Repositories
                             .Select(k => new ParamResource()
                         {
                             ParamID = p.ParamID,
-                            ParamTypeID = (int)p.ParamTypeID,
+                            ParamTypeID = p.ParamTypeID,
                             ScenarioID = p.ScenarioID,
                             Name = p.Name,
                             CompositionDataID = k.CompositionDataID,
-                            Value = (double)k.Value
+                            Value = k.Value
                         }).ToList();
                         break;
                     }
@@ -73,7 +73,7 @@ namespace CalRecycleLCA.Repositories
                             .Select(k => new ParamResource()
                         {
                             ParamID = p.ParamID,
-                            ParamTypeID = (int)p.ParamTypeID,
+                            ParamTypeID = p.ParamTypeID,
                             ScenarioID = p.ScenarioID,
                             Name = p.Name,
                             FlowID = k.ProcessDissipation.FlowPropertyEmission.FlowID,
@@ -89,7 +89,7 @@ namespace CalRecycleLCA.Repositories
                             .Select(k => new ParamResource()
                         {
                             ParamID = p.ParamID,
-                            ParamTypeID = (int)p.ParamTypeID,
+                            ParamTypeID = p.ParamTypeID,
                             ScenarioID = p.ScenarioID,
                             Name = p.Name,
                             FlowID = k.ProcessFlow.FlowID,
@@ -105,7 +105,7 @@ namespace CalRecycleLCA.Repositories
                             .Select(k => new ParamResource()
                         {
                             ParamID = p.ParamID,
-                            ParamTypeID = (int)p.ParamTypeID,
+                            ParamTypeID = p.ParamTypeID,
                             ScenarioID = p.ScenarioID,
                             Name = p.Name,
                             FlowID = k.LCIA.FlowID,

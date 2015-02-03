@@ -17,11 +17,11 @@ namespace LcaDataModel
 
         public int FlowFlowPropertyID { get; set; }
 
-        public int? FlowID { get; set; }
+        public int FlowID { get; set; }
 
-        public int? FlowPropertyID { get; set; }
+        public int FlowPropertyID { get; set; }
 
-        public double? MeanValue { get; set; }
+        public double MeanValue { get; set; }
 
         public double? StDev { get; set; }
 

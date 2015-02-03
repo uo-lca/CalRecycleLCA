@@ -36,9 +36,9 @@ namespace LcaDataModel
 
         public int ReferenceFlowProperty { get; set; }
 
-        public int? FlowTypeID { get; set; }
+        public int FlowTypeID { get; set; }
 
-        public int? ILCDEntityID { get; set; }
+        public int ILCDEntityID { get; set; }
 
         public virtual ICollection<Background> Backgrounds { get; set; }
 

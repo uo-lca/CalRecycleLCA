@@ -17,9 +17,9 @@ namespace LcaDataModel
         //[DatabaseGenerated(DatabaseGeneratedOption.None)]
         public int FragmentNodeFragmentID { get; set; }
 
-        public int? FragmentFlowID { get; set; }
+        public int FragmentFlowID { get; set; }
 
-        public int? SubFragmentID { get; set; }
+        public int SubFragmentID { get; set; }
 
         public int FlowID { get; set; }
 

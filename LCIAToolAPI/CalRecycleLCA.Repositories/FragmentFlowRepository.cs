@@ -33,7 +33,7 @@ namespace CalRecycleLCA.Repositories
                     .Select(a => a.ProcessID).FirstOrDefault();
 
                 if (subsId != null && subsId != 0)
-                    fragmentNode.ProcessID = subsId;
+                    fragmentNode.ProcessID = (int)subsId;
             }
 
             return new FlowTerminationModel
@@ -99,7 +99,7 @@ namespace CalRecycleLCA.Repositories
                     .Select(a => a.SubFragmentID).FirstOrDefault();
 
                 if (subsId != null && subsId != 0)
-                    fragmentNode.SubFragmentID = subsId;
+                    fragmentNode.SubFragmentID = (int)subsId;
             }
 
             return new FlowTerminationModel
@@ -195,9 +195,9 @@ namespace CalRecycleLCA.Repositories
                     NodeWeight = fr.nc.NodeWeight,
                     FlowPropertyMagnitudes = (fr.f.FlowID == null)
                     ? repository.GetRepository<FlowFlowProperty>()
-                        .GetFlowPropertyMagnitudes(inFlow.FlowID, scenarioId, (double)fr.nc.FlowMagnitude).ToList()
+                        .GetFlowPropertyMagnitudes(inFlow.FlowID, scenarioId, fr.nc.FlowMagnitude).ToList()
                     : repository.GetRepository<FlowFlowProperty>()
-                        .GetFlowPropertyMagnitudes((int)fr.f.FlowID, scenarioId, (double)fr.nc.FlowMagnitude).ToList()
+                        .GetFlowPropertyMagnitudes((int)fr.f.FlowID, scenarioId, fr.nc.FlowMagnitude).ToList()
                 });
             return ff;//.Where(f => f.NodeWeight != null);
         }

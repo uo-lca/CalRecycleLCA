@@ -27,7 +27,7 @@ namespace LcaDataModel
 
         public int? UnitGroupID { get; set; }
 
-        public int? ILCDEntityID { get; set; }
+        public int ILCDEntityID { get; set; }
 
         public virtual ICollection<Flow> Flows { get; set; }
 

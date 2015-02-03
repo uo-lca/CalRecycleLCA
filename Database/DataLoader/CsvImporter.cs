@@ -197,7 +197,6 @@ namespace LcaDataLoader {
             int fragmentID = Convert.ToInt32(row["FragmentID"]);
             Fragment ent = dbContext.Find<Fragment>(fragmentID);
             if (ent != null) {
-                ent.ReferenceFragmentFlowID = Convert.ToInt32(row["ReferenceFragmentFlowID"]);
                 ent.Name = row["Name"];
                 if (dbContext.SaveChanges() > 0) isImported = true;
             }
@@ -219,6 +218,7 @@ namespace LcaDataLoader {
             FragmentFlow ent = dbContext.ProduceEntityWithID<FragmentFlow>(fragmentFlowID, out isNew);
             if (ent != null) {
                 ent.FragmentFlowID = fragmentFlowID;
+                ent.FragmentID = Convert.ToInt32(row["FragmentID"]);
                 // Set required properties. Others will be set by UpdateFragmentFlow
                 ent.DirectionID = Convert.ToInt32(row["DirectionID"]);
                 ent.NodeTypeID = Convert.ToInt32(row["NodeTypeID"]);
@@ -233,7 +233,6 @@ namespace LcaDataLoader {
             FragmentFlow ent = dbContext.Find<FragmentFlow>(fragmentFlowID);
             Debug.Assert(ent != null, "FragmentFlow should have been created for this row.");
             if (ent != null) {
-                ent.FragmentID = Convert.ToInt32(row["FragmentID"]);
                 ent.FragmentStageID = TransformOptionalID(row["FragmentStageID"]);
                 ent.Name = row["Name"];
                 ent.ShortName = dbContext.ShortenName(ent.Name, 30);

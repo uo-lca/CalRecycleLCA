@@ -25,11 +25,7 @@ namespace LcaDataModel
         [StringLength(255)]
         public string Name { get; set; }
 
-        public int? ReferenceFragmentFlowID { get; set; }
-
-        public int? ILCDEntityID { get; set; }
-
-        public virtual FragmentFlow FragmentFlow { get; set; }
+        public int ILCDEntityID { get; set; }
 
         public virtual ILCDEntity ILCDEntity { get; set; }
 

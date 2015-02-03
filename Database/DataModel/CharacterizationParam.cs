@@ -14,7 +14,7 @@ namespace LcaDataModel
 
         public int ParamID { get; set; }
 
-        public int? LCIAID { get; set; }
+        public int LCIAID { get; set; }
 
         public double Value { get; set; }
 

@@ -25,7 +25,7 @@ namespace LcaDataModel
         [StringLength(60)]
         public string Methodology { get; set; }
 
-        public int? ImpactCategoryID { get; set; }
+        public int ImpactCategoryID { get; set; }
 
         public string ImpactIndicator { get; set; }
 
@@ -46,9 +46,9 @@ namespace LcaDataModel
 
         public string UseAdvice { get; set; }
 
-        public int? ReferenceQuantity { get; set; }
+        public int ReferenceFlowPropertyID { get; set; }
 
-        public int? ILCDEntityID { get; set; }
+        public int ILCDEntityID { get; set; }
 
         public virtual ICollection<BackgroundCache> BackgroundCaches { get; set; }
 

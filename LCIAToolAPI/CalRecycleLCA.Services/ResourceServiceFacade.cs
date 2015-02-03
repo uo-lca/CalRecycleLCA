@@ -213,7 +213,7 @@ namespace CalRecycleLCA.Services
                 LCIAMethodID = lm.LCIAMethodID,
                 Name = lm.Name,
                 Methodology = lm.Methodology,
-                ImpactCategoryID = TransformNullable(lm.ImpactCategoryID, "LCIAMethod.ImpactCategoryID"),
+                ImpactCategoryID = lm.ImpactCategoryID, 
                 ImpactIndicator = lm.ImpactIndicator,
                 ReferenceYear = lm.ReferenceYear,
                 Duration = lm.Duration,
@@ -222,8 +222,8 @@ namespace CalRecycleLCA.Services
                 Normalization = TransformNullable(lm.Normalization, "LCIAMethod.Normalization"),
                 Weighting = TransformNullable(lm.Weighting, "LCIAMethod.Weighting"),
                 UseAdvice = lm.UseAdvice,
-                ReferenceFlowPropertyID = (int)lm.ReferenceQuantity,
-                ReferenceFlowProperty = _FlowPropertyService.GetResource((int)lm.ReferenceQuantity),
+                ReferenceFlowPropertyID = lm.ReferenceFlowPropertyID,
+                ReferenceFlowProperty = _FlowPropertyService.GetResource(lm.ReferenceFlowPropertyID),
                 UUID = lm.ILCDEntity.UUID,
                 Version = lm.ILCDEntity.Version
             };
@@ -297,14 +297,14 @@ namespace CalRecycleLCA.Services
                                                 .Select();
             
 
-            maxHL = classes.Max(c => Convert.ToInt32(c.Category.HierarchyLevel));
+            maxHL = classes.Max(c => c.Category.HierarchyLevel);
             categoryName = classes.Where(c => c.Category.HierarchyLevel == maxHL).Single().Category.Name;
 
             return new FlowResource
             {
                 FlowID = f.FlowID,
                 Name = f.Name,
-                FlowTypeID = TransformNullable(f.FlowTypeID, "Flow.FlowTypeID"),
+                FlowTypeID = f.FlowTypeID,
                 ReferenceFlowPropertyID = TransformNullable(f.ReferenceFlowProperty, "Flow.ReferenceFlowProperty"),
                 CASNumber = f.CASNumber,
                 Category = categoryName
@@ -344,7 +344,7 @@ namespace CalRecycleLCA.Services
             {
                 FragmentID = f.FragmentID,
                 Name = f.Name,
-                ReferenceFragmentFlowID = TransformNullable(f.ReferenceFragmentFlowID, "Fragment.ReferenceFragmentFlowID"),
+                ReferenceFragmentFlowID = _FragmentFlowService.GetReferenceFlowID(f.FragmentID),
                 TermFlowID = term.FlowID,
                 Direction = Enum.GetName(typeof(DirectionEnum), (DirectionEnum)term.DirectionID)
             };
@@ -374,8 +374,8 @@ namespace CalRecycleLCA.Services
                 Flow = Transform(pf.Flow),
                 Direction = Enum.GetName(typeof(DirectionEnum), (DirectionEnum)pf.DirectionID),
                 VarName = pf.VarName,
-                Magnitude = TransformNullable(pf.Magnitude, "ProcessFlow.Magnitude"),
-                Result = TransformNullable(pf.Result, "ProcessFlow.Result"),
+                Magnitude = pf.Magnitude, 
+                Result = pf.Result, 
                 STDev = TransformNullable(pf.STDev, "ProcessFlow.STDev")
             };
         }
