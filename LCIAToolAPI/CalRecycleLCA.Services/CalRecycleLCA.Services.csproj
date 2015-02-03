@@ -84,14 +84,12 @@
   <ItemGroup>
     <Compile Include="BackgroundService.cs" />
     <Compile Include="CategoryService.cs" />
-    <Compile Include="CharacterizationParamService.cs" />
     <Compile Include="DocuService.cs" />
     <Compile Include="CounterTimer.cs" />
     <Compile Include="ClassificationService.cs" />
     <Compile Include="DependencyParamService.cs" />
     <Compile Include="FlowFlowPropertyService.cs" />
     <Compile Include="FlowPropertyEmissionService.cs" />
-    <Compile Include="FlowPropertyParamService.cs" />
     <Compile Include="FlowPropertyService.cs" />
     <Compile Include="FlowService.cs" />
     <Compile Include="FlowTypeService.cs" />
@@ -114,9 +112,7 @@
     <Compile Include="LCIAService.cs" />
     <Compile Include="NodeCacheService.cs" />
     <Compile Include="ParamService.cs" />
-    <Compile Include="ProcessDissipationParamService.cs" />
     <Compile Include="ProcessDissipationService.cs" />
-    <Compile Include="ProcessEmissionParamService.cs" />
     <Compile Include="ProcessFlowService.cs" />
     <Compile Include="ProcessService.cs" />
     <Compile Include="ProcessSubstitutionService.cs" />

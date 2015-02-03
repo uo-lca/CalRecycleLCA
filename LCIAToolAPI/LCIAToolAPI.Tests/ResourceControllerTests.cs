@@ -43,19 +43,19 @@ namespace LCIAToolAPI.Tests
         //private IFragmentNodeFragmentService _fragmentNodeFragmentService;
         private IFlowFlowPropertyService _flowFlowPropertyService;
         private IDependencyParamService _dependencyParamService;
-        private IFlowPropertyParamService _flowPropertyParamService;
+        //private IFlowPropertyParamService _flowPropertyParamService;
         private IParamService _paramService;
         private IScoreCacheService _scoreCacheService;
         private IProcessSubstitutionService _processSubstitutionService;
         private IFragmentSubstitutionService _fragmentSubstitutionService;
         //private IBackgroundSubstitutionService _backgroundSubstitutionService;
         private IBackgroundService _backgroundService;
-        private IProcessEmissionParamService _processEmissionParamService;
+        //private IProcessEmissionParamService _processEmissionParamService;
         private IFlowPropertyEmissionService _flowPropertyEmissionService;
         private IProcessDissipationService _processDissipationService;
-        private IProcessDissipationParamService _processDissipationParamService;
+        //private IProcessDissipationParamService _processDissipationParamService;
         private ILCIAService _lciaService;
-        private ICharacterizationParamService _characterizationParamService;
+        //private ICharacterizationParamService _characterizationParamService;
 
         private IUnitOfWork _unitOfWork;
 
@@ -172,20 +172,20 @@ namespace LCIAToolAPI.Tests
             //_fragmentNodeFragmentService = new FragmentNodeFragmentService(_mockFragmentNodeFragmentRepository.Object);
             _flowFlowPropertyService = new FlowFlowPropertyService(_mockFlowFlowPropertyRepository.Object);
             _dependencyParamService = new DependencyParamService(_mockDependencyParamRepository.Object);
-            _flowPropertyParamService = new FlowPropertyParamService(_mockFlowPropertyParamRepository.Object);
-            _flowPropertyParamService = new FlowPropertyParamService(_mockFlowPropertyParamRepository.Object);
+            //_flowPropertyParamService = new FlowPropertyParamService(_mockFlowPropertyParamRepository.Object);
+            //_flowPropertyParamService = new FlowPropertyParamService(_mockFlowPropertyParamRepository.Object);
             _paramService = new ParamService(_mockParamRepository.Object);
             _scoreCacheService = new ScoreCacheService(_mockScoreCacheRepository.Object);
             _processSubstitutionService = new ProcessSubstitutionService(_mockProcessSubstitutionRepository.Object);
             _fragmentSubstitutionService = new FragmentSubstitutionService(_mockFragmentSubstitutionRepository.Object);
             //_backgroundSubstitutionService = new BackgroundSubstitutionService(_mockBackgroundSubstitutionRepository.Object);
             _backgroundService = new BackgroundService(_mockBackgroundRepository.Object);
-            _processEmissionParamService = new ProcessEmissionParamService(_mockProcessEmissionParamRepository.Object);
+            //_processEmissionParamService = new ProcessEmissionParamService(_mockProcessEmissionParamRepository.Object);
             _flowPropertyEmissionService = new FlowPropertyEmissionService(_mockFlowPropertyEmissionRepository.Object);
             _processDissipationService = new ProcessDissipationService(_mockProcessDissipationRepository.Object);
-            _processDissipationParamService = new ProcessDissipationParamService(_mockProcessDissipationParamRepository.Object);
+            //_processDissipationParamService = new ProcessDissipationParamService(_mockProcessDissipationParamRepository.Object);
             _lciaService = new LCIAService(_mockLCIARepository.Object);
-            _characterizationParamService = new CharacterizationParamService(_mockCharacterizationParamRepository.Object);
+            //_characterizationParamService = new CharacterizationParamService(_mockCharacterizationParamRepository.Object);
             _unitOfWork = _mockUnitOfWork.Object;
 
             //methods that resource service facade is dependent on.
