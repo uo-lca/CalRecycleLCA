@@ -234,12 +234,13 @@ namespace CalRecycleLCA.Repositories
                             .Where(k => k.FlowPropertyID == post.FlowPropertyID)
                             .Select(k => k.FlowFlowPropertyID)
                             .First();
-                        P.FlowPropertyParam = new FlowPropertyParam()
+                        FlowPropertyParam fp = new FlowPropertyParam()
                         {
                             FlowFlowPropertyID = ffp,
                             Value = post.Value,
                             ObjectState = ObjectState.Added
                         };
+                        P.FlowPropertyParams.Add(fp);
                         cacheTracker.NodeCacheStale = true;
                         break;
                     }
@@ -261,12 +262,13 @@ namespace CalRecycleLCA.Repositories
                             .Where(k => k.ProcessID == post.ProcessID)
                             .Select(k => k.ProcessDissipationID)
                             .First();
-                        P.ProcessDissipationParam = new ProcessDissipationParam()
+                        ProcessDissipationParam pd = new ProcessDissipationParam()
                         {
                             ProcessDissipationID = pdp,
                             Value = post.Value,
                             ObjectState = ObjectState.Added
                         };
+                        P.ProcessDissipationParams.Add(pd);
                         cacheTracker.ScoreCacheStale = true;
                         break;
                     }
@@ -277,12 +279,13 @@ namespace CalRecycleLCA.Repositories
                             .Where(k => k.ProcessID == post.ProcessID)
                             .Select(k => k.ProcessFlowID)
                             .First();
-                        P.ProcessEmissionParam = new ProcessEmissionParam()
+                        ProcessEmissionParam pe = new ProcessEmissionParam()
                         {
                             ProcessFlowID = pfp,
                             Value = post.Value,
                             ObjectState = ObjectState.Added
                         };
+                        P.ProcessEmissionParams.Add(pe);
                         cacheTracker.ScoreCacheStale = true;
                         break;
                     }
@@ -293,12 +296,10 @@ namespace CalRecycleLCA.Repositories
                             .Where(k => k.LCIAMethodID == post.LCIAMethodID)
                             .Select(k => k.LCIAID)
                             .First();
-                        // P.CharacterizationParam = new CharacterizationParam()
                         CharacterizationParam cp = new CharacterizationParam()
                             {
                                 LCIAID = cfp,
                                 Value = post.Value,
-                                Param = P,
                                 ObjectState = ObjectState.Added
                             };
                         P.CharacterizationParams.Add(cp);
@@ -327,10 +328,10 @@ namespace CalRecycleLCA.Repositories
             List<Param> Ps = new List<Param>();
             Param P = repository.Query(k => k.ParamID == paramId)
                 .Include(k => k.DependencyParams)
-                .Include(k => k.FlowPropertyParam)
+                .Include(k => k.FlowPropertyParams)
                 .Include(k => k.CompositionParams)
-                .Include(k => k.ProcessDissipationParam)
-                .Include(k => k.ProcessEmissionParam)
+                .Include(k => k.ProcessDissipationParams)
+                .Include(k => k.ProcessEmissionParams)
                 .Include(k => k.CharacterizationParam.LCIA)
                 .Select().First();
             if (put.Name != null)

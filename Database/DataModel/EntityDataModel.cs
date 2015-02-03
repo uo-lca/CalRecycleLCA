@@ -203,7 +203,9 @@ namespace LcaDataModel {
 
             modelBuilder.Entity<FlowPropertyParam>()
                 .HasRequired(e => e.Param)
-                .WithOptional(e => e.FlowPropertyParam)
+                // Unable to implement 0..1 on the other side of the relationship here
+                .WithMany(e => e.FlowPropertyParams) 
+                .HasForeignKey(e => e.ParamID)
                 .WillCascadeOnDelete(true);
 
             modelBuilder.Entity<FlowType>()
@@ -359,12 +361,14 @@ namespace LcaDataModel {
 
             modelBuilder.Entity<ProcessDissipationParam>()
                 .HasRequired(e => e.Param)
-                .WithOptional(e => e.ProcessDissipationParam)
+                .WithMany(e => e.ProcessDissipationParams) 
+                .HasForeignKey(e => e.ParamID)
                 .WillCascadeOnDelete(true);
 
             modelBuilder.Entity<ProcessEmissionParam>()
                 .HasRequired(e => e.Param)
-                .WithOptional(e => e.ProcessEmissionParam)
+                .WithMany(e => e.ProcessEmissionParams) 
+                .HasForeignKey(e => e.ParamID)
                 .WillCascadeOnDelete(true);
 
             modelBuilder.Entity<ProcessFlow>()

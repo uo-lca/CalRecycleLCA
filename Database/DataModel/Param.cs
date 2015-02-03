@@ -15,9 +15,16 @@ namespace LcaDataModel
         {
             DependencyParams = new HashSet<DependencyParam>();
 
-            CharacterizationParams = new HashSet<CharacterizationParam>();
+            FlowPropertyParams = new HashSet<FlowPropertyParam>();
 
             CompositionParams = new HashSet<CompositionParam>();
+
+            ProcessDissipationParams = new HashSet<ProcessDissipationParam>();
+
+            ProcessEmissionParams = new HashSet<ProcessEmissionParam>();
+            
+            CharacterizationParams = new HashSet<CharacterizationParam>();
+
         }
 
         //[DatabaseGenerated(DatabaseGeneratedOption.None)]
@@ -38,25 +45,41 @@ namespace LcaDataModel
 
         public virtual ParamType ParamType { get; set; }
         public virtual Scenario Scenario { get; set; }
-        
+
         public virtual ICollection<DependencyParam> DependencyParams { get; set; }
 
-        public virtual FlowPropertyParam FlowPropertyParam { get; set; }
+        public virtual ICollection<FlowPropertyParam> FlowPropertyParams { get; set; }
 
         public virtual ICollection<CompositionParam> CompositionParams { get; set; }
 
-        public virtual ProcessDissipationParam ProcessDissipationParam { get; set; }
+        public virtual ICollection<ProcessDissipationParam> ProcessDissipationParams { get; set; }
 
-        public virtual ProcessEmissionParam ProcessEmissionParam { get; set; }
+        public virtual ICollection<ProcessEmissionParam> ProcessEmissionParams { get; set; }
 
-        //
-        // Relationship between Param and CharacterizationParam should be subclass,
-        // and the cardinality should be (0 or 1) to 1. 
-        // The following is a stop-gap until model is revised.
-        //
         public virtual ICollection<CharacterizationParam> CharacterizationParams { get; set; }
+
+        //
+        // Relationship between Param and *Param should be subclass,
+        // and the cardinality should be (0 or 1) to 1. 
+        // below are stop-gaps 
+        //
         [NotMapped]
-        public virtual CharacterizationParam CharacterizationParam {
+        public virtual FlowPropertyParam FlowPropertyParam {
+            get { return FlowPropertyParams.FirstOrDefault(); }
+        }
+        [NotMapped]
+        public virtual ProcessEmissionParam ProcessEmissionParam
+        {
+            get { return ProcessEmissionParams.FirstOrDefault(); }
+        }
+        [NotMapped]
+        public virtual ProcessDissipationParam ProcessDissipationParam
+        {
+            get { return ProcessDissipationParams.FirstOrDefault(); }
+        }
+        [NotMapped]
+        public virtual CharacterizationParam CharacterizationParam
+        {
             get { return CharacterizationParams.FirstOrDefault(); }
         }
     }
