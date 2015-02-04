@@ -1,0 +1,9 @@
+
+  {
+    "name": "LCIA param",
+    "paramTypeID": 10,
+    "flowID": 20,
+    "lciaMethodID": 1,
+    "value": 0.12
+  }
+

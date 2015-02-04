@@ -1016,11 +1016,11 @@ namespace CalRecycleLCA.Services
         public void DeleteParam(int scenarioId, int paramId)
         {
             CacheTracker cacheTracker = new CacheTracker();
-            Param P = _ParamService.Query(k => k.ParamID == paramId).Include(k => k.CharacterizationParam.LCIA)
-                .Select().First();
-            if (P.ScenarioID == scenarioId)
+            int p_scenarioId = _ParamService.Query(k => k.ParamID == paramId)
+                .Select(k => k.ScenarioID).First();
+            if (p_scenarioId == scenarioId)
             {
-                _ParamService.DeleteParam(P, ref cacheTracker);
+                _ParamService.DeleteParam(paramId, ref cacheTracker);
                 ImplementScenarioChanges(scenarioId, cacheTracker);
             }
         }

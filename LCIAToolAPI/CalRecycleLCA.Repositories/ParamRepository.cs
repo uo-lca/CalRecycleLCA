@@ -420,8 +420,10 @@ namespace CalRecycleLCA.Repositories
             return Ps;
         }
 
-        public static void DeleteParam(this IRepositoryAsync<Param> repository, Param P, ref CacheTracker cacheTracker)
+        public static void DeleteParam(this IRepositoryAsync<Param> repository, int paramId, ref CacheTracker cacheTracker)
         {
+            Param P = repository.Query(k => k.ParamID == paramId)
+                .Select().First();
             switch (P.ParamTypeID)
             {
                 case 1:
@@ -440,7 +442,9 @@ namespace CalRecycleLCA.Repositories
                     }
                 case 10:
                     {
-                        cacheTracker.LCIAMethodsStale.Add((int)P.CharacterizationParam.LCIA.LCIAMethodID);
+                        int lmid = repository.GetRepository<CharacterizationParam>().Query(k => k.ParamID == paramId)
+                            .Select(k => k.LCIA.LCIAMethodID).First();
+                        cacheTracker.LCIAMethodsStale.Add(lmid);
                         break;
                     }
             }

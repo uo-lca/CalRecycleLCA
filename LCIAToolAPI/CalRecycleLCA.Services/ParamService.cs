@@ -17,7 +17,7 @@ namespace CalRecycleLCA.Services
         IEnumerable<ParamResource> GetParamResource(IEnumerable<Param> Ps);
         IEnumerable<Param> NewOrUpdateParam(int scenarioId, ParamResource post, ref CacheTracker cacheTracker);
         IEnumerable<Param> UpdateParam(int paramId, ParamResource post, ref CacheTracker cacheTracker);
-        void DeleteParam(Param P, ref CacheTracker cacheTracker);
+        void DeleteParam(int paramId, ref CacheTracker cacheTracker);
     }
 
     public class ParamService : Service<Param>, IParamService
@@ -68,9 +68,9 @@ namespace CalRecycleLCA.Services
             return _repository.UpdateParam(paramId, put, ref cacheTracker);
         }
 
-        public void DeleteParam(Param P, ref CacheTracker cacheTracker)
+        public void DeleteParam(int paramId, ref CacheTracker cacheTracker)
         {
-            _repository.DeleteParam(P, ref cacheTracker);
+            _repository.DeleteParam(paramId, ref cacheTracker);
         }
     }
 }
