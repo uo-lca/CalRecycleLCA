@@ -330,8 +330,8 @@ namespace CalRecycleLCA.Repositories
                 .Include(k => k.DependencyParams)
                 .Include(k => k.FlowPropertyParams)
                 .Include(k => k.CompositionParams)
-                .Include(k => k.ProcessDissipationParam)
-                .Include(k => k.ProcessEmissionParam)
+                .Include(k => k.ProcessDissipationParams)
+                .Include(k => k.ProcessEmissionParams)
                 .Include(k => k.CharacterizationParams)
                 .Select().First();
             if (put.Name != null)
