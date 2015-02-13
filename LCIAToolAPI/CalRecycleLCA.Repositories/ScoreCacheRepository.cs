@@ -76,7 +76,13 @@ namespace CalRecycleLCA.Repositories
             return repository.Queryable()
                 .Where(sc => sc.ScenarioID == scenarioId)
                 .Where(sc => sc.FragmentFlow.FragmentID == fragmentId);
-                
+        }
+
+        public static IEnumerable<ScoreCache> GetFragmentFlowCaches(this IRepositoryAsync<ScoreCache> repository, int fragmentFlowId, int scenarioId)
+        {
+            return repository.Queryable()
+                .Where(sc => sc.ScenarioID == scenarioId)
+                .Where(sc => sc.FragmentFlowID == fragmentFlowId);
         }
     }
 }

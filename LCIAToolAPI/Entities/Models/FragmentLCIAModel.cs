@@ -15,9 +15,9 @@ namespace Entities.Models
         public int? FragmentFlowID { get; set; }
         public int? FragmentStageID { get; set; }
         public int LCIAMethodID { get; set; }
-        public double? NodeWeight { get; set; }
-        public double? ImpactScore { get; set; }
-	    public double Result { get; set; }
+        public double NodeWeight { get; set; }
+        public double ImpactScore { get; set; }
+        public double Result { get { return NodeWeight * ImpactScore;  } }
 
         //public ICollection<LCIAModel> NodeLCIAResults { get; set; } // not currently used
         //public int? fnpProcessID { get; set; }

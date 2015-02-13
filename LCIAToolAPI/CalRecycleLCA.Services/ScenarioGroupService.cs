@@ -13,9 +13,9 @@ namespace CalRecycleLCA.Services
 {
     public interface IScenarioGroupService : IService<ScenarioGroup>
     {
-        bool CanGet(HttpRequestContext request);
-        bool CanAlter(HttpRequestContext request);
-        bool CanAlter(HttpRequestContext request, out int authorizedGroup);
+        bool CanGet(HttpRequestContext request, int scenarioId = 0);
+        bool CanAlter(HttpRequestContext request, int scenarioId = 0);
+        bool CanAlter(HttpRequestContext request, out int authorizedGroup, int scenarioId = 0);
         int? CheckAuthorizedGroup(HttpRequestContext request);
         IEnumerable<ScenarioGroupResource> AuthorizedGroups(HttpRequestContext request);
     }
@@ -35,11 +35,12 @@ namespace CalRecycleLCA.Services
         /// </summary>
         /// <param name="request">HttpRequestContext</param>
         /// <returns>bool</returns>
-        public bool CanGet(HttpRequestContext request)
+        public bool CanGet(HttpRequestContext request, int scenarioId = 0)
         {
             bool auth=false;
             string authString = Convert.ToString(request.RouteData.Values["authString"]);
-            int? scenarioId = Convert.ToInt32(request.RouteData.Values["scenarioId"]);
+            if (scenarioId == 0) // if not provided as argument, scrape from route data
+                scenarioId = Convert.ToInt32(request.RouteData.Values["scenarioId"]);
             var desiredGroup = _repository.GetRepository<Scenario>()
                 .Query(k => k.ScenarioID == scenarioId)
                 .Select(k => k.ScenarioGroupID).FirstOrDefault();
@@ -53,10 +54,11 @@ namespace CalRecycleLCA.Services
             return auth;
         }
 
-        public bool CanAlter(HttpRequestContext request)
+        public bool CanAlter(HttpRequestContext request, int scenarioId = 0)
         {
             string authString = Convert.ToString(request.RouteData.Values["authString"]);
-            int? scenarioId = Convert.ToInt32(request.RouteData.Values["scenarioId"]);
+            if (scenarioId == 0)
+                scenarioId = Convert.ToInt32(request.RouteData.Values["scenarioId"]);
             int? desiredGroup = _repository.GetRepository<Scenario>()
                 .Query(k => k.ScenarioID == scenarioId)
                 .Select(k => k.ScenarioGroupID).FirstOrDefault();
@@ -65,10 +67,11 @@ namespace CalRecycleLCA.Services
             return (desiredGroup == CheckAuthorizedGroup(request));
         }
 
-        public bool CanAlter(HttpRequestContext request, out int authGroup)
+        public bool CanAlter(HttpRequestContext request, out int authGroup, int scenarioId = 0)
         {
             string authString = Convert.ToString(request.RouteData.Values["authString"]);
-            int? scenarioId = Convert.ToInt32(request.RouteData.Values["scenarioId"]);
+            if (scenarioId == 0)
+                scenarioId = Convert.ToInt32(request.RouteData.Values["scenarioId"]);
             authGroup = (int)CheckAuthorizedGroup(request);
             return (_repository.GetRepository<Scenario>()
                 .Query(k => k.ScenarioID == scenarioId)

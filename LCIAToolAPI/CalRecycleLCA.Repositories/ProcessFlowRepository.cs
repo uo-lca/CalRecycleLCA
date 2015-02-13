@@ -13,7 +13,7 @@ namespace CalRecycleLCA.Repositories
 {
     public static class ProcessFlowRepository
     {
-        public static double? FlowExchange(this IRepositoryAsync<ProcessFlow> repository,
+        public static double? FlowExchange(this IRepository<ProcessFlow> repository,
 					  int processId, int flowId, int ex_directionId)
         {
             return repository.Queryable()

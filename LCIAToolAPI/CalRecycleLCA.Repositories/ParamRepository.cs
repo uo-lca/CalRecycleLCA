@@ -13,7 +13,15 @@ namespace CalRecycleLCA.Repositories
 {
     public static class ParamRepository
     {
-        public static IEnumerable<ParamResource> GetParamResource(this IRepositoryAsync<Param> repository,
+        public static bool IsDissipation(this IRepository<Param> repository, int processId, int flowId)
+        {
+            return (repository.GetRepository<ProcessDissipation>().Queryable()
+                .Where(pd => pd.ProcessID == processId)
+                .Where(pd => pd.FlowPropertyEmission.FlowID == flowId)
+                .Count() > 0);
+        }
+
+        public static IEnumerable<ParamResource> GetParamResource(this IRepository<Param> repository,
             Param p)
         {
             var PR = new List<ParamResource>();
@@ -118,7 +126,7 @@ namespace CalRecycleLCA.Repositories
             return PR;
         }
 
-        public static IEnumerable<Param> PostParam(this IRepositoryAsync<Param> repository,
+        public static IEnumerable<Param> PostParam(this IRepository<Param> repository,
             int scenarioId, ParamResource post, ref CacheTracker cacheTracker)
         {
             // determine if a param exists
@@ -189,7 +197,7 @@ namespace CalRecycleLCA.Repositories
                 return repository.UpdateParam((int)pid, post, ref cacheTracker);
         }
 
-        private static Param NewParam(this IRepositoryAsync<Param> repository,
+        private static Param NewParam(this IRepository<Param> repository,
             int scenarioId, ParamResource post, ref CacheTracker cacheTracker)
         {
             // this creates a new param, only after confirming that a matching one does not exist
@@ -312,7 +320,7 @@ namespace CalRecycleLCA.Repositories
             return P;
         }
 
-        private static DependencyParam Conserve(this IRepositoryAsync<Param> repository, int dpid, double delta)
+        private static DependencyParam Conserve(this IRepository<Param> repository, int dpid, double delta)
         {
             DependencyParam dp = repository.GetRepository<DependencyParam>().Query(k => k.DependencyParamID == dpid)
                 .Select().First();
@@ -322,7 +330,7 @@ namespace CalRecycleLCA.Repositories
             return dp;
         }
 
-        public static IEnumerable<Param> UpdateParam(this IRepositoryAsync<Param> repository,
+        public static IEnumerable<Param> UpdateParam(this IRepository<Param> repository,
             int paramId, ParamResource put, ref CacheTracker cacheTracker)
         {
             List<Param> Ps = new List<Param>();
@@ -420,7 +428,7 @@ namespace CalRecycleLCA.Repositories
             return Ps;
         }
 
-        public static void DeleteParam(this IRepositoryAsync<Param> repository, int paramId, ref CacheTracker cacheTracker)
+        public static void DeleteParam(this IRepository<Param> repository, int paramId, ref CacheTracker cacheTracker)
         {
             Param P = repository.Query(k => k.ParamID == paramId)
                 .Select().First();

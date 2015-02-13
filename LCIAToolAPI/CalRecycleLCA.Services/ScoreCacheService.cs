@@ -46,6 +46,12 @@ namespace CalRecycleLCA.Services
          {
              return _repository.GetScenarioCaches(fragmentId, scenarioId);
          }
+        
+        public IEnumerable<ScoreCache> GetFragmentFlowCaches(int fragmentFlowId, int scenarioId = Scenario.MODEL_BASE_CASE_ID)
+        {
+            return _repository.GetFragmentFlowCaches(fragmentFlowId, scenarioId);
+        }
+
     }
 
 }

@@ -32,6 +32,9 @@ namespace LCAToolAPI.API
         [Inject]
         private readonly IDocuService _DocuService;
 
+        [Inject]
+        private readonly IParamService _ParamService;
+
         private String ToolVersion()
         {
             string gitVersion = String.Empty;
@@ -76,9 +79,11 @@ namespace LCAToolAPI.API
         /// <param name="resourceService">provides all services except authorization</param>
         /// <param name="scenarioGroupService">provides authorization</param>
         /// <param name="docuService">provides documentary information</param>
+        /// <param name="paramService">provides param data</param>
         public ResourceController(IResourceServiceFacade resourceService,
             IScenarioGroupService scenarioGroupService,
-            IDocuService docuService)
+            IDocuService docuService,
+            IParamService paramService)
         {
             if (resourceService == null)
             {
@@ -87,6 +92,7 @@ namespace LCAToolAPI.API
             _ResourceService = resourceService;
             _ScenarioGroupService = scenarioGroupService;
             _DocuService = docuService;
+            _ParamService = paramService;
         }
 
         /// <summary>
@@ -362,6 +368,25 @@ namespace LCAToolAPI.API
         {
             if (_ScenarioGroupService.CanGet(RequestContext))
                 return _ResourceService.GetFragmentLCIAResultsAllMethods(fragmentID, scenarioID);
+            else
+                return null;
+        }
+
+        /// <summary>
+        /// Given a Param ID, returns sensitivity results-- dr/dx for lcia score r
+        /// </summary>
+        /// <param name="fragmentId"></param>
+        /// <param name="paramId"></param>
+        /// <returns></returns>
+        [CalRecycleAuthorize]
+        [Route("api/fragments/{fragmentId:int}/params/{paramId:int}/sensitivity")]
+        [HttpGet]
+        public IEnumerable<LCIAResultResource> GetFragmentSensitivity(int fragmentId, int paramId)
+        {
+            int scenarioId = _ParamService.Queryable().Where(p => p.ParamID == paramId)
+                .Select(p => p.ScenarioID).First();
+            if (_ScenarioGroupService.CanGet(RequestContext, scenarioId))
+                return _ResourceService.GetFragmentSensitivity(fragmentId, paramId);
             else
                 return null;
         }

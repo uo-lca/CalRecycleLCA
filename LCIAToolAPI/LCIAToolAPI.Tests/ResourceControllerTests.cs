@@ -246,7 +246,7 @@ namespace LCIAToolAPI.Tests
 
             _docuService = new DocuService();
 
-            _resourceController = new ResourceController(_resourceServiceFacade, _scenarioGroupService, _docuService);
+            _resourceController = new ResourceController(_resourceServiceFacade, _scenarioGroupService, _docuService, _paramService);
 
 
         }

@@ -13,7 +13,7 @@ namespace CalRecycleLCA.Repositories
 {
     public static class FlowFlowPropertyRepository
     {
-        public static double inFlowIn(this IRepositoryAsync<FlowFlowProperty> repository,
+        private static double inFlowIn(this IRepository<FlowFlowProperty> repository,
             int inFlowId, int flowPropertyId, int scenarioId = Scenario.MODEL_BASE_CASE_ID)
         {
             var my_val = repository.Query(ffp => ffp.FlowID == inFlowId)
@@ -35,7 +35,7 @@ namespace CalRecycleLCA.Repositories
             return my_val.MeanValue;
         }
 
-        public static double? FlowConv(this IRepositoryAsync<FlowFlowProperty> repository,
+        public static double? FlowConv(this IRepository<FlowFlowProperty> repository,
             int refFlowId, int inFlowId, int scenarioId = Scenario.MODEL_BASE_CASE_ID)
         {
             double flow_conv = 1;

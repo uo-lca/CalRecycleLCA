@@ -407,7 +407,7 @@ namespace CalRecycleLCA.Services
                 //LCIADetail = details
             };
         }
-
+        
         public LCIAResultResource Transform(LCIAResult m, int processId)
         {
             return new LCIAResultResource
@@ -763,8 +763,29 @@ namespace CalRecycleLCA.Services
                 .Where(s => s.ScenarioID == scenarioID)
                 .Where(s => s.LCIAMethodID == lciaMethodID).ToList().Count() == 0)
                 _FragmentLCIAComputation.FragmentLCIACompute(fragmentID, scenarioID);
+             * */  
+            /*
+            IEnumerable<FragmentLCIAModel> aggResults = 
             * */
-            IEnumerable<FragmentLCIAModel> aggResults = _FragmentLCIAComputation.FragmentLCIA(fragmentID, scenarioID, lciaMethodID)
+            return _FragmentLCIAComputation.FragmentLCIA(fragmentID, scenarioID, lciaMethodID).ToList()
+                .GroupBy(r => r.LCIAMethodID)
+                .Select(group => new LCIAResultResource 
+                { 
+                    ScenarioID = scenarioID,
+                    LCIAMethodID = group.Key,
+                    LCIAScore = group.GroupBy(k => k.FragmentStageID)
+                        .Select(grp => new AggregateLCIAResource
+                        { 
+                            FragmentStageID = grp.Key,
+                            CumulativeResult = grp.Sum(a => a.Result),
+                            LCIADetail = new List<DetailedLCIAResource>()
+                        }).ToList()
+
+                }).Where(r => r.LCIAMethodID == lciaMethodID).First();
+
+            /*
+                
+                
                 .GroupBy(r => new
                 {
                     r.FragmentStageID,
@@ -783,6 +804,7 @@ namespace CalRecycleLCA.Services
                 LCIAScore = aggResults.Select(r => Transform(r)).ToList()
             };
             return lciaResult;
+             * */
         }
 
         /// <summary>
@@ -809,6 +831,37 @@ namespace CalRecycleLCA.Services
         {
             IEnumerable<int> lciaMethods = _LciaMethodService.QueryActiveMethods();
             return lciaMethods.Select(s => GetFragmentLCIAResults(fragmentID, s, scenarioId)).ToList();
+        }
+
+        public IEnumerable<LCIAResultResource> GetFragmentSensitivity(int fragmentId, int paramId)
+        {
+            List<Param> Ps = _ParamService.Queryable()
+                .Where(k => k.ParamID == paramId)
+                .ToList();
+            ParamResource p = _ParamService.GetParamResource(Ps).First();
+            var results = _FragmentLCIAComputation.Sensitivity(fragmentId, p);
+            return results.GroupBy(r => r.LCIAMethodID)
+                .Select(group => new LCIAResultResource()
+                {
+                    ScenarioID = p.ScenarioID,
+                    LCIAMethodID = group.Key,
+                    LCIAScore = group.GroupBy(k => 
+                        k.FragmentStageID // uncomment below for diagnostics
+//                        new 
+//                    { 
+//                        k.FragmentFlowID,
+//                        k.FragmentStageID
+//                    }
+                    )
+                        .Select(grp => new AggregateLCIAResource
+                        {
+//                            FragmentFlowID = grp.Key.FragmentFlowID,
+//                            FragmentStageID = grp.Key.FragmentStageID,
+                            FragmentStageID = grp.Key,
+                            CumulativeResult = grp.Sum(a => a.Result),
+                            LCIADetail = new List<DetailedLCIAResource>()
+                        }).ToList()
+                });
         }
 
         /// <summary>

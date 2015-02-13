@@ -12,5 +12,6 @@ namespace CalRecycleLCA.Services
     public interface IFragmentTraversalV2
     {
         IEnumerable<NodeCacheModel> Traverse(int fragmentId, int scenarioId);
+        IEnumerable<FragmentFlowResource> SensitivityTraverse(FragmentFlowResource ffr, int scenarioId = Scenario.MODEL_BASE_CASE_ID);
     }
 }
