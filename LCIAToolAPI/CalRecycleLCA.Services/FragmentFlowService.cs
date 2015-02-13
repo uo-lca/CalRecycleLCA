@@ -26,6 +26,7 @@ namespace CalRecycleLCA.Services
         InventoryModel GetInFlow(int fragmentId);
         IEnumerable<InventoryModel> GetDependencies(int fragmentId, int flowId, int ex_directionId,
             out double inFlowMagnitude, int scenarioId = Scenario.MODEL_BASE_CASE_ID);
+        double GetNodeScaling(FragmentFlowResource ffr, int scenarioId = Scenario.MODEL_BASE_CASE_ID);
 
         //FragmentFlow GetFragmentFlow(int fragmentFlowId);
         //IEnumerable<FragmentFlow> GetFragmentFlows(IEnumerable<int> ffids);
@@ -247,6 +248,14 @@ namespace CalRecycleLCA.Services
         public IEnumerable<FragmentFlow> GetLCIAFlows(int fragmentId)
         {
             return _repository.GetLCIAFlows(fragmentId);
+        }
+
+        public double GetNodeScaling(FragmentFlowResource ffr, int scenarioId = Scenario.MODEL_BASE_CASE_ID)
+        {
+            FlowTerminationModel term = Terminate(ffr, scenarioId);
+            return _repository.GetNodeScaling(term, (int)ffr.FlowID, 
+                Convert.ToInt32(Enum.Parse(typeof(DirectionEnum),ffr.Direction)), 
+                scenarioId);
         }
 
     }

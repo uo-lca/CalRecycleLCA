@@ -13,6 +13,7 @@ namespace CalRecycleLCA.Services
 {
     public interface IParamService : IService<Param>
     {
+        bool DetermineType(ref ParamResource p);
         IEnumerable<ParamResource> GetParams(int scenarioId);
         IEnumerable<ParamResource> GetParamResource(IEnumerable<Param> Ps);
         IEnumerable<Param> NewOrUpdateParam(int scenarioId, ParamResource post, ref CacheTracker cacheTracker);
@@ -22,13 +23,39 @@ namespace CalRecycleLCA.Services
 
     public class ParamService : Service<Param>, IParamService
     {
-        private IRepositoryAsync<Param> _repository;
+        private IRepository<Param> _repository;
         public ParamService(IRepositoryAsync<Param> repository)
             : base(repository)
         {
             _repository = repository;
         }
 
+        private bool isvalid(int? id)
+        {
+            return (id != null && id != 0);
+        }
+
+        public bool DetermineType(ref ParamResource p)
+        {
+            if (isvalid(p.FragmentFlowID))
+                p.ParamTypeID = 1;
+            else if (isvalid(p.CompositionDataID))
+                p.ParamTypeID = 5;
+            else if (!isvalid(p.FlowID))
+                return false;
+            else if (isvalid(p.LCIAMethodID))
+                p.ParamTypeID = 10;
+            else if (isvalid(p.FlowPropertyID))
+                p.ParamTypeID = 4;
+            else if (isvalid(p.ProcessID))
+                if (_repository.IsDissipation((int)p.ProcessID, (int)p.FlowID))
+                    p.ParamTypeID = 6;
+                else
+                    p.ParamTypeID = 8;
+            else
+                return false;
+            return true;
+        }
 
         public IEnumerable<ParamResource> GetParams(int scenarioId)
         {
@@ -60,12 +87,18 @@ namespace CalRecycleLCA.Services
         /// <returns></returns>
         public IEnumerable<Param> NewOrUpdateParam(int scenarioId, ParamResource post, ref CacheTracker cacheTracker)
         {
-            return _repository.PostParam(scenarioId, post, ref cacheTracker);
+            if (isvalid(post.ParamTypeID) || DetermineType(ref post))
+                return _repository.PostParam(scenarioId, post, ref cacheTracker);
+            else
+                return null;
         }
 
         public IEnumerable<Param> UpdateParam(int paramId, ParamResource put, ref CacheTracker cacheTracker)
         {
-            return _repository.UpdateParam(paramId, put, ref cacheTracker);
+            if (isvalid(put.ParamTypeID) || DetermineType(ref put))
+                return _repository.UpdateParam(paramId, put, ref cacheTracker);
+            else 
+                return null;
         }
 
         public void DeleteParam(int paramId, ref CacheTracker cacheTracker)

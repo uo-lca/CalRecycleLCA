@@ -181,7 +181,7 @@ namespace CalRecycleLCA.Services
 
         }
 
-        public IEnumerable<FragmentLCIAModel> FragmentLCIA(int? fragmentId, int? scenarioId, int? lciaMethodId)
+        public IEnumerable<FragmentLCIAModel> FragmentLCIA(int fragmentId, int scenarioId, int lciaMethodId)
         {
             // for now: return one record per FragmentFlow
             var lcia = _fragmentFlowService.Queryable()
@@ -197,14 +197,24 @@ namespace CalRecycleLCA.Services
             {
                 FragmentFlowID = s.nodeCaches.ff.FragmentFlowID,
                 FragmentStageID = s.nodeCaches.ff.FragmentStageID,
+                LCIAMethodID = lciaMethodId,
                 NodeWeight = s.nodeCaches.nc.NodeWeight,
-                ImpactScore = s.scoreCaches == null ? 0 : s.scoreCaches.ImpactScore,
-                Result = s.nodeCaches.nc.NodeWeight * (s.scoreCaches == null ? 0 : s.scoreCaches.ImpactScore)
+                ImpactScore = s.scoreCaches == null ? 0 : s.scoreCaches.ImpactScore
+                //Result = s.nodeCaches.nc.NodeWeight * (s.scoreCaches == null ? 0 : s.scoreCaches.ImpactScore)
                 //NodeLCIAResults = new List<LCIAModel>()
             });
 
             return lcia;
         }
+
+        public IEnumerable<FragmentLCIAModel> Sensitivity(int fragmentId, ParamResource p)
+        {
+            return GetSensitivities(fragmentId, p);
+        }
+
+        /* *************************
+         * Private Functions
+         * */
 
         private IEnumerable<ScoreCache> FragmentFlowLCIA(int fragmentId, int scenarioId, IEnumerable<int> lciaMethods,
             bool save = false)
@@ -323,7 +333,7 @@ namespace CalRecycleLCA.Services
                 case 2:
                     foreach (var lciaMethodId in needLciaMethods)
                     {
-                        var lcias = FragmentLCIA(fragmentNode.SubFragmentID, fragmentNode.ScenarioID, lciaMethodId);
+                        var lcias = FragmentLCIA((int)fragmentNode.SubFragmentID, fragmentNode.ScenarioID, lciaMethodId);
 
                         scoreCachesInProgress.Add(new ScoreCache()
                         {
@@ -345,5 +355,171 @@ namespace CalRecycleLCA.Services
 
             return scoreCachesInProgress;
         } /* end of SetScoreCache */
+
+        /// <summary>
+        /// Returns a list of impact score deltas associated with a unit parameter value for a given fragment
+        /// </summary>
+        /// <param name="fragmentId"></param>
+        /// <param name="p"></param>
+        /// <returns></returns>
+        private List<FragmentLCIAModel> GetSensitivities(int fragmentId, ParamResource p)
+        {
+            List<FragmentLCIAModel> results = new List<FragmentLCIAModel>();
+
+            sw_local.Click(fragmentId.ToString() + " sensitivities");
+            var ff = _fragmentFlowService.GetTerminatedFlows(fragmentId, p.ScenarioID).ToList();
+            sw_local.Click(fragmentId.ToString() + " terminated");
+
+            switch (p.ParamTypeID)
+            {
+                case 1:
+                    {
+                        var sensflow = ff.Where(k => k.FragmentFlowID == p.FragmentFlowID).FirstOrDefault();
+                        if (sensflow != null)
+                        {
+                            // sensitivity parameter is in current fragment
+                            double scale = (double)ff.Where(k => k.FragmentFlowID == sensflow.ParentFragmentFlowID)
+                                .Select(k => k.NodeWeight).First();
+                            if (scale != 0)
+                            {
+                                if (sensflow.NodeWeight == 0)
+                                {
+                                    // sensitivity path was not traversed
+                                    var sens_ff = _fragmentTraversalV2.SensitivityTraverse(sensflow, p.ScenarioID);
+                                    // sens_nc is a list of minimally-populated FragmentFlowResources, starting with unity 
+                                    // at the test FragmentFlowID
+                                    foreach (var node in sens_ff)
+                                    {
+                                        results.AddRange(LookupScoreCaches(node, scale, p.ScenarioID));
+                                        ff.RemoveAll(k => k.FragmentFlowID == node.FragmentFlowID);
+                                    }
+                                }
+                                else
+                                {
+                                    // path was already traversed-- all we need to do is re-scale it
+                                    var sens_ff = DescendentFlows(ff, sensflow.FragmentFlowID);
+                                    // need to re-compute flow scaling, unfortch.
+                                    // a little documentation: 
+                                    // parent node weight * dependency * flow_conv / flow_exch = child node weight
+                                    // GetNodeScaling returns node_conv = flow_conv / flow_exch
+                                    // so PNW * dependency * node_conv = CNW
+                                    // we want to replace dependency with 1
+                                    // so we want PNW * node_conv = New_CNW
+                                    // Thus, the scaling to apply to each descendent node is New_CNW / CNW
+                                    // so that after scaling, it will have New_CNW
+                                    // so we want scale to equal PNW * node_conv / CNW
+                                    double node_conv = _fragmentFlowService.GetNodeScaling(sensflow, p.ScenarioID);
+                                    scale = scale * node_conv / (double)sensflow.NodeWeight;
+
+                                    foreach (var node in sens_ff)
+                                    {
+                                        results.AddRange(LookupScoreCaches(node, scale, p.ScenarioID));
+                                        ff.RemoveAll(k => k.FragmentFlowID == node.FragmentFlowID);
+                                    }
+                                }
+                            }
+                            else
+                            {
+                                // parent node is 0, so sensitivity is 0
+                                // here- nothing to do. simply don't add any results.
+                            }
+                            
+                        }
+                        break;
+                    }
+                case 4:
+                case 5:
+                case 6:
+                    {
+                        throw new NotImplementedException("Param Type not implemented.");
+                        //break;
+                    }
+                case 8:
+                    {
+                        break;
+                    }
+                case 10:
+                    {
+                        break;
+                    }
+            }
+
+            foreach (var fragmentflow in ff.Where(k => k.NodeType == "Fragment").ToList())
+            {
+                // recurse on sub-fragments
+                results.AddRange(AggregateFragmentSensitivity((int)fragmentflow.SubFragmentID, p)
+                    .Select(s => new FragmentLCIAModel()
+                    {
+                        FragmentFlowID = fragmentflow.FragmentFlowID,
+                        FragmentStageID = fragmentflow.FragmentStageID,
+                        LCIAMethodID = s.LCIAMethodID,
+                        NodeWeight = (double)fragmentflow.NodeWeight,
+                        ImpactScore = s.ImpactScore
+                        //Result = 0.0
+                    }));
+            }
+            //foreach (var elem in results)
+            //    elem.Result = (double)(elem.NodeWeight * elem.ImpactScore);
+
+            return results;
+
+
+
+        }
+
+        /// <summary>
+        /// Given a FragmentFlow Resource, enumerate all the cached scores
+        /// </summary>
+        /// <param name="nc"></param>
+        /// <param name="scale"></param>
+        /// <param name="scenarioId"></param>
+        /// <returns></returns>
+        private List<FragmentLCIAModel> LookupScoreCaches(FragmentFlowResource nc, double scale, int scenarioId)
+        {
+            return _scoreCacheService.GetFragmentFlowCaches(nc.FragmentFlowID, scenarioId)
+                .Select(k => new FragmentLCIAModel()
+                {
+                    FragmentFlowID = nc.FragmentFlowID,
+                    FragmentStageID = nc.FragmentStageID,
+                    LCIAMethodID = k.LCIAMethodID,
+                    NodeWeight = (double)nc.NodeWeight * scale,
+                    ImpactScore = k.ImpactScore
+//                    Result = 0.0
+                }).ToList();
+        }
+
+        /// <summary>
+        /// Recursive function to return a subset of fragmentflows which are descendents of a given fragmentflowID
+        /// </summary>
+        /// <param name="ff"></param>
+        /// <param name="fragmentFlowId"></param>
+        /// <returns></returns>
+        private List<FragmentFlowResource> DescendentFlows(List<FragmentFlowResource> ff, int fragmentFlowId)
+        {
+            List<FragmentFlowResource> descendents = ff.Where(k => k.FragmentFlowID == fragmentFlowId).ToList();
+            var children = ff.Where(k => k.ParentFragmentFlowID == fragmentFlowId);
+            foreach (var child in children)
+                descendents.AddRange(DescendentFlows(ff, child.FragmentFlowID));
+            return descendents;
+        }
+
+        /// <summary>
+        /// Perform sensitivity analysis for subfragment, aggregate SubFragmentFlow results into 
+        /// FragmentFlow (unit) ImapctScore
+        /// </summary>
+        /// <param name="fragmentId"></param>
+        /// <param name="p"></param>
+        /// <returns></returns>
+        private List<FragmentLCIAModel> AggregateFragmentSensitivity(int fragmentId, ParamResource p)
+        {
+            return GetSensitivities(fragmentId, p)
+                .GroupBy(s => s.LCIAMethodID)
+                .Select(g => new FragmentLCIAModel()
+                {
+                    LCIAMethodID = g.Key,
+                    ImpactScore = g.Select(x => x.Result).Sum()
+//                    Result = 0.0
+                }).ToList();
+        }
     }
 }

@@ -348,6 +348,19 @@ namespace CalRecycleLCA.Repositories
 
         }
 
+        public static double GetNodeScaling(this IRepositoryAsync<FragmentFlow> repository, 
+            FlowTerminationModel term, int inFlowId, int directionId, int scenarioId )
+        {
+            var flow_conv = (double)repository.GetRepository<FlowFlowProperty>()
+                .FlowConv(term.TermFlowID, inFlowId, scenarioId);
+            if (term.NodeTypeID == 1)
+                return flow_conv /
+                    (double)repository.GetRepository<ProcessFlow>()
+                    .FlowExchange((int)term.ProcessID, term.TermFlowID, directionId);
+            else
+                return flow_conv;
+        }
+
         /// <summary>
         /// Given a fragment, reports fragment InputOutput flows as product flows. 
         /// There is some complexity involved because the fragment's reference flow does not 

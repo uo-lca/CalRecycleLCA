@@ -44,7 +44,6 @@ namespace CalRecycleLCA.Services
             _dependencyParamService = dependencyParamService;
 
             nodeCaches = new List<NodeCacheModel>();
-
         }
 
         /// <summary>
@@ -70,6 +69,29 @@ namespace CalRecycleLCA.Services
             NodeRecurse(fragmentFlows, dependencyParams, refFlow, scenarioId, activity);
 
             return nodeCaches;
+
+        }
+
+        public IEnumerable<FragmentFlowResource> SensitivityTraverse(FragmentFlowResource ffr, int scenarioId = Scenario.MODEL_BASE_CASE_ID)
+        {
+            nodeCaches = new List<NodeCacheModel>(); // reset these
+
+            // here, traversal is required because dependency parameter is zero in default scenario
+            var fragmentFlows = _fragmentFlowService.LGetFlowsByFragment(ffr.FragmentID);
+            var dependencyParams = _dependencyParamService.Query(dp => dp.Param.ScenarioID == scenarioId).Select().ToList();
+
+            float activity = 1;
+
+            NodeRecurse(fragmentFlows, dependencyParams, ffr.FragmentFlowID, scenarioId, activity);
+
+            return nodeCaches.Where(n => n.FragmentID == ffr.FragmentID) // un-traversed sub-fragments are an unhandled issue at present 
+                .Select(n => new FragmentFlowResource()
+                {
+                    FragmentFlowID = n.FragmentFlowID,
+                    FragmentStageID = fragmentFlows.Where(k => k.FragmentFlowID == n.FragmentFlowID)
+                        .Select(k => k.FragmentStageID).First(),
+                    NodeWeight = n.NodeWeight
+                });
 
         }
 
