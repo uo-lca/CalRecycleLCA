@@ -279,7 +279,6 @@
   <ItemGroup>
     <Compile Include="API\CalRecycleAuthorizeAttribute.cs" />
     <Compile Include="API\LCIAComputationController.cs" />
-    <Compile Include="API\FragmentTraversalController.cs" />
     <Compile Include="API\ResourceController.cs" />
     <Compile Include="API\XMLHandlerController.cs" />
     <Compile Include="App_Start\BundleConfig.cs" />

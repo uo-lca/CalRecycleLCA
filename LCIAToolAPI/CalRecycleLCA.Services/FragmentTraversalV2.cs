@@ -55,7 +55,14 @@ namespace CalRecycleLCA.Services
         /// <param name="fragmentId"></param>
         /// <param name="scenarioId"></param>
         /// <returns></returns>
-        public IEnumerable<NodeCacheModel> Traverse(int fragmentId, int scenarioId = Scenario.MODEL_BASE_CASE_ID)
+        public IEnumerable<NodeCacheModel> EnterTraversal(int fragmentId, int scenarioId = Scenario.MODEL_BASE_CASE_ID)
+        {
+            nodeCaches.Clear();
+            return Traverse(fragmentId, scenarioId); 
+        }
+            
+
+        private IEnumerable<NodeCacheModel> Traverse(int fragmentId, int scenarioId)
         {
             // we only enter this function if traversal is required.
 
@@ -74,7 +81,7 @@ namespace CalRecycleLCA.Services
 
         public IEnumerable<FragmentFlowResource> SensitivityTraverse(FragmentFlowResource ffr, int scenarioId = Scenario.MODEL_BASE_CASE_ID)
         {
-            nodeCaches = new List<NodeCacheModel>(); // reset these
+            nodeCaches.Clear(); // reset these
 
             // here, traversal is required because dependency parameter is zero in default scenario
             var fragmentFlows = _fragmentFlowService.LGetFlowsByFragment(ffr.FragmentID);

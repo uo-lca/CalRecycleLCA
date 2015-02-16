@@ -65,6 +65,7 @@ namespace LCIAToolAPI.Tests
         private ResourceServiceFacade _resourceServiceFacade;
         private ResourceController _resourceController;
         private DocuService _docuService;
+        private CacheManager _cacheManager;
 
         private List<DataSource> _dataSources;
         private List<FlowType> _flowTypes;
@@ -220,6 +221,7 @@ namespace LCIAToolAPI.Tests
             //_fragmentSubstitutionService,
                 _lciaMethodService,
                 _fragmentService,
+                _scenarioService,
             _unitOfWork);
 
             _resourceServiceFacade = new ResourceServiceFacade(
@@ -237,14 +239,19 @@ namespace LCIAToolAPI.Tests
                                _processService,
                                _processFlowService,
                                _scenarioService, 
-                               _nodeCacheService, 
-                               _scoreCacheService,
                                _paramService,
                                _flowFlowPropertyService,
                                _lciaService,
-                               _unitOfWork);
+                               _cacheManager);
 
             _docuService = new DocuService();
+            _cacheManager = new CacheManager(
+                _scenarioService, 
+                _unitOfWork, 
+                _fragmentService, 
+                _fragmentLCIAComputation, 
+                _nodeCacheService, 
+                _scoreCacheService);
 
             _resourceController = new ResourceController(_resourceServiceFacade, _scenarioGroupService, _docuService, _paramService);
 

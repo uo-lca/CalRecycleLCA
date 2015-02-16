@@ -84,6 +84,7 @@
   <ItemGroup>
     <Compile Include="BackgroundService.cs" />
     <Compile Include="CategoryService.cs" />
+    <Compile Include="CacheManager.cs" />
     <Compile Include="DocuService.cs" />
     <Compile Include="CounterTimer.cs" />
     <Compile Include="ClassificationService.cs" />
@@ -99,6 +100,7 @@
     <Compile Include="FragmentStageService.cs" />
     <Compile Include="FragmentSubstitutionService.cs" />
     <Compile Include="FragmentTraversalV2.cs" />
+    <Compile Include="ICacheManager.cs" />
     <Compile Include="IFragmentLCIAComputation.cs" />
     <Compile Include="IFragmentTraversalV2.cs" />
     <Compile Include="ILCIAComputationV2.cs" />

@@ -39,6 +39,8 @@ namespace LcaDataModel
 
         public int DirectionID { get; set; }
 
+        public bool StaleCache { get; set; }
+
         public virtual ICollection<BackgroundCache> BackgroundCaches { get; set; }
 
         public virtual ICollection<NodeCache> NodeCaches { get; set; }

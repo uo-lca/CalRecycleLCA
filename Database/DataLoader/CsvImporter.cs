@@ -474,6 +474,7 @@ namespace LcaDataLoader {
                 ent.ActivityLevel = Convert.ToDouble(row["ActivityLevel"]);
                 ent.FlowID = refID;
                 ent.DirectionID = Convert.ToInt32(row["RefDirectionID"]);
+                ent.StaleCache = true;
                 isImported = isNew ? AddEntityWithVerification<Scenario>( dbContext, ent) : (dbContext.SaveChanges() > 0);
             }
             return isImported;

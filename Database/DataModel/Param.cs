@@ -64,8 +64,18 @@ namespace LcaDataModel
         // below are stop-gaps 
         //
         [NotMapped]
+        public virtual DependencyParam DependencyParam
+        {
+            get { return DependencyParams.FirstOrDefault(); }
+        }
+        [NotMapped]
         public virtual FlowPropertyParam FlowPropertyParam {
             get { return FlowPropertyParams.FirstOrDefault(); }
+        }
+        [NotMapped]
+        public virtual CompositionParam CompositionParam
+        {
+            get { return CompositionParams.FirstOrDefault(); }
         }
         [NotMapped]
         public virtual ProcessEmissionParam ProcessEmissionParam

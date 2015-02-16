@@ -21,15 +21,31 @@ namespace Entities.Models
         public CacheTracker()
         {
             LCIAMethodsStale = new List<int>();
+            _fragmentFlows = new List<int>();
+            ParamModified = new List<int>();
+            ParamUnchanged = new List<int>();
         }
         private bool _recompute;
+        private List<int> _fragmentFlows;
+
         public bool NodeCacheStale { get; set; }
-        public bool ScoreCacheStale { get; set; }
+        public bool ScoreCacheStale { get; set; } // supersedes FragmentFlows list
         public List<int> LCIAMethodsStale { get; set; }
 
+
         public bool Recompute { 
-            get {return ( _recompute | NodeCacheStale | ScoreCacheStale | (LCIAMethodsStale.Count() > 0 )); }
+            get {return ( _recompute | NodeCacheStale | ScoreCacheStale
+                | (LCIAMethodsStale.Count() > 0 )
+                | (_fragmentFlows.Count() > 0)); }
             set { _recompute = value; }
         }
+
+        public List<int> FragmentFlowsStale
+        {
+            get { return _fragmentFlows; }
+            set { _fragmentFlows = value.Distinct().ToList(); }
+        }
+        public List<int> ParamModified;
+        public List<int> ParamUnchanged;
     }
 }

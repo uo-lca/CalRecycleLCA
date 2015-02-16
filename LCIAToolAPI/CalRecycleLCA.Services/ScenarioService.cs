@@ -13,6 +13,10 @@ namespace CalRecycleLCA.Services
 {
     public interface IScenarioService : IService<Scenario>
     {
+        bool IsStale(int ScenarioId);
+        void MarkStale(int ScenarioId);
+        void UnMarkStale(int ScenarioId);
+
         Scenario NewScenario(ScenarioResource scenario);
         Scenario UpdateScenarioFlow(int scenarioId, ScenarioResource scenario, ref CacheTracker cacheTracker);
         Scenario UpdateScenarioDetails(int scenarioId, ScenarioResource scenario);
@@ -27,6 +31,21 @@ namespace CalRecycleLCA.Services
             : base(repository)
         {
             _repository = repository;
+        }
+
+        public void MarkStale(int scenarioId)
+        {
+            _repository.MarkStale(scenarioId);
+        }
+
+        public void UnMarkStale(int scenarioId)
+        {
+            _repository.UnMarkStale(scenarioId);
+        }
+
+        public bool IsStale(int scenarioId)
+        {
+            return _repository.Query(k => k.ScenarioID == scenarioId).Select(k => k.StaleCache).FirstOrDefault();
         }
 
         public Scenario NewScenario(ScenarioResource post)

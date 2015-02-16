@@ -21,11 +21,30 @@ namespace CalRecycleLCA.Repositories
                 ActivityLevel = post.ActivityLevel,
                 TopLevelFragmentID = post.TopLevelFragmentID,
                 FlowID = post.ReferenceFlowID,
-                DirectionID = Convert.ToInt32(Enum.Parse(typeof(DirectionEnum),post.ReferenceDirection))
+                DirectionID = Convert.ToInt32(Enum.Parse(typeof(DirectionEnum),post.ReferenceDirection)),
+                StaleCache = true
             };
             scenario.ObjectState = ObjectState.Added;
             repository.Insert(scenario);
             return scenario;
+        }
+
+        public static void MarkStale(this IRepository<Scenario> repository, int scenarioId)
+        {
+            Scenario scenario = repository.Queryable()
+                .Where(k => k.ScenarioID == scenarioId).First();
+            scenario.StaleCache = true;
+            scenario.ObjectState = ObjectState.Modified;
+            repository.Update(scenario);
+        }
+
+        public static void UnMarkStale(this IRepository<Scenario> repository, int scenarioId)
+        {
+            Scenario scenario = repository.Queryable()
+                .Where(k => k.ScenarioID == scenarioId).First();
+            scenario.StaleCache = false;
+            scenario.ObjectState = ObjectState.Modified;
+            repository.Update(scenario);
         }
 
         public static Scenario UpdateScenarioFlow(this IRepositoryAsync<Scenario> repository, 

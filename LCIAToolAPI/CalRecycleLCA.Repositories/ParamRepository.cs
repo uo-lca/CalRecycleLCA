@@ -126,6 +126,21 @@ namespace CalRecycleLCA.Repositories
             return PR;
         }
 
+        private static List<int> FragmentFlowsAffected(this IRepository<Param> repository, int scenarioId, int processId)
+        {
+            // neglects background
+            var ffs = repository.GetRepository<FragmentNodeProcess>().Queryable()
+                .Where(fnp => fnp.ProcessID == processId)
+                .Select(fnp => fnp.FragmentFlowID)
+                .ToList();
+            ffs.AddRange(repository.GetRepository<ProcessSubstitution>().Queryable()
+                .Where(ps => ps.ScenarioID == scenarioId)
+                .Where(ps => ps.ProcessID == processId)
+                .Select(ps => ps.FragmentNodeProcess.FragmentFlowID)
+                .ToList());
+            return ffs;
+        }
+        
         public static IEnumerable<Param> PostParam(this IRepository<Param> repository,
             int scenarioId, ParamResource post, ref CacheTracker cacheTracker)
         {
@@ -277,7 +292,7 @@ namespace CalRecycleLCA.Repositories
                             ObjectState = ObjectState.Added
                         };
                         P.ProcessDissipationParams.Add(pd);
-                        cacheTracker.ScoreCacheStale = true;
+                        cacheTracker.FragmentFlowsStale.AddRange(repository.FragmentFlowsAffected(scenarioId, (int)post.ProcessID));
                         break;
                     }
                 case 8:
@@ -294,7 +309,7 @@ namespace CalRecycleLCA.Repositories
                             ObjectState = ObjectState.Added
                         };
                         P.ProcessEmissionParams.Add(pe);
-                        cacheTracker.ScoreCacheStale = true;
+                        cacheTracker.FragmentFlowsStale.AddRange(repository.FragmentFlowsAffected(scenarioId, (int)post.ProcessID));
                         break;
                     }
                 case 10:
@@ -344,80 +359,136 @@ namespace CalRecycleLCA.Repositories
                 .Select().First();
             if (put.Name != null)
                 P.Name = put.Name;
-            if (put.Value != null)
+            if (put.Value == null)
+            {
+                cacheTracker.ParamUnchanged.Add(P.ParamID);
+            }
+            else
             { 
                 switch (P.ParamTypeID)
                 {
                     case 1:
                         {
-                            double oldval = P.DependencyParams.Where(k => k.FragmentFlowID == put.FragmentFlowID).First().Value;
-                            FragmentFlow ff = repository.GetRepository<FragmentFlow>().Query(k => k.FragmentFlowID == put.FragmentFlowID)
-                                .Include(k => k.Flow)
-                                .Select().First();
-                            ConservationParam cp = repository.GetRepository<ConservationParam>().Queryable()
-                                .Where(k => k.DependencyParam.Param.ScenarioID == P.ScenarioID)
-                                .Where(k => k.FragmentFlowID == ff.ParentFragmentFlowID)
-                                .Where(k => k.FlowPropertyID == ff.Flow.ReferenceFlowProperty)
-                                .FirstOrDefault();
-                            if (cp != null)
+                            double oldval = P.DependencyParams.First().Value;
+                            if (oldval == put.Value)
                             {
-                                double delta = put.Value - oldval;
-                                if (ff.DirectionID != cp.DirectionID)
-                                    delta = -1 * delta;
-
-                                var cdp = repository.Conserve(cp.DependencyParamID, delta);
-                                Ps.Add(cdp.Param);
-
+                                cacheTracker.ParamUnchanged.Add(P.ParamID);
                             }
-                            P.DependencyParams.Where(k => k.FragmentFlowID == put.FragmentFlowID).First().Value = put.Value;
-                            P.DependencyParams.Where(k => k.FragmentFlowID == put.FragmentFlowID).First().ObjectState = ObjectState.Modified;
-                            cacheTracker.NodeCacheStale = true;
+                            else
+                            {
+                                FragmentFlow ff = repository.GetRepository<FragmentFlow>().Query(k => k.FragmentFlowID == put.FragmentFlowID)
+                                    .Include(k => k.Flow)
+                                    .Select().First();
+                                ConservationParam cp = repository.GetRepository<ConservationParam>().Queryable()
+                                    .Where(k => k.DependencyParam.Param.ScenarioID == P.ScenarioID)
+                                    .Where(k => k.FragmentFlowID == ff.ParentFragmentFlowID)
+                                    .Where(k => k.FlowPropertyID == ff.Flow.ReferenceFlowProperty)
+                                    .FirstOrDefault();
+                                if (cp != null)
+                                {
+                                    double delta = put.Value - oldval;
+                                    if (ff.DirectionID != cp.DirectionID)
+                                        delta = -1 * delta;
+
+                                    var cdp = repository.Conserve(cp.DependencyParamID, delta);
+                                    Ps.Add(cdp.Param);
+                                }
+
+                                P.DependencyParam.Value = put.Value;
+                                P.DependencyParam.ObjectState = ObjectState.Modified;
+                                cacheTracker.NodeCacheStale = true;
+                                cacheTracker.ParamModified.Add(P.ParamID);
+                            }
                             break;
                         }
                     case 2:
                         {
-                            P.DependencyParams.Where(k => k.FragmentFlowID == put.FragmentFlowID).First().Value = put.Value;
-                            P.DependencyParams.Where(k => k.FragmentFlowID == put.FragmentFlowID).First().ObjectState = ObjectState.Modified;
-                            cacheTracker.NodeCacheStale = true;
+                            if (P.DependencyParam.Value == put.Value)
+                                cacheTracker.ParamUnchanged.Add(P.ParamID);
+                            else
+                            {
+                                P.DependencyParam.Value = put.Value;
+                                P.DependencyParam.ObjectState = ObjectState.Modified;
+                                cacheTracker.NodeCacheStale = true;
+                                cacheTracker.ParamModified.Add(P.ParamID);
+                            }
                             break;
                         }
                     case 4:
                         {
-                            P.FlowPropertyParam.Value = put.Value;
-                            P.FlowPropertyParam.ObjectState = ObjectState.Modified;
-                            cacheTracker.NodeCacheStale = true;
+                            if (P.FlowPropertyParam.Value == put.Value)
+                                cacheTracker.ParamUnchanged.Add(P.ParamID);
+                            else
+                            {
+                                P.FlowPropertyParam.Value = put.Value;
+                                P.FlowPropertyParam.ObjectState = ObjectState.Modified;
+                                cacheTracker.NodeCacheStale = true;
+                                cacheTracker.ParamModified.Add(P.ParamID);
+                            }
                             break;
                         }
                     case 5:
                         {
-                            P.CompositionParams.Where(k => k.CompositionDataID == put.CompositionDataID).First().Value = put.Value;
-                            P.CompositionParams.Where(k => k.CompositionDataID == put.CompositionDataID).First().ObjectState = ObjectState.Modified;
-                            cacheTracker.ScoreCacheStale = true;
+                            if (P.CompositionParam.Value == put.Value)
+                                cacheTracker.ParamUnchanged.Add(P.ParamID);
+                            else
+                            {
+                                P.CompositionParam.Value = put.Value;
+                                P.CompositionParam.ObjectState = ObjectState.Modified;
+                                cacheTracker.ScoreCacheStale = true;
+                                cacheTracker.ParamModified.Add(P.ParamID);
+                            }
                             break;
                         }
                     case 6:
                         {
-                            P.ProcessDissipationParam.Value = put.Value;
-                            P.ProcessDissipationParam.ObjectState = ObjectState.Modified;
-                            cacheTracker.ScoreCacheStale = true;
+                            if (P.ProcessDissipationParam.Value == put.Value)
+                                cacheTracker.ParamUnchanged.Add(P.ParamID);
+                            else
+                            {
+                                P.ProcessDissipationParam.Value = put.Value;
+                                P.ProcessDissipationParam.ObjectState = ObjectState.Modified;
+                                cacheTracker.ParamModified.Add(P.ParamID);
+                                int processId = repository.GetRepository<ProcessDissipation>().Queryable()
+                                    .Where(pd => pd.ProcessDissipationID == P.ProcessDissipationParam.ProcessDissipationID)
+                                    .Select(pd => pd.ProcessID)
+                                    .First();
+                                cacheTracker.FragmentFlowsStale.AddRange(repository.FragmentFlowsAffected(P.ScenarioID, processId));
+                            }
                             break;
                         }
                     case 8:
                         {
-                            P.ProcessEmissionParam.Value = put.Value;
-                            P.ProcessEmissionParam.ObjectState = ObjectState.Modified;
-                            cacheTracker.ScoreCacheStale = true;
+                            if (P.ProcessEmissionParam.Value == put.Value)
+                                cacheTracker.ParamUnchanged.Add(P.ParamID);
+                            else
+                            {
+                                P.ProcessEmissionParam.Value = put.Value;
+                                P.ProcessEmissionParam.ObjectState = ObjectState.Modified;
+                                cacheTracker.ParamModified.Add(P.ParamID);
+                                int processId = repository.GetRepository<ProcessFlow>().Queryable()
+                                    .Where(pf => pf.ProcessFlowID == P.ProcessEmissionParam.ProcessFlowID)
+                                    .Select(pf => pf.ProcessID)
+                                    .First();
+                                cacheTracker.FragmentFlowsStale.AddRange(repository.FragmentFlowsAffected(P.ScenarioID, processId));
+                            }
                             break;
                         }
                     case 10:
                         {
-                            int lmid = repository.GetRepository<LCIA>().Queryable()
-                                                .Where(k => k.LCIAID == P.CharacterizationParam.LCIAID)
-                                                .Select(k => k.LCIAMethodID)
-                                                .First();
-                            P.CharacterizationParam.Value = put.Value;
-                            P.CharacterizationParam.ObjectState = ObjectState.Modified;
-                            cacheTracker.LCIAMethodsStale.Add(lmid);
+                            if (P.CharacterizationParam.Value == put.Value)
+                                cacheTracker.ParamUnchanged.Add(P.ParamID);
+                            else
+                            {
+                                int lmid = repository.GetRepository<LCIA>().Queryable()
+                                                    .Where(k => k.LCIAID == P.CharacterizationParam.LCIAID)
+                                                    .Select(k => k.LCIAMethodID)
+                                                    .First();
+                                P.CharacterizationParam.Value = put.Value;
+                                P.CharacterizationParam.ObjectState = ObjectState.Modified;
+                                cacheTracker.LCIAMethodsStale.Add(lmid);
+                                cacheTracker.ParamModified.Add(P.ParamID);
+                            }
                             break;
                         }
                 }
@@ -445,7 +516,9 @@ namespace CalRecycleLCA.Repositories
                 case 6:
                 case 8:
                     {
-                        cacheTracker.ScoreCacheStale = true;
+                        int processId = repository.GetRepository<ProcessEmissionParam>().Query(k => k.ParamID == paramId)
+                            .Select(k => k.ProcessFlow.ProcessID).First();
+                        cacheTracker.FragmentFlowsStale.AddRange(repository.FragmentFlowsAffected(P.ScenarioID, processId));
                         break;
                     }
                 case 10:

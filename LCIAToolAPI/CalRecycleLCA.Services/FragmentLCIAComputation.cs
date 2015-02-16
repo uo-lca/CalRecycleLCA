@@ -30,6 +30,8 @@ namespace CalRecycleLCA.Services
         [Inject]
         private readonly IFragmentService _fragmentService;
         [Inject]
+        private readonly IScenarioService _ScenarioService;
+        [Inject]
         private readonly IUnitOfWork _unitOfWork;
 
 
@@ -45,6 +47,7 @@ namespace CalRecycleLCA.Services
             INodeCacheService nodeCacheService,
             ILCIAMethodService lciaMethodService,
             IFragmentService fragmentService,
+            IScenarioService scenarioService,
             IUnitOfWork unitOfWork)
         {
             if (fragmentTraversalV2 == null)
@@ -89,6 +92,12 @@ namespace CalRecycleLCA.Services
             }
             _fragmentService = fragmentService;
 
+            if (scenarioService == null)
+            {
+                throw new ArgumentNullException("scenarioService is null");
+            }
+            _ScenarioService = scenarioService;
+
             if (unitOfWork == null)
             {
                 throw new ArgumentNullException("unitOfWork is null");
@@ -103,10 +112,16 @@ namespace CalRecycleLCA.Services
 
             currentCache = new List<ScoreCache>();
 
-            fragsThisRound = new bool[_fragmentService.Count()+1];
+            fragsThisRound = new bool[_fragmentService.Count() + 1];
         }
 
-        public IEnumerable<NodeCache> FragmentTraverse(int fragmentId, int scenarioId = Scenario.MODEL_BASE_CASE_ID)
+        private void ClearLocalVars()
+        {
+            fragsThisRound = new bool[_fragmentService.Count() + 1];
+            currentCache.Clear();
+        }
+
+        private IEnumerable<NodeCache> FragmentTraverse(int fragmentId, int scenarioId = Scenario.MODEL_BASE_CASE_ID)
         {
             // this will eventually become private after diagnostics are done
             if (_nodeCacheService.IsCached(fragmentId, scenarioId))
@@ -115,7 +130,7 @@ namespace CalRecycleLCA.Services
                     .Where(nc => nc.ScenarioID == scenarioId).ToList();
             else
             {
-                var nodeCaches = _fragmentTraversalV2.Traverse((int)fragmentId, scenarioId).Select(k => new NodeCache
+                var nodeCaches = _fragmentTraversalV2.EnterTraversal((int)fragmentId, scenarioId).Select(k => new NodeCache
                 {
                     FragmentFlowID = k.FragmentFlowID,
                     ScenarioID = k.ScenarioID,
@@ -139,6 +154,7 @@ namespace CalRecycleLCA.Services
 
         public IEnumerable<ScoreCache> FragmentLCIAComputeNoSave(int fragmentId, int scenarioId)
         {
+            ClearLocalVars();
             sw_local.CStart();
 
             FragmentTraverse(fragmentId, scenarioId);
@@ -162,6 +178,7 @@ namespace CalRecycleLCA.Services
 
         public void FragmentLCIAComputeSave(int fragmentId, int scenarioId)
         {
+            ClearLocalVars();
             sw_local.CStart();
 
             FragmentTraverse(fragmentId, scenarioId);
@@ -176,6 +193,9 @@ namespace CalRecycleLCA.Services
             sw_ff.CStop();
             sw_cache.CStop();
             sw_lcia.CStop();
+
+            _ScenarioService.UnMarkStale(scenarioId);
+            _unitOfWork.SaveChanges();
 
             return;
 

@@ -580,70 +580,6 @@ namespace LCAToolAPI.API
                 return null;
         }
 
-        /// <summary>
-        /// Clear NodeCache data by ScenarioID
-        /// </summary>
-        /// <param name="scenarioId"></param>
-        [Route("api/scenarios/{scenarioID:int}/clearnodecaches")]
-        [HttpPost]
-        public void ClearNodeCacheByScenario(int scenarioId)
-        {
-            _ResourceService.ClearNodeCacheByScenario(scenarioId);
-        }
-
-        /*
-        /// <summary>
-        /// Clear NodeCache data by ScenarioID and FragmentID
-        /// </summary>
-        /// <param name="scenarioId"></param>
-        /// <param name="fragmentId"></param>
-        [Route("api/scenarios/{scenarioID:int}/fragments/{fragmentID:int}/clearnodecaches")]
-        [HttpPost]
-        public void ClearNodeCacheByScenarioAndFragment(int scenarioId, int fragmentId)
-        {
-            _ResourceService.ClearNodeCacheByScenarioAndFragment(scenarioId, fragmentId);
-        }
-        */
-
-        /// <summary>
-        /// Clear ScoreCache data by ScenarioID
-        /// </summary>
-        /// <param name="scenarioId"></param>
-        [Route("api/scenarios/{scenarioID:int}/clearscorecaches")]
-        [HttpPost]
-        public void ClearScoreCacheByScenario(int scenarioId)
-        {
-            _ResourceService.ClearScoreCacheByScenario(scenarioId);
-        }
-
-        /*
-        /// <summary>
-        /// Clear ScoreCache data by ScenarioID and FragmentID
-        /// </summary>
-        /// <param name="scenarioId"></param>
-        /// <param name="fragmentId"></param>
-        [Route("api/scenarios/{scenarioID:int}/fragments/{fragmentID:int}/clearscorecaches")]
-        [HttpPost]
-        public void ClearScoreCacheByScenarioAndFragment(int scenarioId, int fragmentId)
-        {
-            _ResourceService.ClearScoreCacheByScenarioAndFragment(scenarioId, fragmentId);
-        }
-         * */
-
-        
-        /// <summary>
-        /// Clear ScoreCache data by ScenarioID and LCIAMethodID
-        /// 
-        /// </summary>
-        /// <param name="scenarioId"></param>
-        /// <param name="lciaMethodId"></param>
-        [Route("api/scenarios/{scenarioID:int}/lciamethods/{lciaMethodID:int}/clearscorecaches")]
-        [HttpPost]
-        public void ClearScoreCacheByScenarioAndLCIAMethod(int scenarioId, int lciaMethodId)
-        {
-            _ResourceService.ClearScoreCacheByScenarioAndLCIAMethod(scenarioId, lciaMethodId);
-        }
-
     
         //[Authorize]
         /// <summary>
@@ -829,8 +765,28 @@ namespace LCAToolAPI.API
         }
 
         /// <summary>
+        /// Update entire param collection for a scenario.  Required when more than one concurrent 
+        /// update is submitted.  Client error to issue concurrent PUT or POST requests for the same scenario. 
+        /// </summary>
+        /// <param name="scenarioId"></param>
+        /// <returns></returns>
+        [CalRecycleAuthorize]
+        [Route("api/scenarios/{scenarioId}/params")]
+        [AcceptVerbs("PUT")]
+        [HttpPut]
+        public IEnumerable<ParamResource> UpdateParams(int scenarioId, [FromBody] IEnumerable<ParamResource> putParams)
+        {
+            if (_ScenarioGroupService.CanAlter(RequestContext))
+                return _ResourceService.UpdateParams(scenarioId, putParams);
+            else
+                throw new HttpResponseException(HttpStatusCode.Unauthorized);
+        }
+
+
+
+        /// <summary>
         /// PUT api/scenarios/{scenarioId}/params/{paramId}
-        /// Update param.  not yet implemented.
+        /// Update param.  only name or value fields updated.
         /// </summary>
         [CalRecycleAuthorize]
         [Route("api/scenarios/{scenarioId}/params/{paramId}")]

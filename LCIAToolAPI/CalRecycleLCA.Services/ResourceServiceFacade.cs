@@ -54,17 +54,11 @@ namespace CalRecycleLCA.Services
         [Inject]
         private readonly IScenarioService _ScenarioService;
         [Inject]
-        private readonly INodeCacheService _NodeCacheService;
-        [Inject]
-        private readonly IScoreCacheService _ScoreCacheService;
-        [Inject]
         private readonly IParamService _ParamService;
         [Inject]
         private readonly IFlowFlowPropertyService _FlowFlowPropertyService;
         [Inject]
         private readonly ILCIAService _LCIAService;
-        [Inject]
-        private readonly IUnitOfWork _unitOfWork;
         //
         // Traversal and Computation components
         //
@@ -72,6 +66,8 @@ namespace CalRecycleLCA.Services
         private readonly IFragmentLCIAComputation _FragmentLCIAComputation;
         [Inject]
         private readonly ILCIAComputationV2 _LCIAComputation;
+        [Inject]
+        private readonly ICacheManager _CacheManager;
 
         private T verifiedDependency<T>(T dependency) where T : class
         {
@@ -103,12 +99,10 @@ namespace CalRecycleLCA.Services
                                IProcessService processService,
                                IProcessFlowService processFlowService,
                                IScenarioService scenarioService,
-                               INodeCacheService nodeCacheService,
-                               IScoreCacheService scoreCacheService,
                                IParamService paramService,
                                IFlowFlowPropertyService flowFlowPropertyService,
                                ILCIAService lciaService,
-                               IUnitOfWork unitOfWork) 
+                               ICacheManager cacheManager) 
         {
             _ClassificationService = verifiedDependency(classificationService);
             _FragmentService = verifiedDependency(fragmentService);
@@ -124,12 +118,10 @@ namespace CalRecycleLCA.Services
             _ProcessService = verifiedDependency(processService);
             _ProcessFlowService = verifiedDependency(processFlowService);
             _ScenarioService = verifiedDependency(scenarioService);
-            _NodeCacheService = verifiedDependency(nodeCacheService);
-            _ScoreCacheService = verifiedDependency(scoreCacheService);
             _ParamService = verifiedDependency(paramService);
             _FlowFlowPropertyService = verifiedDependency(flowFlowPropertyService);
             _LCIAService = verifiedDependency(lciaService);
-            _unitOfWork = verifiedDependency(unitOfWork);
+            _CacheManager = verifiedDependency(cacheManager);
         }
         #endregion
 
@@ -485,8 +477,8 @@ namespace CalRecycleLCA.Services
         public IEnumerable<FragmentFlowResource> GetFragmentFlowResources(int fragmentID, int scenarioID = Scenario.MODEL_BASE_CASE_ID) {
             /// NEED FIX--> terminate nodes in repository layer; eager-fetch only scenario NodeCaches
             /// see http://stackoverflow.com/questions/19386501/linq-to-entities-include-where-method
-            _FragmentLCIAComputation.FragmentTraverse(fragmentID, scenarioID);
-            var test = _FragmentFlowService.GetTerminatedFlows(fragmentID, scenarioID)
+            //_FragmentLCIAComputation.FragmentTraverse(fragmentID, scenarioID); // do not allow outside cache updates
+            return _FragmentFlowService.GetTerminatedFlows(fragmentID, scenarioID)
                 .ToList();
             //foreach (var ff in test)
             //    ff.FlowPropertyMagnitudes = _FlowFlowPropertyService.GetFlowPropertyMagnitudes(ff, scenarioID);
@@ -499,7 +491,6 @@ namespace CalRecycleLCA.Services
                 //                                .Select().Where(x => x.NodeCaches.Count > 0).ToList();
             //var stopgap = fragmentFlows.Where(f => f.NodeCaches.Any(nc => nc.ScenarioID == scenarioID))
               //  .Select(ff => Transform(ff, scenarioID)).ToList();
-            return test;
         }
 
         /// <summary>
@@ -781,7 +772,7 @@ namespace CalRecycleLCA.Services
                             LCIADetail = new List<DetailedLCIAResource>()
                         }).ToList()
 
-                }).Where(r => r.LCIAMethodID == lciaMethodID).First();
+                }).Where(r => r.LCIAMethodID == lciaMethodID).FirstOrDefault();
 
             /*
                 
@@ -895,97 +886,6 @@ namespace CalRecycleLCA.Services
             }).ToList();
         }
 
-        /// <summary>
-        /// Delete NodeCache data by ScenarioId
-        /// </summary>
-        public void ClearNodeCacheByScenario(int scenarioId = Scenario.MODEL_BASE_CASE_ID)
-        {
-            CacheTracker cacheTracker = new CacheTracker();
-            cacheTracker.NodeCacheStale = true;
-            ImplementScenarioChanges(scenarioId, cacheTracker);
-        }
-
-        /*
-        /// <summary>
-        /// Delete NodeCache data by ScenarioID and FragmentID
-        /// </summary>
-        public void ClearNodeCacheByScenarioAndFragment(int scenarioId = Scenario.MODEL_BASE_CASE_ID, int fragmentId = 0)
-        {
-            _NodeCacheService.ClearNodeCacheByScenarioAndFragment(scenarioId, fragmentId);
-            _unitOfWork.SaveChanges();
-        }
-         * */
-
-        /// <summary>
-        /// Delete ScoreCache data by ScenarioId
-        /// </summary>
-        public void ClearScoreCacheByScenario(int scenarioId)
-        {
-            //_unitOfWork.SetAutoDetectChanges(false); 
-            CacheTracker cacheTracker = new CacheTracker();
-            cacheTracker.ScoreCacheStale = true;
-            ImplementScenarioChanges(scenarioId, cacheTracker);
-            //_unitOfWork.SetAutoDetectChanges(true);
-        }
-
-        /*
-        /// <summary>
-        /// Delete ScoreCache data by ScenarioID and FragmentID
-        /// </summary>
-        public void ClearScoreCacheByScenarioAndFragment(int scenarioId = Scenario.MODEL_BASE_CASE_ID, int fragmentId = 0)
-        {
-            _ScoreCacheService.ClearScoreCacheByScenarioAndFragment(scenarioId, fragmentId);
-            _unitOfWork.SaveChanges();
-        }
-        */
-        /// <summary>
-        /// Delete ScoreCache data by ScenarioID and LCIAMethodID
-        /// </summary>
-        public void ClearScoreCacheByScenarioAndLCIAMethod(int scenarioId, int lciaMethodId)
-        {
-            CacheTracker cacheTracker = new CacheTracker();
-            cacheTracker.LCIAMethodsStale.Add(lciaMethodId);
-            ImplementScenarioChanges(scenarioId, cacheTracker);
-        }
-
-        private void ImplementScenarioChanges(int scenarioId, CacheTracker cacheTracker)
-        {
-            var sw = new CounterTimer();
-            sw.CStart();
-            // first, we do the most surgical operations: clear LCIA method-specific results
-            _unitOfWork.SetAutoDetectChanges(false);
-            if (cacheTracker.LCIAMethodsStale != null)
-            {
-                cacheTracker.Recompute = true; // set this explicitly
-                foreach (int method in cacheTracker.LCIAMethodsStale)
-                {
-                    _ScoreCacheService.ClearScoreCacheByScenarioAndLCIAMethod(scenarioId, method);
-                }
-            }
-            sw.Click("methods");
-            if (cacheTracker.NodeCacheStale)
-            {
-                // next, clear all computed fragment scores
-                _ScoreCacheService.ClearScoreCacheForSubFragments(scenarioId);
-                _NodeCacheService.ClearNodeCacheByScenario(scenarioId);
-            }
-            sw.Click("node");
-            if (cacheTracker.ScoreCacheStale)
-                _ScoreCacheService.ClearScoreCacheByScenario(scenarioId);
-
-            sw.Click("score");
-            _unitOfWork.SaveChanges(); // update database with changes
-            _unitOfWork.SetAutoDetectChanges(true);
-            sw.Click("save");
-            if (cacheTracker.Recompute)
-            {
-                int tlf = _ScenarioService.Query(k => k.ScenarioID == scenarioId).Select(k => k.TopLevelFragmentID).First();
-                _FragmentLCIAComputation.FragmentLCIAComputeSave(tlf, scenarioId);
-            }
-            sw.CStop();
-            return;
-        }
-
         private ScenarioResource CheckTopLevelFragment(ScenarioResource scenario)
         {
             if (_FragmentService.Query(k => k.FragmentID == scenario.TopLevelFragmentID) == null)
@@ -1025,16 +925,13 @@ namespace CalRecycleLCA.Services
             postScenario = CheckTopLevelFragment(postScenario);
             if (postScenario == null)
                 return -1; // -1 should generate a 400 or 415 http error
-            
+
             if (postScenario.Name == null)
                 postScenario.Name = "User-Generated Scenario";
             if (postScenario.ActivityLevel == 0)
                 postScenario.ActivityLevel = 1;
             postScenario.ScenarioGroupID = scenarioGroupId;
-            Scenario newScenario = _ScenarioService.NewScenario(postScenario);
-            _unitOfWork.SaveChanges();
-            _FragmentLCIAComputation.FragmentLCIAComputeSave(newScenario.TopLevelFragmentID, newScenario.ScenarioID);
-            return newScenario.ScenarioID;
+            return _CacheManager.CreateScenario(postScenario);
         }
 
         public bool UpdateScenario(int scenarioId, ScenarioResource putScenario)
@@ -1054,16 +951,14 @@ namespace CalRecycleLCA.Services
             }
             if (scenario != null)
             {
-                ImplementScenarioChanges(scenario.ScenarioID, cacheTracker);
-                return true;
+                return _CacheManager.ImplementScenarioChanges(scenario.ScenarioID, cacheTracker);
             }
             return false;
         }
 
         public void DeleteScenario(int scenarioId)
         {
-            _ScenarioService.DeleteScenario(scenarioId);
-            _unitOfWork.SaveChanges();
+            _CacheManager.DeleteScenario(scenarioId);
         }
 
         public void DeleteParam(int scenarioId, int paramId)
@@ -1074,7 +969,7 @@ namespace CalRecycleLCA.Services
             if (p_scenarioId == scenarioId)
             {
                 _ParamService.DeleteParam(paramId, ref cacheTracker);
-                ImplementScenarioChanges(scenarioId, cacheTracker);
+                _CacheManager.ImplementScenarioChanges(scenarioId, cacheTracker);
             }
         }
 
@@ -1092,7 +987,7 @@ namespace CalRecycleLCA.Services
         {
             CacheTracker cacheTracker = new CacheTracker();
             IEnumerable<Param> Ps = _ParamService.NewOrUpdateParam(scenarioId, postParam, ref cacheTracker);
-            ImplementScenarioChanges(scenarioId, cacheTracker);
+            _CacheManager.ImplementScenarioChanges(scenarioId, cacheTracker);
             return _ParamService.GetParamResource(Ps);
         }
 
@@ -1104,10 +999,34 @@ namespace CalRecycleLCA.Services
                 Ps = _ParamService.UpdateParam(paramId, putParam, ref cacheTracker);
             else
                 Ps = _ParamService.NewOrUpdateParam(scenarioId, putParam, ref cacheTracker);
-            ImplementScenarioChanges(scenarioId, cacheTracker);
+            _CacheManager.ImplementScenarioChanges(scenarioId, cacheTracker);
             return _ParamService.GetParamResource(Ps);
         }
 
+        public IEnumerable<ParamResource> UpdateParams(int scenarioId, IEnumerable<ParamResource> putParams)
+        {
+            CacheTracker cacheTracker = new CacheTracker();
+            List<Param> Ps = new List<Param>();
+            List<int> existingParamIds = _ParamService.Queryable()
+                .Where(p => p.ScenarioID == scenarioId)
+                .Select(p => p.ParamID).ToList();
+
+            foreach (ParamResource put in putParams)
+                Ps.AddRange(_ParamService.NewOrUpdateParam(scenarioId, put, ref cacheTracker));
+
+            // determine omitted parameters
+            List<int> omittedParamIds = existingParamIds.AsQueryable()
+                .Where(pid => !cacheTracker.ParamModified.Contains(pid))
+                .Where(pid => !cacheTracker.ParamUnchanged.Contains(pid))
+                .ToList();
+
+            foreach (int del in omittedParamIds)
+                _ParamService.DeleteParam(del, ref cacheTracker);
+
+            _CacheManager.ImplementScenarioChanges(scenarioId, cacheTracker);
+
+            return _ParamService.GetParams(scenarioId);
+        }
 
       #endregion  
     }

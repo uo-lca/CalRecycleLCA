@@ -11,6 +11,7 @@ namespace CalRecycleLCA.Services
     public interface IScoreCacheService : IService<ScoreCache>
     {
         void ClearScoreCacheByScenario(int scenarioId);
+        void ClearScoreCacheByScenario(int scenarioId, List<int> fragmentFlows);
 
         //void ClearScoreCacheByScenarioAndFragment(int scenarioId = Scenario.MODEL_BASE_CASE_ID, int fragmentId = 0);
 

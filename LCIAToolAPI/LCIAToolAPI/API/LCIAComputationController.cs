@@ -22,6 +22,8 @@ namespace LCAToolAPI.API
         private readonly ILCIAComputationV2 _lciaComputationV2;
         [Inject]
         private readonly IFragmentLCIAComputation _fragmentLCIAComputation;
+        [Inject]
+        private readonly ICacheManager _CacheManager;
         //[Inject]
         //private readonly ITestGenericService _testService;
 
@@ -29,11 +31,13 @@ namespace LCAToolAPI.API
         /// Constructor for LCIA computation diagnostic controller.  Creates computation objects 
         /// via dependency injection.
         /// </summary>
-        /// <param name="lciaComputationV2">via dependency injection</param>
-        /// <param name="fragmentLCIAComputation">via dependency injection</param>
+        /// <param name="lciaComputationV2"></param>
+        /// <param name="fragmentLCIAComputation"></param>
+        /// <param name="cacheManager"></param>
         public LCIAComputationController(
             ILCIAComputationV2 lciaComputationV2, 
-            IFragmentLCIAComputation fragmentLCIAComputation)
+            IFragmentLCIAComputation fragmentLCIAComputation,
+            ICacheManager cacheManager)
         {
 
             if (lciaComputationV2 == null)
@@ -50,6 +54,12 @@ namespace LCAToolAPI.API
 
             _fragmentLCIAComputation = fragmentLCIAComputation;
 
+            if (cacheManager == null)
+            {
+                throw new ArgumentNullException("cacheManager is null");
+            }
+
+            _CacheManager = cacheManager;
             /*
             if (testGenericService == null)
             {
@@ -58,6 +68,18 @@ namespace LCAToolAPI.API
 
             _testService = testGenericService;
              * */
+        }
+
+        /// <summary>
+        /// Runs through base case and existing scenarios, populating cache.
+        /// Base case has cache populated for all fragments, all LCIA methods
+        /// Scenarios have cache populated for top level fragment and descendents, all LCIA methods.
+        /// </summary>
+        [Route("api/init")]
+        [HttpGet]
+        public void InitializeCache()
+        {
+            _CacheManager.InitializeCache();
         }
 
         //GET api/<controller>
@@ -163,6 +185,70 @@ namespace LCAToolAPI.API
             return _testService.GetDependencies(fragmentFlowID, scenarioID);
         }
         */
+
+        /// <summary>
+        /// Clear NodeCache data by ScenarioID
+        /// </summary>
+        /// <param name="scenarioId"></param>
+        [Route("api/scenarios/{scenarioID:int}/clearnodecaches")]
+        [HttpPost]
+        public void ClearNodeCacheByScenario(int scenarioId)
+        {
+            _CacheManager.ClearNodeCacheByScenario(scenarioId);
+        }
+
+        /*
+        /// <summary>
+        /// Clear NodeCache data by ScenarioID and FragmentID
+        /// </summary>
+        /// <param name="scenarioId"></param>
+        /// <param name="fragmentId"></param>
+        [Route("api/scenarios/{scenarioID:int}/fragments/{fragmentID:int}/clearnodecaches")]
+        [HttpPost]
+        public void ClearNodeCacheByScenarioAndFragment(int scenarioId, int fragmentId)
+        {
+            _ResourceService.ClearNodeCacheByScenarioAndFragment(scenarioId, fragmentId);
+        }
+        */
+
+        /// <summary>
+        /// Clear ScoreCache data by ScenarioID
+        /// </summary>
+        /// <param name="scenarioId"></param>
+        [Route("api/scenarios/{scenarioID:int}/clearscorecaches")]
+        [HttpPost]
+        public void ClearScoreCacheByScenario(int scenarioId)
+        {
+            _CacheManager.ClearScoreCacheByScenario(scenarioId);
+        }
+
+        /*
+        /// <summary>
+        /// Clear ScoreCache data by ScenarioID and FragmentID
+        /// </summary>
+        /// <param name="scenarioId"></param>
+        /// <param name="fragmentId"></param>
+        [Route("api/scenarios/{scenarioID:int}/fragments/{fragmentID:int}/clearscorecaches")]
+        [HttpPost]
+        public void ClearScoreCacheByScenarioAndFragment(int scenarioId, int fragmentId)
+        {
+            _ResourceService.ClearScoreCacheByScenarioAndFragment(scenarioId, fragmentId);
+        }
+         * */
+
+
+        /// <summary>
+        /// Clear ScoreCache data by ScenarioID and LCIAMethodID
+        /// 
+        /// </summary>
+        /// <param name="scenarioId"></param>
+        /// <param name="lciaMethodId"></param>
+        [Route("api/scenarios/{scenarioID:int}/lciamethods/{lciaMethodID:int}/clearscorecaches")]
+        [HttpPost]
+        public void ClearScoreCacheByScenarioAndLCIAMethod(int scenarioId, int lciaMethodId)
+        {
+            _CacheManager.ClearScoreCacheByScenarioAndLCIAMethod(scenarioId, lciaMethodId);
+        }
 
 
        

@@ -13,19 +13,24 @@ namespace CalRecycleLCA.Services
 {
     public class ScoreCacheService : Service<ScoreCache>, IScoreCacheService
     {
-         private readonly IRepositoryAsync<ScoreCache> _repository;
+        private readonly IRepositoryAsync<ScoreCache> _repository;
 
-         public ScoreCacheService(IRepositoryAsync<ScoreCache> repository)
+        public ScoreCacheService(IRepositoryAsync<ScoreCache> repository)
             : base(repository)
         {
             _repository = repository; 
         }
 
-         public void ClearScoreCacheByScenario(int scenarioId)
+        public void ClearScoreCacheByScenario(int scenarioId)
         {
             _repository.ClearScoreCacheByScenario(scenarioId);
         }
 
+        public void ClearScoreCacheByScenario(int scenarioId, List<int> fragmentFlows)
+        {
+            _repository.ClearScoreCacheByScenario(scenarioId, fragmentFlows);
+        }
+        
         /* public void ClearScoreCacheByScenarioAndFragment(int scenarioId = Scenario.MODEL_BASE_CASE_ID, int fragmentId = 0)
         {
             _repository.ClearScoreCacheByScenarioAndFragment(scenarioId, fragmentId);

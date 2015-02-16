@@ -20,6 +20,26 @@ namespace CalRecycleLCA.Repositories
             });
         }
 
+        /// <summary>
+        /// Like above, but only clears cache values for the named FragmentFlowIDs
+        /// </summary>
+        /// <param name="repository"></param>
+        /// <param name="scenarioId"></param>
+        /// <param name="fragmentFlows"></param>
+        public static void ClearScoreCacheByScenario(this IRepositoryAsync<ScoreCache> repository, int scenarioId,
+            List<int> fragmentFlows)
+        {
+            fragmentFlows = fragmentFlows.Distinct().ToList();
+            var scoreCaches = repository.Queryable().Where(sc => sc.ScenarioID == scenarioId)
+                .Where(sc => fragmentFlows.Contains(sc.FragmentFlowID))
+                .ToList();
+
+            scoreCaches.ForEach(x =>
+                {
+                    repository.Delete(x.ScoreCacheID);
+                });
+        }
+
         /*
         public static void ClearScoreCacheByScenarioAndFragment(this IRepositoryAsync<ScoreCache> repository, int scenarioId = Scenario.MODEL_BASE_CASE_ID, int fragmentId = 0)
         {
