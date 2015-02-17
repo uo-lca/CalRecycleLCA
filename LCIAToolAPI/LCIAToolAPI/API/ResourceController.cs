@@ -27,6 +27,9 @@ namespace LCAToolAPI.API
         private readonly IResourceServiceFacade _ResourceService;
 
         [Inject]
+        private readonly IScenarioService _ScenarioService;
+
+        [Inject]
         private readonly IScenarioGroupService _ScenarioGroupService;
 
         [Inject]
@@ -34,6 +37,8 @@ namespace LCAToolAPI.API
 
         [Inject]
         private readonly IParamService _ParamService;
+
+        private string conflictMsg = "Requested scenario is being updated by another request. Please wait and try again.";
 
         private String ToolVersion()
         {
@@ -81,6 +86,7 @@ namespace LCAToolAPI.API
         /// <param name="docuService">provides documentary information</param>
         /// <param name="paramService">provides param data</param>
         public ResourceController(IResourceServiceFacade resourceService,
+            IScenarioService scenarioService,
             IScenarioGroupService scenarioGroupService,
             IDocuService docuService,
             IParamService paramService)
@@ -90,6 +96,7 @@ namespace LCAToolAPI.API
                 throw new ArgumentNullException("resourceService");
             }
             _ResourceService = resourceService;
+            _ScenarioService = scenarioService;
             _ScenarioGroupService = scenarioGroupService;
             _DocuService = docuService;
             _ParamService = paramService;
@@ -212,15 +219,15 @@ namespace LCAToolAPI.API
         /// Get a single fragment.
         /// </summary>
         /// <param name="fragmentID"></param>
-        /// <returns></returns>
+        /// <returns>FragmentResource</returns>
         [Route("api/fragments/{fragmentID:int}")]
         [HttpGet]
-        public FragmentResource GetFragment(int fragmentID) {
+        public HttpResponseMessage GetFragment(int fragmentID) {
             FragmentResource fr = _ResourceService.GetFragmentResource(fragmentID);
             if (fr == null) {
-                throw new HttpResponseException(HttpStatusCode.NotFound);
+                return Request.CreateResponse(HttpStatusCode.BadRequest);
             }
-            return fr;
+            return Request.CreateResponse(HttpStatusCode.OK, fr);
         }
 
         // Fragments //////////////////////////////////////////////////////////////
@@ -242,16 +249,19 @@ namespace LCAToolAPI.API
         /// </summary>
         /// <param name="fragmentID"></param>
         /// <param name="scenarioID"></param>
-        /// <returns></returns>
+        /// <returns>IEnumerable FragmentFlowResource</returns>
         [CalRecycleAuthorize]
         [Route("api/scenarios/{scenarioID:int}/fragments/{fragmentID:int}/fragmentflows")]
         [HttpGet]
-        public IEnumerable<FragmentFlowResource> GetFragmentFlowResources(int fragmentID, int scenarioID = Scenario.MODEL_BASE_CASE_ID)
+        public HttpResponseMessage GetFragmentFlowResources(int fragmentID, int scenarioID = Scenario.MODEL_BASE_CASE_ID)
         {
+            if (_ScenarioService.IsStale(scenarioID))
+                return Request.CreateResponse(HttpStatusCode.Conflict, conflictMsg);
             if (_ScenarioGroupService.CanGet(RequestContext))
-                return _ResourceService.GetFragmentFlowResources(fragmentID, scenarioID);
+                return Request.CreateResponse(HttpStatusCode.OK,
+                    _ResourceService.GetFragmentFlowResources(fragmentID, scenarioID));
             else
-                return null;
+                return Request.CreateResponse(HttpStatusCode.Unauthorized);
         }
 
         
@@ -348,11 +358,14 @@ namespace LCAToolAPI.API
         [CalRecycleAuthorize]
         [Route("api/scenarios/{scenarioID:int}/fragments/{fragmentID:int}/lciamethods/{lciaMethodID:int}/lciaresults")]
         [HttpGet]
-        public LCIAResultResource GetFragmentLCIAResults(int fragmentID, int lciaMethodID, int scenarioID) {
+        public HttpResponseMessage GetFragmentLCIAResults(int fragmentID, int lciaMethodID, int scenarioID) {
+            if (_ScenarioService.IsStale(scenarioID))
+                return Request.CreateResponse(HttpStatusCode.Conflict, conflictMsg);
             if (_ScenarioGroupService.CanGet(RequestContext))
-                return _ResourceService.GetFragmentLCIAResults(fragmentID, lciaMethodID, scenarioID);
+                return Request.CreateResponse(HttpStatusCode.OK,
+                    _ResourceService.GetFragmentLCIAResults(fragmentID, lciaMethodID, scenarioID));
             else
-                return null;
+                return Request.CreateResponse(HttpStatusCode.Unauthorized);
         }
 
         /// <summary>
@@ -364,12 +377,15 @@ namespace LCAToolAPI.API
         [CalRecycleAuthorize]
         [Route("api/scenarios/{scenarioID:int}/fragments/{fragmentID:int}/lciaresults")]
         [HttpGet]
-        public IEnumerable<LCIAResultResource> GetFragmentLCIAResultsAllMethods(int fragmentID, int scenarioID)
+        public HttpResponseMessage GetFragmentLCIAResultsAllMethods(int fragmentID, int scenarioID)
         {
+            if (_ScenarioService.IsStale(scenarioID))
+                return Request.CreateResponse(HttpStatusCode.Conflict, conflictMsg);
             if (_ScenarioGroupService.CanGet(RequestContext))
-                return _ResourceService.GetFragmentLCIAResultsAllMethods(fragmentID, scenarioID);
+                return Request.CreateResponse(HttpStatusCode.OK,
+                    _ResourceService.GetFragmentLCIAResultsAllMethods(fragmentID, scenarioID));
             else
-                return null;
+                return Request.CreateResponse(HttpStatusCode.Unauthorized);
         }
 
         /// <summary>
@@ -377,18 +393,21 @@ namespace LCAToolAPI.API
         /// </summary>
         /// <param name="fragmentId"></param>
         /// <param name="paramId"></param>
-        /// <returns></returns>
+        /// <returns>List of LCIAResultResource</returns>
         [CalRecycleAuthorize]
         [Route("api/fragments/{fragmentId:int}/params/{paramId:int}/sensitivity")]
         [HttpGet]
-        public IEnumerable<LCIAResultResource> GetFragmentSensitivity(int fragmentId, int paramId)
+        public HttpResponseMessage GetFragmentSensitivity(int fragmentId, int paramId)
         {
             int scenarioId = _ParamService.Queryable().Where(p => p.ParamID == paramId)
                 .Select(p => p.ScenarioID).First();
+            if (_ScenarioService.IsStale(scenarioId))
+                return Request.CreateResponse(HttpStatusCode.Conflict, conflictMsg);
             if (_ScenarioGroupService.CanGet(RequestContext, scenarioId))
-                return _ResourceService.GetFragmentSensitivity(fragmentId, paramId);
+                return Request.CreateResponse(HttpStatusCode.OK,
+                    _ResourceService.GetFragmentSensitivity(fragmentId, paramId));
             else
-                return null;
+                return Request.CreateResponse(HttpStatusCode.Unauthorized);
         }
 
         // LCIA Metadata ////////////////////////////////////////////////////////////
@@ -568,47 +587,62 @@ namespace LCAToolAPI.API
         /// <param name="processID"></param>
         /// <param name="lciaMethodID"></param>
         /// <param name="scenarioID"></param>
-        /// <returns></returns>
+        /// <returns>LCIAResultResource </returns>
         [CalRecycleAuthorize]
         [Route("api/scenarios/{scenarioID:int}/processes/{processID:int}/lciamethods/{lciaMethodID:int}/lciaresults")]
         [HttpGet]
-        public LCIAResultResource GetProcessLCIAResult(int processID, int lciaMethodID, int scenarioID)
+        public HttpResponseMessage GetProcessLCIAResult(int processID, int lciaMethodID, int scenarioID)
         {
+            if (_ScenarioService.IsStale(scenarioID))
+                return Request.CreateResponse(HttpStatusCode.Conflict, conflictMsg);
             if (_ScenarioGroupService.CanGet(RequestContext))
-                return _ResourceService.GetProcessLCIAResult(processID, lciaMethodID, scenarioID);
+                return Request.CreateResponse(HttpStatusCode.OK,
+                    _ResourceService.GetProcessLCIAResult(processID, lciaMethodID, scenarioID));
             else
-                return null;
+                return Request.CreateResponse(HttpStatusCode.Unauthorized);
         }
 
     
-        //[Authorize]
         /// <summary>
         /// GET api/scenarios/{scenarioId}/params
         /// Returns a list of params belonging to the given scenario
         /// </summary>
         /// <param name="scenarioId"></param>
         /// <returns>ParamResource (list)</returns>
+        [CalRecycleAuthorize]
         [Route("api/scenarios/{scenarioId}/params")]
         [AcceptVerbs("GET")]
-        public IEnumerable<ParamResource> GetScenarioParams(int scenarioId)
+        public HttpResponseMessage GetScenarioParams(int scenarioId)
         {
-            return _ResourceService.GetParams(scenarioId);
+            if (_ScenarioService.IsStale(scenarioId))
+                return Request.CreateResponse(HttpStatusCode.Conflict, conflictMsg);
+            if (_ScenarioGroupService.CanGet(RequestContext))
+                return Request.CreateResponse(HttpStatusCode.OK,
+                    _ResourceService.GetParams(scenarioId));
+            else
+                return Request.CreateResponse(HttpStatusCode.Unauthorized);
         }
 
         
-        //[Authorize]
         /// <summary>
         /// GET api/scenarios/{scenarioId}/params/{paramId}
         /// </summary>
         /// <param name="scenarioId"></param>
         /// <param name="paramId"></param>
         /// <returns>ParamResource</returns>
+        [CalRecycleAuthorize]
         [Route("api/scenarios/{scenarioId}/params/{paramId}")]
         [AcceptVerbs("GET")]
-        public ParamResource GetScenarioParam(int scenarioId, int paramId)
+        public HttpResponseMessage GetScenarioParam(int scenarioId, int paramId)
         {
-            // leakproof linq
-            return _ResourceService.GetParams(scenarioId).Where(k => k.ParamID == paramId).FirstOrDefault();
+            if (_ScenarioService.IsStale(scenarioId))
+                return Request.CreateResponse(HttpStatusCode.Conflict, conflictMsg);
+            if (_ScenarioGroupService.CanGet(RequestContext))
+                // leakproof linq
+                return Request.CreateResponse(HttpStatusCode.OK,
+                    _ResourceService.GetParams(scenarioId).Where(k => k.ParamID == paramId).FirstOrDefault());
+            else
+                return Request.CreateResponse(HttpStatusCode.Unauthorized);
         }
 
         /// <summary>
@@ -648,11 +682,11 @@ namespace LCAToolAPI.API
         /// Get the list of all scenarios eligible to be viewed given the connection's authorization.
         /// Note: authorization is presently not implemented.
         /// </summary>
-        /// <returns></returns>
+        /// <returns>ScenarioResource</returns>
         [Route("api/scenarios/{scenarioId}")]
         [CalRecycleAuthorize]
         [HttpGet]
-        public ScenarioResource GetScenario(int scenarioId)
+        public HttpResponseMessage GetScenario(int scenarioId)
         {
 
             // need auth here to determine remote user's scenario group.  
@@ -660,9 +694,10 @@ namespace LCAToolAPI.API
             //return _ResourceService.GetScenarios(userGroupID);
             // else:
             if (_ScenarioGroupService.CanGet(RequestContext))
-                return _ResourceService.GetScenarios().Where(k => k.ScenarioID == scenarioId).FirstOrDefault();
+                return Request.CreateResponse(HttpStatusCode.OK,
+                    _ResourceService.GetScenarios().Where(k => k.ScenarioID == scenarioId).FirstOrDefault());
             else
-                throw new HttpResponseException(HttpStatusCode.Unauthorized);
+                return Request.CreateResponse(HttpStatusCode.Unauthorized);
         }
         
         //[Authorize]
@@ -676,7 +711,7 @@ namespace LCAToolAPI.API
         [Route("api/scenarios")]
         [AcceptVerbs("POST")]
         [HttpPost]
-        public ScenarioResource AddScenario([FromBody] ScenarioResource postdata)
+        public HttpResponseMessage AddScenario([FromBody] ScenarioResource postdata)
         {
             int scenarioId;
             int? authGroup = _ScenarioGroupService.CheckAuthorizedGroup(RequestContext);
@@ -685,10 +720,11 @@ namespace LCAToolAPI.API
             {
                 var foo = Request.Content.ToString();
                 scenarioId = _ResourceService.AddScenario(postdata, (int)authGroup);
-                return _ResourceService.GetScenarios().Where(k => k.ScenarioID == scenarioId).FirstOrDefault(); 
+                return Request.CreateResponse(HttpStatusCode.OK,
+                    _ResourceService.GetScenarios().Where(k => k.ScenarioID == scenarioId).FirstOrDefault()); 
             }
             else
-                throw new HttpResponseException(HttpStatusCode.Unauthorized); 
+                return Request.CreateResponse(HttpStatusCode.Unauthorized); 
 
         }
 
@@ -698,22 +734,23 @@ namespace LCAToolAPI.API
         /// </summary>
         /// <param name="scenarioId"></param>
         /// <param name="putdata"></param>
-        /// <returns></returns>
+        /// <returns>ScenarioResource</returns>
         [CalRecycleAuthorize]
         [Route("api/scenarios/{scenarioId}")]
         [AcceptVerbs("PUT")]
         [HttpPut]
-        public ScenarioResource UpdateScenario(int scenarioId, [FromBody] ScenarioResource putdata)
+        public HttpResponseMessage UpdateScenario(int scenarioId, [FromBody] ScenarioResource putdata)
         {
             if (_ScenarioGroupService.CanAlter(RequestContext))
             {
                 if (_ResourceService.UpdateScenario(scenarioId, putdata))
-                    return _ResourceService.GetScenarios().Where(k => k.ScenarioID == scenarioId).FirstOrDefault();
+                    return Request.CreateResponse(HttpStatusCode.OK,
+                        _ResourceService.GetScenarios().Where(k => k.ScenarioID == scenarioId).FirstOrDefault());
                 else
-                    return null;
+                    return Request.CreateResponse(HttpStatusCode.Conflict, conflictMsg);
             }
             else
-                throw new HttpResponseException(HttpStatusCode.Unauthorized);
+                return Request.CreateResponse(HttpStatusCode.Unauthorized);
         }
 
         /// <summary>
@@ -722,47 +759,46 @@ namespace LCAToolAPI.API
         [CalRecycleAuthorize]
         [Route("api/scenarios/{scenarioId}")]
         [AcceptVerbs("DELETE")]
-        public void DeleteScenario(int scenarioId)
+        public HttpResponseMessage DeleteScenario(int scenarioId)
         {
+            if (_ScenarioService.IsStale(scenarioId))
+                return Request.CreateResponse(HttpStatusCode.Conflict, conflictMsg);
             if (_ScenarioGroupService.CanAlter(RequestContext))
+            {
                 _ResourceService.DeleteScenario(scenarioId);
+                return Request.CreateResponse(HttpStatusCode.OK);
+            }
             else
-                throw new HttpResponseException(HttpStatusCode.Unauthorized); 
+                return Request.CreateResponse(HttpStatusCode.Unauthorized); 
 
         }
-
-        /*
-        /// <summary>
-        /// DELETE api/scenarios/{scenarioId}/params/{paramId}
-        /// Deletes the named parameter from the table
-        /// not yet implemented
-        /// </summary>
-        [Authorize]
-        [Route("api/scenarios/{scenarioId}/params/{paramId}")]
-        [AcceptVerbs("DELETE")]
-        [HttpPost]
-        public void DeleteParam()
-        {
-            _ResourceService.DeleteParam(deleteParamJSON);
-        }
-         * */
 
         /// <summary>
         /// POST api/scenarios/{scenarioId}/params
         /// Create a new param belonging to the named Scenario. must be authenticated-- Scenario.ScenarioGroupID must 
         /// match the authorizedScenarioGroup;
         /// </summary>
+        /// <param name="scenarioId"></param>
+        /// <param name="postParam"></param>
+        /// <returns>ParamResource</returns>
         [CalRecycleAuthorize]
         [Route("api/scenarios/{scenarioId}/params")]
         [AcceptVerbs("POST")]
         [HttpPost]
-        public ParamResource AddParam(int scenarioId, [FromBody] ParamResource postParam)
+        public HttpResponseMessage AddParam(int scenarioId, [FromBody] ParamResource postParam)
         {
-            if (_ScenarioGroupService.CanAlter(RequestContext)) 
-               return _ResourceService.AddParam(scenarioId, postParam).FirstOrDefault();
-            
+            if (_ScenarioService.IsStale(scenarioId))
+                return Request.CreateResponse(HttpStatusCode.Conflict, conflictMsg);
+            if (_ScenarioGroupService.CanAlter(RequestContext))
+            {
+                ParamResource result = _ResourceService.AddParam(scenarioId, postParam).FirstOrDefault();
+                if (result == null)
+                    return Request.CreateResponse(HttpStatusCode.Conflict, conflictMsg);
+                else
+                    return Request.CreateResponse(HttpStatusCode.OK, result);
+            }
             else
-                throw new HttpResponseException(HttpStatusCode.Unauthorized);
+                return Request.CreateResponse(HttpStatusCode.Unauthorized);
         }
 
         /// <summary>
@@ -770,17 +806,25 @@ namespace LCAToolAPI.API
         /// update is submitted.  Client error to issue concurrent PUT or POST requests for the same scenario. 
         /// </summary>
         /// <param name="scenarioId"></param>
-        /// <returns></returns>
+        /// <returns>List of ParamResources</returns>
         [CalRecycleAuthorize]
         [Route("api/scenarios/{scenarioId}/params")]
         [AcceptVerbs("PUT")]
         [HttpPut]
-        public IEnumerable<ParamResource> UpdateParams(int scenarioId, [FromBody] IEnumerable<ParamResource> putParams)
+        public HttpResponseMessage UpdateParams(int scenarioId, [FromBody] IEnumerable<ParamResource> putParams)
         {
+            if (_ScenarioService.IsStale(scenarioId))
+                return Request.CreateResponse(HttpStatusCode.Conflict, conflictMsg);
             if (_ScenarioGroupService.CanAlter(RequestContext))
-                return _ResourceService.UpdateParams(scenarioId, putParams);
+            {
+                IEnumerable<ParamResource> result = _ResourceService.UpdateParams(scenarioId, putParams);
+                if (result == null)
+                    return Request.CreateResponse(HttpStatusCode.Conflict, conflictMsg);
+                else
+                    return Request.CreateResponse(HttpStatusCode.OK,result);
+            }                    
             else
-                throw new HttpResponseException(HttpStatusCode.Unauthorized);
+                return Request.CreateResponse(HttpStatusCode.Unauthorized);
         }
 
 
@@ -789,16 +833,28 @@ namespace LCAToolAPI.API
         /// PUT api/scenarios/{scenarioId}/params/{paramId}
         /// Update param.  only name or value fields updated.
         /// </summary>
+        /// <param name="scenarioId"></param>
+        /// <param name="paramId"></param>
+        /// <param name="putParam"></param>
+        /// <returns>ParamResource</returns>
         [CalRecycleAuthorize]
         [Route("api/scenarios/{scenarioId}/params/{paramId}")]
         [AcceptVerbs("PUT")]
-        [HttpPost]
-        public ParamResource UpdateParam(int scenarioId, int paramId, [FromBody] ParamResource putParam)
+        [HttpPut]
+        public HttpResponseMessage UpdateParam(int scenarioId, int paramId, [FromBody] ParamResource putParam)
         {
+            if (_ScenarioService.IsStale(scenarioId))
+                return Request.CreateResponse(HttpStatusCode.Conflict, conflictMsg);
             if (_ScenarioGroupService.CanAlter(RequestContext))
-                return _ResourceService.UpdateParam(scenarioId, paramId, putParam).FirstOrDefault();
+            {
+                ParamResource result = _ResourceService.UpdateParam(scenarioId, paramId, putParam).FirstOrDefault();
+                if (result == null)
+                    return Request.CreateResponse(HttpStatusCode.Conflict, conflictMsg);
+                else
+                    return Request.CreateResponse(HttpStatusCode.OK, result);
+            }
             else
-                throw new HttpResponseException(HttpStatusCode.Unauthorized);
+                return Request.CreateResponse(HttpStatusCode.Unauthorized);
         }
 
         /// <summary>
@@ -811,21 +867,20 @@ namespace LCAToolAPI.API
         [Route("api/scenarios/{scenarioId}/params/{paramId}")]
         [AcceptVerbs("DELETE")]
         [HttpPost]
-        public void DeleteParam(int scenarioId, int paramId, [FromBody] ParamResource putParam)
+        public HttpResponseMessage DeleteParam(int scenarioId, int paramId, [FromBody] ParamResource putParam)
         {
+            if (_ScenarioService.IsStale(scenarioId))
+                return Request.CreateResponse(HttpStatusCode.Conflict, conflictMsg);
             if (_ScenarioGroupService.CanAlter(RequestContext))
-                _ResourceService.DeleteParam(scenarioId, paramId);
+                if (_ResourceService.DeleteParam(scenarioId, paramId))
+                    return Request.CreateResponse(HttpStatusCode.OK);
+                else
+                    return Request.CreateResponse(HttpStatusCode.Conflict, conflictMsg);
             else
-                throw new HttpResponseException(HttpStatusCode.Unauthorized);
+                return Request.CreateResponse(HttpStatusCode.Unauthorized);
         }
 
         /* TODO:
-         * 
-         * Add route to get Process LCIA results for all methods
-         * [Route("api/processes/{processID:int}")] // to report what?
-         X [Route("api/fragments/{fragmentID:int}/lciaresults")]    
-         X [Route("api/scenarios/{scenarioID:int}/fragments/{fragmentID:int}/lciaresults")]    
-         X [Route("api/scenariogroups/{scenarioID:int}/scenarios")]    
          * 
          */
     }
