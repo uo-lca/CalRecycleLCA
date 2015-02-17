@@ -147,23 +147,23 @@ angular.module('lcaApp.resources.service', ['ngResource', 'lcaApp.idmap.service'
             };
 
             resourceService.addChangeMethods = function(svc) {
-                svc.create = function (obj, successCB, errorCB, params) {
+                svc.create = function (params, obj, successCB, errorCB) {
                     var p = resourceService.addAuthParam(params);
                     svc.objects = null;
-                    svc.resource.save( p, obj, successCB, errorCB);
+                    return svc.resource.save( p, obj, successCB, errorCB);
                 };
-
-                svc.delete = function(obj, successCB, errorCB, params) {
+                // avoid using reserved word, delete
+                svc.remove = function(params, obj, successCB, errorCB) {
                     var p = resourceService.addAuthParam(params);
                     p[svc.idName] = obj[svc.idName];
                     svc.objects = null;
-                    svc.resource.delete( p, obj, successCB, errorCB);
+                    return svc.resource.delete( p, obj, successCB, errorCB);
                 };
 
-                svc.update = function(obj, successCB, errorCB, params) {
+                svc.update = function(params, obj, successCB, errorCB) {
                     var p = resourceService.addAuthParam(params);
                     p[svc.idName] = obj[svc.idName];
-                    svc.resource.update( p, obj, successCB, errorCB);
+                    return svc.resource.update( p, obj, successCB, errorCB);
                 };
             };
 

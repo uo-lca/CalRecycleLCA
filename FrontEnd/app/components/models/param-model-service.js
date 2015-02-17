@@ -48,8 +48,13 @@
     }}}
  */
 angular.module('lcaApp.models.param', ['lcaApp.resources.service', 'lcaApp.status.service'] )
-    .factory('ParamModelService', ['ParamService', '$q', 'StatusService', '$log',
-        function(ParamService, $q, StatusService, $log) {
+    // Status relevant to editor views.
+    .constant('PARAM_VALUE_STATUS',
+                { unchanged: 1, // value did not change
+                    changed: 2, // value changed and is valid
+                    invalid: 3 }) // value changed and is not valid
+    .factory('ParamModelService', ['ParamService', 'PARAM_VALUE_STATUS', '$q',
+        function(ParamService, PARAM_VALUE_STATUS, $q) {
             var svc = {},
                 model = { scenarios : {} };
 
@@ -68,27 +73,6 @@ angular.module('lcaApp.models.param', ['lcaApp.resources.service', 'lcaApp.statu
                     } else {
                         nest( nest(parent.flows, param.flowID), "paramTypes");
                         parent.flows[param.flowID]["paramTypes"][param.paramTypeID] = param;
-                    }
-                }
-            }
-
-            function insertParam(p) {
-                var m = model.scenarios[p.scenarioID];
-                if ("processID" in p ) {
-                    nest( nest(m, "processes"), p.processID);
-                    associateByFlow(m.processes[p.processID], p);
-                }
-                else if ("lciaMethodID" in p ) {
-                    nest( nest(m, "lciaMethods"), p.lciaMethodID);
-                    associateByFlow(m.lciaMethods[p.lciaMethodID], p);
-                }
-            }
-
-            function removeParam(p) {
-                if (p.paramTypeID === 10) {
-                    var params = svc.getLciaMethodFlowParams(p.scenarioID, p.lciaMethodID);
-                    if (params.hasOwnProperty(p.flowID)) {
-                        delete params[p.flowID];
                     }
                 }
             }
@@ -156,6 +140,12 @@ angular.module('lcaApp.models.param', ['lcaApp.resources.service', 'lcaApp.statu
                 return deferred.promise;
             };
 
+            /**
+             * Look up params by scenario and process
+             * @param scenarioID
+             * @param processID
+             * @returns {*} If found, associative array of params, keyed by flowID. Otherwise null.
+             */
             svc.getProcessFlowParams = function(scenarioID, processID) {
                 var sModel = svc.getModel(scenarioID);
                 if ( sModel &&
@@ -169,6 +159,12 @@ angular.module('lcaApp.models.param', ['lcaApp.resources.service', 'lcaApp.statu
                 }
             };
 
+            /**
+             * Look up params by scenario and LCIA method
+             * @param scenarioID
+             * @param lciaMethodID
+             * @returns {*} If found, associative array of params, keyed by flowID. Otherwise null.
+             */
             svc.getLciaMethodFlowParams = function(scenarioID, lciaMethodID) {
                 var sModel = svc.getModel(scenarioID);
                 if ( sModel &&
@@ -182,11 +178,26 @@ angular.module('lcaApp.models.param', ['lcaApp.resources.service', 'lcaApp.statu
                 }
             };
 
+            /**
+             * Look up param by scenario, LCIA method, and flow
+             * @param scenarioID
+             * @param lciaMethodID
+             * @param flowID
+             * @returns {*}
+             */
             svc.getLciaMethodFlowParam = function(scenarioID, lciaMethodID, flowID) {
                 var params = svc.getLciaMethodFlowParams(scenarioID, lciaMethodID);
                 return ( params && params.hasOwnProperty(flowID)) ? params[flowID] : null;
             };
 
+            /**
+             * Look up param by scenario, process, flow, and type
+             * @param scenarioID
+             * @param processID
+             * @param flowID
+             * @param paramTypeID
+             * @returns {*}
+             */
             svc.getProcessFlowParam = function(scenarioID, processID, flowID, paramTypeID) {
                 var params = svc.getProcessFlowParams(scenarioID, processID);
                 if (params && params.hasOwnProperty(flowID) &&
@@ -199,47 +210,84 @@ angular.module('lcaApp.models.param', ['lcaApp.resources.service', 'lcaApp.statu
                 }
             };
 
-            function handleCreate(result) {
-                insertParam(result);
-                $log.info("Parameter created. " + angular.toJson(result, true));
-            }
 
-            function handleUpdate(result) {
-                $log.info("Parameter updated. " + angular.toJson(result, true));
-            }
-
-            function handleDelete(result) {
-                if (result.hasOwnProperty("scenarioID") &&
-                    result.hasOwnProperty("lciaMethodID") &&
-                    result.hasOwnProperty("flowID")) {
-                    var param = svc.getLciaMethodFlowParam(result.scenarioID, result.lciaMethodID, result.flowID);
-                    if (param) {
-                        removeParam(param);
+            /**
+             * Compare input value with the value of original param resource, if it exists.
+             *
+             *  Return change status
+             *  PARAM_VALUE_STATUS.changed for new, updated, and deleted value.
+             *  PARAM_VALUE_STATUS.invalid for invalid value.
+             *  PARAM_VALUE_STATUS.unchanged when new value matches original
+             *
+             *  If input value is invalid, then add error message to returned result.
+             *
+             * @param {Number} baseValue Value of the thing to which the param applies
+             * @param {{value: number}} paramResource
+             * @param {String} value Edit value, should be numeric
+             * @returns {{paramValueStatus:number, msg: string }}
+             */
+            svc.getParamValueStatus = function(baseValue, paramResource, value) {
+                var result = { paramValueStatus: null, msg: null };
+                if (value) {
+                    // Value was input
+                    if (isNaN(value) ) {
+                        result.msg = "Parameter value, " + value + ", is not numeric.";
+                        result.paramValueStatus = PARAM_VALUE_STATUS.invalid;
+                    } else if (+value === baseValue) {
+                        result.msg = "Parameter value, " + value + ", is the same as default value.";
+                        result.paramValueStatus = PARAM_VALUE_STATUS.invalid;
+                    } else if (paramResource) {
+                        // Check if param value changed
+                        if (paramResource.value === +value) {
+                            result.paramValueStatus = PARAM_VALUE_STATUS.unchanged;
+                        } else {
+                            result.paramValueStatus = PARAM_VALUE_STATUS.changed;
+                        }
+                    } else {
+                        // No paramResource. Interpret this as create
+                        result.paramValueStatus = PARAM_VALUE_STATUS.changed;
                     }
                 }
-                $log.info("Parameter deleted. " + angular.toJson(result, true));
+                else {
+                    // No input value. If paramResource exists, interpret this as delete.
+                    if (paramResource) {
+                        result.paramValueStatus = PARAM_VALUE_STATUS.changed;
+                    } else {
+                        result.paramValueStatus = PARAM_VALUE_STATUS.unchanged;
+                    }
+                }
+                return result;
+            };
+
+            function makeRequest(changedParam) {
+                var requestResult = null;
+                if (changedParam.hasOwnProperty("paramID")) {
+                    if (changedParam.value) {
+                        requestResult = ParamService.update({scenarioID: changedParam.scenarioID}, changedParam );
+                    } else {
+                        requestResult = ParamService.remove({scenarioID: changedParam.scenarioID}, changedParam);
+                    }
+                } else {
+                    requestResult = ParamService.create({scenarioID: changedParam.scenarioID}, changedParam );
+                }
+                return requestResult.$promise;
             }
 
-            svc.createParam = function(newParam) {
-                if (newParam.hasOwnProperty("lciaMethodID") && newParam.hasOwnProperty("flowID")) {
-                    newParam.paramTypeID = 10;
-                }
-                ParamService.create(newParam, handleCreate, StatusService.handleFailure, {scenarioID: newParam.scenarioID});
-            };
-
-            svc.deleteParam = function(paramID) {
-                var param = ParamService.get(paramID);
-                if (param) {
-                    ParamService.delete(param, handleDelete, StatusService.handleFailure, {scenarioID: param.scenarioID});
-                }
-            };
-
-            svc.updateParam = function(paramID, paramValue) {
-                var param = ParamService.get(paramID);
-                if (param) {
-                    param.value = paramValue;
-                    ParamService.update(param, handleUpdate, StatusService.handleFailure, {scenarioID: param.scenarioID});
-                }
+            /**
+             * Submit resource change requests, and wait for responses from all.
+             * @param {[]} changes   Array of changed param resources
+             * @param {Function} successCB  Function to call when all requests succeed
+             * @param {Function} errorCB    Function to call when some request fails
+             */
+            svc.applyChanges = function (changes, successCB, errorCB) {
+                var requests = [];
+                changes.forEach( function (ch) {
+                    var request = makeRequest(ch);
+                    if (request) {
+                        requests.push(request);
+                    }
+                });
+                $q.all(requests).then(successCB, errorCB);
             };
 
             return svc;

@@ -756,10 +756,11 @@ namespace LCAToolAPI.API
         [Route("api/scenarios/{scenarioId}/params")]
         [AcceptVerbs("POST")]
         [HttpPost]
-        public IEnumerable<ParamResource> AddParam(int scenarioId, [FromBody] ParamResource postParam)
+        public ParamResource AddParam(int scenarioId, [FromBody] ParamResource postParam)
         {
-            if (_ScenarioGroupService.CanAlter(RequestContext))
-                return _ResourceService.AddParam(scenarioId, postParam);
+            if (_ScenarioGroupService.CanAlter(RequestContext)) 
+               return _ResourceService.AddParam(scenarioId, postParam).FirstOrDefault();
+            
             else
                 throw new HttpResponseException(HttpStatusCode.Unauthorized);
         }
@@ -792,10 +793,10 @@ namespace LCAToolAPI.API
         [Route("api/scenarios/{scenarioId}/params/{paramId}")]
         [AcceptVerbs("PUT")]
         [HttpPost]
-        public IEnumerable<ParamResource> UpdateParam(int scenarioId, int paramId, [FromBody] ParamResource putParam)
+        public ParamResource UpdateParam(int scenarioId, int paramId, [FromBody] ParamResource putParam)
         {
             if (_ScenarioGroupService.CanAlter(RequestContext))
-                return _ResourceService.UpdateParam(scenarioId, paramId, putParam);
+                return _ResourceService.UpdateParam(scenarioId, paramId, putParam).FirstOrDefault();
             else
                 throw new HttpResponseException(HttpStatusCode.Unauthorized);
         }
