@@ -24,6 +24,7 @@ namespace Entities.Models
             _fragmentFlows = new List<int>();
             ParamModified = new List<int>();
             ParamUnchanged = new List<int>();
+            ParamsToPost = new List<ParamResource>();
         }
         private bool _recompute;
         private List<int> _fragmentFlows;
@@ -32,6 +33,7 @@ namespace Entities.Models
         public bool ScoreCacheStale { get; set; } // supersedes FragmentFlows list
         public List<int> LCIAMethodsStale { get; set; }
 
+        public List<ParamResource> ParamsToPost { get; set; }
 
         public bool Recompute { 
             get {return ( _recompute | NodeCacheStale | ScoreCacheStale

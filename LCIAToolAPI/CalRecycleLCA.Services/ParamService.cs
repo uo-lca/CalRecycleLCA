@@ -2,6 +2,7 @@
 using Repository.Pattern.Repositories;
 using Service.Pattern;
 using System;
+using System.Web;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -17,6 +18,7 @@ namespace CalRecycleLCA.Services
         IEnumerable<ParamResource> GetParams(int scenarioId);
         IEnumerable<ParamResource> GetParamResource(IEnumerable<Param> Ps);
         IEnumerable<Param> NewOrUpdateParam(int scenarioId, ParamResource post, ref CacheTracker cacheTracker);
+        IEnumerable<Param> PostNewParams(int scenarioId, ref CacheTracker cacheTracker);
         IEnumerable<Param> UpdateParam(int paramId, ParamResource post, ref CacheTracker cacheTracker);
         void DeleteParam(int paramId, ref CacheTracker cacheTracker);
     }
@@ -91,6 +93,11 @@ namespace CalRecycleLCA.Services
                 return _repository.PostParam(scenarioId, post, ref cacheTracker);
             else
                 return null;
+        }
+
+        public IEnumerable<Param> PostNewParams(int scenarioId, ref CacheTracker cacheTracker)
+        {
+            return _repository.PostNewParams(scenarioId, ref cacheTracker);
         }
 
         public IEnumerable<Param> UpdateParam(int paramId, ParamResource put, ref CacheTracker cacheTracker)

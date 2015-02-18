@@ -987,7 +987,8 @@ namespace CalRecycleLCA.Services
         public IEnumerable<ParamResource> AddParam(int scenarioId, ParamResource postParam)
         {
             CacheTracker cacheTracker = new CacheTracker();
-            IEnumerable<Param> Ps = _ParamService.NewOrUpdateParam(scenarioId, postParam, ref cacheTracker);
+            List<Param> Ps = _ParamService.NewOrUpdateParam(scenarioId, postParam, ref cacheTracker).ToList();
+            Ps.AddRange(_ParamService.PostNewParams(scenarioId, ref cacheTracker));
             if (_CacheManager.ImplementScenarioChanges(scenarioId, cacheTracker))
                 return _ParamService.GetParamResource(Ps);
             else
@@ -1018,6 +1019,8 @@ namespace CalRecycleLCA.Services
 
             foreach (ParamResource put in putParams)
                 Ps.AddRange(_ParamService.NewOrUpdateParam(scenarioId, put, ref cacheTracker));
+
+            Ps.AddRange(_ParamService.PostNewParams(scenarioId, ref cacheTracker));
 
             // determine omitted parameters
             List<int> omittedParamIds = existingParamIds.AsQueryable()

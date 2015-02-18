@@ -207,10 +207,25 @@ namespace CalRecycleLCA.Repositories
                     }
             }
             if (pid == 0) // no match- create a new one
-                return new List<Param> { repository.NewParam(scenarioId, post, ref cacheTracker) };
+            {
+                cacheTracker.ParamsToPost.Add(post);
+                return new List<Param>();// { repository.NewParam(scenarioId, post, ref cacheTracker) };
+            }
             else
                 return repository.UpdateParam((int)pid, post, ref cacheTracker);
         }
+
+        public static List<Param> PostNewParams(this IRepository<Param> repository,
+            int scenarioId, ref CacheTracker cacheTracker)
+        {
+            List<Param> Ps = new List<Param>();
+            foreach (var post in cacheTracker.ParamsToPost)
+                Ps.Add(repository.NewParam(scenarioId, post, ref cacheTracker));
+            repository.InsertGraphRange(Ps);
+            cacheTracker.ParamsToPost.Clear();
+            return Ps;
+        }
+
 
         private static Param NewParam(this IRepository<Param> repository,
             int scenarioId, ParamResource post, ref CacheTracker cacheTracker)
@@ -331,7 +346,6 @@ namespace CalRecycleLCA.Repositories
                     }
             }
             P.ObjectState = ObjectState.Added;
-            repository.InsertOrUpdateGraph(P);
             return P;
         }
 
