@@ -82,6 +82,7 @@ namespace LCAToolAPI.API
         /// Dependency injection
         /// </summary>
         /// <param name="resourceService">provides all services except authorization</param>
+        /// <param name="scenarioService">check for stale scenario data</param>
         /// <param name="scenarioGroupService">provides authorization</param>
         /// <param name="docuService">provides documentary information</param>
         /// <param name="paramService">provides param data</param>
@@ -858,6 +859,7 @@ namespace LCAToolAPI.API
         /// update is submitted.  Client error to issue concurrent PUT or POST requests for the same scenario. 
         /// </summary>
         /// <param name="scenarioId"></param>
+        /// <param name="putParams"></param>
         /// <returns>List of ParamResources</returns>
         [CalRecycleAuthorize]
         [Route("api/scenarios/{scenarioId}/params")]

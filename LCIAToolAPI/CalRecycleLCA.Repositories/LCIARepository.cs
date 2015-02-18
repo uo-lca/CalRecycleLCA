@@ -108,6 +108,28 @@ namespace CalRecycleLCA.Repositories
                     Factor = k.Factor
                 });
         }
+
+        public static IEnumerable<LCIAFactorResource> QueryFlowFactors(this IRepository<LCIA> repository,
+            int flowId, int scenarioId)
+        {
+            return repository.Queryable()
+                .Where(k => k.FlowID == flowId)
+                .Where(k => String.IsNullOrEmpty(k.Geography))
+                .GroupJoin(repository.GetRepository<CharacterizationParam>().Queryable()
+                            .Where(cp => cp.Param.ScenarioID == scenarioId),
+                    lc => lc.LCIAID,
+                    cp => cp.LCIAID,
+                    (lc, cp) => new { db = lc, param = cp })
+                .SelectMany(s => s.param.DefaultIfEmpty(),
+                    (s, param) => new LCIAFactorResource
+                    {
+                        LCIAMethodID = s.db.LCIAMethodID,
+                        FlowID = (int)s.db.FlowID,
+                        //Geography = s.db.Geography,
+                        Direction = s.db.Direction.Name,
+                        Factor = param == null ? s.db.Factor : param.Value
+                    });
+        }
     }
 }
 

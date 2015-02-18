@@ -222,6 +222,7 @@ namespace LCIAToolAPI.Tests
                 _lciaMethodService,
                 _fragmentService,
                 _scenarioService,
+                _processFlowService,
             _unitOfWork);
 
             _resourceServiceFacade = new ResourceServiceFacade(

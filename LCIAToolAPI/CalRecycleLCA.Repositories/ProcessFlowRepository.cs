@@ -91,7 +91,7 @@ namespace CalRecycleLCA.Repositories
                         {
                             FlowID = s.baseFlows.FlowID,
                             DirectionID = s.baseFlows.DirectionID,
-                            Result = s.baseFlows.Result,
+                            Result = efParams == null ? s.baseFlows.Result : efParams.Value,
                             Param = efParams == null ? null : new ParamInstance
                             {
                                 ParamID = efParams.ParamID,
@@ -160,5 +160,15 @@ namespace CalRecycleLCA.Repositories
         }
 
          * */
+        public static IEnumerable<LCIAFactorResource> GetEmissionSensitivity(this IRepository<ProcessFlow> repository,
+            int processId, int flowId, int scenarioId)
+        {
+            if (repository.Queryable().Where(k => k.ProcessID == processId)
+                .Where(k => k.FlowID == flowId).Any())
+                return repository.GetRepository<LCIA>().QueryFlowFactors(flowId, scenarioId);
+            else
+                return new List<LCIAFactorResource>();
+        }
+
     }
 }

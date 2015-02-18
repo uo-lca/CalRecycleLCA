@@ -32,8 +32,17 @@ namespace CalRecycleLCA.Services
         [Inject]
         private readonly IScenarioService _ScenarioService;
         [Inject]
+        private readonly IProcessFlowService _processFlowService;
+        [Inject]
         private readonly IUnitOfWork _unitOfWork;
 
+        private T verifiedDependency<T>(T dependency) where T : class
+        {
+            if (dependency == null)
+                throw new ArgumentNullException("dependency", String.Format("Type: {0}", dependency.GetType().ToString()));
+            else
+                return dependency;
+        }
 
         // diagnostics
         private CounterTimer sw_local, sw_ff, sw_cache, sw_lcia, sw_traverse;
@@ -48,61 +57,19 @@ namespace CalRecycleLCA.Services
             ILCIAMethodService lciaMethodService,
             IFragmentService fragmentService,
             IScenarioService scenarioService,
+            IProcessFlowService processFlowService,
             IUnitOfWork unitOfWork)
         {
-            if (fragmentTraversalV2 == null)
-            {
-                throw new ArgumentNullException("fragmentTraversalV2 is null");
-            }
-            _fragmentTraversalV2 = fragmentTraversalV2;
-
-            if (lciaComputationV2 == null)
-            {
-                throw new ArgumentNullException("lciaComputationV2 is null");
-            }
-            _lciaComputationV2 = lciaComputationV2;
-
-            if (fragmentFlowService == null)
-            {
-                throw new ArgumentNullException("fragmentFlowService is null");
-            }
-            _fragmentFlowService = fragmentFlowService;
-
-            if (scoreCacheService == null)
-            {
-                throw new ArgumentNullException("scoreCacheService is null");
-            }
-            _scoreCacheService = scoreCacheService;
-
-            if (nodeCacheService == null)
-            {
-                throw new ArgumentNullException("nodeCacheService is null");
-            }
-            _nodeCacheService = nodeCacheService;
-
-            if (lciaMethodService == null)
-            {
-                throw new ArgumentNullException("lciaMethodService is null");
-            }
-            _lciaMethodService = lciaMethodService;
-
-            if (fragmentService == null)
-            {
-                throw new ArgumentNullException("fragmentService is null");
-            }
-            _fragmentService = fragmentService;
-
-            if (scenarioService == null)
-            {
-                throw new ArgumentNullException("scenarioService is null");
-            }
-            _ScenarioService = scenarioService;
-
-            if (unitOfWork == null)
-            {
-                throw new ArgumentNullException("unitOfWork is null");
-            }
-            _unitOfWork = unitOfWork;
+            _fragmentTraversalV2 = verifiedDependency(fragmentTraversalV2);
+            _lciaComputationV2 = verifiedDependency(lciaComputationV2);
+            _fragmentFlowService = verifiedDependency(fragmentFlowService);
+            _scoreCacheService = verifiedDependency(scoreCacheService);
+            _nodeCacheService = verifiedDependency(nodeCacheService);
+            _lciaMethodService = verifiedDependency(lciaMethodService);
+            _fragmentService = verifiedDependency(fragmentService);
+            _ScenarioService = verifiedDependency(scenarioService);
+            _processFlowService = verifiedDependency(processFlowService);
+            _unitOfWork = verifiedDependency(unitOfWork);
 
             sw_local = new CounterTimer();
             sw_ff = new CounterTimer();
@@ -377,7 +344,12 @@ namespace CalRecycleLCA.Services
         } /* end of SetScoreCache */
 
         /// <summary>
-        /// Returns a list of impact score deltas associated with a unit parameter value for a given fragment
+        /// Returns a list of impact score deltas associated with a unit parameter value for a given fragment.
+        /// At each node, score equals nodeCache * scoreCache or nc * sc; sensitivity is nc * dsc/dx + dnc/dx * sc; 
+        /// for each param type, either dnc/dx or dsc/dx is zero.
+        /// for type 1- sc stays constant, dx = dependency weight; dnc/dx = parent node weight<br/>
+        /// for type 8- nc stays constant, dx = emission qty; dsc/dx = LCIA factor<br/>
+        /// for type 10- nc stays constant, dx = LCIA factor; dsc/dx = emission qty<br/>
         /// </summary>
         /// <param name="fragmentId"></param>
         /// <param name="p"></param>
@@ -428,6 +400,7 @@ namespace CalRecycleLCA.Services
                                     // Thus, the scaling to apply to each descendent node is New_CNW / CNW
                                     // so that after scaling, it will have New_CNW
                                     // so we want scale to equal PNW * node_conv / CNW
+                                    // this is equal to the inverse of the current dependency value
                                     double node_conv = _fragmentFlowService.GetNodeScaling(sensflow, p.ScenarioID);
                                     scale = scale * node_conv / (double)sensflow.NodeWeight;
 
@@ -456,10 +429,22 @@ namespace CalRecycleLCA.Services
                     }
                 case 8:
                     {
+                        foreach (var node in ff.Where(k => k.NodeType == "Process")
+                            .Where(k => k.ProcessID == p.ProcessID).ToList())
+                        {
+                            results.AddRange(LookupFlowCFs(node, (int)p.FlowID, p.ScenarioID));
+                            ff.RemoveAll(k => k.FragmentFlowID == node.FragmentFlowID);
+                        }
+
                         break;
                     }
                 case 10:
                     {
+                        foreach (var node in ff.Where(k => k.NodeType == "Process").ToList())
+                        {
+                            results.AddRange(LookupFlowQuantities(node, (int)p.FlowID, (int)p.LCIAMethodID, p.ScenarioID));
+                            ff.RemoveAll(k => k.FragmentFlowID == node.FragmentFlowID);
+                        }
                         break;
                     }
             }
@@ -521,6 +506,51 @@ namespace CalRecycleLCA.Services
             foreach (var child in children)
                 descendents.AddRange(DescendentFlows(ff, child.FragmentFlowID));
             return descendents;
+        }
+
+        /// <summary>
+        /// Returns a process's sensitivity to a given flow.  The process-flow pairing must exist in ProcessFlow, 
+        /// or else no results are returned.
+        /// 
+        /// Basically, this is a lookup of flows across LCIA methods
+        /// </summary>
+        /// <param name="nc"></param>
+        /// <returns></returns>
+        private List<FragmentLCIAModel> LookupFlowCFs(FragmentFlowResource nc, int flowId, int scenarioId)
+        {
+            return _processFlowService.GetEmissionSensitivity((int)nc.ProcessID, flowId, scenarioId)
+                .Select(k => new FragmentLCIAModel()
+                {
+                    FragmentFlowID = nc.FragmentFlowID,
+                    FragmentStageID = nc.FragmentStageID,
+                    LCIAMethodID = k.LCIAMethodID,
+                    NodeWeight = (double)nc.NodeWeight,
+                    ImpactScore = k.Factor
+                }).ToList();
+        }
+
+        /// <summary>
+        /// Returns a process's sensitivity to a given LCIA factor, defined by a flowId.
+        /// 
+        /// Basically, this is a lookup of a Processflow record.
+        /// </summary>
+        /// <param name="nc"></param>
+        /// <param name="flowId"></param>
+        /// <param name="lciaMethodId"></param>
+        /// <param name="scenarioId"></param>
+        /// <returns></returns>
+        private List<FragmentLCIAModel> LookupFlowQuantities(FragmentFlowResource nc, int flowId, int lciaMethodId, int scenarioId)
+        {
+            return _processFlowService.GetEmissions((int)nc.ProcessID, scenarioId)
+                .Where(k => k.FlowID == flowId)
+                .Select(k => new FragmentLCIAModel() 
+                {
+                    FragmentFlowID = nc.FragmentFlowID,
+                    FragmentStageID = nc.FragmentStageID,
+                    LCIAMethodID = lciaMethodId,
+                    NodeWeight = (double)nc.NodeWeight,
+                    ImpactScore = (double)k.Result
+                }).ToList();
         }
 
         /// <summary>
