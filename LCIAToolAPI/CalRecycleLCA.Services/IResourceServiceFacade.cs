@@ -43,7 +43,7 @@ namespace CalRecycleLCA.Services
         IEnumerable<ParamResource> AddParam(int scenarioId, ParamResource postParam);
         IEnumerable<ParamResource> UpdateParams(int scenarioId, IEnumerable<ParamResource> putParams);
         IEnumerable<ParamResource> UpdateParam(int scenarioId, int paramId, ParamResource postParam);
-        void DeleteParam(int scenarioId, int paramId);
+        bool DeleteParam(int scenarioId, int paramId);
         //void UpdateParam(string updateParamJSON);
     }
 }

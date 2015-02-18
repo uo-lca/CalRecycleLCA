@@ -961,7 +961,7 @@ namespace CalRecycleLCA.Services
             _CacheManager.DeleteScenario(scenarioId);
         }
 
-        public void DeleteParam(int scenarioId, int paramId)
+        public bool DeleteParam(int scenarioId, int paramId)
         {
             CacheTracker cacheTracker = new CacheTracker();
             int p_scenarioId = _ParamService.Query(k => k.ParamID == paramId)
@@ -969,8 +969,9 @@ namespace CalRecycleLCA.Services
             if (p_scenarioId == scenarioId)
             {
                 _ParamService.DeleteParam(paramId, ref cacheTracker);
-                _CacheManager.ImplementScenarioChanges(scenarioId, cacheTracker);
+                return _CacheManager.ImplementScenarioChanges(scenarioId, cacheTracker);
             }
+            return false;
         }
 
         /// <summary>
@@ -987,8 +988,10 @@ namespace CalRecycleLCA.Services
         {
             CacheTracker cacheTracker = new CacheTracker();
             IEnumerable<Param> Ps = _ParamService.NewOrUpdateParam(scenarioId, postParam, ref cacheTracker);
-            _CacheManager.ImplementScenarioChanges(scenarioId, cacheTracker);
-            return _ParamService.GetParamResource(Ps);
+            if (_CacheManager.ImplementScenarioChanges(scenarioId, cacheTracker))
+                return _ParamService.GetParamResource(Ps);
+            else
+                return null;
         }
 
         public IEnumerable<ParamResource> UpdateParam(int scenarioId, int paramId, ParamResource putParam)
@@ -999,8 +1002,10 @@ namespace CalRecycleLCA.Services
                 Ps = _ParamService.UpdateParam(paramId, putParam, ref cacheTracker);
             else
                 Ps = _ParamService.NewOrUpdateParam(scenarioId, putParam, ref cacheTracker);
-            _CacheManager.ImplementScenarioChanges(scenarioId, cacheTracker);
-            return _ParamService.GetParamResource(Ps);
+            if (_CacheManager.ImplementScenarioChanges(scenarioId, cacheTracker))
+                return _ParamService.GetParamResource(Ps);
+            else
+                return null;
         }
 
         public IEnumerable<ParamResource> UpdateParams(int scenarioId, IEnumerable<ParamResource> putParams)
@@ -1023,9 +1028,10 @@ namespace CalRecycleLCA.Services
             foreach (int del in omittedParamIds)
                 _ParamService.DeleteParam(del, ref cacheTracker);
 
-            _CacheManager.ImplementScenarioChanges(scenarioId, cacheTracker);
-
-            return _ParamService.GetParams(scenarioId);
+            if (_CacheManager.ImplementScenarioChanges(scenarioId, cacheTracker))
+                return _ParamService.GetParams(scenarioId);
+            else
+                return null;
         }
 
       #endregion  
