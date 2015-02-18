@@ -15,6 +15,7 @@ namespace CalRecycleLCA.Services
     public interface IParamService : IService<Param>
     {
         bool DetermineType(ref ParamResource p);
+        ParamResource AdHocParam(string query);
         IEnumerable<ParamResource> GetParams(int scenarioId);
         IEnumerable<ParamResource> GetParamResource(IEnumerable<Param> Ps);
         IEnumerable<Param> NewOrUpdateParam(int scenarioId, ParamResource post, ref CacheTracker cacheTracker);
@@ -57,6 +58,25 @@ namespace CalRecycleLCA.Services
             else
                 return false;
             return true;
+        }
+
+        public ParamResource AdHocParam(string query)
+        {
+            ParamResource PR = new ParamResource();
+            var queryFields = HttpUtility.ParseQueryString(query);
+            var idFields = new List<string>() { "FragmentFlowID", "FlowID", "ProcessID", "LCIAMethodID", "FlowPropertyID", "CompositionDataID" };
+            foreach (string field in idFields)
+            {
+                var property = PR.GetType().GetProperty(field);
+                var content = queryFields.Get(field);
+                if (content != null)
+                    property.SetValue(PR, Convert.ToInt32(content));
+            }
+
+            if (DetermineType(ref PR))
+                return PR;
+            else
+                return null;
         }
 
         public IEnumerable<ParamResource> GetParams(int scenarioId)

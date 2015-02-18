@@ -410,6 +410,58 @@ namespace LCAToolAPI.API
                 return Request.CreateResponse(HttpStatusCode.Unauthorized);
         }
 
+        /// <summary>
+        /// Computes sensitivity of the base model to an ad-hoc parameter defined in URL query
+        /// string.
+        /// </summary>
+        /// <param name="fragmentId"></param>
+        /// <returns>List of LCIAResultResource</returns>
+        [Route("api/fragments/{fragmentId:int}/sensitivity")]
+        [HttpGet]
+        public HttpResponseMessage GetAdHocSensitivity(int fragmentId)
+        {
+            // determine ad-hoc parameter from URL params
+            ParamResource urlParam = _ParamService.AdHocParam(Request.RequestUri.Query);
+            if (urlParam == null)
+                return Request.CreateResponse(HttpStatusCode.BadRequest);
+            else
+            {
+                urlParam.ScenarioID = Scenario.MODEL_BASE_CASE_ID;
+                return Request.CreateResponse(HttpStatusCode.OK,
+                    _ResourceService.GetFragmentSensitivity(fragmentId, urlParam));
+            }
+        }
+
+        /// <summary>
+        /// Get scenario-specific sensitivity to an ad-hoc param.
+        /// </summary>
+        /// <param name="fragmentId"></param>
+        /// <param name="scenarioId"></param>
+        /// <returns>List of LCIAResultResource</returns>
+        [CalRecycleAuthorize]
+        [Route("api/scenarios/{scenarioId:int}/fragments/{fragmentId:int}/sensitivity")]
+        [HttpGet]
+        public HttpResponseMessage GetAdHocSensitivity(int fragmentId, int scenarioId)
+        {
+            // determine ad-hoc parameter from URL params
+            if (_ScenarioService.IsStale(scenarioId))
+                return Request.CreateResponse(HttpStatusCode.Conflict, conflictMsg);
+            if (_ScenarioGroupService.CanGet(RequestContext))
+            {
+                ParamResource urlParam = _ParamService.AdHocParam(Request.RequestUri.Query);
+                if (urlParam == null)
+                    return Request.CreateResponse(HttpStatusCode.BadRequest);
+                else
+                {
+                    urlParam.ScenarioID = Scenario.MODEL_BASE_CASE_ID;
+                    return Request.CreateResponse(HttpStatusCode.OK,
+                        _ResourceService.GetFragmentSensitivity(fragmentId, urlParam));
+                }
+            }
+            else
+                return Request.CreateResponse(HttpStatusCode.Unauthorized);
+        }
+
         // LCIA Metadata ////////////////////////////////////////////////////////////
         /// <summary>
         /// GET api/impactcategories

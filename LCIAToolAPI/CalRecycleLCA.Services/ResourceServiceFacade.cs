@@ -829,7 +829,11 @@ namespace CalRecycleLCA.Services
             List<Param> Ps = _ParamService.Queryable()
                 .Where(k => k.ParamID == paramId)
                 .ToList();
-            ParamResource p = _ParamService.GetParamResource(Ps).First();
+            return GetFragmentSensitivity(fragmentId, _ParamService.GetParamResource(Ps).First());
+        }
+
+        public IEnumerable<LCIAResultResource> GetFragmentSensitivity(int fragmentId, ParamResource p)
+        {
             var results = _FragmentLCIAComputation.Sensitivity(fragmentId, p);
             return results.GroupBy(r => r.LCIAMethodID)
                 .Select(group => new LCIAResultResource()
