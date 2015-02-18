@@ -13,6 +13,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Web.Http;
 using System.Web.Http.Results;
+using System.Net.Http;
 
 namespace LCIAToolAPI.Tests
 {
@@ -253,7 +254,7 @@ namespace LCIAToolAPI.Tests
                 _nodeCacheService, 
                 _scoreCacheService);
 
-            _resourceController = new ResourceController(_resourceServiceFacade, _scenarioGroupService, _docuService, _paramService);
+            _resourceController = new ResourceController(_resourceServiceFacade, _scenarioService, _scenarioGroupService, _docuService, _paramService);
 
 
         }
@@ -468,7 +469,7 @@ namespace LCIAToolAPI.Tests
                      };
 
             //Act
-            LCIAResultResource result = _resourceController.GetProcessLCIAResult(processID, lciaMethodID, scenarioID);
+            LCIAResultResource result = _resourceServiceFacade.GetProcessLCIAResult(processID, lciaMethodID, scenarioID);
             Assert.AreEqual(_processLCIAResult.LCIAMethodID, result.LCIAMethodID); 
 
 
@@ -548,7 +549,7 @@ namespace LCIAToolAPI.Tests
             _mockFragmentRepository.Setup(m => m.Find(fragmentID)).Returns(_fragment);
 
             //Act
-            FragmentResource result = _resourceController.GetFragment(fragmentID);
+            FragmentResource result = _resourceServiceFacade.GetFragmentResource(fragmentID);
             Assert.AreEqual(_fragment.Name, result.Name);
         }
 
