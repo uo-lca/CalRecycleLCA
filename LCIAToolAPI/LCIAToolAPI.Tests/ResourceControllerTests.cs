@@ -13,7 +13,6 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Web.Http;
 using System.Web.Http.Results;
-using System.Net.Http;
 
 namespace LCIAToolAPI.Tests
 {
