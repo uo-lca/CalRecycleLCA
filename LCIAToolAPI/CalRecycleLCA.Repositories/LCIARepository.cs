@@ -23,11 +23,12 @@ namespace CalRecycleLCA.Repositories
                     l => l.FlowID,
                     i => i.FlowID,
                     (l, i) => new { l, i })
+                .Where(join => join.l.DirectionID == join.i.DirectionID)
                 .GroupJoin(repository.GetRepository<CharacterizationParam>().Queryable()
                         .Where(cp => cp.Param.ScenarioID == scenarioId), // Target table
-                    l => l.l.LCIAID,
+                    join => join.l.LCIAID,
                     cp => cp.LCIAID,
-                    (l, cp) => new { lcias = l, parameter = cp })
+                    (join, cp) => new { lcias = join, parameter = cp })
                 .SelectMany(s => s.parameter.DefaultIfEmpty(),
                     (s, parameter) => new LCIAModel
                     {
