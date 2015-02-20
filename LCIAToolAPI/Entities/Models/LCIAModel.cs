@@ -10,6 +10,8 @@ namespace Entities.Models
     {
         public int FlowID { get; set; }
         public int DirectionID { get; set; }
+        public double? Composition { get; set; }
+        public double? Dissipation { get; set; }
         public double Quantity { get; set; }
         public double Factor { get; set; }
         public double Result { get; set; }

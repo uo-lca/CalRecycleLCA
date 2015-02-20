@@ -579,6 +579,25 @@ namespace LCAToolAPI.API
             return _ResourceService.GetProcessFlows(processID);
         }
 
+        /// <summary>
+        /// Same as above, for specific scenario. Values will be parameterized, but not marked as such.
+        /// </summary>
+        /// <param name="processID"></param>
+        /// <param name="scenarioId"></param>
+        /// <returns></returns>
+        [CalRecycleAuthorize]
+        [Route("api/scenarios/{scenarioId:int}/processes/{processID:int}/processflows")]
+        [HttpGet]
+        public HttpResponseMessage GetProcessFlows(int processID, int scenarioId)
+        {
+            if (_ScenarioGroupService.CanGet(RequestContext))
+                return Request.CreateResponse(HttpStatusCode.OK,
+                    _ResourceService.GetProcessFlows(processID, scenarioId));
+            else
+                return Request.CreateResponse(HttpStatusCode.Unauthorized);
+        }
+
+
         // ???
         /// <summary>
         /// GET api/processes/{processID:int}/flowproperties
@@ -625,13 +644,17 @@ namespace LCAToolAPI.API
         /// </summary>
         /// <param name="processId"></param>
         /// <param name="scenarioId"></param>
-        /// <returns>LCIAResultResource list</returns>
+        /// <returns>LCIAResultResource list in Response.Content</returns>
         [CalRecycleAuthorize]
         [Route("api/scenarios/{scenarioId}/processes/{processId:int}/lciaresults")]
         [HttpGet]
-        public IEnumerable<LCIAResultResource> GetProcessLCIAResults(int processId, int scenarioId)
+        public HttpResponseMessage GetProcessLCIAResults(int processId, int scenarioId)
         {
-            return _ResourceService.GetProcessLCIAResults(processId, scenarioId);
+            if (_ScenarioGroupService.CanGet(RequestContext))
+                return Request.CreateResponse(HttpStatusCode.OK,
+                    _ResourceService.GetProcessLCIAResults(processId, scenarioId));
+            else
+                return Request.CreateResponse(HttpStatusCode.Unauthorized);
         }
 
         /// <summary>
@@ -640,14 +663,12 @@ namespace LCAToolAPI.API
         /// <param name="processID"></param>
         /// <param name="lciaMethodID"></param>
         /// <param name="scenarioID"></param>
-        /// <returns>LCIAResultResource </returns>
+        /// <returns>LCIAResultResource in Response.Content</returns>
         [CalRecycleAuthorize]
         [Route("api/scenarios/{scenarioID:int}/processes/{processID:int}/lciamethods/{lciaMethodID:int}/lciaresults")]
         [HttpGet]
         public HttpResponseMessage GetProcessLCIAResult(int processID, int lciaMethodID, int scenarioID)
         {
-            if (_ScenarioService.IsStale(scenarioID))
-                return Request.CreateResponse(HttpStatusCode.Conflict, conflictMsg);
             if (_ScenarioGroupService.CanGet(RequestContext))
                 return Request.CreateResponse(HttpStatusCode.OK,
                     _ResourceService.GetProcessLCIAResult(processID, lciaMethodID, scenarioID));

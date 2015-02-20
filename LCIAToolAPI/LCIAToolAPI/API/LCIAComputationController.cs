@@ -112,7 +112,7 @@ namespace LCAToolAPI.API
         [System.Web.Http.HttpGet]
         public IEnumerable<InventoryModel> LCICompute(int processId, int scenarioId)
         {
-            return _lciaComputationV2.ComputeProcessLCI(processId, scenarioId);
+            return _lciaComputationV2.ComputeProcessEmissions(processId, scenarioId);
         }
 
         /// <summary>

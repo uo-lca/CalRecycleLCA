@@ -75,7 +75,8 @@ namespace CalRecycleLCA.Repositories
                     {
                         FlowID = pf.FlowID,
                         DirectionID = pf.DirectionID,
-                        Result = pf.Result
+                        Result = pf.Result,
+                        StDev = pf.STDev
                     });
             else
                 return repository.Queryable()
@@ -92,11 +93,7 @@ namespace CalRecycleLCA.Repositories
                             FlowID = s.baseFlows.FlowID,
                             DirectionID = s.baseFlows.DirectionID,
                             Result = efParams == null ? s.baseFlows.Result : efParams.Value,
-                            Param = efParams == null ? null : new ParamInstance
-                            {
-                                ParamID = efParams.ParamID,
-                                Value = efParams.Value
-                            }
+                            StDev = efParams == null ? s.baseFlows.STDev : 0.0
                         });
 
         }

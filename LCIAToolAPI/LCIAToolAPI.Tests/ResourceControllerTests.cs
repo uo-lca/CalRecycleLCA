@@ -200,11 +200,11 @@ namespace LCIAToolAPI.Tests
             _lciaComputation = new LCIAComputationV2(_processFlowService,
                 //_processEmissionParamService,
             _lciaMethodService,
-                //_flowService,
+            _flowService,
                 //_flowFlowPropertyService,
                 //_flowPropertyParamService,
                 //_flowPropertyEmissionService,
-                //_processDissipationService,
+            _processDissipationService,
                 //_processDissipationParamService,
             _lciaService);
             //_characterizationParamService,

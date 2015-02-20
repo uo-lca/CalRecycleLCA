@@ -342,6 +342,7 @@ namespace CalRecycleLCA.Services
             };
         }
 
+        /*****************************
         public ProcessResource Transform(Process p, IList<int> emisProcesses)
         {
             return new ProcessResource
@@ -368,9 +369,10 @@ namespace CalRecycleLCA.Services
                 VarName = pf.VarName,
                 Magnitude = pf.Magnitude, 
                 Result = pf.Result, 
-                STDev = TransformNullable(pf.STDev, "ProcessFlow.STDev")
+                STDev = pf.STDev == null ? 0 : (double)pf.STDev
             };
         }
+        * */
 
         public DetailedLCIAResource Transform(LCIAModel m)
         {
@@ -379,6 +381,8 @@ namespace CalRecycleLCA.Services
                 //LCIAMethodID = TransformNullable(m.LCIAMethodID, "LCIAModel.LCIAMethodID"),
                 FlowID = TransformNullable(m.FlowID, "LCIAModel.FlowID"),
                 Direction = Enum.GetName(typeof(DirectionEnum), (DirectionEnum)m.DirectionID),
+                Content = m.Composition,
+                Dissipation = m.Dissipation,
                 Quantity = Convert.ToDouble(m.Quantity),
                 Factor = Convert.ToDouble(m.Factor),
                 Result = Convert.ToDouble(m.Result)
@@ -556,20 +560,13 @@ namespace CalRecycleLCA.Services
         ///      descend into certain fragments]
         /// Ultimately, could be switch IsPrivate rather than bool.
         /// </summary>
-        public IEnumerable<ProcessFlowResource> GetProcessFlows(int processID)
+        public IEnumerable<ProcessFlowResource> GetProcessFlows(int processID, int scenarioId = Scenario.MODEL_BASE_CASE_ID)
         {
 
             if (_ProcessService.IsPrivate(processID))
-            {
                 return new List<ProcessFlowResource>();
-            }
             else
-            {
-                return _ProcessFlowService.Query(x => x.ProcessID == processID)
-                                                .Include(x => x.Flow)
-                                                .Select()
-                                                .Select(pf => Transform(pf)).ToList();
-            }
+                return _LCIAComputation.ComputeProcessLCI(processID, scenarioId);
         }
 
         /// <summary>

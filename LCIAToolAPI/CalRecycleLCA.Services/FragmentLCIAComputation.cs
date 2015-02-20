@@ -290,7 +290,7 @@ namespace CalRecycleLCA.Services
             {
                 case 1:
 
-                    var scores = _lciaComputationV2.ProcessLCIA(fragmentNode.ProcessID, needLciaMethods, fragmentNode.ScenarioID);
+                    var scores = _lciaComputationV2.ProcessLCIA((int)fragmentNode.ProcessID, needLciaMethods, fragmentNode.ScenarioID);
 
                     foreach (var lciaMethodId in needLciaMethods.AsQueryable())
                     {

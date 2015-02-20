@@ -13,7 +13,8 @@ namespace CalRecycleLCA.Services
 {
     public interface ILCIAService : IService<LCIA>
     {
-        LCIAResult ComputeLCIA(IEnumerable<InventoryModel> inventory, int lciaMethodId, int scenarioId = Scenario.MODEL_BASE_CASE_ID);
+        List<LCIAModel> ComputeLCIA(IEnumerable<InventoryModel> inventory, int lciaMethodId, int scenarioId = Scenario.MODEL_BASE_CASE_ID);
+        List<LCIAModel> ComputeLCIADiss(IEnumerable<InventoryModel> dissipation, int lciaMethodId, int scenarioId = Scenario.MODEL_BASE_CASE_ID);
         //IEnumerable<LCIAModel> OldComputeLCIA(IEnumerable<InventoryModel> inventory, int lciaMethodId, int scenarioId = Scenario.MODEL_BASE_CASE_ID);
         IEnumerable<LCIAFactorResource> QueryFactors(int LCIAMethodID);
     }
@@ -28,18 +29,29 @@ namespace CalRecycleLCA.Services
             _repository = repository;            
         }
 
-        public LCIAResult ComputeLCIA(IEnumerable<InventoryModel> inventory, int lciaMethodId, int scenarioId = Scenario.MODEL_BASE_CASE_ID)
+        public List<LCIAModel> ComputeLCIA(IEnumerable<InventoryModel> inventory, int lciaMethodId, int scenarioId = Scenario.MODEL_BASE_CASE_ID)
         {
-            ICollection<LCIAModel> model = _repository.ComputeLCIA(inventory, lciaMethodId, scenarioId)
+            List<LCIAModel> model = _repository.ComputeLCIA(inventory, lciaMethodId, scenarioId)
                 .Where(k => String.IsNullOrEmpty(k.Geography)).ToList();
+
             foreach (var k in model)
                 k.Result = k.Quantity * k.Factor;
-            return new LCIAResult
+
+            return model;
+        }
+        public List<LCIAModel> ComputeLCIADiss(IEnumerable<InventoryModel> dissipation, int lciaMethodId, int scenarioId = Scenario.MODEL_BASE_CASE_ID)
+        {
+            List<LCIAModel> model = _repository.ComputeLCIADiss(dissipation, lciaMethodId, scenarioId)
+                .Where(k => String.IsNullOrEmpty(k.Geography)).ToList();
+
+            model.RemoveAll(k => k.Composition == null || k.Dissipation == null);
+
+            foreach (var k in model)
             {
-                LCIAMethodID = lciaMethodId,
-                ScenarioID = scenarioId,
-                LCIADetail = model
-            };
+                k.Quantity = (double)k.Composition * (double)k.Dissipation;
+                k.Result = k.Quantity * k.Factor;
+            }
+            return model;
         }
         public IEnumerable<LCIAModel> OldComputeLCIA(IEnumerable<InventoryModel> inventory, int lciaMethodId, int scenarioId = Scenario.MODEL_BASE_CASE_ID)
         {

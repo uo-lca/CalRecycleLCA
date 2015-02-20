@@ -22,8 +22,22 @@ namespace Entities.Models {
         public FlowResource Flow { get; set; }
         public string Direction { get; set; }
         public string VarName { get; set; }
-        public double Magnitude { get; set; }
-        public double Result { get; set; }
+        /// <summary>
+        /// note: content = composition * FlowPropertyEmission.Scale to account for molecular
+        /// weight conversion.  So e.g. a flow with 0.85 carbon CompositionData
+        /// would show up as a content of 0.85 * 44 / 12 = 3.12 for Flow CO2
+        /// </summary>
+        public double? Content { get; set; }
+        /// <summary>
+        /// Dissipation = fraction of content that gets emitted.  (1 - Dissipation) = fraction retained.
+        /// </summary>
+        public double? Dissipation { get; set; }
+        /// <summary>
+        /// For dissipation flows: Content * Dissipation = Quantity.  
+        /// For non-dissipation flows, Quantity is ProcessFlow.Result.
+        /// Composition, Dissipation, ProcessFlow.Result can have Type 5, 6, 8 params respectively.
+        /// </summary>
+        public double Quantity { get; set; }
         public double STDev { get; set; }
     }
 }
