@@ -74,7 +74,11 @@ namespace CalRecycleLCA.Repositories
 
         public static IEnumerable<FlowResource> GetFlowsByFragment(this IRepositoryAsync<Flow> repository, int fragmentId)
         {
-            return repository.Query(f => f.FragmentFlows.Any(ff => ff.FragmentID == fragmentId))
+            List<int> flows = repository.Queryable()
+                .Where(f => f.FragmentFlows.Any(ff => ff.FragmentID == fragmentId))
+                .Select(f => f.FlowID).ToList();
+            flows.Add(repository.GetRepository<FragmentFlow>().GetInFlow(fragmentId, Scenario.MODEL_BASE_CASE_ID).FlowID);
+            return repository.Query(f => flows.Contains(f.FlowID))
                 .Include(f => f.ILCDEntity)
                 .Select()
                 .Select(f => repository.ToResource(f));

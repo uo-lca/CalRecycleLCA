@@ -46,7 +46,7 @@ namespace CalRecycleLCA.Repositories
             };
         }
 
-        private static FlowTerminationModel LGetFragmentNodeProcess(this IRepositoryAsync<FragmentFlow> repository,
+        private static FlowTerminationModel LGetFragmentNodeProcess(this IRepository<FragmentFlow> repository,
             int ffid, int scenarioId)
         {
             var Dflt = repository.GetRepository<FragmentNodeProcess>().Queryable()
@@ -64,7 +64,7 @@ namespace CalRecycleLCA.Repositories
                 TermFlowID = Dflt.FlowID
             };
         }
-        private static FlowTerminationModel LGetFragmentNodeFragment(this IRepositoryAsync<FragmentFlow> repository,
+        private static FlowTerminationModel LGetFragmentNodeFragment(this IRepository<FragmentFlow> repository,
             int ffid, int scenarioId)
         {
             var Dflt = repository.GetRepository<FragmentNodeFragment>().Queryable()
@@ -202,7 +202,7 @@ namespace CalRecycleLCA.Repositories
             return ff;//.Where(f => f.NodeWeight != null);
         }
 
-        public static FlowTerminationModel Terminate(this IRepositoryAsync<FragmentFlow> repository, 
+        public static FlowTerminationModel Terminate(this IRepository<FragmentFlow> repository, 
 						     NodeCacheModel ff, int scenarioId, bool doBackground)
         {
             var fragmentNode = new FlowTerminationModel();
@@ -321,7 +321,7 @@ namespace CalRecycleLCA.Repositories
             return compdir;
         }
 
-        public static InventoryModel GetInFlow(this IRepositoryAsync<FragmentFlow> repository,
+        public static InventoryModel GetInFlow(this IRepository<FragmentFlow> repository,
                      int fragmentId, int scenarioId)
         {
             var inFlow = repository.Queryable()
