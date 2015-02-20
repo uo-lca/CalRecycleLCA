@@ -1,4 +1,52 @@
 ======================================================================================================================
+Thur Jan 19 2015
+Met with Robert and Brandon
+
+Fragment LCIA
+	Should be able to remove scenarios (via multi-selection list) and methods (using close button)
+
+Navigation Bar
+	Scenario Detail View. Doubles as scenario edit view.
+
+Fragment LCIA
+	Axis label overlap problem
+
+Fragment flows
+	Add button to navigate to fragment flow param view
+	Apply changes returns to fragment flows view
+
+Help
+	Define fragment, top-level fragment, activity level etc.
+
+Process selection should be recalled
+
+Process LCIA
+	Display process data source, private setting
+
+Process LCIA detail view
+	Allow EF param to be updated, but not CF param
+
+Excel upload of params would be desirable
+
+Ability to download data desirable
+
+Param grid
+	All text should be selectable
+	Desirable: button to copy value to param
+
+Fragment Flow Param
+	2 grids for different factor types: Emission and Dissipation
+		
+Fragment Sankey
+	root node label: reference flow		
+	
+Conservation parameter desirable
+
+Composition models very desirable
+	
+
+
+======================================================================================================================
 Wed Jan 14 2015
 
 Summary of UI discussions today and Monday.
