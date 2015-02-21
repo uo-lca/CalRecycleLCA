@@ -549,7 +549,7 @@ namespace LCIAToolAPI.Tests
             _mockFragmentRepository.Setup(m => m.Find(fragmentID)).Returns(_fragment);
 
             //Act
-            FragmentResource result = _resourceServiceFacade.GetFragmentResource(fragmentID);
+            FragmentResource result = _resourceServiceFacade.GetFragmentResources(fragmentID).First();
             Assert.AreEqual(_fragment.Name, result.Name);
         }
 

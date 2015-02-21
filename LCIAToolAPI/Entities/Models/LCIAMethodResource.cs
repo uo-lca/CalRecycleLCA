@@ -31,8 +31,8 @@ namespace Entities.Models {
         public string Duration { get; set; }
         public string ImpactLocation { get; set; }
         public string IndicatorType { get; set; }   // IndicatorType.Name
-        public bool Normalization { get; set; }
-        public bool Weighting { get; set; }
+        public bool? Normalization { get; set; }
+        public bool? Weighting { get; set; }
         public string UseAdvice { get; set; }
         public int ReferenceFlowPropertyID { get; set; }
         public FlowPropertyResource ReferenceFlowProperty { get; set; }     

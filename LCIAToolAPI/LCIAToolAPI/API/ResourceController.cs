@@ -224,7 +224,7 @@ namespace LCAToolAPI.API
         [Route("api/fragments/{fragmentID:int}")]
         [HttpGet]
         public HttpResponseMessage GetFragment(int fragmentID) {
-            FragmentResource fr = _ResourceService.GetFragmentResource(fragmentID);
+            FragmentResource fr = _ResourceService.GetFragmentResources(fragmentID).FirstOrDefault();
             if (fr == null) {
                 return Request.CreateResponse(HttpStatusCode.BadRequest);
             }
