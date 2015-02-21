@@ -28,7 +28,7 @@ namespace CalRecycleLCA.Services
 
         private string UrlRoot(HttpRequestMessage request)
         {
-            return MyTrimEnd(request.RequestUri.AbsoluteUri, request.RequestUri.AbsolutePath)
+            return MyTrimEnd(request.RequestUri.AbsoluteUri, request.RequestUri.PathAndQuery)
                 + MyTrimEnd(request.GetRequestContext().VirtualPathRoot,"/")
                 + "/";
             //return new Uri(request.Url.Request.RequestUri, UriKind.Relative).ToString();
