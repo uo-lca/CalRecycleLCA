@@ -12,6 +12,7 @@ namespace CalRecycleLCA.Repositories
 {
     public static class LCIARepository
     {
+
         public static IEnumerable<LCIAModel> ComputeLCIA(this IRepositoryAsync<LCIA> repository,
             IEnumerable<InventoryModel> inventory, int lciaMethodId, int scenarioId)
         {
@@ -35,6 +36,40 @@ namespace CalRecycleLCA.Repositories
                         FlowID = (int)s.lcias.l.FlowID,
                         DirectionID = s.lcias.l.DirectionID,
                         Quantity = (double)s.lcias.i.Result, // inventory table
+                        Factor = parameter == null ? s.lcias.l.Factor : parameter.Value,
+                        Geography = s.lcias.l.Geography,
+                        CharacterizationParam = parameter == null ? null : new ParamInstance
+                            {
+                                ParamID = parameter.ParamID,
+                                Value = parameter.Value
+                            }
+                    });
+        }
+
+        public static IEnumerable<LCIAModel> ComputeLCIADiss(this IRepositoryAsync<LCIA> repository,
+            IEnumerable<InventoryModel> inventory, int lciaMethodId, int scenarioId)
+        {
+            return repository.Queryable()
+                .Where(x => x.FlowID != null
+                        && x.Geography == null
+                        && x.LCIAMethodID == lciaMethodId)
+                .Join(inventory,
+                    l => l.FlowID,
+                    i => i.FlowID,
+                    (l, i) => new { l, i })
+                .Where(join => join.l.DirectionID == join.i.DirectionID)
+                .GroupJoin(repository.GetRepository<CharacterizationParam>().Queryable()
+                        .Where(cp => cp.Param.ScenarioID == scenarioId), // Target table
+                    join => join.l.LCIAID,
+                    cp => cp.LCIAID,
+                    (join, cp) => new { lcias = join, parameter = cp })
+                .SelectMany(s => s.parameter.DefaultIfEmpty(),
+                    (s, parameter) => new LCIAModel
+                    {
+                        FlowID = (int)s.lcias.l.FlowID,
+                        DirectionID = s.lcias.l.DirectionID,
+                        Composition = s.lcias.i.Composition,
+                        Dissipation = s.lcias.i.Dissipation,
                         Factor = parameter == null ? s.lcias.l.Factor : parameter.Value,
                         Geography = s.lcias.l.Geography,
                         CharacterizationParam = parameter == null ? null : new ParamInstance

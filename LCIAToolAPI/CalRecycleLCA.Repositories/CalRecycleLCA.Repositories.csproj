@@ -52,6 +52,7 @@
     <Compile Include="FlowFlowPropertyRepository.cs" />
     <Compile Include="FragmentFlowRepository.cs" />
     <Compile Include="NodeCacheRepository.cs" />
+    <Compile Include="ProcessDissipationRepository.cs" />
     <Compile Include="ProcessFlowRepository.cs" />
     <Compile Include="ProcessRepository.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

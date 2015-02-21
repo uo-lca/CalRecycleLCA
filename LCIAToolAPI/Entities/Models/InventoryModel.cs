@@ -12,8 +12,10 @@ namespace Entities.Models
 
         public int DirectionID { get; set; }
 
+        public double? Composition { get; set; } 
+        public double? Dissipation { get; set; }
         public double? Result { get; set; }
+        public double? StDev { get; set; }
 
-        public ParamInstance Param { get; set; }
     }
 }
