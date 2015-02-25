@@ -2,11 +2,12 @@
  * Service providing data model for LCA parameters.
  * This model facilitates parameter lookup with a nested associative array.
  * Parameters are first indexed by scenarioID. Subsequent nesting depends on parameter type.
- * Currently, only parameter types affecting LCIA results are handled
- * (Characterization Factor, Emission Factor, Dissipation Factor?).
+ * Currently, only parameter types affecting LCIA results and fragment flows are handled
+ * (Characterization Factor, Emission Factor, Dissipation Factor, Dependency ).
  * Other parameter types are ignored until front end usage has been determined.
  * Characterization Factor parameters are indexed by scenarioID, lciaMethodID, flowID.
  * Dissipation and Emission Factor parameters are indexed by scenarioID, processID, flowID, paramTypeID.
+ * Dependency parameters are indexed by fragmentFlowID.
  *
  * Example :
  *
@@ -89,6 +90,10 @@ angular.module('lcaApp.models.param', ['lcaApp.resources.service', 'lcaApp.statu
                         else if ("lciaMethodID" in p ) {
                             nest( nest(m, "lciaMethods"), p.lciaMethodID);
                             associateByFlow(m.lciaMethods[p.lciaMethodID], p);
+                        }
+                        else if (p.hasOwnProperty("fragmentFlowID")) {
+                            nest(m, "fragmentFlows");
+                            m.fragmentFlows[p.fragmentFlowID] = p;
                         }
                     });
                     model.scenarios[scenarioID] = m;
@@ -212,6 +217,24 @@ angular.module('lcaApp.models.param', ['lcaApp.resources.service', 'lcaApp.statu
                 }
             };
 
+            /**
+             * Look up param by scenario and fragment flow
+             * @param { Number } scenarioID
+             * @param { Number } fragmentFlowID
+             * @returns {*}
+             */
+            svc.getFragmentFlowParam = function(scenarioID, fragmentFlowID) {
+                var sModel = svc.getModel(scenarioID),
+                    param = null;
+                if ( sModel &&
+                     sModel.hasOwnProperty("fragmentFlows") ) {
+                    var params = sModel.fragmentFlows;
+                    if (params.hasOwnProperty(fragmentFlowID)) {
+                        param = params[fragmentFlowID];
+                    }
+                }
+                return param;
+            };
 
             /**
              * Compare input value with the value of original param resource, if it exists.
@@ -259,6 +282,83 @@ angular.module('lcaApp.models.param', ['lcaApp.resources.service', 'lcaApp.statu
                     }
                 }
                 return result;
+            };
+
+            /**
+             * Compare input value with the value of original param resource, if it exists.
+             *
+             *  Set change status
+             *  PARAM_VALUE_STATUS.changed for new, updated, and deleted value.
+             *  PARAM_VALUE_STATUS.invalid for invalid value.
+             *  PARAM_VALUE_STATUS.unchanged when new value matches original
+             *
+             *  If input value is invalid, then return error message.
+             *
+             * @param {number} baseValue Value of the thing to which the param applies
+             * @param {{paramResource: {}, value: String, editStatus: Number }} paramWrapper
+             * @returns {string}    Error message, if status is invalid
+             */
+            svc.setParamWrapperStatus = function(baseValue, paramWrapper) {
+                var msg = null;
+                if (paramWrapper.value) {
+                    // Value was input
+                    if (isNaN(paramWrapper.value) ) {
+                        msg = "Parameter value, " + paramWrapper.value + ", is not numeric.";
+                        paramWrapper.editStatus = PARAM_VALUE_STATUS.invalid;
+                    } else if (+paramWrapper.value === baseValue) {
+                        msg = "Parameter value, " + paramWrapper.value + ", is the same as default value.";
+                        paramWrapper.editStatus = PARAM_VALUE_STATUS.invalid;
+                    } else if (paramWrapper.paramResource) {
+                        // Check if param value changed
+                        if (paramWrapper.paramResource.value === +paramWrapper.value) {
+                            paramWrapper.editStatus = PARAM_VALUE_STATUS.unchanged;
+                        } else {
+                            paramWrapper.editStatus = PARAM_VALUE_STATUS.changed;
+                        }
+                    } else {
+                        // No paramResource. Interpret this as create
+                        paramWrapper.editStatus = PARAM_VALUE_STATUS.changed;
+                    }
+                }
+                else {
+                    // No input value. If paramResource exists, interpret this as delete.
+                    if (paramWrapper.paramResource) {
+                        paramWrapper.editStatus = PARAM_VALUE_STATUS.changed;
+                    } else {
+                        paramWrapper.editStatus = PARAM_VALUE_STATUS.unchanged;
+                    }
+                }
+                return msg;
+            };
+
+            /**
+             * Create an object with embedded param resource to be used in editor
+             * @param {{}} paramResource   May be null, when target has no param
+             * @returns {{paramResource: *, value: *, editStatus: number}} the object created
+             */
+            svc.wrapParam = function (paramResource) {
+                return {
+                    paramResource : paramResource,
+                    value : paramResource ? paramResource.value : "",
+                    editStatus : PARAM_VALUE_STATUS.unchanged
+                };
+            };
+
+            /**
+             * Inspect data array for wrapped param changes
+             * @param {[]} data
+             * @returns {*|boolean} true iff there is at least one valid change and no
+             * invalid change
+             */
+            svc.hasValidChanges = function (data) {
+                return (
+                    data.some(function (d) {
+                        return d.paramWrapper.editStatus === PARAM_VALUE_STATUS.changed;
+                    }) &&
+                    !data.some(function (d) {
+                        return d.paramWrapper.editStatus === PARAM_VALUE_STATUS.invalid;
+                    })
+                );
             };
 
             /**

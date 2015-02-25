@@ -19,6 +19,8 @@
             <dd>{{activityLevel | numFormat}}</dd>
             <dt>Process</dt>
             <dd>{{process.name}}</dd>
+            <dt>Data Source</dt>
+            <dd>{{process.dataSource}}<span ng-if="process.isPrivate"> (private) </span></dd>
         </dl>
         </div>
         <div ng-if="!activityLevel">
@@ -36,8 +38,12 @@
                         ng-change="onProcessChange()" style="width:70%">
                 </select>
             </dd>
+            <p></p>
+            <dt>Data Source</dt>
+            <dd>{{process.dataSource}}<span ng-if="process.isPrivate"> (private) </span></dd>
         </dl>
         </div>
+
         <ul class="list-unstyled">
             <li ng-repeat="method in lciaMethods" class="lcia-method">
                 <div class="panel panel-default">
@@ -56,6 +62,9 @@
                         <div class="lcia-bar-container">
                             <lcia-bar-chart lcia="lciaResults[method.lciaMethodID].detail"
                                             flows="elementaryFlows"></lcia-bar-chart>
+                            <button class="btn btn-sm pull-right" ng-show="lciaResults[method.lciaMethodID].detail"
+                                    ng-click="viewProcessFlowParam(method.lciaMethodID)">More Details...</button>
+
                         </div>
                     </div>
                 </div>
