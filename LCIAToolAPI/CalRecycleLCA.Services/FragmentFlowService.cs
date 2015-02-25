@@ -28,6 +28,8 @@ namespace CalRecycleLCA.Services
             out double inFlowMagnitude, int scenarioId = Scenario.MODEL_BASE_CASE_ID);
         double GetNodeScaling(FragmentFlowResource ffr, int scenarioId = Scenario.MODEL_BASE_CASE_ID);
 
+        IEnumerable<FragmentStageResource> GetFragmentStages(int fragmentId);
+
         //FragmentFlow GetFragmentFlow(int fragmentFlowId);
         //IEnumerable<FragmentFlow> GetFragmentFlows(IEnumerable<int> ffids);
         //IEnumerable<FragmentFlow> GetFlowsByFragment(int fragmentId);
@@ -256,6 +258,18 @@ namespace CalRecycleLCA.Services
             return _repository.GetNodeScaling(term, (int)ffr.FlowID, 
                 Convert.ToInt32(Enum.Parse(typeof(DirectionEnum),ffr.Direction)), 
                 scenarioId);
+        }
+
+        public IEnumerable<FragmentStageResource> GetFragmentStages(int fragmentId)
+        {
+            return _repository.Queryable().Where(k => k.FragmentID == fragmentId)
+                .Where(k => k.FragmentStageID != null)
+                .Select(k => new FragmentStageResource()
+                {
+                    FragmentStageID = (int)k.FragmentStageID,
+                    FragmentID = fragmentId,
+                    Name = k.FragmentStage.Name
+                }).Distinct().ToList();
         }
 
     }

@@ -17,12 +17,8 @@ namespace LcaDataModel
 
         public int FragmentStageID { get; set; }
 
-        public int FragmentID { get; set; }
-
         [StringLength(255)]
         public string Name { get; set; } 
-
-        public virtual Fragment Fragment { get; set; }
 
         public virtual ICollection<FragmentFlow> FragmentFlows { get; set; }
     }
