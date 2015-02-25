@@ -157,16 +157,6 @@ namespace CalRecycleLCA.Services
             };
         }
 
-        public FragmentStageResource Transform(FragmentStage s)
-        {
-            return new FragmentStageResource
-            {
-                FragmentStageID = s.FragmentStageID,
-                FragmentID = s.FragmentID,
-                Name = s.Name
-            };
-        }
-
         public FragmentResource Transform(Fragment f)
         {
             var term = _FragmentFlowService.GetInFlow(f.FragmentID);
@@ -324,13 +314,14 @@ namespace CalRecycleLCA.Services
         public IEnumerable<FragmentStageResource> GetStagesByFragment(int fragmentID)
         {
             if (fragmentID == 0)
-                return _FragmentStageService.Query()
-                    .Select()
-                    .Select(s => Transform(s)).ToList();
+                return _FragmentStageService.Queryable()
+                    .Select(k => new FragmentStageResource() 
+                    { 
+                        FragmentStageID = k.FragmentStageID,
+                        Name = k.Name
+                    }).ToList();
             else
-                return _FragmentStageService.Query(s => s.FragmentID == fragmentID)
-                    .Select()
-                    .Select(s => Transform(s)).ToList();
+                return _FragmentFlowService.GetFragmentStages(fragmentID);
         }
 
 

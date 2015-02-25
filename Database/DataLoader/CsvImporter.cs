@@ -256,7 +256,6 @@ namespace LcaDataLoader {
             FragmentStage ent = dbContext.ProduceEntityWithID<FragmentStage>(id, out isNew);
             if (ent != null)
             {
-                ent.FragmentID = Convert.ToInt32(row["FragmentID"]);
                 ent.Name = row["Name"];
                 isImported = isNew ? dbContext.AddEntity(ent) : (dbContext.SaveChanges() > 0);
             }
@@ -290,6 +289,7 @@ namespace LcaDataLoader {
                 ent.SubFragmentID = Convert.ToInt32(row["SubFragmentID"]);
                 if (dbContext.FindRefIlcdEntityID<LcaDataModel.Flow>(row["FlowUUID"], out refID))
                     ent.FlowID = refID;
+                ent.Descend = Convert.ToBoolean(Convert.ToInt32(row["Descend"]));
                 isImported = isNew ? AddEntityWithVerification<FragmentNodeFragment>(dbContext, ent) : (dbContext.SaveChanges() > 0);
             }
             return isImported;
@@ -673,6 +673,14 @@ namespace LcaDataLoader {
             return table.Rows;
         }
 
+        private static IEnumerable<Row> ImportCSVIfExists(string fileName, Func<Row, DbContextWrapper, bool> importRow, DbContextWrapper dbContext)
+        {
+            if (File.Exists(fileName))
+                return ImportCSV(fileName, importRow, dbContext);
+            else
+                return null;
+        }
+
         private static int UpdateEntities(IEnumerable<Row> rows, Func<Row, DbContextWrapper, bool> updateRow, DbContextWrapper dbContext) {
             int importCounter = 0;
             Program.Logger.InfoFormat("Update imported rows...");
@@ -775,15 +783,16 @@ namespace LcaDataLoader {
                 ImportCSV(Path.Combine(dirName, "User.csv"), ImportUser, dbContext);
                 ImportCSV(Path.Combine(dirName, "ScenarioGroup.csv"), ImportScenarioGroup, dbContext);
                 ImportCSV(Path.Combine(dirName, "Scenario.csv"), ImportScenario, dbContext);
-                ImportCSV(Path.Combine(dirName, "Param.csv"), ImportParam, dbContext);
-                ImportCSV(Path.Combine(dirName, "ProcessSubstitution.csv"), ImportProcessSubstitution, dbContext);
-                ImportCSV(Path.Combine(dirName, "DependencyParam.csv"), ImportDependencyParam, dbContext);
-                ImportCSV(Path.Combine(dirName, "ConservationParam.csv"), ImportConservationParam, dbContext);
+                ImportCSVIfExists(Path.Combine(dirName, "ProcessSubstitution.csv"), ImportProcessSubstitution, dbContext);
+                if (ImportCSVIfExists(Path.Combine(dirName, "Param.csv"), ImportParam, dbContext) == null)
+                    return;
+                ImportCSVIfExists(Path.Combine(dirName, "DependencyParam.csv"), ImportDependencyParam, dbContext);
+                ImportCSVIfExists(Path.Combine(dirName, "ConservationParam.csv"), ImportConservationParam, dbContext);
                 //ImportCSV(Path.Combine(dirName, "FlowPropertyParam.csv"), ImportFlowPropertyParam, dbContext);
-                ImportCSV(Path.Combine(dirName, "CompositionParam.csv"), ImportCompositionParam, dbContext);
-                ImportCSV(Path.Combine(dirName, "ProcessDissipationParam.csv"), ImportProcessDissipationParam, dbContext);
-                ImportCSV(Path.Combine(dirName, "ProcessEmissionParam.csv"), ImportProcessEmissionParam, dbContext);
-                ImportCSV(Path.Combine(dirName, "CharacterizationParam.csv"), ImportCharacterizationParam, dbContext);
+                ImportCSVIfExists(Path.Combine(dirName, "CompositionParam.csv"), ImportCompositionParam, dbContext);
+                ImportCSVIfExists(Path.Combine(dirName, "ProcessDissipationParam.csv"), ImportProcessDissipationParam, dbContext);
+                ImportCSVIfExists(Path.Combine(dirName, "ProcessEmissionParam.csv"), ImportProcessEmissionParam, dbContext);
+                ImportCSVIfExists(Path.Combine(dirName, "CharacterizationParam.csv"), ImportCharacterizationParam, dbContext);
             }
             else {
                 Program.Logger.WarnFormat("Scenarios folder, {0}, does not exist.", dirName);
