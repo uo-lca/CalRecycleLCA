@@ -254,12 +254,12 @@ namespace CalRecycleLCA.Services
             {
                 sw_cache.CStart();
                 //disable this until results have been cached - doesn't seem to increase performance
-                //_unitOfWork.SetAutoDetectChanges(false);
+                _unitOfWork.SetAutoDetectChanges(false);
                 _scoreCacheService.InsertGraphRange(scoreCaches);
 
                 _unitOfWork.SaveChanges();
                 //enable this after results have been cached -  it was turned off to increase performance
-                //_unitOfWork.SetAutoDetectChanges(true);
+                _unitOfWork.SetAutoDetectChanges(true);
                 sw_cache.CStop();
             }
 
