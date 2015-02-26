@@ -29,6 +29,7 @@ namespace CalRecycleLCA.Services
         double GetNodeScaling(FragmentFlowResource ffr, int scenarioId = Scenario.MODEL_BASE_CASE_ID);
 
         IEnumerable<FragmentStageResource> GetFragmentStages(int fragmentId);
+        IEnumerable<FragmentStageResource> GetRecursiveFragmentStages(int fragmentId);
 
         //FragmentFlow GetFragmentFlow(int fragmentFlowId);
         //IEnumerable<FragmentFlow> GetFragmentFlows(IEnumerable<int> ffids);
@@ -271,6 +272,38 @@ namespace CalRecycleLCA.Services
                     Name = k.FragmentStage.Name
                 }).Distinct().ToList();
         }
+
+        public IEnumerable<FragmentStageResource> GetRecursiveFragmentStages(int fragmentId)
+        {
+            var flatStages = _repository.Queryable().Where(k => k.FragmentID == fragmentId)
+                .Where(k => k.FragmentStageID != null)
+                .Where(k => k.NodeTypeID != 2)
+                .Select(k => new FragmentStageResource()
+                {
+                    FragmentStageID = (int)k.FragmentStageID,
+                    Name = k.FragmentStage.Name
+                }).ToList();
+
+            flatStages.AddRange(_repository.Queryable().Where(k => k.FragmentID == fragmentId)
+                .Where(k => k.NodeTypeID == 2)
+                .Where(k => k.FragmentNodeFragments.FirstOrDefault().Descend == false)
+                .Select(k => new FragmentStageResource()
+                {
+                    FragmentStageID = (int)k.FragmentStageID,
+                    Name = k.FragmentStage.Name
+                }));
+
+            List<int> subfragments = _repository.Queryable().Where(k => k.FragmentID == fragmentId)
+                .Where(k => k.NodeTypeID == 2)
+                .Where(k => k.FragmentNodeFragments.FirstOrDefault().Descend == true)
+                .Select(k => k.FragmentNodeFragments.FirstOrDefault().SubFragmentID).ToList(); // breaks for Fragment Substitutions
+
+            foreach (int subfrag in subfragments)
+                flatStages.AddRange(GetRecursiveFragmentStages(subfrag));
+
+            return flatStages.Distinct().OrderBy(k => k.FragmentStageID).ToList();
+        }
+
 
     }
 }

@@ -19,14 +19,18 @@ namespace CalRecycleLCA.Services
         IEnumerable<FlowResource> GetFlows(int flowtypeID = 0);
         IEnumerable<FlowResource> GetFlowsByFragment(int fragmentID);
         IEnumerable<FragmentStageResource> GetStagesByFragment(int fragmentID = 0);
+        IEnumerable<FragmentStageResource> GetRecursiveStagesByFragment(int fragmentID);
         IEnumerable<ProcessFlowResource> GetProcessFlows(int processID, int scenarioID = Scenario.MODEL_BASE_CASE_ID);
         IEnumerable<FlowPropertyResource> GetFlowProperties();
         IEnumerable<FlowPropertyMagnitude> GetFlowFlowProperties(int flowId);
         IEnumerable<FlowPropertyResource> GetFlowPropertiesByFragment(int fragmentID);
         IEnumerable<FlowPropertyResource> GetFlowPropertiesByProcess(int processID);
         LCIAResultResource GetFragmentLCIAResults(int fragmentID, int lciaMethodID, int scenarioID = Scenario.MODEL_BASE_CASE_ID);
+        LCIAResultResource GetRecursiveFragmentLCIAResults(int fragmentID, int lciaMethodID, int scenarioID = Scenario.MODEL_BASE_CASE_ID);
         IEnumerable<LCIAResultResource> GetFragmentLCIAResultsAllScenarios(int fragmentID, int lciaMethodID, int scenarioGroupID = 1);
+        IEnumerable<LCIAResultResource> GetRecursiveFragmentLCIAResultsAllScenarios(int fragmentID, int lciaMethodID, int scenarioGroupID = 1);
         IEnumerable<LCIAResultResource> GetFragmentLCIAResultsAllMethods(int fragmentID, int scenarioID = Scenario.MODEL_BASE_CASE_ID);
+        IEnumerable<LCIAResultResource> GetRecursiveFragmentLCIAResultsAllMethods(int fragmentID, int scenarioID = Scenario.MODEL_BASE_CASE_ID);
         IEnumerable<LCIAResultResource> GetFragmentSensitivity(int fragmentId, int paramId);
         IEnumerable<LCIAResultResource> GetFragmentSensitivity(int fragmentId, ParamResource param);
         IEnumerable<ProcessResource> GetProcesses(int flowTypeID = 0);

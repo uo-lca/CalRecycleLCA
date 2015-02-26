@@ -324,6 +324,11 @@ namespace CalRecycleLCA.Services
                 return _FragmentFlowService.GetFragmentStages(fragmentID);
         }
 
+        public IEnumerable<FragmentStageResource> GetRecursiveStagesByFragment(int fragmentId)
+        {
+            return _FragmentFlowService.GetRecursiveFragmentStages(fragmentId);
+        }
+
 
         /// <summary>
         /// Get list of processflow resources.  
@@ -461,6 +466,25 @@ namespace CalRecycleLCA.Services
             return lciaResults.Select(m => Transform(m, processId));
         }
         
+
+        private IEnumerable<LCIAResultResource> GroupFragmentLCIA(List<FragmentLCIAModel> ff_results, int scenarioId)
+        {
+            return ff_results
+                .GroupBy(r => r.LCIAMethodID)
+                .Select(group => new LCIAResultResource
+                {
+                    ScenarioID = scenarioId,
+                    LCIAMethodID = group.Key,
+                    LCIAScore = group.GroupBy(k => k.FragmentStageID)
+                        .Select(grp => new AggregateLCIAResource
+                        {
+                            FragmentStageID = grp.Key,
+                            CumulativeResult = grp.Sum(a => a.Result),
+                            LCIADetail = new List<DetailedLCIAResource>()
+                        }).ToList()
+                });
+        }
+
         /// <summary>
         /// Execute Fragment LCIA and return computation result as FragmentLCIAResource object
         /// </summary>
@@ -469,22 +493,20 @@ namespace CalRecycleLCA.Services
         /// <param name="scenarioID">Defaults to base scenario</param>
         /// <returns>Fragment LCIA results for given parameters</returns> 
         public LCIAResultResource GetFragmentLCIAResults(int fragmentID, int lciaMethodID, int scenarioID = Scenario.MODEL_BASE_CASE_ID) {
-            return _FragmentLCIAComputation.FragmentLCIA(fragmentID, scenarioID, lciaMethodID).ToList()
-                .GroupBy(r => r.LCIAMethodID)
-                .Select(group => new LCIAResultResource 
-                { 
-                    ScenarioID = scenarioID,
-                    LCIAMethodID = group.Key,
-                    LCIAScore = group.GroupBy(k => k.FragmentStageID)
-                        .Select(grp => new AggregateLCIAResource
-                        { 
-                            FragmentStageID = grp.Key,
-                            CumulativeResult = grp.Sum(a => a.Result),
-                            LCIADetail = new List<DetailedLCIAResource>()
-                        }).ToList()
-
-                }).Where(r => r.LCIAMethodID == lciaMethodID).FirstOrDefault();
+            return GroupFragmentLCIA(_FragmentLCIAComputation
+                    .FragmentLCIA(fragmentID, scenarioID, lciaMethodID).ToList(),
+                    scenarioID)
+                .Where(r => r.LCIAMethodID == lciaMethodID).FirstOrDefault();
         }
+
+        public LCIAResultResource GetRecursiveFragmentLCIAResults(int fragmentID, int lciaMethodID, int scenarioID = Scenario.MODEL_BASE_CASE_ID)
+        {
+            return GroupFragmentLCIA(_FragmentLCIAComputation
+                    .RecursiveFragmentLCIA(fragmentID, scenarioID, lciaMethodID).ToList(),
+                    scenarioID)
+                .Where(r => r.LCIAMethodID == lciaMethodID).FirstOrDefault();
+        }
+
 
         /// <summary>
         /// Execute Fragment LCIA and return computation results in FragmentLCIAResource objects-- one lcia method, all scenarios
@@ -499,6 +521,12 @@ namespace CalRecycleLCA.Services
             return scenarios.Select(s => GetFragmentLCIAResults(fragmentID, lciaMethodID, s.ScenarioID)).ToList();
         }
 
+        public IEnumerable<LCIAResultResource> GetRecursiveFragmentLCIAResultsAllScenarios(int fragmentID, int lciaMethodID, int scenarioGroupID = 1)
+        {
+            IEnumerable<Scenario> scenarios = _ScenarioService.Queryable().Where(s => s.ScenarioGroupID == scenarioGroupID).ToList();
+            return scenarios.Select(s => GetRecursiveFragmentLCIAResults(fragmentID, lciaMethodID, s.ScenarioID)).ToList();
+        }
+        
         /// <summary>
         /// Execute Fragment LCIA and return computation results in FragmentLCIAResource objects-- one scenario, all LCIA methods
         /// </summary>
@@ -512,6 +540,12 @@ namespace CalRecycleLCA.Services
             return lciaMethods.Select(s => GetFragmentLCIAResults(fragmentID, s, scenarioId)).ToList();
         }
 
+        public IEnumerable<LCIAResultResource> GetRecursiveFragmentLCIAResultsAllMethods(int fragmentID, int scenarioId = Scenario.MODEL_BASE_CASE_ID)
+        {
+            IEnumerable<int> lciaMethods = _LciaMethodService.QueryActiveMethods();
+            return lciaMethods.Select(s => GetRecursiveFragmentLCIAResults(fragmentID, s, scenarioId)).ToList();
+        }
+        
         public IEnumerable<LCIAResultResource> GetFragmentSensitivity(int fragmentId, int paramId)
         {
             List<Param> Ps = _ParamService.Queryable()

@@ -294,12 +294,21 @@ namespace LCAToolAPI.API
         /// <returns>FragmentStageResource array</returns>
         [Route("api/fragmentstages")]
         [Route("api/stages")]
-        [Route("api/fragments/{fragmentID:int}/fragmentstages")]
-        [Route("api/fragments/{fragmentID:int}/stages")]
+        [Route("api/fragments/{fragmentID:int}/f/fragmentstages")]
+        [Route("api/fragments/{fragmentID:int}/f/stages")]
         [HttpGet]
         public IEnumerable<FragmentStageResource> GetStagesByFragment(int fragmentID = 0)
         {
             return _ResourceService.GetStagesByFragment(fragmentID);
+        }
+        [Route("api/fragments/{fragmentID:int}/fragmentstages")]
+        [Route("api/fragments/{fragmentID:int}/stages")]
+        [Route("api/fragments/{fragmentID:int}/r/fragmentstages")]
+        [Route("api/fragments/{fragmentID:int}/r/stages")]
+        [HttpGet]
+        public IEnumerable<FragmentStageResource> GetRecursiveStagesByFragment(int fragmentID = 0)
+        {
+            return _ResourceService.GetRecursiveStagesByFragment(fragmentID);
         }
         
         
@@ -325,7 +334,7 @@ namespace LCAToolAPI.API
         /// <param name="lciaMethodID"></param>
         /// <returns>LCIAResultResource (list)</returns>
         [CalRecycleAuthorize]
-        [Route("api/fragments/{fragmentID:int}/lciamethods/{lciaMethodID:int}/lciaresults")]
+        [Route("api/fragments/{fragmentID:int}/lciamethods/{lciaMethodID:int}/f/lciaresults")]
         [HttpGet]
         public IEnumerable<LCIAResultResource> GetFragmentLCIAResultsAllScenarios(int fragmentID, int lciaMethodID) {
             int authGroup = (int)_ScenarioGroupService.CheckAuthorizedGroup(RequestContext);
@@ -334,17 +343,36 @@ namespace LCAToolAPI.API
             else
                 return _ResourceService.GetFragmentLCIAResultsAllScenarios(fragmentID, lciaMethodID, authGroup);
         }
+        [CalRecycleAuthorize]
+        [Route("api/fragments/{fragmentID:int}/lciamethods/{lciaMethodID:int}/lciaresults")]
+        [Route("api/fragments/{fragmentID:int}/lciamethods/{lciaMethodID:int}/r/lciaresults")]
+        [HttpGet]
+        public IEnumerable<LCIAResultResource> GetRecursiveFragmentLCIAResultsAllScenarios(int fragmentID, int lciaMethodID)
+        {
+            int authGroup = (int)_ScenarioGroupService.CheckAuthorizedGroup(RequestContext);
+            if (authGroup == 0)
+                return _ResourceService.GetRecursiveFragmentLCIAResultsAllScenarios(fragmentID, lciaMethodID);
+            else
+                return _ResourceService.GetRecursiveFragmentLCIAResultsAllScenarios(fragmentID, lciaMethodID, authGroup);
+        }
 
         /// <summary>
         /// Fragment LCIA results across all methods under base scenario
         /// </summary>
         /// <param name="fragmentID"></param>
         /// <returns>LCIAResultResource list</returns>
-        [Route("api/fragments/{fragmentID:int}/lciaresults")]
+        [Route("api/fragments/{fragmentID:int}/f/lciaresults")]
         [HttpGet]
         public IEnumerable<LCIAResultResource> GetFragmentLCIAResultsAllMethods(int fragmentID)
         {
             return _ResourceService.GetFragmentLCIAResultsAllMethods(fragmentID);
+        }
+        [Route("api/fragments/{fragmentID:int}/lciaresults")]
+        [Route("api/fragments/{fragmentID:int}/r/lciaresults")]
+        [HttpGet]
+        public IEnumerable<LCIAResultResource> GetRecursiveFragmentLCIAResultsAllMethods(int fragmentID)
+        {
+            return _ResourceService.GetRecursiveFragmentLCIAResultsAllMethods(fragmentID);
         }
 
         /// <summary>
@@ -357,7 +385,7 @@ namespace LCAToolAPI.API
         /// <param name="scenarioID"></param>
         /// <returns>LCIAResultResource</returns>
         [CalRecycleAuthorize]
-        [Route("api/scenarios/{scenarioID:int}/fragments/{fragmentID:int}/lciamethods/{lciaMethodID:int}/lciaresults")]
+        [Route("api/scenarios/{scenarioID:int}/fragments/{fragmentID:int}/lciamethods/{lciaMethodID:int}/f/lciaresults")]
         [HttpGet]
         public HttpResponseMessage GetFragmentLCIAResults(int fragmentID, int lciaMethodID, int scenarioID) {
             if (_ScenarioService.IsStale(scenarioID))
@@ -369,6 +397,21 @@ namespace LCAToolAPI.API
                 return Request.CreateResponse(HttpStatusCode.Unauthorized);
         }
 
+        [CalRecycleAuthorize]
+        [Route("api/scenarios/{scenarioID:int}/fragments/{fragmentID:int}/lciamethods/{lciaMethodID:int}/lciaresults")]
+        [Route("api/scenarios/{scenarioID:int}/fragments/{fragmentID:int}/lciamethods/{lciaMethodID:int}/r/lciaresults")]
+        [HttpGet]
+        public HttpResponseMessage GetRecursiveFragmentLCIAResults(int fragmentID, int lciaMethodID, int scenarioID)
+        {
+            if (_ScenarioService.IsStale(scenarioID))
+                return Request.CreateResponse(HttpStatusCode.Conflict, conflictMsg);
+            if (_ScenarioGroupService.CanGet(RequestContext))
+                return Request.CreateResponse(HttpStatusCode.OK,
+                    _ResourceService.GetRecursiveFragmentLCIAResults(fragmentID, lciaMethodID, scenarioID));
+            else
+                return Request.CreateResponse(HttpStatusCode.Unauthorized);
+        }
+
         /// <summary>
         /// Fragment LCIA results, all methods, for a given scenario
         /// </summary>
@@ -376,7 +419,7 @@ namespace LCAToolAPI.API
         /// <param name="scenarioID"></param>
         /// <returns>LCIAResultResource list</returns>
         [CalRecycleAuthorize]
-        [Route("api/scenarios/{scenarioID:int}/fragments/{fragmentID:int}/lciaresults")]
+        [Route("api/scenarios/{scenarioID:int}/fragments/{fragmentID:int}/f/lciaresults")]
         [HttpGet]
         public HttpResponseMessage GetFragmentLCIAResultsAllMethods(int fragmentID, int scenarioID)
         {
@@ -385,6 +428,20 @@ namespace LCAToolAPI.API
             if (_ScenarioGroupService.CanGet(RequestContext))
                 return Request.CreateResponse(HttpStatusCode.OK,
                     _ResourceService.GetFragmentLCIAResultsAllMethods(fragmentID, scenarioID));
+            else
+                return Request.CreateResponse(HttpStatusCode.Unauthorized);
+        }
+        [CalRecycleAuthorize]
+        [Route("api/scenarios/{scenarioID:int}/fragments/{fragmentID:int}/lciaresults")]
+        [Route("api/scenarios/{scenarioID:int}/fragments/{fragmentID:int}/r/lciaresults")]
+        [HttpGet]
+        public HttpResponseMessage GetRecursiveFragmentLCIAResultsAllMethods(int fragmentID, int scenarioID)
+        {
+            if (_ScenarioService.IsStale(scenarioID))
+                return Request.CreateResponse(HttpStatusCode.Conflict, conflictMsg);
+            if (_ScenarioGroupService.CanGet(RequestContext))
+                return Request.CreateResponse(HttpStatusCode.OK,
+                    _ResourceService.GetRecursiveFragmentLCIAResultsAllMethods(fragmentID, scenarioID));
             else
                 return Request.CreateResponse(HttpStatusCode.Unauthorized);
         }

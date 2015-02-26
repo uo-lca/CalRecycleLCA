@@ -16,11 +16,26 @@ namespace Entities.Models {
         public double Magnitude { get; set; }  // NodeCache.FlowMagnitude * FlowFlowProperty.MeanValue
     }
 
-    public class FragmentStageResource
+    public class FragmentStageResource :IEquatable<FragmentStageResource>
     {
         public int FragmentStageID { get; set; }
         public int? FragmentID { get; set; }
         public string Name { get; set; }
+
+        // http://blogs.msdn.com/b/csharpfaq/archive/2009/03/25/how-to-use-linq-methods-to-compare-objects-of-custom-types.aspx
+        public bool Equals(FragmentStageResource other)
+        {
+            if (Object.ReferenceEquals(other, null)) return false;
+
+            if (Object.ReferenceEquals(this, other)) return true;
+
+            return FragmentStageID.Equals(other.FragmentStageID);
+        }
+
+        public override int GetHashCode()
+        {
+            return FragmentStageID.GetHashCode();
+        }
     }
 
     /// <summary>
