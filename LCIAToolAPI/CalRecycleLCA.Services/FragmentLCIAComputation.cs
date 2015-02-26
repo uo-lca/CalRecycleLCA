@@ -88,7 +88,7 @@ namespace CalRecycleLCA.Services
             currentCache.Clear();
         }
 
-        private IEnumerable<NodeCache> FragmentTraverse(int fragmentId, int scenarioId = Scenario.MODEL_BASE_CASE_ID)
+        public IEnumerable<NodeCache> FragmentTraverse(int fragmentId, int scenarioId = Scenario.MODEL_BASE_CASE_ID)
         {
             // this will eventually become private after diagnostics are done
             if (_nodeCacheService.IsCached(fragmentId, scenarioId))
@@ -115,9 +115,6 @@ namespace CalRecycleLCA.Services
 
 
         }
-
-
-
 
         public IEnumerable<ScoreCache> FragmentLCIAComputeNoSave(int fragmentId, int scenarioId)
         {

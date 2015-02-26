@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Repository.Pattern.UnitOfWork;
+using Repository.Pattern.Infrastructure;
 using Ninject;
 using LcaDataModel;
 using Entities.Models;
@@ -68,11 +69,38 @@ namespace CalRecycleLCA.Services
                 _FragmentLCIAComputation.FragmentLCIAComputeSave(s.TopLevelFragmentID, s.ScenarioID);
         }
  
+        private void CloneBaseScenario(int fragmentId, int scenarioId)
+        {
+            // quant. traversal may cost 6 seconds but it's cheaper than writing a new sleeker recursive traversal.
+            var ffs = _FragmentLCIAComputation.FragmentTraverse(fragmentId, scenarioId)
+                .Select(k => k.FragmentFlowID).Distinct().ToList();
+
+            var sc = _ScoreCacheService.Queryable()
+                .Where(k => k.ScenarioID == Scenario.MODEL_BASE_CASE_ID)
+                .Where(k => ffs.Contains(k.FragmentFlowID)).ToList()
+                .Select(k => new ScoreCache
+                {
+                    ScenarioID = scenarioId,
+                    FragmentFlowID = k.FragmentFlowID,
+                    LCIAMethodID = k.LCIAMethodID,
+                    ImpactScore = k.ImpactScore,
+                    ObjectState = ObjectState.Added
+                });
+
+            _unitOfWork.SetAutoDetectChanges(false);
+            _ScoreCacheService.InsertGraphRange(sc);
+            _unitOfWork.SaveChanges();
+            _unitOfWork.SetAutoDetectChanges(true);
+        }
+
         public int CreateScenario(ScenarioResource postScenario)
         {
             Scenario newScenario = _ScenarioService.NewScenario(postScenario);
-            _unitOfWork.SaveChanges();
-            _FragmentLCIAComputation.FragmentLCIAComputeSave(newScenario.TopLevelFragmentID, newScenario.ScenarioID);
+            _unitOfWork.SaveChanges(); // sets flag
+
+            CloneBaseScenario(postScenario.TopLevelFragmentID, newScenario.ScenarioID);
+
+            _FragmentLCIAComputation.FragmentLCIAComputeSave(newScenario.TopLevelFragmentID, newScenario.ScenarioID); // clears flag
             return newScenario.ScenarioID;
         }
 
