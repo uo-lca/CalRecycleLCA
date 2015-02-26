@@ -161,7 +161,7 @@ namespace CalRecycleLCA.Services
                 // more outFlows than outLinks. (i.e. allow unlinked outFlows to be cutoff)
                 if (outLinks.Count() > outFlows.Count()) // TODO -- this should be !=
                 {
-                    throw new ArgumentException("OutFlows and OutLinks don't reconcile!");
+                    throw new ArgumentException("OutFlows and OutLinks don't reconcile! FFID: " + Convert.ToString(fragmentFlowId));
                 }
 
                 // abandon recursion if no recursive steps-- but foreach should just not run if outLinks is empty
@@ -285,15 +285,19 @@ namespace CalRecycleLCA.Services
             // private re-implementation of _FragmentFlowService.GetDependencies that uses local nodeCaches
             var fragRefFlow = _fragmentFlowService.GetInFlow(fragmentId);
 
-            var Outflows = nodeCaches
-                .Where(ff => ff.FragmentID == fragmentId) // fragment flows belonging to this fragment
+            var Outflows = _fragmentFlowService.Queryable()
+                .Where(ff => ff.FragmentID == fragmentId)
                 .Where(ff => ff.FlowID != null)           // reference flow (null FlowID) is .Unioned below
-                .Where(ff => ff.NodeTypeID == 3)          // of type InputOutput
-                .Select(a => new InventoryModel
+                .Where(ff => ff.NodeTypeID == 3).ToList()          // of type InputOutput
+                .GroupJoin(nodeCaches,
+                    ff => ff.FragmentFlowID,
+                    nc => nc.FragmentFlowID,
+                    (ff,nc) => new { ff, nc })
+                .SelectMany(d => d.nc.DefaultIfEmpty(), (d,nc) => new InventoryModel
                     {
-                        FlowID = (int)a.FlowID,
-                        DirectionID = a.DirectionID,
-                        Result = a.FlowMagnitude
+                        FlowID = (int)d.ff.FlowID,
+                        DirectionID = d.ff.DirectionID,
+                        Result = nc == null ? 0.0 : nc.FlowMagnitude
                     }).ToList()                         // into List<InventoryModel>
                 .Union(new List<InventoryModel> { fragRefFlow }) // add fragment ReferenceFlow
                 .GroupBy(a => new                   // group by Flow and Direction
@@ -307,6 +311,8 @@ namespace CalRecycleLCA.Services
                         DirectionID = group.Key.DirectionID,
                         Result = group.Sum(a => a.Result)
                     }).ToList();
+
+            // need to look for unvisited 
 
             var myDirectionId = comp(ex_directionId);
 
