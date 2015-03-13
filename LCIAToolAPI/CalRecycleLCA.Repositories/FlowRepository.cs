@@ -18,7 +18,7 @@ namespace CalRecycleLCA.Repositories
         /// <param name="repository"></param>
         /// <param name="f"></param>
         /// <returns></returns>
-        private static FlowResource ToResource(this IRepositoryAsync<Flow> repository, Flow f)
+        private static FlowResource ToResource(this IRepository<Flow> repository, Flow f)
         {
             int? maxHL;
             string categoryName;
@@ -78,6 +78,18 @@ namespace CalRecycleLCA.Repositories
                 .Where(f => f.FragmentFlows.Any(ff => ff.FragmentID == fragmentId))
                 .Select(f => f.FlowID).ToList();
             flows.Add(repository.GetRepository<FragmentFlow>().GetInFlow(fragmentId, Scenario.MODEL_BASE_CASE_ID).FlowID);
+            return repository.Query(f => flows.Contains(f.FlowID))
+                .Include(f => f.ILCDEntity)
+                .Select()
+                .Select(f => repository.ToResource(f));
+        }
+
+        public static IEnumerable<FlowResource> GetFlowsByLCIAMethod(this IRepository<Flow> repository, int lciaMethodId)
+        {
+            List<int> flows = repository.GetRepository<LCIA>().Queryable()
+                .Where(fac => fac.LCIAMethodID == lciaMethodId)
+                .Where(fac => fac.FlowID != null)
+                .Select(fac => (int)fac.FlowID).ToList();
             return repository.Query(f => flows.Contains(f.FlowID))
                 .Include(f => f.ILCDEntity)
                 .Select()

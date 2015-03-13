@@ -585,6 +585,19 @@ namespace LCAToolAPI.API
             return _ResourceService.GetLCIAFactors(lciaMethodId);
         }
 
+        /// <summary>
+        /// Return a list of elementary flows, filtered by LCIA method, to include only flows
+        /// characterized by the given LCIA method.
+        /// </summary>
+        /// <param name="lciaMethodId"></param>
+        /// <returns></returns>
+        [Route("api/lciamethods/{lciaMethodId:int}/flows")]
+        [HttpGet]
+        public IEnumerable<FlowResource> GetLCIAMethodFlows(int lciaMethodId)
+        {
+            return _ResourceService.GetFlowsByLCIAMethod(lciaMethodId);
+        }
+
         // Process metadata /////////////////////////////////////////////////////////
         /// <summary>
         /// List of processes

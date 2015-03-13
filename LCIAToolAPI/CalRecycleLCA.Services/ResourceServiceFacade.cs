@@ -303,6 +303,11 @@ namespace CalRecycleLCA.Services
             return _FlowService.GetFlow(flowId);
         }
 
+        public IEnumerable<FlowResource> GetFlowsByLCIAMethod(int lciaMethodId)
+        {
+            return _FlowService.GetFlowsByLCIAMethod(lciaMethodId);
+        }
+
         /// <summary>
         /// Get list of flows related to a fragment (via FragmentFlow)
         /// </summary>

@@ -17,6 +17,7 @@ namespace CalRecycleLCA.Services
         IEnumerable<FragmentFlowResource> GetFragmentFlowResources(int fragmentID, int scenarioID = Scenario.MODEL_BASE_CASE_ID);
         IEnumerable<FlowResource> GetFlow(int flowId);
         IEnumerable<FlowResource> GetFlows(int flowtypeID = 0);
+        IEnumerable<FlowResource> GetFlowsByLCIAMethod(int lciaMethodId);
         IEnumerable<FlowResource> GetFlowsByFragment(int fragmentID);
         IEnumerable<FragmentStageResource> GetStagesByFragment(int fragmentID = 0);
         IEnumerable<FragmentStageResource> GetRecursiveStagesByFragment(int fragmentID);
