@@ -31,10 +31,10 @@ namespace CalRecycleLCA.Services
             notes.Add(note);
         }
 
-        public void CStop()
+        public void CStop(String note = "")
         {
             base.Stop();
-            Click();
+            Click(note);
         }
 
         public List<long> Counts()
@@ -42,5 +42,12 @@ namespace CalRecycleLCA.Services
             return counts;
         }
 
+        public void Reset()
+        {
+            base.Reset();
+            counts.Clear();
+            notes.Clear();
+            startval = 0;
+        }
     }
 }
