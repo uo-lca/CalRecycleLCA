@@ -286,9 +286,10 @@ namespace LCAToolAPI.API
         }
 
         /// <summary>
-        /// Return a table of FragmentStage resources.  FragmentStages are grouping units for nodes
-        /// in a fragment for the purposes of LCIA reporting.  Each fragment has its own distinct
-        /// stages, and every impact-generating flow belongs to one stage.
+        /// Return a table of FragmentStage resources.  
+        /// 
+        /// This variant reports only the stages that belong to the named fragment (or all known stages if 
+        /// the fragment is not specified).  Stages belonging to sub-fragments will not be included.  
         /// </summary>
         /// <param name="fragmentID">if present, report only stages belonging to the specified fragment</param>
         /// <returns>FragmentStageResource array</returns>
@@ -301,6 +302,18 @@ namespace LCAToolAPI.API
         {
             return _ResourceService.GetStagesByFragment(fragmentID);
         }
+        /// <summary>
+        /// Return a table of FragmentStage resources.  FragmentStages are grouping units for nodes
+        /// in a fragment for the purposes of LCIA reporting.  Each fragment has its own distinct
+        /// stages, and every impact-generating flow belongs to one stage.
+        /// 
+        /// The list of stages visible is determined via "recursive ascent," which is the default.  
+        /// Each sub-fragment has a flag indicating whether the sub-fragment's stages should be visible
+        /// to the fragment.  If yes, the fragment's stage list will include sub-fragment stages. If no,
+        /// the sub-fragment's stages will be aggregated together.
+        /// </summary>
+        /// <param name="fragmentID"></param>
+        /// <returns></returns>
         [Route("api/fragments/{fragmentID:int}/fragmentstages")]
         [Route("api/fragments/{fragmentID:int}/stages")]
         [Route("api/fragments/{fragmentID:int}/r/fragmentstages")]
@@ -329,6 +342,8 @@ namespace LCAToolAPI.API
         /// <summary>
         /// GET api/fragments/{fragmentID:int}/lciamethods/{lciaMethodID:int}/lciaresults
         /// reports lcia results for all scenarios visible to the user. for a single LCIA method
+        /// 
+        /// This variant returns "flat" (i.e. non-recursive) LCIA results for the fragment.
         /// </summary>
         /// <param name="fragmentID"></param>
         /// <param name="lciaMethodID"></param>
@@ -343,6 +358,18 @@ namespace LCAToolAPI.API
             else
                 return _ResourceService.GetFragmentLCIAResultsAllScenarios(fragmentID, lciaMethodID, authGroup);
         }
+        /// <summary>
+        /// GET api/fragments/{fragmentID:int}/lciamethods/{lciaMethodID:int}/lciaresults
+        /// reports lcia results for all scenarios visible to the user. for a single LCIA method.
+        /// 
+        /// This method (the default) performs contribution analysis via "recursive ascent."  For
+        /// sub-fragments marked with the "descend" flag true [!! this flag is not visible to end users!],
+        /// the sub-fragments' stages will be reported separately.  If "descend" flag is false, the 
+        /// sub-fragment stages will be aggregated together.
+        /// </summary>
+        /// <param name="fragmentID"></param>
+        /// <param name="lciaMethodID"></param>
+        /// <returns>List of LCIAResultResource</returns>
         [CalRecycleAuthorize]
         [Route("api/fragments/{fragmentID:int}/lciamethods/{lciaMethodID:int}/lciaresults")]
         [Route("api/fragments/{fragmentID:int}/lciamethods/{lciaMethodID:int}/r/lciaresults")]
@@ -358,6 +385,8 @@ namespace LCAToolAPI.API
 
         /// <summary>
         /// Fragment LCIA results across all methods under base scenario
+        /// 
+        /// This variant returns "flat" (i.e. non-recursive) LCIA results for the fragment.
         /// </summary>
         /// <param name="fragmentID"></param>
         /// <returns>LCIAResultResource list</returns>
@@ -367,6 +396,16 @@ namespace LCAToolAPI.API
         {
             return _ResourceService.GetFragmentLCIAResultsAllMethods(fragmentID);
         }
+        /// <summary>
+        /// Fragment LCIA results across all methods under base scenario.
+        /// 
+        /// This method (the default) performs contribution analysis via "recursive ascent."  For
+        /// sub-fragments marked with the "descend" flag true [!! this flag is not visible to end users!],
+        /// the sub-fragments' stages will be reported separately.  If "descend" flag is false, the 
+        /// sub-fragment stages will be aggregated together.
+        /// </summary>
+        /// <param name="fragmentID"></param>
+        /// <returns>List of LCIAResultResource</returns>
         [Route("api/fragments/{fragmentID:int}/lciaresults")]
         [Route("api/fragments/{fragmentID:int}/r/lciaresults")]
         [HttpGet]
@@ -376,9 +415,10 @@ namespace LCAToolAPI.API
         }
 
         /// <summary>
-        /// GET api/scenarios/{scenarioID:int}/fragments/{fragmentID:int}/lciamethods/{lciaMethodID:int}/lciaresults
         /// Compute LCIA results for a fragment and sub-fragments, under a particular scenario.
         /// requires authentication.  the ScenarioGroup for the Scenario specified must be 1 or authorizedScenarioGroup 
+        /// 
+        /// This variant performs "flat" (i.e. non-recursive) contribution analysis for the fragment.
         /// </summary>
         /// <param name="fragmentID"></param>
         /// <param name="lciaMethodID"></param>
@@ -397,6 +437,19 @@ namespace LCAToolAPI.API
                 return Request.CreateResponse(HttpStatusCode.Unauthorized);
         }
 
+        /// <summary>
+        /// Compute LCIA results for a fragment and sub-fragments, under a particular scenario.
+        /// requires authentication.  the ScenarioGroup for the Scenario specified must be 1 or authorizedScenarioGroup 
+        /// 
+        /// This method (the default) performs contribution analysis via "recursive ascent."  For
+        /// sub-fragments marked with the "descend" flag true [!! this flag is not visible to end users!],
+        /// the sub-fragments' stages will be reported separately.  If "descend" flag is false, the 
+        /// sub-fragment stages will be aggregated together.
+        /// </summary>
+        /// <param name="fragmentID"></param>
+        /// <param name="lciaMethodID"></param>
+        /// <param name="scenarioID"></param>
+        /// <returns></returns>
         [CalRecycleAuthorize]
         [Route("api/scenarios/{scenarioID:int}/fragments/{fragmentID:int}/lciamethods/{lciaMethodID:int}/lciaresults")]
         [Route("api/scenarios/{scenarioID:int}/fragments/{fragmentID:int}/lciamethods/{lciaMethodID:int}/r/lciaresults")]
@@ -414,6 +467,8 @@ namespace LCAToolAPI.API
 
         /// <summary>
         /// Fragment LCIA results, all methods, for a given scenario
+        /// 
+        /// This variant performs "flat" (i.e. non-recursive) contribution analysis.
         /// </summary>
         /// <param name="fragmentID"></param>
         /// <param name="scenarioID"></param>
@@ -431,6 +486,18 @@ namespace LCAToolAPI.API
             else
                 return Request.CreateResponse(HttpStatusCode.Unauthorized);
         }
+
+        /// <summary>
+        /// Fragment LCIA results, all methods, for a given scenario
+        /// 
+        /// This method (the default) performs contribution analysis via "recursive ascent."  For
+        /// sub-fragments marked with the "descend" flag true [!! this flag is not visible to end users!],
+        /// the sub-fragments' stages will be reported separately.  If "descend" flag is false, the 
+        /// sub-fragment stages will be aggregated together.
+        /// </summary>
+        /// <param name="fragmentID"></param>
+        /// <param name="scenarioID"></param>
+        /// <returns></returns>
         [CalRecycleAuthorize]
         [Route("api/scenarios/{scenarioID:int}/fragments/{fragmentID:int}/lciaresults")]
         [Route("api/scenarios/{scenarioID:int}/fragments/{fragmentID:int}/r/lciaresults")]
@@ -511,7 +578,7 @@ namespace LCAToolAPI.API
                     return Request.CreateResponse(HttpStatusCode.BadRequest);
                 else
                 {
-                    urlParam.ScenarioID = Scenario.MODEL_BASE_CASE_ID;
+                    urlParam.ScenarioID = scenarioId;
                     return Request.CreateResponse(HttpStatusCode.OK,
                         _ResourceService.GetFragmentSensitivity(fragmentId, urlParam));
                 }
