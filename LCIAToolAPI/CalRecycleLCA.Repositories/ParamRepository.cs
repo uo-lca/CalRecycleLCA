@@ -41,6 +41,10 @@ namespace CalRecycleLCA.Repositories
                             FragmentFlowID = k.FragmentFlowID,
                             Value = k.Value
                         }).ToList();
+                        foreach (var PRi in PR)
+                            PRi.DefaultValue = repository.GetRepository<FragmentFlow>()
+                                .GetDefaultValue((int)PRi.FragmentFlowID, p.ScenarioID);
+
                         break;
                     }
                 case 4:
@@ -55,7 +59,8 @@ namespace CalRecycleLCA.Repositories
                             Name = p.Name,
                             FlowID = k.FlowFlowProperty.FlowID,
                             FlowPropertyID = k.FlowFlowProperty.FlowPropertyID,
-                            Value = k.Value
+                            Value = k.Value,
+                            DefaultValue = k.FlowFlowProperty.MeanValue
                         }).ToList();
                         break;
                     }
@@ -70,7 +75,8 @@ namespace CalRecycleLCA.Repositories
                             ScenarioID = p.ScenarioID,
                             Name = p.Name,
                             CompositionDataID = k.CompositionDataID,
-                            Value = k.Value
+                            Value = k.Value,
+                            DefaultValue = k.CompositionData.Value
                         }).ToList();
                         break;
                     }
@@ -86,7 +92,8 @@ namespace CalRecycleLCA.Repositories
                             Name = p.Name,
                             FlowID = k.ProcessDissipation.FlowPropertyEmission.FlowID,
                             ProcessID = k.ProcessDissipation.ProcessID,
-                            Value = k.Value
+                            Value = k.Value,
+                            DefaultValue = k.ProcessDissipation.EmissionFactor
                         }).ToList();
                         break;
                     }
@@ -102,7 +109,8 @@ namespace CalRecycleLCA.Repositories
                             Name = p.Name,
                             FlowID = k.ProcessFlow.FlowID,
                             ProcessID = k.ProcessFlow.ProcessID,
-                            Value = k.Value
+                            Value = k.Value,
+                            DefaultValue = k.ProcessFlow.Result
                         }).ToList();
                         break;
                     }
@@ -118,7 +126,8 @@ namespace CalRecycleLCA.Repositories
                             Name = p.Name,
                             FlowID = k.LCIA.FlowID,
                             LCIAMethodID = k.LCIA.LCIAMethodID,
-                            Value = k.Value
+                            Value = k.Value,
+                            DefaultValue = k.LCIA.Factor
                         }).ToList();
                         break;
                     }
@@ -215,17 +224,134 @@ namespace CalRecycleLCA.Repositories
                 return repository.UpdateParam((int)pid, post, ref cacheTracker);
         }
 
+
+        private static bool Validate(this IRepository<Param> repository, ParamResource post)
+        {
+            switch (post.ParamTypeID)
+            {
+                case 1:
+                case 2:
+                    // need to confirm that the FragmentFlow being parameterized has a Process-type parent
+                    return (repository.GetRepository<FragmentFlow>().Queryable()
+                            .Where(k => k.FragmentFlowID == post.FragmentFlowID)
+                            .Where(k => k.ParentFragmentFlow != null)
+                            .Select(k => k.ParentFragmentFlow.NodeTypeID).FirstOrDefault() == 1);
+                case 4:
+                    // not implemented
+                    return (repository.GetRepository<FlowFlowProperty>().Queryable()
+                        .Where(k => k.FlowID == post.FlowID)
+                        .Where(k => k.FlowPropertyID == post.FlowPropertyID)
+                        .Where(k => k.Flow.ReferenceFlowProperty != post.FlowPropertyID)
+                        .Count() == 1);
+                case 5:
+                    return (repository.GetRepository<CompositionData>().Queryable()
+                        .Where(k => k.CompositionDataID == post.CompositionDataID).Count() == 1);
+                case 6:
+                    return (repository.GetRepository<ProcessDissipation>().Queryable()
+                        .Where(k => k.ProcessID == post.ProcessID)
+                        .Where(k => k.FlowPropertyEmission.FlowID == post.FlowID)
+                        .Count() == 1);
+                case 8:
+                    return (repository.GetRepository<ProcessFlow>().Queryable()
+                        .Where(k => k.ProcessID == post.ProcessID)
+                        .Where(k => k.FlowID == post.FlowID)
+                        .Count() > 0);
+                case 10:
+                    return (repository.GetRepository<LCIA>().Queryable()
+                        .Where(k => k.FlowID == post.FlowID)
+                        .Where(k => k.LCIAMethodID == post.LCIAMethodID)
+                        .Count() > 0);
+
+                default:
+                    return false;
+            }
+        }
+
         public static List<Param> PostNewParams(this IRepository<Param> repository,
             int scenarioId, ref CacheTracker cacheTracker)
         {
             List<Param> Ps = new List<Param>();
             foreach (var post in cacheTracker.ParamsToPost)
-                Ps.Add(repository.NewParam(scenarioId, post, ref cacheTracker));
+            {
+                if (repository.Validate(post))
+                    Ps.Add(repository.NewParam(scenarioId, post, ref cacheTracker));
+            }
             repository.InsertGraphRange(Ps);
             cacheTracker.ParamsToPost.Clear();
             return Ps;
         }
 
+
+        private static string GetCanonicalName(this IRepository<Param> repository,
+            ParamResource post)
+        {
+            string c;
+            switch (post.ParamTypeID)
+            {
+                case 1:
+                case 2:
+                    {
+                        var n = repository.GetRepository<FragmentFlow>()
+                            .Query(k => k.FragmentFlowID == post.FragmentFlowID)
+                            .Include(k => k.ParentFragmentFlow)
+                            .Select().First();
+                        c = n.ParentFragmentFlow.ShortName + " -> " + n.ShortName;
+                        break;
+                    }
+                case 4:
+                    {
+                        var n = repository.GetRepository<FlowFlowProperty>()
+                            .Query(k => k.FlowID == post.FlowID && k.FlowPropertyID == post.FlowPropertyID)
+                            .Include(k => k.Flow)
+                            .Include(k => k.FlowProperty)
+                            .Select().First();
+                        c = n.Flow.Name + " | " + n.FlowProperty.Name;
+                        break;
+                    }
+                case 5:
+                    {
+                        var n = repository.GetRepository<CompositionData>()
+                            .Query(k => k.CompositionDataID == post.CompositionDataID)
+                            .Include(k => k.CompositionModel.Flow)
+                            .Include(k => k.FlowProperty)
+                            .Select().First();
+                        c = n.CompositionModel.Flow.Name + " | " + n.FlowProperty.Name;
+                        break;
+                    }
+                case 6:
+                    {
+                        var n = repository.GetRepository<ProcessDissipation>()
+                            .Query(k => k.ProcessID == post.ProcessID && k.FlowPropertyEmission.FlowID == post.FlowID)
+                            .Include(k => k.FlowPropertyEmission.FlowProperty)
+                            .Include(k => k.Process)
+                            .Select().First();
+                        c = n.Process.Name + " | Dissipation of " + n.FlowPropertyEmission.FlowProperty.Name;
+                        break;
+                    }
+                case 8:
+                    {
+                        var n = repository.GetRepository<ProcessFlow>().Queryable()
+                            .Where(k => k.ProcessID == post.ProcessID)
+                            .Where(k => k.FlowID == post.FlowID)
+                            .Select(k => k.Process.Name).First();
+                        c = n + " | " + repository.GetRepository<Flow>().GetCanonicalName((int)post.FlowID);
+                        break;
+                    }
+                case 10:
+                    {
+                        var n = repository.GetRepository<LCIA>().Queryable()
+                            .Where(k => k.FlowID == post.FlowID)
+                            .Where(k => k.LCIAMethodID == post.LCIAMethodID)
+                            .Select(k => k.LCIAMethod.Name).First();
+                        c = n + " | " + repository.GetRepository<Flow>().GetCanonicalName((int)post.FlowID);
+                        break;
+                    }
+                default:
+                    c = "";
+                    break;
+            }
+            return c;
+        }
 
         private static Param NewParam(this IRepository<Param> repository,
             int scenarioId, ParamResource post, ref CacheTracker cacheTracker)
@@ -235,7 +361,9 @@ namespace CalRecycleLCA.Repositories
             {
                 ScenarioID = scenarioId,
                 ParamTypeID = post.ParamTypeID,
-                Name = post.Name,
+                Name = String.IsNullOrEmpty(post.Name) 
+                        ? repository.GetCanonicalName(post)
+                        : post.Name,
             };
             switch (post.ParamTypeID)
             {
@@ -245,7 +373,10 @@ namespace CalRecycleLCA.Repositories
                         DependencyParam DP = new DependencyParam()
                         {
                             FragmentFlowID = (int)post.FragmentFlowID,
-                            Value = post.Value,
+                            Value = (double)(post.Value == null 
+                                ? repository.GetRepository<FragmentFlow>()
+                                    .GetDefaultValue((int)post.FragmentFlowID, post.ScenarioID)
+                                : post.Value),
                             ObjectState = ObjectState.Added
                         };
                         if (post.ParamTypeID == 2)
@@ -267,15 +398,14 @@ namespace CalRecycleLCA.Repositories
                     }
                 case 4:
                     {
-                        int ffp = repository.GetRepository<FlowFlowProperty>().Queryable()
+                        var ffp = repository.GetRepository<FlowFlowProperty>().Queryable()
                             .Where(k => k.FlowID == post.FlowID)
                             .Where(k => k.FlowPropertyID == post.FlowPropertyID)
-                            .Select(k => k.FlowFlowPropertyID)
                             .First();
                         FlowPropertyParam fp = new FlowPropertyParam()
                         {
-                            FlowFlowPropertyID = ffp,
-                            Value = post.Value,
+                            FlowFlowPropertyID = ffp.FlowFlowPropertyID,
+                            Value = post.Value == null ? ffp.MeanValue : (double)post.Value,
                             ObjectState = ObjectState.Added
                         };
                         P.FlowPropertyParams.Add(fp);
@@ -284,10 +414,14 @@ namespace CalRecycleLCA.Repositories
                     }
                 case 5:
                     {
+                        var cp = repository.GetRepository<CompositionData>().Queryable()
+                            .Where(k => k.CompositionDataID == post.CompositionDataID)
+                            .First();
+
                         P.CompositionParams.Add(new CompositionParam()
                         {
-                            CompositionDataID = (int)post.CompositionDataID,
-                            Value = post.Value,
+                            CompositionDataID = cp.CompositionDataID,
+                            Value = post.Value == null ? cp.Value : (double)post.Value,
                             ObjectState = ObjectState.Added
                         });
                         cacheTracker.ScoreCacheStale = true;
@@ -295,15 +429,14 @@ namespace CalRecycleLCA.Repositories
                     }
                 case 6:
                     {
-                        int pdp = repository.GetRepository<ProcessDissipation>().Queryable()
+                        var pdp = repository.GetRepository<ProcessDissipation>().Queryable()
                             .Where(k => k.FlowPropertyEmission.FlowID == post.FlowID)
                             .Where(k => k.ProcessID == post.ProcessID)
-                            .Select(k => k.ProcessDissipationID)
                             .First();
                         ProcessDissipationParam pd = new ProcessDissipationParam()
                         {
-                            ProcessDissipationID = pdp,
-                            Value = post.Value,
+                            ProcessDissipationID = pdp.ProcessDissipationID,
+                            Value = post.Value == null ? pdp.EmissionFactor : (double)post.Value,
                             ObjectState = ObjectState.Added
                         };
                         P.ProcessDissipationParams.Add(pd);
@@ -312,15 +445,14 @@ namespace CalRecycleLCA.Repositories
                     }
                 case 8:
                     {
-                        int pfp = repository.GetRepository<ProcessFlow>().Queryable()
+                        var pfp = repository.GetRepository<ProcessFlow>().Queryable()
                             .Where(k => k.FlowID == post.FlowID)
                             .Where(k => k.ProcessID == post.ProcessID)
-                            .Select(k => k.ProcessFlowID)
                             .First();
                         ProcessEmissionParam pe = new ProcessEmissionParam()
                         {
-                            ProcessFlowID = pfp,
-                            Value = post.Value,
+                            ProcessFlowID = pfp.ProcessFlowID,
+                            Value = post.Value == null ? pfp.Result : (double)post.Value,
                             ObjectState = ObjectState.Added
                         };
                         P.ProcessEmissionParams.Add(pe);
@@ -329,15 +461,15 @@ namespace CalRecycleLCA.Repositories
                     }
                 case 10:
                     {
-                        int cfp = repository.GetRepository<LCIA>().Queryable()
+                        var cfp = repository.GetRepository<LCIA>().Queryable()
                             .Where(k => k.FlowID == post.FlowID)
                             .Where(k => k.LCIAMethodID == post.LCIAMethodID)
-                            .Select(k => k.LCIAID)
+                            .Where(k => String.IsNullOrEmpty(k.Geography) )
                             .First();
                         CharacterizationParam cp = new CharacterizationParam()
                             {
-                                LCIAID = cfp,
-                                Value = post.Value,
+                                LCIAID = cfp.LCIAID,
+                                Value = post.Value == null ? cfp.Factor : (double)post.Value,
                                 ObjectState = ObjectState.Added
                             };
                         P.CharacterizationParams.Add(cp);
@@ -378,7 +510,7 @@ namespace CalRecycleLCA.Repositories
                 cacheTracker.ParamUnchanged.Add(P.ParamID);
             }
             else
-            { 
+            {
                 switch (P.ParamTypeID)
                 {
                     case 1:
@@ -400,7 +532,7 @@ namespace CalRecycleLCA.Repositories
                                     .FirstOrDefault();
                                 if (cp != null)
                                 {
-                                    double delta = put.Value - oldval;
+                                    double delta = (double)put.Value - oldval;
                                     if (ff.DirectionID != cp.DirectionID)
                                         delta = -1 * delta;
 
@@ -408,7 +540,7 @@ namespace CalRecycleLCA.Repositories
                                     Ps.Add(cdp.Param);
                                 }
 
-                                P.DependencyParam.Value = put.Value;
+                                P.DependencyParam.Value = (double)put.Value;
                                 P.DependencyParam.ObjectState = ObjectState.Modified;
                                 cacheTracker.NodeCacheStale = true;
                                 cacheTracker.ParamModified.Add(P.ParamID);
@@ -421,7 +553,7 @@ namespace CalRecycleLCA.Repositories
                                 cacheTracker.ParamUnchanged.Add(P.ParamID);
                             else
                             {
-                                P.DependencyParam.Value = put.Value;
+                                P.DependencyParam.Value = (double)put.Value;
                                 P.DependencyParam.ObjectState = ObjectState.Modified;
                                 cacheTracker.NodeCacheStale = true;
                                 cacheTracker.ParamModified.Add(P.ParamID);
@@ -434,7 +566,7 @@ namespace CalRecycleLCA.Repositories
                                 cacheTracker.ParamUnchanged.Add(P.ParamID);
                             else
                             {
-                                P.FlowPropertyParam.Value = put.Value;
+                                P.FlowPropertyParam.Value = (double)put.Value;
                                 P.FlowPropertyParam.ObjectState = ObjectState.Modified;
                                 cacheTracker.NodeCacheStale = true;
                                 cacheTracker.ParamModified.Add(P.ParamID);
@@ -447,7 +579,7 @@ namespace CalRecycleLCA.Repositories
                                 cacheTracker.ParamUnchanged.Add(P.ParamID);
                             else
                             {
-                                P.CompositionParam.Value = put.Value;
+                                P.CompositionParam.Value = (double)put.Value;
                                 P.CompositionParam.ObjectState = ObjectState.Modified;
                                 cacheTracker.ScoreCacheStale = true;
                                 cacheTracker.ParamModified.Add(P.ParamID);
@@ -460,7 +592,7 @@ namespace CalRecycleLCA.Repositories
                                 cacheTracker.ParamUnchanged.Add(P.ParamID);
                             else
                             {
-                                P.ProcessDissipationParam.Value = put.Value;
+                                P.ProcessDissipationParam.Value = (double)put.Value;
                                 P.ProcessDissipationParam.ObjectState = ObjectState.Modified;
                                 cacheTracker.ParamModified.Add(P.ParamID);
                                 int processId = repository.GetRepository<ProcessDissipation>().Queryable()
@@ -477,7 +609,7 @@ namespace CalRecycleLCA.Repositories
                                 cacheTracker.ParamUnchanged.Add(P.ParamID);
                             else
                             {
-                                P.ProcessEmissionParam.Value = put.Value;
+                                P.ProcessEmissionParam.Value = (double)put.Value;
                                 P.ProcessEmissionParam.ObjectState = ObjectState.Modified;
                                 cacheTracker.ParamModified.Add(P.ParamID);
                                 int processId = repository.GetRepository<ProcessFlow>().Queryable()
@@ -498,7 +630,7 @@ namespace CalRecycleLCA.Repositories
                                                     .Where(k => k.LCIAID == P.CharacterizationParam.LCIAID)
                                                     .Select(k => k.LCIAMethodID)
                                                     .First();
-                                P.CharacterizationParam.Value = put.Value;
+                                P.CharacterizationParam.Value = (double)put.Value;
                                 P.CharacterizationParam.ObjectState = ObjectState.Modified;
                                 cacheTracker.LCIAMethodsStale.Add(lmid);
                                 cacheTracker.ParamModified.Add(P.ParamID);

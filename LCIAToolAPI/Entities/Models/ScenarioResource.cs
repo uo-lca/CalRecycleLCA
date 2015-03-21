@@ -68,7 +68,8 @@ namespace Entities.Models {
         // For ParamTypeID == 10
         public int? LCIAMethodID { get; set; }
         // common to all
-        public double Value { get; set; }
+        public double? Value { get; set; }
+        public double? DefaultValue { get; set; }
     }
 
 

@@ -15,7 +15,7 @@ namespace CalRecycleLCA.Services
     {
         IEnumerable<FlowResource> GetFlowsByFragment(int fragmentId);
         IEnumerable<FlowResource> GetFlowsByLCIAMethod(int lciaMethodId);
-        IEnumerable<FlowResource> GetFlow(int flowId);
+        FlowResource GetFlow(int flowId);
         IEnumerable<FlowResource> GetFlows(int flowtypeID);
     }
 
@@ -37,9 +37,9 @@ namespace CalRecycleLCA.Services
                 return _repository.GetFlows(flowtypeID).ToList();
         }
 
-        public IEnumerable<FlowResource> GetFlow(int flowId)
+        public FlowResource GetFlow(int flowId)
         {
-            return _repository.GetFlow(flowId).ToList();
+            return _repository.GetFlow(flowId);
         }
 
 

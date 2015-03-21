@@ -42,7 +42,7 @@ namespace CalRecycleLCA.Services
             return counts;
         }
 
-        public void Reset()
+        new public void Reset()
         {
             base.Reset();
             counts.Clear();
