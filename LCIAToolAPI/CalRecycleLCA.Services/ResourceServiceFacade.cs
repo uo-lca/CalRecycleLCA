@@ -300,7 +300,7 @@ namespace CalRecycleLCA.Services
         /// <returns></returns>
         public IEnumerable<FlowResource> GetFlow(int flowId)
         {
-            return _FlowService.GetFlow(flowId);
+            return new List<FlowResource>() {_FlowService.GetFlow(flowId) };
         }
 
         public IEnumerable<FlowResource> GetFlowsByLCIAMethod(int lciaMethodId)

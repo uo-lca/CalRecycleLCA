@@ -256,7 +256,7 @@ namespace CalRecycleLCA.Repositories
 	    }
 
         ///** ************************
-        public static FlowTerminationModel Terminate(this IRepositoryAsync<FragmentFlow> repository, 
+        public static FlowTerminationModel Terminate(this IRepository<FragmentFlow> repository, 
 						     FragmentFlow ff, int scenarioId, bool doBackground)
 	    {
 	        var fragmentNode = new FlowTerminationModel();
@@ -407,6 +407,35 @@ namespace CalRecycleLCA.Repositories
                     }).ToList();
 
             return Outflows;
+        }
+
+        /// <summary>
+        /// Determines the default dependency value for a fragmentflow. not fast.
+        /// </summary>
+        /// <param name="repository"></param>
+        /// <param name="fragmentFlowId"></param>
+        /// <param name="scenarioId"></param>
+        /// <returns></returns>
+        public static double? GetDefaultValue(this IRepository<FragmentFlow> repository,
+            int fragmentFlowId, int scenarioId = Scenario.MODEL_BASE_CASE_ID)
+        {
+            FragmentFlow fragmentFlow = repository.Queryable()
+                .Where(k => k.FragmentFlowID == fragmentFlowId)
+                .Where(k => k.ParentFragmentFlow.NodeTypeID == 1)
+                .FirstOrDefault();
+            if (fragmentFlow == null)
+                return null;
+
+            var ncm = new NodeCacheModel()
+            {
+                NodeTypeID = 1,
+                FragmentFlowID = (int)fragmentFlow.ParentFragmentFlowID
+            };
+
+            var parentNode = repository.Terminate(ncm, scenarioId, false);
+
+            return repository.GetRepository<ProcessFlow>().FlowExchange((int)parentNode.ProcessID, (int)fragmentFlow.FlowID,
+                comp(fragmentFlow.DirectionID)); // double comp!
         }
     }
 }

@@ -229,7 +229,7 @@ namespace CalRecycleLCA.Services
             
             return flows.Select(k => new ProcessFlowResource()
                 {
-                    Flow = _flowService.GetFlow(k.FlowID).First(),
+                    Flow = _flowService.GetFlow(k.FlowID),
                     Direction = Enum.GetName(typeof(DirectionEnum), (DirectionEnum)k.DirectionID),
                     // VarName = omitted,
                     Content = k.Composition,

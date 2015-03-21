@@ -64,12 +64,18 @@ namespace CalRecycleLCA.Repositories
                 .Select(f => repository.ToResource(f));
         }
 
-        public static IEnumerable<FlowResource> GetFlow(this IRepositoryAsync<Flow> repository, int flowId)
+        public static string GetCanonicalName(this IRepository<Flow> repository, int flowId)
+        {
+            var f = repository.GetFlow(flowId);
+            return f.Name + " [" + f.Category + "]";
+        }
+
+        public static FlowResource GetFlow(this IRepository<Flow> repository, int flowId)
         {
             return repository.Query(f => f.FlowID == flowId)
                 .Include(f => f.ILCDEntity)
                 .Select()
-                .Select(f => repository.ToResource(f));
+                .Select(f => repository.ToResource(f)).First();
         }
 
         public static IEnumerable<FlowResource> GetFlowsByFragment(this IRepositoryAsync<Flow> repository, int fragmentId)
