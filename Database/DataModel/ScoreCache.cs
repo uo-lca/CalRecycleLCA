@@ -10,12 +10,15 @@ namespace LcaDataModel
     [Table("ScoreCache")]
     public partial class ScoreCache : Entity
     {
-        public int ScoreCacheID { get; set; }
+        //public int ScoreCacheID { get; set; }
 
+        [Key, Column(Order = 1)]
         public int FragmentFlowID { get; set; }
 
+        [Key, Column(Order = 2)]
         public int ScenarioID { get; set; }
 
+        [Key, Column(Order = 3)]
         public int LCIAMethodID { get; set; }
 
         public double ImpactScore { get; set; }

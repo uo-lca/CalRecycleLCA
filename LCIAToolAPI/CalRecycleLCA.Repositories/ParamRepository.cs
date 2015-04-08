@@ -379,6 +379,7 @@ namespace CalRecycleLCA.Repositories
                                 : post.Value),
                             ObjectState = ObjectState.Added
                         };
+                        /* no more conservation param
                         if (post.ParamTypeID == 2)
                         {
                             FragmentFlow c = repository.GetRepository<FragmentFlow>()
@@ -392,6 +393,7 @@ namespace CalRecycleLCA.Repositories
                                 ObjectState = ObjectState.Added
                             };
                         }
+                         * */
                         P.DependencyParams.Add(DP);
                         cacheTracker.NodeCacheStale = true;
                         break;
@@ -481,6 +483,7 @@ namespace CalRecycleLCA.Repositories
             return P;
         }
 
+        /*
         private static DependencyParam Conserve(this IRepository<Param> repository, int dpid, double delta)
         {
             DependencyParam dp = repository.GetRepository<DependencyParam>().Query(k => k.DependencyParamID == dpid)
@@ -490,6 +493,8 @@ namespace CalRecycleLCA.Repositories
             repository.GetRepository<DependencyParam>().Update(dp);
             return dp;
         }
+         * 
+         * */
 
         public static IEnumerable<Param> UpdateParam(this IRepository<Param> repository,
             int paramId, ParamResource put, ref CacheTracker cacheTracker)
@@ -525,6 +530,7 @@ namespace CalRecycleLCA.Repositories
                                 FragmentFlow ff = repository.GetRepository<FragmentFlow>().Query(k => k.FragmentFlowID == put.FragmentFlowID)
                                     .Include(k => k.Flow)
                                     .Select().First();
+                                /*
                                 ConservationParam cp = repository.GetRepository<ConservationParam>().Queryable()
                                     .Where(k => k.DependencyParam.Param.ScenarioID == P.ScenarioID)
                                     .Where(k => k.FragmentFlowID == ff.ParentFragmentFlowID)
@@ -539,6 +545,7 @@ namespace CalRecycleLCA.Repositories
                                     var cdp = repository.Conserve(cp.DependencyParamID, delta);
                                     Ps.Add(cdp.Param);
                                 }
+                                 * */
 
                                 P.DependencyParam.Value = (double)put.Value;
                                 P.DependencyParam.ObjectState = ObjectState.Modified;

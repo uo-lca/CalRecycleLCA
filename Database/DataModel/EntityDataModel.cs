@@ -30,7 +30,7 @@ namespace LcaDataModel {
         public virtual DbSet<DataType> DataTypes { get; set; }
         public virtual DbSet<DependencyParam> DependencyParams { get; set; }
         public virtual DbSet<Direction> Directions { get; set; }
-        public virtual DbSet<ConservationParam> ConservationParams { get; set; }
+        //public virtual DbSet<ConservationParam> ConservationParams { get; set; }
         public virtual DbSet<Flow> Flows { get; set; }
         public virtual DbSet<FlowFlowProperty> FlowFlowProperties { get; set; }
         public virtual DbSet<FlowProperty> FlowProperties { get; set; }
@@ -134,10 +134,10 @@ namespace LcaDataModel {
                 .HasForeignKey(e => e.ScenarioID)
                 .WillCascadeOnDelete(true);
 
-            modelBuilder.Entity<ConservationParam>()
-                .HasRequired(e => e.DependencyParam)
-                .WithOptional(e => e.ConservationParam)
-                .WillCascadeOnDelete(true);
+            //modelBuilder.Entity<ConservationParam>()
+            //    .HasRequired(e => e.DependencyParam)
+            //    .WithOptional(e => e.ConservationParam)
+            //    .WillCascadeOnDelete(true);
 
             modelBuilder.Entity<DataSource>()
                 .Property(e => e.Name)

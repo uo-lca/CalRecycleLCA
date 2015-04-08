@@ -17,7 +17,7 @@ namespace LcaDataModel
             FlowFlowProperties = new HashSet<FlowFlowProperty>();
             FlowPropertyEmissions = new HashSet<FlowPropertyEmission>();
             LCIAMethods = new HashSet<LCIAMethod>();
-            ConservationParams = new HashSet<ConservationParam>();
+            //ConservationParams = new HashSet<ConservationParam>();
         }
 
         public int FlowPropertyID { get; set; }
@@ -43,7 +43,7 @@ namespace LcaDataModel
 
         public virtual ICollection<LCIAMethod> LCIAMethods { get; set; }
     
-        public virtual ICollection<ConservationParam> ConservationParams { get; set; }
+        //public virtual ICollection<ConservationParam> ConservationParams { get; set; }
 
     }
 }

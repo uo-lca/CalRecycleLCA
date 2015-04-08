@@ -274,6 +274,8 @@ namespace LcaDataLoader {
                     ent.ProcessID = refID;
                 if (dbContext.FindRefIlcdEntityID<LcaDataModel.Flow>(row["FlowUUID"], out refID))
                     ent.FlowID = refID;
+                if (!String.IsNullOrEmpty(row["ConservationFFID"]))
+                    ent.ConservationFragmentFlowID = Convert.ToInt32(row["ConservationFFID"]);
                 isImported = isNew ? AddEntityWithVerification<FragmentNodeProcess>(dbContext, ent) : (dbContext.SaveChanges() > 0);
             }
             return isImported;
@@ -502,6 +504,7 @@ namespace LcaDataLoader {
             return isImported;
         }
 
+        /* ** get rid of conservation param table
         private static bool ImportConservationParam(Row row, DbContextWrapper dbContext) {
             bool isImported = false, isNew = true;
             int id = Convert.ToInt32(row["DependencyParamID"]), fpID;
@@ -521,6 +524,7 @@ namespace LcaDataLoader {
             }
             return isImported;
         }
+         * */
 
         private static bool ImportCompositionParam(Row row, DbContextWrapper dbContext)
         {
@@ -787,7 +791,7 @@ namespace LcaDataLoader {
                 if (ImportCSVIfExists(Path.Combine(dirName, "Param.csv"), ImportParam, dbContext) == null)
                     return;
                 ImportCSVIfExists(Path.Combine(dirName, "DependencyParam.csv"), ImportDependencyParam, dbContext);
-                ImportCSVIfExists(Path.Combine(dirName, "ConservationParam.csv"), ImportConservationParam, dbContext);
+                //ImportCSVIfExists(Path.Combine(dirName, "ConservationParam.csv"), ImportConservationParam, dbContext);
                 //ImportCSV(Path.Combine(dirName, "FlowPropertyParam.csv"), ImportFlowPropertyParam, dbContext);
                 ImportCSVIfExists(Path.Combine(dirName, "CompositionParam.csv"), ImportCompositionParam, dbContext);
                 ImportCSVIfExists(Path.Combine(dirName, "ProcessDissipationParam.csv"), ImportProcessDissipationParam, dbContext);

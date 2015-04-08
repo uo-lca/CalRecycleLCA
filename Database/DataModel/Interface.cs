@@ -81,14 +81,14 @@ namespace LcaDataModel {
     }
 
     // Weak entity - related to DependencyParam
-    public partial class ConservationParam : Entity, IEntity
-    {
-        [NotMapped]
-        public int ID {
-            get { return DependencyParamID; }
-            set { DependencyParamID = value; }
-        }
-    }
+    //public partial class ConservationParam : Entity, IEntity
+    //{
+    //    [NotMapped]
+    //    public int ID {
+    //        get { return DependencyParamID; }
+    //        set { DependencyParamID = value; }
+    //    }
+    //}
 
     public partial class ProcessDissipationParam : Entity, IEntity
     {

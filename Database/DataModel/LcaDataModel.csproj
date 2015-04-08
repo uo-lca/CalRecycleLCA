@@ -68,7 +68,6 @@
     <Compile Include="DbContextExtension.cs" />
     <Compile Include="DependencyParam.cs" />
     <Compile Include="Direction.cs" />
-    <Compile Include="ConservationParam.cs" />
     <Compile Include="EntityDataModel.cs" />
     <Compile Include="Enum.cs" />
     <Compile Include="Flow.cs" />

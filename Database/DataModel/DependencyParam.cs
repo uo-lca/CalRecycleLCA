@@ -23,6 +23,6 @@ namespace LcaDataModel
 
         public virtual Param Param { get; set; }
 
-        public virtual ConservationParam ConservationParam { get; set; }
+        //public virtual ConservationParam ConservationParam { get; set; }
     }
 }

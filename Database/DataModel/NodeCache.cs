@@ -11,10 +11,12 @@ namespace LcaDataModel
     public partial class NodeCache : Entity
     {
 
-        public int NodeCacheID { get; set; }
+        //public int NodeCacheID { get; set; }
 
-        public int FragmentFlowID { get; set; } 
+        [Key, Column(Order=1)]
+        public int FragmentFlowID { get; set; }
 
+        [Key, Column(Order = 2)]
         public int ScenarioID { get; set; } 
 
         public double NodeWeight { get; set; }

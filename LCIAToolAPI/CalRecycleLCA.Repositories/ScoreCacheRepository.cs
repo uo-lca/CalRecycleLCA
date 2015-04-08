@@ -16,7 +16,7 @@ namespace CalRecycleLCA.Repositories
 
             scoreCaches.ForEach(x =>
             {
-                repository.Delete(x.ScoreCacheID);
+                repository.Delete(x);
             });
         }
 
@@ -36,7 +36,7 @@ namespace CalRecycleLCA.Repositories
 
             scoreCaches.ForEach(x =>
                 {
-                    repository.Delete(x.ScoreCacheID);
+                    repository.Delete(x);
                 });
         }
 
@@ -73,7 +73,7 @@ namespace CalRecycleLCA.Repositories
 
             scoreCaches.ForEach(x =>
                 {
-                    repository.Delete(x.ScoreCacheID);
+                    repository.Delete(x);
                 });
         }
 
@@ -87,7 +87,7 @@ namespace CalRecycleLCA.Repositories
             //delete each of the returned ScoreCacheIDs from the ScoreCache table
             scoreCaches.ForEach(x =>
             {
-                repository.Delete(x.ScoreCacheID);
+                repository.Delete(x);
             });
         }
 

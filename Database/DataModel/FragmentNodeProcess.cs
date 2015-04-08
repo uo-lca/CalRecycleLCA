@@ -23,6 +23,8 @@ namespace LcaDataModel
 
         public int FlowID { get; set; }
 
+        public int? ConservationFragmentFlowID { get; set; } // not a foreign key, just an annotation
+
         public virtual Flow Flow { get; set; }
 
         public virtual FragmentFlow FragmentFlow { get; set; }

@@ -16,7 +16,7 @@ namespace CalRecycleLCA.Repositories
 
             nodeCaches.ForEach(x =>
                 {
-                    repository.Delete(x.NodeCacheID);
+                    repository.Delete(x);
                 });
         }
 
@@ -37,7 +37,7 @@ namespace CalRecycleLCA.Repositories
             //delete each of the returned NodeCacheIDs from the NodeCache table
             query.ForEach(x =>
             {
-                repository.Delete(x.NodeCache.NodeCacheID);
+                repository.Delete(x.NodeCache);
             });
         }
 
