@@ -9,6 +9,8 @@ namespace LcaDataModel
     [Table("User")]
     public partial class User : Entity
     {
+        public const int AUTHENTICATED_USER = 2;
+
         public User()
         {
             ScenarioGroups = new HashSet<ScenarioGroup>();

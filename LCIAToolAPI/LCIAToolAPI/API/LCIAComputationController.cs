@@ -9,13 +9,16 @@ using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Web.Http;
+using System.Web.Http.Cors;
 using CalRecycleLCA.Services;
 
 namespace LCAToolAPI.API
 {
     /// <summary>
-    /// Internal API routes for testing LCIA computation and ScoreCache control
+    /// Internal API routes for testing LCIA computation and ScoreCache control.  Creation [and deletion...] of
+    /// Scenario Groups also happens here.
     /// </summary>
+    [EnableCors(origins: "localhost", headers: "*", methods: "*")]
     public class LCIAComputationController : ApiController
     {
         [Inject]
@@ -60,6 +63,7 @@ namespace LCAToolAPI.API
             }
 
             _CacheManager = cacheManager;
+
             /*
             if (testGenericService == null)
             {
@@ -80,6 +84,29 @@ namespace LCAToolAPI.API
         public void InitializeCache()
         {
             _CacheManager.InitializeCache();
+        }
+
+        /// <summary>
+        /// Creates a new scenario group with a known "secret." Requests must use this secret as auth token when requesting scenarios belonging to this group.
+        /// 
+        /// Note that this should obviously use some more secure form of secret sharing.
+        /// Note too that updating scenario groups (secret, visibility) is TODO.
+        /// </summary>
+        /// <param name="?"></param>
+        /// <returns>ScenarioGroup Resource</returns>
+        [Route("api/scenariogroups/add")]
+        [AcceptVerbs("POST")]
+        [HttpPost]
+        public HttpResponseMessage CreateScenarioGroup([FromBody] ScenarioGroupResource postdata)
+        {
+            if (postdata == null)
+                return Request.CreateResponse(HttpStatusCode.BadRequest, "No content provided.");
+            if (String.IsNullOrEmpty(postdata.Secret))
+                return Request.CreateResponse(HttpStatusCode.BadRequest, "No Secret provided.");
+            if (String.IsNullOrEmpty(postdata.Name))
+                postdata.Name = "New Scenario Group";
+            return Request.CreateResponse(HttpStatusCode.OK,
+                _CacheManager.CreateScenarioGroup(postdata));
         }
 
         //GET api/<controller>

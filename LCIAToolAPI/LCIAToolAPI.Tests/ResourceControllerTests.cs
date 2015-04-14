@@ -252,7 +252,8 @@ namespace LCIAToolAPI.Tests
                 _fragmentService, 
                 _fragmentLCIAComputation, 
                 _nodeCacheService, 
-                _scoreCacheService);
+                _scoreCacheService,
+                _scenarioGroupService);
 
             _resourceController = new ResourceController(_resourceServiceFacade, _scenarioService, _scenarioGroupService, _docuService, _paramService);
 

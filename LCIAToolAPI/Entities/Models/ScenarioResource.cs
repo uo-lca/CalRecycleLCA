@@ -11,6 +11,8 @@ namespace Entities.Models {
     {
         public int ScenarioGroupID { get; set; }
         public string Name { get; set; }
+        public string Secret { get; set; } // for post only
+        public string Visibility { get; set; }
     }
 
 

@@ -1,5 +1,6 @@
 ﻿using LcaDataModel;
 using Repository.Pattern.Repositories;
+using Repository.Pattern.Infrastructure;
 using Service.Pattern;
 using System;
 using System.Collections.Generic;
@@ -17,7 +18,9 @@ namespace CalRecycleLCA.Services
         bool CanAlter(HttpRequestContext request, int scenarioId = 0);
         bool CanAlter(HttpRequestContext request, out int authorizedGroup, int scenarioId = 0);
         int? CheckAuthorizedGroup(HttpRequestContext request);
+        ScenarioGroupResource GetResource(int scenarioGroupId);
         IEnumerable<ScenarioGroupResource> AuthorizedGroups(HttpRequestContext request);
+        ScenarioGroup AddAuthenticatedScenarioGroup(ScenarioGroupResource postdata);
     }
 
     public class ScenarioGroupService : Service<ScenarioGroup>, IScenarioGroupService
@@ -84,14 +87,43 @@ namespace CalRecycleLCA.Services
             return _repository.Queryable().Where(k => k.Secret == authString).Select(k => k.ScenarioGroupID).FirstOrDefault();
         }
 
+        public ScenarioGroupResource GetResource(int scenarioGroupId)
+        {
+            return _repository.Queryable().Where(k => k.ScenarioGroupID == scenarioGroupId).ToList()
+                .Select(k => new ScenarioGroupResource
+                {
+                    Name = k.Name,
+                    ScenarioGroupID = k.ScenarioGroupID,
+                    Visibility = Enum.GetName(typeof(VisibilityEnum), (VisibilityEnum)k.VisibilityID)
+                }).First();
+        }
+        
         public IEnumerable<ScenarioGroupResource> AuthorizedGroups(HttpRequestContext request)
         {
             string authString = Convert.ToString(request.RouteData.Values["authString"]);
-            return _repository.Queryable().Where(k => k.Secret == authString || k.ScenarioGroupID == 1).Select(k => new ScenarioGroupResource()
+            return _repository.Queryable().Where(k => k.Secret == authString || k.ScenarioGroupID == 1).ToList()
+                .Select(k => new ScenarioGroupResource()
             {
                 Name = k.Name,
-                ScenarioGroupID = k.ScenarioGroupID
+                ScenarioGroupID = k.ScenarioGroupID,
+                Visibility = Enum.GetName(typeof(VisibilityEnum),(VisibilityEnum)k.VisibilityID)
             });
+        }
+
+        public ScenarioGroup AddAuthenticatedScenarioGroup(ScenarioGroupResource postdata)
+        {
+            ScenarioGroup scenarioGroup = new ScenarioGroup()
+            {
+                Name = postdata.Name,
+                Secret = postdata.Secret,
+                OwnedBy = LcaDataModel.User.AUTHENTICATED_USER,
+                VisibilityID = Convert.ToInt32(String.IsNullOrEmpty(postdata.Visibility)
+                                   ? VisibilityEnum.Private
+                                   : Enum.Parse(typeof(VisibilityEnum), postdata.Visibility)),
+                ObjectState = ObjectState.Added
+            };
+            _repository.Insert(scenarioGroup);
+            return scenarioGroup;
         }
     }
 }

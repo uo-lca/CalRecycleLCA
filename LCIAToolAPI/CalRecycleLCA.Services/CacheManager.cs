@@ -25,6 +25,8 @@ namespace CalRecycleLCA.Services
         private readonly INodeCacheService _NodeCacheService;
         [Inject]
         private readonly IScoreCacheService _ScoreCacheService;
+        [Inject]
+        private readonly IScenarioGroupService _ScenarioGroupService;
 
 
         private T verifiedDependency<T>(T dependency) where T : class
@@ -44,7 +46,8 @@ namespace CalRecycleLCA.Services
             IFragmentService fragmentService,
             IFragmentLCIAComputation fragmentLCIAComputation,
             INodeCacheService nodeCacheService,
-            IScoreCacheService scoreCacheService)
+            IScoreCacheService scoreCacheService,
+            IScenarioGroupService scenarioGroupService)
         {
             _ScenarioService = verifiedDependency(scenarioService);
             _unitOfWork = verifiedDependency(unitOfWork);
@@ -52,6 +55,7 @@ namespace CalRecycleLCA.Services
             _FragmentLCIAComputation = verifiedDependency(fragmentLCIAComputation);
             _NodeCacheService = verifiedDependency(nodeCacheService);
             _ScoreCacheService = verifiedDependency(scoreCacheService);
+            _ScenarioGroupService = verifiedDependency(scenarioGroupService);
         }
 
         public void InitializeCache()
@@ -105,6 +109,13 @@ namespace CalRecycleLCA.Services
             _ScoreCacheService.InsertGraphRange(sc);
             _unitOfWork.SaveChanges();
             _unitOfWork.SetAutoDetectChanges(true);
+        }
+
+        public ScenarioGroupResource CreateScenarioGroup(ScenarioGroupResource postdata)
+        {
+            ScenarioGroup newGroup = _ScenarioGroupService.AddAuthenticatedScenarioGroup(postdata);
+            _unitOfWork.SaveChanges();
+            return _ScenarioGroupService.GetResource(newGroup.ScenarioGroupID);
         }
 
         public int CreateScenario(ScenarioResource postScenario, int refScenarioId = Scenario.MODEL_BASE_CASE_ID)
