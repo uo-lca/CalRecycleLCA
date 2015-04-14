@@ -6,6 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Net;
 using System.Net.Http;
+using System.Web;
 using System.Web.Http;
 using System.Web.Http.Cors;
 using Ninject;
@@ -911,7 +912,6 @@ namespace LCAToolAPI.API
                 return Request.CreateResponse(HttpStatusCode.Unauthorized);
         }
         
-        //[Authorize]
         /// <summary>
         /// POST api/scenarios
         /// Creates a new scenario. not yet tested. Scenario group should be determined during authorization,
@@ -924,13 +924,27 @@ namespace LCAToolAPI.API
         [HttpPost]
         public HttpResponseMessage AddScenario([FromBody] ScenarioResource postdata)
         {
-            int scenarioId;
+            int cloneScenario = Scenario.MODEL_BASE_CASE_ID;
+
+            var cloneScenarioFromQuery = HttpUtility.ParseQueryString(Request.RequestUri.Query)["cloneScenario"];
+
+            if (!String.IsNullOrEmpty(cloneScenarioFromQuery))
+                cloneScenario = Convert.ToInt32(cloneScenarioFromQuery);
+
             int? authGroup = _ScenarioGroupService.CheckAuthorizedGroup(RequestContext);
             // need to authorize this
-            if (authGroup != 0 && authGroup != null)
+            if (authGroup != 0 && authGroup != null && _ScenarioGroupService.CanGet(RequestContext, cloneScenario))
             {
-                var foo = Request.Content.ToString();
-                scenarioId = _ResourceService.AddScenario(postdata, (int)authGroup);
+                if (postdata == null)
+                    postdata = _ScenarioService.Queryable().Where(k => k.ScenarioID == cloneScenario)
+                        .Select(k => new ScenarioResource()
+                        {
+                            Name = "New Scenario",
+                            ActivityLevel = k.ActivityLevel,
+                            TopLevelFragmentID = k.TopLevelFragmentID
+                        }).First();
+
+                int scenarioId = _ResourceService.AddScenario(postdata, (int)authGroup, cloneScenario);
                 return Request.CreateResponse(HttpStatusCode.OK,
                     _ResourceService.GetScenarios().Where(k => k.ScenarioID == scenarioId).FirstOrDefault()); 
             }

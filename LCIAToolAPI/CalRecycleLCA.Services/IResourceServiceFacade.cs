@@ -41,7 +41,7 @@ namespace CalRecycleLCA.Services
         IEnumerable<LCIAResultResource> GetProcessLCIAResults(int processID, int scenarioID = Scenario.MODEL_BASE_CASE_ID);
         IEnumerable<FlowTypeResource> GetFlowTypes();
         IEnumerable<ParamResource> GetParams(int scenarioId);
-        int AddScenario(ScenarioResource inScenario, int scenarioGroupId);
+        int AddScenario(ScenarioResource inScenario, int scenarioGroupId, int cloneScenario);
         bool UpdateScenario(int scenarioId, ScenarioResource inScenario);
         void DeleteScenario(int scenarioId);
         //void DeleteParam(string deleteParamJSON);

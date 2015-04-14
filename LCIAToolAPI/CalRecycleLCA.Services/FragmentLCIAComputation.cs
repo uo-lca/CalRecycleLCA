@@ -88,6 +88,37 @@ namespace CalRecycleLCA.Services
             currentCache.Clear();
         }
 
+        /// <summary>
+        /// Generates a list of FragmentFlowIDs that would be encountered during traversal of a given scenario, so that 
+        /// cache records matching them can be cloned.
+        /// </summary>
+        /// <param name="fragmentId"></param>
+        /// <param name="scenarioId"></param>
+        /// <returns></returns>
+        public List<int> FragmentsEncountered(int fragmentId, int scenarioId = Scenario.MODEL_BASE_CASE_ID)
+        {
+            return FragmentsEncounteredRecurse(fragmentId, scenarioId).Distinct().ToList();
+        }
+
+        /// <summary>
+        /// List of fragments encountered- called recursively
+        /// </summary>
+        /// <param name="fragmentId"></param>
+        /// <param name="scenarioId"></param>
+        /// <returns></returns>
+        private List<int> FragmentsEncounteredRecurse(int fragmentId, int scenarioId)
+        {
+            List<int> fs = new List<int>() { fragmentId };
+            var subfrags = _fragmentFlowService.LGetFlowsByFragment(fragmentId).Where(k => k.NodeTypeID == 2 || k.NodeTypeID == 4);
+            foreach (var ff in subfrags)
+            {
+                var term = _fragmentFlowService.Terminate(_fragmentFlowService.GetNodeModel(ff), scenarioId, true);
+                if (term.NodeTypeID == 2)
+                    fs.AddRange(FragmentsEncounteredRecurse((int)term.SubFragmentID, scenarioId).ToList());
+            }
+            return fs;
+        }
+
         public IEnumerable<NodeCache> FragmentTraverse(int fragmentId, int scenarioId = Scenario.MODEL_BASE_CASE_ID)
         {
             // this will eventually become private after diagnostics are done

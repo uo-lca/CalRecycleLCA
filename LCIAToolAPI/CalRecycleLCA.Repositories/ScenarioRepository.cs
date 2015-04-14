@@ -84,5 +84,93 @@ namespace CalRecycleLCA.Repositories
             repository.Delete(scenario);
             // hoping entity framework automatically deletes descendents! wouldn't that be cool?
         }
+
+        public static void CloneScenarioElements(this IRepository<Scenario> repository, int newScenarioId, int refScenarioId)
+        {
+            // need to clone params and substitutions as well-- can I do this with eager query?
+            // even this is fairly verbose-- I wonder if there is a better way.....
+            var S = repository.Query(k => k.ScenarioID == refScenarioId)
+                    .Include(k => k.ProcessSubstitutions)
+                    .Include(k => k.FragmentSubstitutions)
+                    .Include(k => k.BackgroundSubstitutions)
+                    .Select().First();
+
+            var Ps = repository.GetRepository<Param>().Query(k => k.ScenarioID == refScenarioId)
+                    .Include(k => k.DependencyParams)
+                    .Include(k => k.FlowPropertyParams)
+                    .Include(k => k.CompositionParams)
+                    .Include(k => k.ProcessDissipationParams)
+                    .Include(k => k.ProcessEmissionParams)
+                    .Include(k => k.CharacterizationParams)
+                    .Select().ToList();
+
+            foreach (var p in Ps)
+            {
+                p.ScenarioID = newScenarioId;
+                p.ObjectState = ObjectState.Added;
+                switch (p.ParamTypeID)
+                {
+                    case 1:
+                        {
+                            foreach (var dp in p.DependencyParams)
+                                dp.ObjectState = ObjectState.Added;
+                            break;
+                        }
+                    case 4:
+                        {
+                            foreach (var fp in p.FlowPropertyParams)
+                                fp.ObjectState = ObjectState.Added;
+                            break;
+                        }
+                    case 5:
+                        {
+                            foreach (var cp in p.CompositionParams)
+                                cp.ObjectState = ObjectState.Added;
+                            break;
+                        }
+                    case 6:
+                        {
+                            foreach (var pdp in p.ProcessDissipationParams)
+                                pdp.ObjectState = ObjectState.Added;
+                            break;
+                        }
+                    case 8:
+                        {
+                            foreach (var pep in p.ProcessEmissionParams)
+                                pep.ObjectState = ObjectState.Added;
+                            break;
+                        }
+                    case 10:
+                        {
+                            foreach (var cp in p.CharacterizationParams)
+                                cp.ObjectState = ObjectState.Added;
+                            break;
+                        }
+                }
+            }
+            if (Ps.Count > 0)
+                repository.GetRepository<Param>().InsertGraphRange(Ps);
+
+            foreach (var ps in S.ProcessSubstitutions)
+            {
+                ps.ScenarioID = newScenarioId;
+                ps.ObjectState = ObjectState.Added;
+                repository.GetRepository<ProcessSubstitution>().Insert(ps);
+            }
+
+            foreach (var fs in S.FragmentSubstitutions)
+            {
+                fs.ScenarioID = newScenarioId;
+                fs.ObjectState = ObjectState.Added;
+                repository.GetRepository<FragmentSubstitution>().Insert(fs);
+            }
+
+            foreach (var bs in S.BackgroundSubstitutions)
+            {
+                bs.ScenarioID = newScenarioId;
+                bs.ObjectState = ObjectState.Added;
+                repository.GetRepository<BackgroundSubstitution>().Insert(bs);
+            }
+        }
     }
 }

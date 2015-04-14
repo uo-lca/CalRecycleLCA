@@ -630,10 +630,12 @@ namespace CalRecycleLCA.Services
             }).ToList();
         }
 
-        private ScenarioResource CheckTopLevelFragment(ScenarioResource scenario)
+        private ScenarioResource CheckTopLevelFragment(ScenarioResource scenario, int cloneScenario)
         {
             if (_FragmentService.Query(k => k.FragmentID == scenario.TopLevelFragmentID) == null)
-                return null;
+                scenario.TopLevelFragmentID = _ScenarioService.Queryable()
+                    .Where(k => k.ScenarioID == cloneScenario)
+                    .Select(k => k.TopLevelFragmentID).First();
 
             var term = _FragmentFlowService.GetInFlow(scenario.TopLevelFragmentID);
             if (scenario.ReferenceFlowID == 0)
@@ -652,7 +654,7 @@ namespace CalRecycleLCA.Services
             return scenario;
         }
 
-        public int AddScenario(ScenarioResource postScenario, int scenarioGroupId)
+        public int AddScenario(ScenarioResource postScenario, int scenarioGroupId, int cloneScenario)
         {
             // request has already been authorized-- all we need to do is fill in the pieces
             // ScenarioResource has fields:
@@ -666,7 +668,7 @@ namespace CalRecycleLCA.Services
             //A  ScenarioGroupID 
             // of these, ScenarioID is ignored; TopLevelFragmentID is required; ActivityLevel is optional; Name is optional.
             // ScenarioGroupID is set; Reference flow + direction are set; ScenarioID is db-generated.
-            postScenario = CheckTopLevelFragment(postScenario);
+            postScenario = CheckTopLevelFragment(postScenario, cloneScenario);
             if (postScenario == null)
                 return -1; // -1 should generate a 400 or 415 http error
 
@@ -675,7 +677,7 @@ namespace CalRecycleLCA.Services
             if (postScenario.ActivityLevel == 0)
                 postScenario.ActivityLevel = 1;
             postScenario.ScenarioGroupID = scenarioGroupId;
-            return _CacheManager.CreateScenario(postScenario);
+            return _CacheManager.CreateScenario(postScenario, cloneScenario);
         }
 
         public bool UpdateScenario(int scenarioId, ScenarioResource putScenario)
@@ -690,7 +692,7 @@ namespace CalRecycleLCA.Services
                 if (putScenario.TopLevelFragmentID == 0)
                     putScenario.TopLevelFragmentID = _ScenarioService.Query(k => k.ScenarioID == scenarioId)
                         .Select(k => k.TopLevelFragmentID).First();
-                putScenario = CheckTopLevelFragment(putScenario);
+                putScenario = CheckTopLevelFragment(putScenario, scenarioId);
                 scenario = _ScenarioService.UpdateScenarioFlow(scenarioId, putScenario, ref cacheTracker);
             }
             if (scenario != null)

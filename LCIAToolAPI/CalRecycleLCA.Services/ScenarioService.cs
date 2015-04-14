@@ -16,6 +16,7 @@ namespace CalRecycleLCA.Services
         bool IsStale(int ScenarioId);
         void MarkStale(int ScenarioId);
         void UnMarkStale(int ScenarioId);
+        void CloneScenarioElements(int newScenarioId, int refScenarioId);
 
         Scenario NewScenario(ScenarioResource scenario);
         Scenario UpdateScenarioFlow(int scenarioId, ScenarioResource scenario, ref CacheTracker cacheTracker);
@@ -69,6 +70,12 @@ namespace CalRecycleLCA.Services
         {
             _repository.DeleteScenario(scenarioId);
         }
+
+        public void CloneScenarioElements(int newScenarioId, int refScenarioId)
+        {
+            _repository.CloneScenarioElements(newScenarioId, refScenarioId);
+        }
+
     }
 }
 

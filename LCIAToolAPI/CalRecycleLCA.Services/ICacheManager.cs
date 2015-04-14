@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using LcaDataModel;
 using Entities.Models;
 
 namespace CalRecycleLCA.Services
@@ -10,7 +11,7 @@ namespace CalRecycleLCA.Services
     public interface ICacheManager
     {
         void InitializeCache();
-        int CreateScenario(ScenarioResource post);
+        int CreateScenario(ScenarioResource post, int refScenarioId = Scenario.MODEL_BASE_CASE_ID);
         void DeleteScenario(int scenarioId);
         bool ImplementScenarioChanges(int scenarioId, CacheTracker cacheTracker);
 

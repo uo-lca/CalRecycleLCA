@@ -69,36 +69,50 @@ namespace CalRecycleLCA.Services
                 _FragmentLCIAComputation.FragmentLCIAComputeSave(s.TopLevelFragmentID, s.ScenarioID);
         }
  
-        private void CloneBaseScenario(int fragmentId, int scenarioId)
+        private void CloneRefScenario(int fragmentId, int newScenarioId, int refScenarioId)
         {
-            // quant. traversal may cost 6 seconds but it's cheaper than writing a new sleeker recursive traversal.
-            var ffs = _FragmentLCIAComputation.FragmentTraverse(fragmentId, scenarioId)
-                .Select(k => k.FragmentFlowID).Distinct().ToList();
+            var fs = _FragmentLCIAComputation.FragmentsEncountered(fragmentId, refScenarioId);
 
+            var nc = _NodeCacheService.Queryable()
+                .Where(k => k.ScenarioID == refScenarioId)
+                .Where(k => fs.Contains(k.FragmentFlow.FragmentID)).ToList()
+                .Select(k => new NodeCache
+                {
+                    ScenarioID = newScenarioId,
+                    FragmentFlowID = k.FragmentFlowID,
+                    NodeWeight = k.NodeWeight,
+                    FlowMagnitude = k.FlowMagnitude,
+                    ObjectState = ObjectState.Added
+                });
+            
             var sc = _ScoreCacheService.Queryable()
-                .Where(k => k.ScenarioID == Scenario.MODEL_BASE_CASE_ID)
-                .Where(k => ffs.Contains(k.FragmentFlowID)).ToList()
+                .Where(k => k.ScenarioID == refScenarioId)
+                .Where(k => fs.Contains(k.FragmentFlow.FragmentID)).ToList()
                 .Select(k => new ScoreCache
                 {
-                    ScenarioID = scenarioId,
+                    ScenarioID = newScenarioId,
                     FragmentFlowID = k.FragmentFlowID,
                     LCIAMethodID = k.LCIAMethodID,
                     ImpactScore = k.ImpactScore,
                     ObjectState = ObjectState.Added
                 });
 
+            if (refScenarioId != Scenario.MODEL_BASE_CASE_ID)
+                _ScenarioService.CloneScenarioElements(newScenarioId, refScenarioId);
+
             _unitOfWork.SetAutoDetectChanges(false);
+            _NodeCacheService.InsertGraphRange(nc);
             _ScoreCacheService.InsertGraphRange(sc);
             _unitOfWork.SaveChanges();
             _unitOfWork.SetAutoDetectChanges(true);
         }
 
-        public int CreateScenario(ScenarioResource postScenario)
+        public int CreateScenario(ScenarioResource postScenario, int refScenarioId = Scenario.MODEL_BASE_CASE_ID)
         {
             Scenario newScenario = _ScenarioService.NewScenario(postScenario);
             _unitOfWork.SaveChanges(); // sets flag
 
-            CloneBaseScenario(postScenario.TopLevelFragmentID, newScenario.ScenarioID);
+            CloneRefScenario(postScenario.TopLevelFragmentID, newScenario.ScenarioID, refScenarioId);
 
             _FragmentLCIAComputation.FragmentLCIAComputeSave(newScenario.TopLevelFragmentID, newScenario.ScenarioID); // clears flag
             return newScenario.ScenarioID;
