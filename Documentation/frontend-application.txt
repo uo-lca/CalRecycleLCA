@@ -1,10 +1,21 @@
+Thur Apr 15 2015
+Future work ideas (not in scope of current SOW)
+
+Sensitivity Analysis
+    In Fragment LCIA click on waterfall node -> Sensitivity analysis view which is more interactive
+    Return to Fragment LCIA to see effect in all method panels.
+
+Exploded Fragment View
+    Graph of fragment where subfragments are replaced with subgraph. Nodes are colored by stage.
+    Need to merge flows having same flowid.
+======================================================================================================================
 Thur Apr 2 2015
 Fragment LCIA planned change summary
 
-The Fragment LCIA view + controller will have 2 different modes. The mode depends on UI router state. Here is how I imagine each mode will look and behave…
+The Fragment LCIA view + controller will have 2 different modes. The mode depends on UI router state. Here is how I imagine each mode will look and behaveï¿½
 
 1.	Top-level fragment LCIA mode is enabled when user selects Fragment LCIA from top menu bar.
-View contains drop-down selection list of top-level fragments and multiple selection list of scenarios. Fragment selection determines contents of scenario selection list. Fragment LCIA is not performed until user clicks a  button labeled, “Get Fragment LCIA Results” (?).
+View contains drop-down selection list of top-level fragments and multiple selection list of scenarios. Fragment selection determines contents of scenario selection list. Fragment LCIA is not performed until user clicks a  button labeled, ï¿½Get Fragment LCIA Resultsï¿½ (?).
 2.	Fragment navigation mode is enabled when user clicks Fragment LCIA from Fragment Sankey view.
 In this mode, the view displays the current fragment navigation state as breadcrumbs. Fragment LCIA is performed immediately on current fragment, comparing current scenario to base case scenario. (If they are the same, then only one waterfall is shown in each panel).
 A sub-fragment selection list will allow the user to navigate to a sub-fragment. The behavior will be like in the Fragment Sankey view. Implementation of breadcrumbs may get tricky here. Will let you know how it goes.
