@@ -666,7 +666,23 @@ namespace CalRecycleLCA.Repositories
                         break;
                     }
                 case 5:
+                    {
+                        int compositionModel = repository.GetRepository<CompositionParam>().Query(k => k.ParamID == paramId)
+                            .Select(k => k.CompositionData.CompositionModelID).First();
+                        // have to deal with CompositionSubstitutions here if they ever become a thing
+                        List<int> processIds = repository.GetRepository<ProcessComposition>().Query(k => k.CompositionModelID == compositionModel)
+                            .Select(k => k.ProcessID).ToList();
+                        foreach (int process in processIds)
+                            cacheTracker.FragmentFlowsStale.AddRange(repository.FragmentFlowsAffected(P.ScenarioID, process));
+                        break;
+                    }
                 case 6:
+                    {
+                        int processId = repository.GetRepository<ProcessDissipationParam>().Query(k => k.ParamID == paramId)
+                            .Select(k => k.ProcessDissipation.ProcessID).First();
+                        cacheTracker.FragmentFlowsStale.AddRange(repository.FragmentFlowsAffected(P.ScenarioID, processId));
+                        break;
+                    }
                 case 8:
                     {
                         int processId = repository.GetRepository<ProcessEmissionParam>().Query(k => k.ParamID == paramId)
