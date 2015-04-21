@@ -18,9 +18,9 @@ FrontEnd contains a single page app for data visualization.
 
 Details are described in subfolder README files:
 
- * [Back end](tree/master/LCIAToolAPI/)
- * [Front end](tree/master/FrontEnd/)
- * [Data loader](tree/master/Database/)
+ * [Back end](LCIAToolAPI/)
+ * [Front end](FrontEnd/)
+ * [Data loader](Database/)
 
 The Data loader (and by extension the back end) requires an LCA data
 directory, which is [a separate repository](../LCA_Data/).

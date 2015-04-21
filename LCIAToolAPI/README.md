@@ -31,7 +31,8 @@ stores the XML files.  This is the same as the directory used by the data
 loader.
 
 Currently that directory is configured via a **private variable in
-[ILCDEntityService.cs](CalRecycleLCA.Services/ILCDEntityService.cs)**.
+[ILCDEntityService.cs](CalRecycleLCA.Services/ILCDEntityService.cs)**
+called `DataRoot`.
 This variable's value must be re-defined before deployment.
 
 For obvious reasons I am seeking a more effective way to configure this
