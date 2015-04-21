@@ -233,6 +233,11 @@ namespace LCAToolAPI.API
 
                 var response = Request.CreateResponse(HttpStatusCode.OK);
                 response.Content = new StringContent(stringWriter.ToString(), stringWriter.Encoding, "application/xml");
+                response.Headers.CacheControl = new CacheControlHeaderValue()
+                {
+                    Public = true,
+                    MaxAge = new TimeSpan(1,0,0,0) // 1-day cache 
+                };
                 return response;
             }
 
