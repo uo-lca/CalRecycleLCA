@@ -3,16 +3,57 @@ Backend - LCA Engine and Web Services
 
 Domain logic and web API are implemented here.
 
-Deployment Instructions
------------------------
+#Deployment Instructions
+
+## XML File Server
+
+The code now includes a file server for ILCD-formatted XML files for
+transparency.  It leverages the ILCD format's existing high-quality schema
+and stylesheet infrastructure to display ILCD files in a format that is
+(ostensibly) pleasing to the eye.
+
+In order for this mechanism to work, the ILCD-generic stylesheets and
+schemas must be exposed via virtual directories on the web server (security
+concerns require the XML files, schemas, and stylesheets to all be served
+from the same host and port).
+
+The `ILCD-generic\stylesheets` and `ILCD-generic\schemas` directories
+already exist in the LCA_Data repository, so all that is required is to
+expose them as virtual directories:
+
+ * `<virtualDirectory path="/stylesheets" physicalPath="C:\path\to\GitHub\LCA_Data\ILCD-generic\stylesheets" />`
+ * `<virtualDirectory path="/schemas" physicalPath="C:\path\to\GitHub\LCA_Data\ILCD-generic\schemas" />`
+
+## Data Path Configuration
+
+The XML file server also requires access to the physical directory that
+stores the XML files.  This is the same as the directory used by the data
+loader.
+
+Currently that directory is configured via a **private variable in
+[ILCDEntityService.cs](CalRecycleLCA.Services/ILCDEntityService.cs)**
+called `DataRoot`.
+This variable's value must be re-defined before deployment.
+
+For obvious reasons I am seeking a more effective way to configure this
+setting.
+
+## Documentation
+
+The solution automatically builds an XML-formatted documentation file,
+which it stores in the `bin` directory.  Access to this file must be
+enabled at runtime in order for the documentation page to be built.
+
+## Deployment
+
 1. Build solution (..\CalRecycleLCA.sln), Release configuration
 2. Publish project, LCIAToolAPI. A publishing profile must first be configured. FTP is used at UCSB to publish to a test server. The profile is saved as LCIAToolAPI\Properties\PublishProfiles\kbcalr.pubxml.
 3. Edit web.config in the publish destination. In the connection string with name=UsedOilLCAContext, change the Data Source to the name of the server hosting a deployed database (see database deployment instructions in ..\..\Database\README).
 4. In the deployed database, add user IIS APPPOOL\DefaultAppPool and grant it connect, read, and write privileges to the database.
 5. Restart the published web app in IIS.
 
-Usage Instructions
-------------------
+#Usage Instructions
+
 
 The URL for the web API is the publish URL + /api/ + resource
 
@@ -23,7 +64,8 @@ Resources are defined in [Models](https://github.com/uo-lca/CalRecycleLCA/tree/m
 API Resources
 -------------
 
-The API aspires to HATEOAS, but for now is documented in LCIAToolAPI/README.md
+The API aspires to HATEOAS, but for now is documented in
+LCIAToolAPI/README.md.  Note that this documentation is out of date.
 
 ### Process
 

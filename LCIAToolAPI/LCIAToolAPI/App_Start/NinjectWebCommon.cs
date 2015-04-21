@@ -20,7 +20,6 @@ namespace LCAToolAPI.App_Start
     using Service.Pattern;
     using Repository.Pattern.DataContext;
     using Repository.Pattern.Ef6.Factories;
-    using XMLHandler;
 
     /// <summary>
     /// 
@@ -97,7 +96,6 @@ namespace LCAToolAPI.App_Start
             kernel.Bind<IResourceServiceFacade>().To<ResourceServiceFacade>();
             kernel.Bind<IDocuService>().To<DocuService>();
             kernel.Bind<ICacheManager>().To<CacheManager>();
-            kernel.Bind<IFlowTestService>().To<FlowTestService>();
 
             kernel.Bind(typeof(IRepositoryAsync<Category>)).To(typeof(Repository<Category>));
             kernel.Bind(typeof(IRepositoryAsync<Classification>)).To(typeof(Repository<Classification>));
@@ -108,6 +106,7 @@ namespace LCAToolAPI.App_Start
             kernel.Bind(typeof(IRepositoryAsync<FlowProperty>)).To(typeof(Repository<FlowProperty>));
             kernel.Bind(typeof(IRepositoryAsync<FlowType>)).To(typeof(Repository<FlowType>));
             kernel.Bind(typeof(IRepositoryAsync<ImpactCategory>)).To(typeof(Repository<ImpactCategory>));
+            kernel.Bind(typeof(IRepositoryAsync<ILCDEntity>)).To(typeof(Repository<ILCDEntity>));
             kernel.Bind(typeof(IRepositoryAsync<LCIAMethod>)).To(typeof(Repository<LCIAMethod>));
             kernel.Bind(typeof(IRepositoryAsync<Process>)).To(typeof(Repository<Process>));
             kernel.Bind(typeof(IRepositoryAsync<ProcessFlow>)).To(typeof(Repository<ProcessFlow>));
@@ -142,6 +141,7 @@ namespace LCAToolAPI.App_Start
             kernel.Bind<IFlowService>().To<FlowService>();
             kernel.Bind<IFlowPropertyService>().To<FlowPropertyService>();
             kernel.Bind<IFlowTypeService>().To<FlowTypeService>();
+            kernel.Bind<IILCDEntityService>().To<ILCDEntityService>();
             kernel.Bind<IImpactCategoryService>().To<ImpactCategoryService>();
             kernel.Bind<ILCIAMethodService>().To<LCIAMethodService>();
             kernel.Bind<IProcessService>().To<ProcessService>();

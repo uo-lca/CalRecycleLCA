@@ -18,7 +18,7 @@ namespace CalRecycleLCA.Services
     public class DocuService : IDocuService
     {
 
-        private string MyTrimEnd(string source, string value)
+        public string MyTrimEnd(string source, string value)
         {
             if (!source.EndsWith(value))
                 return source;
@@ -26,7 +26,7 @@ namespace CalRecycleLCA.Services
             return source.Remove(source.LastIndexOf(value));
         }
 
-        private string UrlRoot(HttpRequestMessage request)
+        public string UrlRoot(HttpRequestMessage request)
         {
             return MyTrimEnd(request.RequestUri.AbsoluteUri, request.RequestUri.PathAndQuery)
                 + MyTrimEnd(request.GetRequestContext().VirtualPathRoot,"/")

@@ -25,28 +25,25 @@ namespace LCIAToolAPI.App_Start
         {
             config.EnableCors();
 
-            var json = config.Formatters.JsonFormatter;
             //json.SerializerSettings.PreserveReferencesHandling = Newtonsoft.Json.PreserveReferencesHandling.Objects;
-            config.Formatters.Remove(config.Formatters.XmlFormatter);
+            //config.Formatters.Remove(config.Formatters.XmlFormatter);
             //config.Formatters.Remove(config.Formatters.JsonFormatter);
+            config.Formatters.JsonFormatter.MediaTypeMappings
+                .Add(new RequestHeaderMapping("Accept", "text/html", StringComparison.InvariantCultureIgnoreCase, true, "application/json"));
 
-            //JsonSerializerSettings serializerSettings = new JsonSerializerSettings();
-            //serializerSettings.ContractResolver = new ExcludeEntityKeyContractResolver();
-            //var jsonMediaTypeFormatter = new JsonMediaTypeFormatter();
-            //jsonMediaTypeFormatter.SerializerSettings = serializerSettings;
-            //GlobalConfiguration.Configuration.Formatters.Insert(0, jsonMediaTypeFormatter);
-            GlobalConfiguration.Configuration.Formatters.JsonFormatter.SerializerSettings = new JsonSerializerSettings();
-            GlobalConfiguration.Configuration.Formatters.JsonFormatter.SerializerSettings.NullValueHandling = NullValueHandling.Ignore;
-            GlobalConfiguration.Configuration.Formatters.JsonFormatter.SerializerSettings.ContractResolver = 
+            //config.Formatters.JsonFormatter.SupportedMediaTypes.Remove(new MediaTypeHeaderValue("text/xml"));
+            config.Formatters.JsonFormatter.SerializerSettings = new JsonSerializerSettings();
+            config.Formatters.JsonFormatter.SerializerSettings.NullValueHandling = NullValueHandling.Ignore;
+            config.Formatters.JsonFormatter.SerializerSettings.ContractResolver = 
                 new Newtonsoft.Json.Serialization.CamelCasePropertyNamesContractResolver();
-                                                                                                                
-            GlobalConfiguration.Configuration.Formatters.JsonFormatter.SerializerSettings.Formatting = Formatting.Indented;
 
+            //GlobalConfiguration.Configuration
+            config.Formatters.JsonFormatter.SerializerSettings.Formatting = Formatting.Indented;
 
-            GlobalConfiguration.Configuration.Formatters.JsonFormatter.SerializerSettings.ReferenceLoopHandling = //Newtonsoft.Json.ReferenceLoopHandling.Serialize;
+            config.Formatters.JsonFormatter.SerializerSettings.ReferenceLoopHandling = //Newtonsoft.Json.ReferenceLoopHandling.Serialize;
                 Newtonsoft.Json.ReferenceLoopHandling.Ignore;
-            GlobalConfiguration.Configuration.Formatters.JsonFormatter.SerializerSettings.PreserveReferencesHandling = // Newtonsoft.Json.PreserveReferencesHandling.Objects;
-                                                                                                                       Newtonsoft.Json.PreserveReferencesHandling.None;
+            config.Formatters.JsonFormatter.SerializerSettings.PreserveReferencesHandling = // Newtonsoft.Json.PreserveReferencesHandling.Objects;
+                Newtonsoft.Json.PreserveReferencesHandling.None;
             // Routes are defined in Controller classes
 
             config.MapHttpAttributeRoutes();

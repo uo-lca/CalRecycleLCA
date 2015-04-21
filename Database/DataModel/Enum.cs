@@ -10,14 +10,27 @@ namespace LcaDataModel {
 
     public enum DataTypeEnum {
         Flow=1,
-        FlowProperty,
-        Process,
-        UnitGroup,
-        Source,
-        LCIAMethod,
-        Contact,
-        Fragment
+        FlowProperty=2,
+        Process=3,
+        UnitGroup=4,
+        Source=5,
+        LCIAMethod=6,
+        Contact=7,
+        Fragment=0
     }
+
+    public enum DataPathEnum
+    {
+        flows=1,
+        flowproperties=2,
+        processes=3,
+        unitgroups=4,
+        sources=5,
+        lciamethods=6,
+        contacts=7,
+        fragments=0
+    };
+
 
     public enum DirectionEnum {
         Input=1, Output
