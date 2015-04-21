@@ -24,6 +24,12 @@ expose them as virtual directories:
  * `<virtualDirectory path="/stylesheets" physicalPath="C:\path\to\GitHub\LCA_Data\ILCD-generic\stylesheets" />`
  * `<virtualDirectory path="/schemas" physicalPath="C:\path\to\GitHub\LCA_Data\ILCD-generic\schemas" />`
 
+Note: on a debugging machine, the file to be edited is
+`applicationhost.config` and it can be found in
+`$USER_HOME\Documents\IISExpress\config\`.  Look for  (XPath)
+`//configuration/system.applicationHost/sites/site` that matches the
+project.
+
 ## Data Path Configuration
 
 The XML file server also requires access to the physical directory that
@@ -38,28 +44,51 @@ This variable's value must be re-defined before deployment.
 For obvious reasons I am seeking a more effective way to configure this
 setting.
 
+## Access-Restricted Controller
+
+The `LCIAComputationController` is used for debugging and for certain
+maintenance tasks, including the initial population of the NodeCache and
+ScoreCache (`GET /api/init`), clearing and recomputing the cache in the
+event of a problem (`POST /api/scenarios/x/clearscorecaches` and `POST
+/api/scenarios/x/clearnodecaches`); and creating new scenario groups (`POST
+/api/scenariogroups/add`).
+
+By default, this controller's access is restricted to `localhost` in the
+`EnableCors` attribute specification in
+[LCIAComputationController.cs](LCIAToolAPI/API/LCIAComputationController.cs). This
+value should be changed to match the domain(s) from which maintenance-oriented
+requests should be accepted.  Again, improved configuration of this setting
+is desired.
+
+
+
 ## Documentation
 
-The solution automatically builds an XML-formatted documentation file,
-which it stores in the `bin` directory.  Access to this file must be
-enabled at runtime in order for the documentation page to be built.
+The solution automatically builds an XML-formatted documentation file
+called `LCAToolAPI.XML` which is generated in the `bin` directory.  This
+file must be published with the rest of the project in order for the
+documentation page to be available.
 
 ## Deployment
 
+0. Create and populate the database using the [Data Loader](../Database/DataLoader).
 1. Build solution (..\CalRecycleLCA.sln), Release configuration
 2. Publish project, LCIAToolAPI. A publishing profile must first be configured. FTP is used at UCSB to publish to a test server. The profile is saved as LCIAToolAPI\Properties\PublishProfiles\kbcalr.pubxml.
 3. Edit web.config in the publish destination. In the connection string with name=UsedOilLCAContext, change the Data Source to the name of the server hosting a deployed database (see database deployment instructions in ..\..\Database\README).
 4. In the deployed database, add user IIS APPPOOL\DefaultAppPool and grant it connect, read, and write privileges to the database.
 5. Restart the published web app in IIS.
+6. To initialize a newly deployed database, visit the API endpoint
+   `GET /api/init` from a site permitted to access the LCIAComputationController
+   (default: localhost).  This will generate the cache for all scenarios.
 
 #Usage Instructions
 
 
 The URL for the web API is the publish URL + /api/ + resource
 
-Resource routes are defined in [ResourceController.cs](https://github.com/uo-lca/CalRecycleLCA/blob/master/vs/LCIAToolAPI/LCIAToolAPI/API/ResourceController.cs)
+Resource routes are defined in [ResourceController.cs](https://github.com/uo-lca/CalRecycleLCA/blob/master/LCIAToolAPI/LCIAToolAPI/API/ResourceController.cs)
 
-Resources are defined in [Models](https://github.com/uo-lca/CalRecycleLCA/tree/master/vs/LCIAToolAPI/Entities/Models)/*Resource.cs
+Resources are defined in [Models](https://github.com/uo-lca/CalRecycleLCA/tree/master/LCIAToolAPI/Entities/Models)/*Resource.cs
 
 API Resources
 -------------

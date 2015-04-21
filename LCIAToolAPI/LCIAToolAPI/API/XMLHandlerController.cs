@@ -24,6 +24,14 @@ namespace LCAToolAPI.API
         private readonly IDocuService _docuService;
         [Inject]
         private readonly IILCDEntityService _ilcdEntityService;
+        [Inject]
+        private readonly IProcessService _processService;
+        [Inject]
+        private readonly IFlowService _flowService;
+        [Inject]
+        private readonly IFlowPropertyService _flowPropertyService;
+        [Inject]
+        private readonly ILCIAMethodService _lciaMethodService;
 
         private T verifiedDependency<T>(T dependency) where T : class
         {
@@ -34,30 +42,44 @@ namespace LCAToolAPI.API
         }
 
         /// <summary>
-        /// 
+        /// Constructor for XMLHandlerController using dependency injection.
         /// </summary>
-        /// <param name="flowTestService"></param>
+        /// <param name="docuService"></param>
+        /// <param name="ilcdEntityService"></param>
+        /// <param name="processService"></param>
+        /// <param name="flowService"></param>
+        /// <param name="flowPropertyService"></param>
+        /// <param name="lciaMethodService"></param>
         public XMLHandlerController(IDocuService docuService,
-            IILCDEntityService ilcdEntityService)
+            IILCDEntityService ilcdEntityService,
+            IProcessService processService,
+            IFlowService flowService,
+            IFlowPropertyService flowPropertyService,
+            ILCIAMethodService lciaMethodService)
         {
             _docuService = verifiedDependency(docuService);
             _ilcdEntityService = verifiedDependency(ilcdEntityService);
+            _processService = verifiedDependency(processService);
+            _flowService = verifiedDependency(flowService);
+            _flowPropertyService = verifiedDependency(flowPropertyService);
+            _lciaMethodService = verifiedDependency(lciaMethodService);
+
         }
 
-        private HttpResponseMessage CreateXmlResponse(XmlElement content)
+        private HttpResponseMessage CreateRedirectResponse(ILCDEntity entity)
         {
-            Request.Headers.Accept.Remove(new MediaTypeWithQualityHeaderValue("text/html"));
-            var response = Request.CreateResponse(HttpStatusCode.OK, content);
-            response.Content.Headers.ContentType = new System.Net.Http.Headers.MediaTypeHeaderValue("application/xml");
-            return response;
-        }
+            if (entity == null)
+                return Request.CreateResponse(HttpStatusCode.NotFound);
+            else
+            {
+                String uri = (_docuService.UrlRoot(Request) + "xml/" 
+                    + Enum.GetName(typeof(DataPathEnum),entity.DataTypeID) // DataTypeEnum and DataPathEnum must coincide
+                    + "/" + entity.UUID + "?version=" + entity.Version);
 
-        private Uri CreateRedirect(ILCDEntity entity)
-        {
-            String uri =(_docuService.UrlRoot(Request) + "xml/" 
-                + Enum.GetName(typeof(DataPathEnum),entity.DataTypeID) // DataTypeEnum and DataPathEnum must coincide
-                + "/" + entity.UUID + "?version=" + entity.Version);
-            return new Uri(uri, UriKind.Absolute);
+                var response = Request.CreateResponse(HttpStatusCode.Found);
+                response.Headers.Location = new Uri(uri, UriKind.Absolute);
+                return response;
+            }
         }
 
         private bool TryParse(String uuid, out Guid guid)
@@ -69,8 +91,80 @@ namespace LCAToolAPI.API
             return true;
         }
 
+        /// <summary>
+        /// Lookup a process by its internal ID.
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns>redirect to canonical XML reference</returns>
+        [Route("xml/processes/{id:int}")]
+        [HttpGet]
+        public HttpResponseMessage LookupProcessByID(int id)
+        {
+            ILCDEntity entity = _processService.Query(k => k.ProcessID == id)
+                .Include(k => k.ILCDEntity)
+                .Select(k => k.ILCDEntity)
+                .FirstOrDefault();
 
+            return CreateRedirectResponse(entity);
+        }
 
+        /// <summary>
+        /// Lookup a flow by its internal ID.
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns>redirect to canonical XML reference</returns>
+        [Route("xml/flows/{id:int}")]
+        [HttpGet]
+        public HttpResponseMessage LookupFlowByID(int id)
+        {
+            ILCDEntity entity = _flowService.Query(k => k.FlowID == id)
+                .Include(k => k.ILCDEntity)
+                .Select(k => k.ILCDEntity)
+                .FirstOrDefault();
+
+            return CreateRedirectResponse(entity);
+        }
+
+        /// <summary>
+        /// Lookup a flow property by its internal ID.
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns>redirect to canonical XML reference</returns>
+        [Route("xml/flowproperties/{id:int}")]
+        [HttpGet]
+        public HttpResponseMessage LookupFlowPropertyByID(int id)
+        {
+            ILCDEntity entity = _flowPropertyService.Query(k => k.FlowPropertyID == id)
+                .Include(k => k.ILCDEntity)
+                .Select(k => k.ILCDEntity)
+                .FirstOrDefault();
+
+            return CreateRedirectResponse(entity);
+        }
+
+        /// <summary>
+        /// Lookup an LCIA method by its internal ID.
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns>redirect to canonical XML reference</returns>
+        [Route("xml/lciamethods/{id:int}")]
+        [HttpGet]
+        public HttpResponseMessage LookupLCIAMethodByID(int id)
+        {
+            ILCDEntity entity = _lciaMethodService.Query(k => k.LCIAMethodID == id)
+                .Include(k => k.ILCDEntity)
+                .Select(k => k.ILCDEntity)
+                .FirstOrDefault();
+
+            return CreateRedirectResponse(entity);
+        }
+
+        /// <summary>
+        /// Lookup an entity by its internal ID.  Optional version specification as a URL parameter ?version=xx.xx.xxx; 
+        /// if no version specified, returns the lexically highest version number.
+        /// </summary>
+        /// <param name="uuid"></param>
+        /// <returns>redirect to canonical XML reference</returns>
         [Route("xml/{uuid}")]
         [HttpGet]
         public HttpResponseMessage LookupByUUID(String uuid)
@@ -88,17 +182,16 @@ namespace LCAToolAPI.API
             else
                 entity = _ilcdEntityService.LookupUUID(guid.ToString("D"), versionFromQuery);
 
-            if (entity == null)
-                return Request.CreateResponse(HttpStatusCode.NotFound);
-            else
-            {
-                var response = Request.CreateResponse(HttpStatusCode.Found);
-                response.Headers.Location = CreateRedirect(entity);
-                return response;
-            }
-
+            return CreateRedirectResponse(entity);
         }
 
+        /// <summary>
+        /// Canonical XML reference.  Optional version specification as a URL parameter ?version=xx.xx.xxx; 
+        /// if no version specified, returns the lexically highest version number.
+        /// </summary>
+        /// <param name="dpath"></param>
+        /// <param name="uuid"></param>
+        /// <returns></returns>
         [Route("xml/{dpath}/{uuid}")]
         [HttpGet]
         public HttpResponseMessage LookupByDataTypeAndUUID(String dpath, String uuid)
@@ -127,7 +220,7 @@ namespace LCAToolAPI.API
             {
                 if (dataTypeId != entity.DataTypeID)
                     return Request.CreateResponse(HttpStatusCode.BadRequest, 
-                        String.Format("Incorrect data type. Should be {0}",
+                        String.Format("Incorrect data type. Should be {0} (should be redirect?)",
                         Enum.GetName(typeof(DataPathEnum),(DataPathEnum)entity.DataTypeID)));
 
                 // override default JSON serialization
@@ -144,47 +237,5 @@ namespace LCAToolAPI.API
             }
 
         }
-
-
-        /*
-        /// <summary>
-        /// legacy code
-        /// </summary>
-        /// <returns></returns>
-        [Route("api/xmlhandler")]
-        [System.Web.Http.AcceptVerbs("GET", "POST")]
-        [System.Web.Http.HttpGet]
-        public HttpResponseMessage FlowTest()
-        {
-            // can I munge the request header?
-            Request.Headers.Accept.Remove(new MediaTypeWithQualityHeaderValue("text/html"));
-            XmlDocument doc = _flowTestService.ViewXML();
-
-            var stringWriter = new StringWriter();
-            doc.Save(stringWriter);
-
-            var content = new StringContent(stringWriter.ToString(), stringWriter.Encoding, "application/xml");
-
-            var response = Request.CreateResponse(HttpStatusCode.OK);
-            response.Content = content;
-            //response.
-                
-            //    , stringWriter.ToString());
-            //response.Content.Headers.ContentType = new System.Net.Http.Headers.MediaTypeHeaderValue("application/xml");
-            return response;
-        }
-
-        [Route("xml/stylesheets/{filename}")]
-        [AcceptVerbs("GET")]
-        [HttpGet]
-        public HttpResponseMessage GetStylesheet(String filename)
-        {
-            var stylesheet = _xmlHandler.GetStylesheet(filename);
-            if (stylesheet == null)
-                return Request.CreateResponse(HttpStatusCode.NotFound);
-            else
-                return CreateXmlResponse(stylesheet);
-        }
-         * */
     }
 }
