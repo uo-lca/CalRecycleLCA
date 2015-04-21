@@ -103,6 +103,7 @@
     <Compile Include="ICacheManager.cs" />
     <Compile Include="IFragmentLCIAComputation.cs" />
     <Compile Include="IFragmentTraversalV2.cs" />
+    <Compile Include="ILCDEntityService.cs" />
     <Compile Include="ILCIAComputationV2.cs" />
     <Compile Include="ImpactCategoryService.cs" />
     <Compile Include="INodeCacheService.cs" />
