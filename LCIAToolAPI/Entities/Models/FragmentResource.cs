@@ -12,11 +12,13 @@ namespace Entities.Models {
     /// Maintains Pascal case of properties in Data model. These are automatically converted to
     /// camel case during JSON serialization.
     /// </summary>
-    public class FragmentResource {
+    public class FragmentResource : Resource 
+    {
+        public FragmentResource() : base("Fragment") { }
+
+        public override int ID { get { return FragmentID; } }
 
         public int FragmentID { get; set; }
-
-        public string Name { get; set; }
 
         public int  ReferenceFragmentFlowID { get; set; }
 

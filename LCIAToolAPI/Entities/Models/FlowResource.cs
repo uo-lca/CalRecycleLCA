@@ -14,16 +14,11 @@ namespace Entities.Models {
     /// camel case during JSON serialization.
     /// </summary>
     public class FlowResource : Resource {
-        public FlowResource()
-        {
-            base.ResourceType = "Flow";
-            base.Links = new List<Link>();
-        }
+        public FlowResource() : base("Flow") { }
 
         public override int ID { get { return FlowID; } }
 
         public int FlowID { get; set; }
-        public string Name { get; set; }
         public string CASNumber { get; set; }
         public int ReferenceFlowPropertyID { get; set; }
         public int FlowTypeID { get; set; }

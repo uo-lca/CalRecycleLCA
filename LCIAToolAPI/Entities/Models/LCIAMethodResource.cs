@@ -14,16 +14,11 @@ namespace Entities.Models {
     /// 
     /// </summary>
     public class LCIAMethodResource : Resource {
-        public LCIAMethodResource()
-        {
-            base.Links = new List<Link>();
-            base.ResourceType = "LCIAMethod";
-        }
+        public LCIAMethodResource() : base("LCIAMethod") { }
 
         public override int ID { get { return LCIAMethodID; } }
         
         public int LCIAMethodID { get; set; }
-        public string Name { get; set; }
         public string Methodology { get; set; }
         public int ImpactCategoryID { get; set; }
         public string ImpactIndicator { get; set; }

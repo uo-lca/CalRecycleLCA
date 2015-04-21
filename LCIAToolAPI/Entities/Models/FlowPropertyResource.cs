@@ -14,16 +14,11 @@ namespace Entities.Models {
     /// </summary>
     public class FlowPropertyResource : Resource {
 
-        public FlowPropertyResource()
-        {
-            base.ResourceType = "FlowProperty";
-            base.Links = new List<Link>();
-        }
+        public FlowPropertyResource() : base("FlowProperty") { }
 
         public override int ID { get { return FlowPropertyID; } }
 
         public int FlowPropertyID { get; set; }
-        public string Name { get; set; }
         public string ReferenceUnit { get; set; }  // FlowProperty.UnitGroup.UnitConversion.Unit 
     }
 }

@@ -15,17 +15,11 @@ namespace Entities.Models {
     /// </summary>
     public class ProcessResource : Resource {
 
-        public ProcessResource()
-        {
-            base.Links = new List<Link>();
-            base.ResourceType = "Process";
-        }
+        public ProcessResource() : base("Process") { }
 
         public override int ID { get { return ProcessID; }}
 
         public int ProcessID { get; set; }
-
-        public string Name { get; set; }
 
         public string ReferenceYear { get; set; }
 
@@ -36,8 +30,6 @@ namespace Entities.Models {
         public int? ReferenceFlowID { get; set; }
 
         public string DataSource { get; set; }
-
-        public bool isPrivate { get; set; }
 
         public bool hasElementaryFlows { get; set; }
     }
