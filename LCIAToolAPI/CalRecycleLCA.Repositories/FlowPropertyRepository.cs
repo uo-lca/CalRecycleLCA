@@ -42,7 +42,12 @@ namespace CalRecycleLCA.Repositories
         public static IEnumerable<FlowPropertyResource> GetFlowPropertiesByProcess(this IRepositoryAsync<FlowProperty> repository,
             int processId)
         {
-            return repository.Query(fp => fp.Flows.Any(f => f.ProcessFlows.Any(pf => pf.ProcessID == processId)))
+            var FPs = repository.GetRepository<ProcessFlow>().Queryable()
+                .Where(k => k.ProcessID == processId)
+                .Join(repository.GetRepository<FlowFlowProperty>().Queryable(), pf => pf.FlowID, k => k.FlowID,
+                    (pf, k) => new { pf = pf, ffp = k }).Select(j => j.ffp.FlowPropertyID).Distinct().ToList();
+
+            return repository.Query(fp => FPs.Contains(fp.FlowPropertyID))
                 .Include(fp => fp.ILCDEntity)
                 .Include(fp => fp.UnitGroup)
                 .Select()
@@ -52,7 +57,12 @@ namespace CalRecycleLCA.Repositories
         public static IEnumerable<FlowPropertyResource> GetFlowPropertiesByFragment(this IRepositoryAsync<FlowProperty> repository,
             int fragmentId)
         {
-            return repository.Query(fp => fp.Flows.Any(f => f.FragmentFlows.Any(ff => ff.FragmentID == fragmentId)))
+            var FPs = repository.GetRepository<FragmentFlow>().Queryable()
+                .Where(k => k.FragmentID == fragmentId)
+                .Join(repository.GetRepository<FlowFlowProperty>().Queryable(), ff => ff.FlowID, k => k.FlowID,
+                    (ff, k) => new { ff = ff, ffp = k }).Select(j => j.ffp.FlowPropertyID).Distinct().ToList();
+
+            return repository.Query(fp => FPs.Contains(fp.FlowPropertyID))
                 .Include(fp => fp.ILCDEntity)
                 .Include(fp => fp.UnitGroup)
                 .Select()

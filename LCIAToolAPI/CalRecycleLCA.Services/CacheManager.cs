@@ -113,8 +113,16 @@ namespace CalRecycleLCA.Services
 
         public ScenarioGroupResource CreateScenarioGroup(ScenarioGroupResource postdata)
         {
-            ScenarioGroup newGroup = _ScenarioGroupService.AddAuthenticatedScenarioGroup(postdata);
-            _unitOfWork.SaveChanges();
+
+            ScenarioGroup newGroup = _ScenarioGroupService.Query(k => k.Secret == postdata.Secret)
+                .Select()
+                .FirstOrDefault();
+
+            if (newGroup == null)
+            {
+                newGroup = _ScenarioGroupService.AddAuthenticatedScenarioGroup(postdata);
+                _unitOfWork.SaveChanges();
+            }
             return _ScenarioGroupService.GetResource(newGroup.ScenarioGroupID);
         }
 

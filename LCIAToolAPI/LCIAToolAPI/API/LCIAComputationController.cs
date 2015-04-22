@@ -92,8 +92,8 @@ namespace LCAToolAPI.API
         /// Note that this should obviously use some more secure form of secret sharing.
         /// Note too that updating scenario groups (secret, visibility) is TODO.
         /// </summary>
-        /// <param name="?"></param>
-        /// <returns>ScenarioGroup Resource</returns>
+        /// <param name="postdata"></param>
+        /// <returns>ScenarioGroup resource with secret omitted.</returns>
         [Route("api/scenariogroups/add")]
         [AcceptVerbs("POST")]
         [HttpPost]

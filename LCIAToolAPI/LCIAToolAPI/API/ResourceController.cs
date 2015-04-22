@@ -6,6 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Net;
 using System.Net.Http;
+using System.Net.Http.Headers;
 using System.Web;
 using System.Web.Http;
 using System.Web.Http.Cors;
@@ -54,29 +55,18 @@ namespace LCAToolAPI.API
 
         }
 
-        private IEnumerable<LCIAMethodResource> Decorate(IEnumerable<LCIAMethodResource> resource)
+        private HttpResponseMessage Decorate(IEnumerable<Resource> resource) 
         {
             foreach (var k in resource)
                 k.Links.AddRange(_DocuService.ResourceLinks(ActionContext, k));
-            return resource;
-        }
-        private IEnumerable<ProcessResource> Decorate(IEnumerable<ProcessResource> resource)
-        {
-            foreach (var k in resource)
-                k.Links.AddRange(_DocuService.ResourceLinks(ActionContext, k));
-            return resource;
-        }
-        private IEnumerable<FlowResource> Decorate(IEnumerable<FlowResource> resource)
-        {
-            foreach (var k in resource)
-                k.Links.AddRange(_DocuService.ResourceLinks(ActionContext, k));
-            return resource;
-        }
-        private IEnumerable<FlowPropertyResource> Decorate(IEnumerable<FlowPropertyResource> resource)
-        {
-            foreach (var k in resource)
-                k.Links.AddRange(_DocuService.ResourceLinks(ActionContext, k));
-            return resource;
+
+            var response = Request.CreateResponse(HttpStatusCode.OK, resource);
+            response.Headers.CacheControl = new CacheControlHeaderValue()
+            {
+                Public = true,
+                MaxAge = new TimeSpan(1,0,0,0)
+            };
+            return response;
         }
 
         /// <summary>
@@ -137,7 +127,7 @@ namespace LCAToolAPI.API
         [Route("api/flows")]
         [Route("api/flowtypes/{flowtypeID:int}/flows")]
         [HttpGet]
-        public IEnumerable<FlowResource> GetFlows(int flowTypeId = 0)
+        public HttpResponseMessage GetFlows(int flowTypeId = 0)
         {
             return Decorate(_ResourceService.GetFlows(flowTypeId));
         }
@@ -149,7 +139,7 @@ namespace LCAToolAPI.API
         /// <returns>list of FlowResource</returns>
         [Route("api/flows/{flowId}")]
         [HttpGet]
-        public IEnumerable<FlowResource> GetFlow(int flowId)
+        public HttpResponseMessage GetFlow(int flowId)
         {
             return Decorate(_ResourceService.GetFlow(flowId));
             /*
@@ -179,7 +169,7 @@ namespace LCAToolAPI.API
         /// <returns></returns>
         [Route("api/flowproperties")]
         [HttpGet]
-        public IEnumerable<FlowPropertyResource> GetFlowProperties()
+        public HttpResponseMessage GetFlowProperties()
         {
             return Decorate(_ResourceService.GetFlowProperties());
         }
@@ -187,13 +177,13 @@ namespace LCAToolAPI.API
         /// <summary>
         /// one flow property
         /// </summary>
-        /// <param name="fpid"></param>
+        /// <param name="flowPropertyId"></param>
         /// <returns></returns>
-        [Route("api/flowproperties/{fpid}")]
+        [Route("api/flowproperties/{flowPropertyId:int}")]
         [HttpGet]
-        public IEnumerable<FlowPropertyResource> GetFlowProperties(int fpid)
+        public HttpResponseMessage GetFlowProperties(int flowPropertyId)
         {
-            return Decorate(_ResourceService.GetFlowProperties().Where(k => k.FlowPropertyID == fpid).ToList());
+            return Decorate(_ResourceService.GetFlowProperties().Where(k => k.FlowPropertyID == flowPropertyId).ToList());
         }
 
         /// <summary>
@@ -201,6 +191,7 @@ namespace LCAToolAPI.API
         /// </summary>
         /// <returns>FlowPropertyMagnitude list</returns>
         [Route("api/flows/{flowId}/flowproperties")]
+        [Route("api/flows/{flowId}/flowpropertymagnitudes")]
         [HttpGet]
         public IEnumerable<FlowPropertyMagnitude> GetFlowFlowProperties(int flowId)
         {
@@ -213,23 +204,24 @@ namespace LCAToolAPI.API
         /// <returns></returns>
         [Route("api/fragments")]
         [HttpGet]
-        public IEnumerable<FragmentResource> GetFragments() {
-            return _ResourceService.GetFragmentResources();
+        public HttpResponseMessage GetFragments()
+        {
+            return Decorate(_ResourceService.GetFragmentResources());
         }
 
         /// <summary>
         /// Get a single fragment.
         /// </summary>
-        /// <param name="fragmentID"></param>
+        /// <param name="fragmentId"></param>
         /// <returns>FragmentResource</returns>
-        [Route("api/fragments/{fragmentID:int}")]
+        [Route("api/fragments/{fragmentId:int}")]
         [HttpGet]
-        public HttpResponseMessage GetFragment(int fragmentID) {
-            FragmentResource fr = _ResourceService.GetFragmentResources(fragmentID).FirstOrDefault();
-            if (fr == null) {
+        public HttpResponseMessage GetFragment(int fragmentId) {
+            var fr = _ResourceService.GetFragmentResources(fragmentId).ToList();
+            if (fr.Count()==0) {
                 return Request.CreateResponse(HttpStatusCode.BadRequest);
             }
-            return Request.CreateResponse(HttpStatusCode.OK, fr);
+            return Decorate(fr);
         }
 
         // Fragments //////////////////////////////////////////////////////////////
@@ -237,13 +229,13 @@ namespace LCAToolAPI.API
         /// Returns a list of FragmentFlows belonging to a fragment.. i.e. the links in the 
         /// fragment tree structure.  .
         /// </summary>
-        /// <param name="fragmentID"></param>
+        /// <param name="fragmentId"></param>
         /// <returns>FragmentFlowResource array</returns>
-        [Route("api/fragments/{fragmentID:int}/fragmentflows")]
+        [Route("api/fragments/{fragmentId:int}/fragmentflows")]
         [HttpGet]
-        public IEnumerable<FragmentFlowResource> GetFragmentFlowResources(int fragmentID) {
+        public IEnumerable<FragmentFlowResource> GetFragmentFlowResources(int fragmentId) {
             // Use default scenario
-            return _ResourceService.GetFragmentFlowResources(fragmentID); 
+            return _ResourceService.GetFragmentFlowResources(fragmentId); 
         }
 
         /// <summary>
@@ -604,12 +596,13 @@ namespace LCAToolAPI.API
         /// GET api/impactcategories/{impactCategoryID:int}/lciamethods
         /// List all LCIA methods in a given category.
         /// </summary>
-        /// <param name="impactCategoryID"></param>
+        /// <param name="impactCategoryId"></param>
         /// <returns>LCIAMethodResource (list)</returns>
-        [Route("api/impactcategories/{impactCategoryID:int}/lciamethods")]
+        [Route("api/impactcategories/{impactCategoryId:int}/lciamethods")]
         [HttpGet]
-        public IEnumerable<LCIAMethodResource> GetLCIAMethodsByImpactCategory(int impactCategoryID) {
-            return Decorate(_ResourceService.GetActiveLCIAMethodResources(impactCategoryID));
+        public HttpResponseMessage GetLCIAMethodsByImpactCategory(int impactCategoryId)
+        {
+            return Decorate(_ResourceService.GetActiveLCIAMethodResources(impactCategoryId));
         }
 
         /// <summary>
@@ -619,7 +612,8 @@ namespace LCAToolAPI.API
         /// <returns>LCIAMethodResource (list)</returns>
         [Route("api/lciamethods")]
         [HttpGet]
-        public IEnumerable<LCIAMethodResource> GetLCIAMethodResources() {
+        public HttpResponseMessage GetLCIAMethodResources()
+        {
             return Decorate(_ResourceService.GetActiveLCIAMethodResources());
         }
 
@@ -631,7 +625,7 @@ namespace LCAToolAPI.API
         /// <returns></returns>
         [Route("api/lciamethods/{lciaMethodId}")]
         [HttpGet]
-        public IEnumerable<LCIAMethodResource> GetLCIAMethodResource(int lciaMethodId)
+        public HttpResponseMessage GetLCIAMethodResource(int lciaMethodId)
         {
             return Decorate(_ResourceService.GetActiveLCIAMethodResources()
                 .Where(k => k.LCIAMethodID == lciaMethodId).ToList());
@@ -673,7 +667,8 @@ namespace LCAToolAPI.API
         /// <returns>list of ProcessResource</returns>
         [Route("api/processes")]
         [HttpGet]
-        public IEnumerable<ProcessResource> GetProcesses() {
+        public HttpResponseMessage GetProcesses()
+        {
             return Decorate(_ResourceService.GetProcesses());
         }
 
@@ -684,7 +679,7 @@ namespace LCAToolAPI.API
         /// <returns></returns>
         [Route("api/processes/{processId}")]
         [HttpGet]
-        public IEnumerable<ProcessResource> GetProcess(int processId)
+        public HttpResponseMessage GetProcess(int processId)
         {
             return Decorate(_ResourceService.GetProcess(processId));
         }
@@ -696,12 +691,13 @@ namespace LCAToolAPI.API
         /// 1=intermediate should return all processes
         /// 2 will return only processes with emissions
         /// </summary>
-        /// <param name="flowTypeID">1=intermediate; 2=elementary</param>
+        /// <param name="flowTypeId">1=intermediate; 2=elementary</param>
         /// <returns></returns>
         [Route("api/flowtypes/{flowTypeID:int}/processes")]
         [HttpGet]
-        public IEnumerable<ProcessResource> GetProcesses(int flowTypeID) {
-            return Decorate(_ResourceService.GetProcesses(flowTypeID));
+        public HttpResponseMessage GetProcesses(int flowTypeId)
+        {
+            return Decorate(_ResourceService.GetProcesses(flowTypeId));
         }
 
         

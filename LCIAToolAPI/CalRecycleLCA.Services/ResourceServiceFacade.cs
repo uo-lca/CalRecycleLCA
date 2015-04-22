@@ -168,7 +168,9 @@ namespace CalRecycleLCA.Services
                 Name = f.Name,
                 ReferenceFragmentFlowID = _FragmentFlowService.GetReferenceFlowID(f.FragmentID),
                 TermFlowID = term.FlowID,
-                Direction = Enum.GetName(typeof(DirectionEnum), (DirectionEnum)term.DirectionID)
+                Direction = Enum.GetName(typeof(DirectionEnum), (DirectionEnum)term.DirectionID),
+                UUID = f.ILCDEntity.UUID,
+                Version = f.ILCDEntity.Version
             };
         }
 
@@ -399,10 +401,13 @@ namespace CalRecycleLCA.Services
         public IEnumerable<FragmentResource> GetFragmentResources(int? fragmentId = null)
         {
             if (fragmentId == null)
-                return _FragmentService.Query().Select().Select(f => Transform(f)).ToList();
+                return _FragmentService.Query()
+                    .Include(k => k.ILCDEntity)
+                    .Select().Select(f => Transform(f)).ToList();
             else
-                return _FragmentService.Query(f => f.FragmentID == fragmentId).Select()
-                    .Select(f => Transform(f)).ToList();
+                return _FragmentService.Query(f => f.FragmentID == fragmentId)
+                    .Include(k => k.ILCDEntity)
+                    .Select().Select(f => Transform(f)).ToList();
         }
 
         /// <summary>

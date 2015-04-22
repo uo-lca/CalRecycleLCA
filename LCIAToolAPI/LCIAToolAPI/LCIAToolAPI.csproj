@@ -280,6 +280,7 @@
     <Compile Include="API\CalRecycleAuthorizeAttribute.cs" />
     <Compile Include="API\LCIAComputationController.cs" />
     <Compile Include="API\ResourceController.cs" />
+    <Compile Include="API\XMLHandlerController.cs" />
     <Compile Include="App_Start\BundleConfig.cs" />
     <Compile Include="App_Start\NinjectWeb.cs" />
     <Compile Include="App_Start\NinjectWebCommon.cs" />
