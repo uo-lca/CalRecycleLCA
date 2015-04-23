@@ -97,7 +97,18 @@ namespace CalRecycleLCA.Services
         /// <returns></returns>
         public List<int> FragmentsEncountered(int fragmentId, int scenarioId = Scenario.MODEL_BASE_CASE_ID)
         {
-            return FragmentsEncounteredRecurse(fragmentId, scenarioId).Distinct().ToList();
+            List<int> found = new List<int>();
+            List<int> queue = new List<int>() { fragmentId };
+            while (queue.Count() > 0 )
+            {
+                if (!found.Contains(queue[0]))
+                {
+                    found.Add(queue[0]);
+                    queue.AddRange(SubFragmentsEncountered(queue[0], scenarioId));
+                }
+                queue.RemoveAt(0);
+            }
+            return found;
         }
 
         /// <summary>
@@ -106,15 +117,15 @@ namespace CalRecycleLCA.Services
         /// <param name="fragmentId"></param>
         /// <param name="scenarioId"></param>
         /// <returns></returns>
-        private List<int> FragmentsEncounteredRecurse(int fragmentId, int scenarioId)
+        private List<int> SubFragmentsEncountered(int fragmentId, int scenarioId)
         {
-            List<int> fs = new List<int>() { fragmentId };
+            List<int> fs = new List<int>();
             var subfrags = _fragmentFlowService.LGetFlowsByFragment(fragmentId).Where(k => k.NodeTypeID == 2 || k.NodeTypeID == 4);
             foreach (var ff in subfrags)
             {
                 var term = _fragmentFlowService.Terminate(_fragmentFlowService.GetNodeModel(ff), scenarioId, true);
                 if (term.NodeTypeID == 2)
-                    fs.AddRange(FragmentsEncounteredRecurse((int)term.SubFragmentID, scenarioId).ToList());
+                    fs.Add((int)term.SubFragmentID);
             }
             return fs;
         }
