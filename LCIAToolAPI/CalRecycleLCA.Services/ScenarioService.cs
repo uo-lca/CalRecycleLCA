@@ -62,8 +62,10 @@ namespace CalRecycleLCA.Services
 
         public Scenario UpdateScenarioDetails(int scenarioId, ScenarioResource put)
         {
-            Scenario scenario = _repository.Query(k => k.ScenarioID == scenarioId).Select().First();
-            return _repository.UpdateScenario(scenario, put);
+            Scenario scenario = _repository.Query(k => k.ScenarioID == scenarioId).Select().FirstOrDefault();
+            return (scenario == null) 
+                ? scenario
+                : _repository.UpdateScenario(scenario, put);
         }
 
         public void DeleteScenario(int scenarioId)

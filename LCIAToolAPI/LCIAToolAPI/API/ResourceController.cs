@@ -968,7 +968,7 @@ namespace LCAToolAPI.API
                     return Request.CreateResponse(HttpStatusCode.OK,
                         _ResourceService.GetScenarios().Where(k => k.ScenarioID == scenarioId).FirstOrDefault());
                 else
-                    return Request.CreateResponse(HttpStatusCode.Conflict, conflictMsg);
+                    return Request.CreateResponse(HttpStatusCode.BadRequest,"Scenario resource specification is invalid.");
             }
             else
                 return Request.CreateResponse(HttpStatusCode.Unauthorized);

@@ -651,7 +651,7 @@ namespace CalRecycleLCA.Services
             {
                 // alternative ReferenceFlowID is allowed only if it can be converted to the same units as term.FlowID
                 var conv = _FlowFlowPropertyService.FlowConv(scenario.ReferenceFlowID, term.FlowID);
-                if (conv == 0)
+                if (conv == 0 || conv == null)
                     return null; // must be commensurable
                 // else - nothing required
             }
@@ -698,6 +698,8 @@ namespace CalRecycleLCA.Services
                     putScenario.TopLevelFragmentID = _ScenarioService.Query(k => k.ScenarioID == scenarioId)
                         .Select(k => k.TopLevelFragmentID).First();
                 putScenario = CheckTopLevelFragment(putScenario, scenarioId);
+                if (putScenario == null)
+                    return false;
                 scenario = _ScenarioService.UpdateScenarioFlow(scenarioId, putScenario, ref cacheTracker);
             }
             if (scenario != null)
