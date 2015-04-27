@@ -57,10 +57,16 @@ namespace CalRecycleLCA.Repositories
         public static IEnumerable<FlowPropertyResource> GetFlowPropertiesByFragment(this IRepositoryAsync<FlowProperty> repository,
             int fragmentId)
         {
+            // FOUR queries AND a node termination? seriously?
             var FPs = repository.GetRepository<FragmentFlow>().Queryable()
                 .Where(k => k.FragmentID == fragmentId)
                 .Join(repository.GetRepository<FlowFlowProperty>().Queryable(), ff => ff.FlowID, k => k.FlowID,
-                    (ff, k) => new { ff = ff, ffp = k }).Select(j => j.ffp.FlowPropertyID).Distinct().ToList();
+                    (ff, k) => new { ff = ff, ffp = k }).Select(j => j.ffp.FlowPropertyID)
+                    .Distinct().ToList();
+
+            var termFlow = repository.GetRepository<FragmentFlow>().GetInFlow(fragmentId, Scenario.MODEL_BASE_CASE_ID).FlowID;
+            FPs.AddRange(repository.GetRepository<FlowFlowProperty>().Queryable().Where(f => f.FlowID == termFlow).Select(f => f.FlowPropertyID));
+            FPs = FPs.Distinct().ToList();
 
             return repository.Query(fp => FPs.Contains(fp.FlowPropertyID))
                 .Include(fp => fp.ILCDEntity)
