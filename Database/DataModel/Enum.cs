@@ -16,7 +16,7 @@ namespace LcaDataModel {
         Source=5,
         LCIAMethod=6,
         Contact=7,
-        Fragment=0
+        Fragment=8
     }
 
     public enum DataPathEnum
@@ -28,7 +28,7 @@ namespace LcaDataModel {
         sources=5,
         lciamethods=6,
         contacts=7,
-        fragments=0
+        fragments=8
     };
 
 
