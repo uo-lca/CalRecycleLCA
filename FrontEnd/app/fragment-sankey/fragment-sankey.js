@@ -1,7 +1,7 @@
 'use strict';
 /* Controller for Fragment Sankey Diagram View */
 angular.module('lcaApp.fragment.sankey',
-                ['ui.router', 'lcaApp.sankey', 'lcaApp.resources.service', 'lcaApp.status.service',
+                ['ui.router', 'lcaApp.sankey.directive', 'lcaApp.resources.service', 'lcaApp.status.service',
                  'lcaApp.format', 'lcaApp.fragmentNavigation.service', 'lcaApp.models.scenario',
                     'lcaApp.selection.service'])
     .controller('FragmentSankeyCtrl',
@@ -20,7 +20,7 @@ angular.module('lcaApp.fragment.sankey',
                 magFormat = FormatService.format();
 
 
-            $scope.color = { domain: (["Fragment", "InputOutput", "Cutoff", "Process", "Background"]), range: colorbrewer.Set3[5], property: "nodeType" };
+            $scope.color = { domain: (["Fragment", "InputOutput", "Process", "Cutoff",  "Background"]), range: colorbrewer.Set2[5], property: "nodeType" };
             $scope.selectedFlowProperty = null;
             $scope.selectedNode = null;
             $scope.mouseOverNode = null;
@@ -181,11 +181,13 @@ angular.module('lcaApp.fragment.sankey',
                         flowID: element.flowID,
                         value: value
                     };
-                    if (magnitude) {
-                        link.magnitude = magnitude;
-                        link.toolTip = flow.name + " : " + magFormat(magnitude) + " " + unit;
+                    if (magnitude === null) {
+                        link.unit = "N/A";
+                        link.toolTip = flow.name;
                     } else {
-                        link.toolTip = flow.name + " does not have property : " + $scope.selectedFlowProperty["name"];
+                        link.magnitude = magnitude;
+                        link.unit = unit;
+                        link.toolTip = flow.name + " : " + magFormat(magnitude) + " " + unit;
                     }
                     if (element.direction === "Input") {
                         link.source = nodeIndex;
