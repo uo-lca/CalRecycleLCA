@@ -10,7 +10,7 @@ namespace CalRecycleLCA.Services
 {
     public interface ICacheManager
     {
-        void InitializeCache();
+        List<int> InitializeCache();
         ScenarioGroupResource CreateScenarioGroup(ScenarioGroupResource postdata);
         int CreateScenario(ScenarioResource post, int refScenarioId = Scenario.MODEL_BASE_CASE_ID);
         void DeleteScenario(int scenarioId);

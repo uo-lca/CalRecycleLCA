@@ -81,9 +81,10 @@ namespace LCAToolAPI.API
         /// </summary>
         [Route("api/init")]
         [HttpGet]
-        public void InitializeCache()
+        public HttpResponseMessage InitializeCache()
         {
-            _CacheManager.InitializeCache();
+            var result = _CacheManager.InitializeCache();
+            return Request.CreateResponse(HttpStatusCode.OK, String.Format("Computed {0} fragments, {1} scenarios.", result[0], result[1]));
         }
 
         /// <summary>
