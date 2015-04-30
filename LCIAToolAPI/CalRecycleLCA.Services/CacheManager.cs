@@ -58,7 +58,7 @@ namespace CalRecycleLCA.Services
             _ScenarioGroupService = verifiedDependency(scenarioGroupService);
         }
 
-        public void InitializeCache()
+        public List<int> InitializeCache()
         {
             // first- compute FragmentFlowLCIA for all fragments for base scenario
             List<int> frags = _FragmentService.Queryable().Select(k => k.FragmentID).ToList();
@@ -71,6 +71,8 @@ namespace CalRecycleLCA.Services
 
             foreach (Scenario s in scenarios)
                 _FragmentLCIAComputation.FragmentLCIAComputeSave(s.TopLevelFragmentID, s.ScenarioID);
+
+            return new List<int>() { frags.Count, scenarios.Count };
         }
  
         private void CloneRefScenario(int fragmentId, int newScenarioId, int refScenarioId)
@@ -128,12 +130,23 @@ namespace CalRecycleLCA.Services
 
         public int CreateScenario(ScenarioResource postScenario, int refScenarioId = Scenario.MODEL_BASE_CASE_ID)
         {
+            var sw = new CounterTimer();
+            sw.CStart();
             Scenario newScenario = _ScenarioService.NewScenario(postScenario);
+
+            sw.Click("created");
+            
             _unitOfWork.SaveChanges(); // sets flag
+
+            sw.Click("saved");
 
             CloneRefScenario(postScenario.TopLevelFragmentID, newScenario.ScenarioID, refScenarioId);
 
+            sw.Click("cloned");
+
             _FragmentLCIAComputation.FragmentLCIAComputeSave(newScenario.TopLevelFragmentID, newScenario.ScenarioID); // clears flag
+            sw.Click("computed");
+            sw.Stop();
             return newScenario.ScenarioID;
         }
 
