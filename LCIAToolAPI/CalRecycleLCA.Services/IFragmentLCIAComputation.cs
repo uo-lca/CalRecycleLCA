@@ -18,5 +18,6 @@ namespace CalRecycleLCA.Services
         IEnumerable<FragmentLCIAModel> RecursiveFragmentLCIA(int fragmentId, int scenarioId, int lciaMethodId);
         IEnumerable<FragmentLCIAModel> FragmentLCIA(int fragmentId, int scenarioId, int lciaMethodId);
         IEnumerable<FragmentLCIAModel> Sensitivity(int fragmentId, ParamResource p);
+        List<InventoryModel> ComputeFragmentLCI(int fragmentId, int scenarioId);
     }
 }

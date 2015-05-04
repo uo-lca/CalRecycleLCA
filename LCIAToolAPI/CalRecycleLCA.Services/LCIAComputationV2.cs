@@ -212,10 +212,13 @@ namespace CalRecycleLCA.Services
             return lciaResults;
         }
 
-        public List<ProcessFlowResource> ComputeProcessLCI(int processId, int scenarioId = Scenario.MODEL_BASE_CASE_ID)
+        public List<InventoryModel> ComputeProcessLCI(int processId, int scenarioId, bool includeProducts = true)
         {
             // there has to be code duplication here because we want the inventories to be unenumerated for LCIA, but enumerated here
-            var flows = _processFlowService.GetProductFlows(processId).ToList();
+            var flows = new List<InventoryModel>();
+            if (includeProducts)
+                flows.AddRange(_processFlowService.GetProductFlows(processId).ToList());
+
             var inventory = ComputeProcessEmissions(processId, scenarioId).ToList();
 
             //var dissipation = new IEnumerable<InventoryModel>();
@@ -226,19 +229,12 @@ namespace CalRecycleLCA.Services
 
             flows.AddRange(dissipation);
             flows.AddRange(inventory);
-            
-            return flows.Select(k => new ProcessFlowResource()
-                {
-                    Flow = _flowService.GetFlow(k.FlowID),
-                    Direction = Enum.GetName(typeof(DirectionEnum), (DirectionEnum)k.DirectionID),
-                    // VarName = omitted,
-                    Content = k.Composition,
-                    Dissipation = k.Dissipation,
-                    Quantity = k.Result == null 
-                        ? (double)k.Composition * (double)k.Dissipation
-                        : (double)k.Result,
-                    STDev = k.StDev == null ? 0.0 : (double)k.StDev
-                }).ToList();
+
+            foreach (var flow in flows)
+                if (flow.Result == null)
+                    flow.Result = (double)flow.Composition * (double)flow.Dissipation;
+
+            return flows;
         }
 
         //inventory in pseudocode

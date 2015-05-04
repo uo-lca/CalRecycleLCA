@@ -359,7 +359,19 @@ namespace CalRecycleLCA.Services
             if (_ProcessService.IsPrivate(processID))
                 return new List<ProcessFlowResource>();
             else
-                return _LCIAComputation.ComputeProcessLCI(processID, scenarioId);
+                return _LCIAComputation.ComputeProcessLCI(processID, scenarioId).Select(k => new ProcessFlowResource()
+                {
+                    Flow = _FlowService.GetFlow(k.FlowID),
+                    Direction = Enum.GetName(typeof(DirectionEnum), (DirectionEnum)k.DirectionID),
+                    // VarName = omitted,
+                    Content = k.Composition,
+                    Dissipation = k.Dissipation,
+                    Quantity = k.Result == null 
+                        ? (double)k.Composition * (double)k.Dissipation
+                        : (double)k.Result,
+                    STDev = k.StDev == null ? 0.0 : (double)k.StDev
+                }).ToList();
+;
         }
 
         /// <summary>
@@ -602,6 +614,18 @@ namespace CalRecycleLCA.Services
                             LCIADetail = new List<DetailedLCIAResource>()
                         }).ToList()
                 });
+        }
+
+        public IEnumerable<ProcessFlowResource> GetFragmentLCI(int fragmentId, int scenarioId = Scenario.MODEL_BASE_CASE_ID)
+        {
+            return _FragmentLCIAComputation.ComputeFragmentLCI(fragmentId, scenarioId)
+                .Select(k => new ProcessFlowResource()
+                {
+                    Flow = _FlowService.GetFlow(k.FlowID),
+                    Direction = Enum.GetName(typeof(DirectionEnum), (DirectionEnum)k.DirectionID),
+                    Quantity = (double)k.Result,
+                    STDev = (double)k.StDev
+                }).OrderBy(k => k.Flow.FlowID);
         }
 
         /// <summary>

@@ -580,6 +580,37 @@ namespace LCAToolAPI.API
                 return Request.CreateResponse(HttpStatusCode.Unauthorized);
         }
 
+        /// <summary>
+        /// Compute aggregated LCI for fragment
+        /// </summary>
+        /// <param name="fragmentId"></param>
+        /// <returns></returns>
+        [Route("api/fragments/{fragmentId:int}/exchanges")]
+        [Route("api/fragments/{fragmentId:int}/processflows")]
+        [HttpGet]
+        public IEnumerable<ProcessFlowResource> GetFragmentLCI(int fragmentId)
+        {
+            return _ResourceService.GetFragmentLCI(fragmentId);
+        }
+
+        /// <summary>
+        /// Compute aggregated LCI for fragment under scenario
+        /// </summary>
+        /// <param name="fragmentId"></param>
+        /// <returns></returns>
+        [CalRecycleAuthorize]
+        [Route("api/scenarios/{scenarioId:int}/fragments/{fragmentId:int}/exchanges")]
+        [Route("api/scenarios/{scenarioId:int}/fragments/{fragmentId:int}/processflows")]
+        [HttpGet]
+        public HttpResponseMessage GetFragmentLCI(int fragmentId, int scenarioId)
+        {
+            if (_ScenarioGroupService.CanGet(RequestContext))
+                return Request.CreateResponse(HttpStatusCode.OK,
+                    _ResourceService.GetFragmentLCI(fragmentId,scenarioId));
+            else
+                return Request.CreateResponse(HttpStatusCode.Unauthorized);
+        }
+
         // LCIA Metadata ////////////////////////////////////////////////////////////
         /// <summary>
         /// GET api/impactcategories
@@ -707,6 +738,7 @@ namespace LCAToolAPI.API
         /// </summary>
         /// <param name="processID"></param>
         /// <returns>ProcessFlowResource list</returns>
+        [Route("api/processes/{processID:int}/exchanges")]
         [Route("api/processes/{processID:int}/processflows")]
         [HttpGet]
         public IEnumerable<ProcessFlowResource> GetProcessFlows(int processID) {
@@ -720,6 +752,7 @@ namespace LCAToolAPI.API
         /// <param name="scenarioId"></param>
         /// <returns></returns>
         [CalRecycleAuthorize]
+        [Route("api/scenarios/{scenarioId:int}/processes/{processID:int}/exchanges")]
         [Route("api/scenarios/{scenarioId:int}/processes/{processID:int}/processflows")]
         [HttpGet]
         public HttpResponseMessage GetProcessFlows(int processID, int scenarioId)

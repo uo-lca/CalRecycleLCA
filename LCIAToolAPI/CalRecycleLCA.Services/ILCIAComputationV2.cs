@@ -14,7 +14,7 @@ namespace CalRecycleLCA.Services
         IEnumerable<InventoryModel> ComputeProcessEmissions(int processId, int scenarioId = Scenario.MODEL_BASE_CASE_ID);
         IEnumerable<InventoryModel> ComputeProcessDissipation(int processId, int scenarioId = Scenario.MODEL_BASE_CASE_ID);
         // this is the main inventory result
-        List<ProcessFlowResource> ComputeProcessLCI(int processId, int scenarioId = Scenario.MODEL_BASE_CASE_ID);
+        List<InventoryModel> ComputeProcessLCI(int processId, int scenarioId, bool includeProducts = true);
         //IEnumerable<LCIAModel> ComputeProcessLCIA(IEnumerable<InventoryModel> inventory, LCIAMethod lciaMethodItem, int? scenarioId);
         IEnumerable<LCIAResult> LCIACompute(int processId, int scenarioId); // wrapper for ProcessLCIA to include all LCIA methods
         IEnumerable<LCIAResult> ProcessLCIA(int processId, IEnumerable<int> lciaMethods, int scenarioId = Scenario.MODEL_BASE_CASE_ID);

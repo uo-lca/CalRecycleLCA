@@ -34,6 +34,7 @@ namespace CalRecycleLCA.Services
         IEnumerable<LCIAResultResource> GetRecursiveFragmentLCIAResultsAllMethods(int fragmentID, int scenarioID = Scenario.MODEL_BASE_CASE_ID);
         IEnumerable<LCIAResultResource> GetFragmentSensitivity(int fragmentId, int paramId);
         IEnumerable<LCIAResultResource> GetFragmentSensitivity(int fragmentId, ParamResource param);
+        IEnumerable<ProcessFlowResource> GetFragmentLCI(int fragmentId, int scenarioId = Scenario.MODEL_BASE_CASE_ID);
         IEnumerable<ProcessResource> GetProcesses(int flowTypeID = 0);
         IEnumerable<ProcessResource> GetProcess(int processId);
         IEnumerable<ImpactCategoryResource> GetImpactCategories();
