@@ -5,11 +5,11 @@ angular.module('lcaApp.resources.service', ['ngResource', 'lcaApp.idmap.service'
     .constant('API_ROOT', "http://localhost:60393/api/")
     .constant('MODEL_BASE_CASE_SCENARIO_ID', 1)
     .constant('BASE_SCENARIO_GROUP_ID', 1)
-    .factory('ResourceService', ['$resource', 'API_ROOT', 'IdMapService', '$q',
-        function($resource, API_ROOT, IdMapService, $q){
+    .factory('ResourceService', ['$resource', 'API_ROOT', 'IdMapService', '$q', '$location',
+        function($resource, API_ROOT, IdMapService, $q, $location){
             var resourceService = {},   // Singleton creates specific service type objects
                 services = {},          // Services created for, and shared by controllers
-                authToken = '2514bc8', // Authentication token. Placeholder, to be obtained from login in the future
+                authParamObject = null, // '2514bc8' - Authentication token is now extracted from URL
                 actions = {
                 // Custom actions
                     update: { method: 'PUT' },
@@ -34,7 +34,8 @@ angular.module('lcaApp.resources.service', ['ngResource', 'lcaApp.idmap.service'
                 "process" : API_ROOT + "processes",
                 "processForFlowType" : API_ROOT + "flowtypes/:flowTypeID/processes",
                 "processFlow" : API_ROOT + "processes/:processID/processflows",
-                "scenario" : API_ROOT + "scenarios/:scenarioID"
+                "scenario" : API_ROOT + "scenarios/:scenarioID",
+                "scenarioGroup" : API_ROOT + "scenariogroups/:scenarioGroupID"
             };
 
             resourceService.getResource = function( routeKey) {
@@ -43,9 +44,29 @@ angular.module('lcaApp.resources.service', ['ngResource', 'lcaApp.idmap.service'
                 }
             };
 
+            /**
+             * Extract auth token from current URL. Only do this once per app session.
+             * @returns { string | null }
+             */
+            resourceService.getAuthParam = function() {
+                if (authParamObject === null) {
+                    authParamObject = $location.search();
+                }
+                return authParamObject.hasOwnProperty("auth") ? authParamObject.auth : null;
+            };
+
+            /**
+             * Add auth token to web API request
+             * @param filter
+             * @returns {*|{}}
+             */
             resourceService.addAuthParam = function( filter) {
-                var paramFilter = filter || {};
-                paramFilter.auth = authToken;
+                var paramFilter = filter || {},
+                    authParam = resourceService.getAuthParam();
+
+                if (authParam) {
+                    paramFilter.auth = authParam;
+                }
                 return paramFilter;
             };
 
@@ -60,8 +81,12 @@ angular.module('lcaApp.resources.service', ['ngResource', 'lcaApp.idmap.service'
                     { loadFilter: null,
                       resource: resourceService.getResource(routeKey), // Instance of $resource
                       objects: null,    // Loaded objects
-                      extensionFactory: null // Factory for extending loaded objects
+                      extensionFactory: null, // Factory for extending loaded objects
+                      authenticated : false   // Web API requests are unauthenticated unless this
+                                              // application's URL contains auth parameter
                     };
+
+                svc.authenticated = resourceService.getAuthParam() != null;
 
                 svc.handleNewObjects = function(objects) {
                     if (svc.extensionFactory) {
@@ -70,8 +95,8 @@ angular.module('lcaApp.resources.service', ['ngResource', 'lcaApp.idmap.service'
                         });
                     }
                     if (svc.idName) {
-                        IdMapService.clear(svc.idName);
-                        IdMapService.add(svc.idName, objects);
+                        IdMapService.clear(routeKey);
+                        IdMapService.add(routeKey, svc.idName, objects);
                     }
                 };
 
@@ -136,11 +161,11 @@ angular.module('lcaApp.resources.service', ['ngResource', 'lcaApp.idmap.service'
                     svc.idName = idName;
                     /**
                      * Get loaded resource by object ID
-                     * @param id    Object ID value
-                     * @returns loaded resource, if found.
+                     * @param { number } id     Object ID value
+                     * @returns { null | {} }   Loaded resource, if found.
                      */
                     svc.get = function(id) {
-                       return IdMapService.get(svc.idName, id);
+                       return IdMapService.get(routeKey, id);
                     };
                 }
 
@@ -252,7 +277,21 @@ angular.module('lcaApp.resources.service')
                 return scenario.scenarioGroupID !== BASE_SCENARIO_GROUP_ID;
             };
 
+            /**
+             * Can user create scenario? Any authenticated user should be able to create scenario.
+             * If URL does not contain auth param, then user cannot be authenticated.
+             * @returns {boolean}
+             */
+            svc.canCreate = function () {
+                return ResourceService.getAuthParam() !== null;
+            };
+
             return svc;
+        }
+    ])
+    .factory('ScenarioGroupService', ['ResourceService',
+        function(ResourceService){
+            return ResourceService.getService('ScenarioGroupService', "scenarioGroup", "scenarioGroupID");
         }
     ])
     .factory('FragmentService', ['ResourceService',

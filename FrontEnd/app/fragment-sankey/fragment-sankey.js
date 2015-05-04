@@ -117,6 +117,7 @@ angular.module('lcaApp.fragment.sankey',
              */
             function addGraphNode(element) {
                 var node = {
+                        isBackground : element.isBackground,
                         nodeType: element.nodeType,
                         nodeID: element.fragmentFlowID,
                         nodeName: "",
@@ -129,8 +130,11 @@ angular.module('lcaApp.fragment.sankey',
                 if (fragFlow) {
                     node.nodeName = fragFlow["shortName"];
                 }
+                if (node.isBackground) {
+                    node.toolTip = "<p>Background</p>"
+                }
                 if (node.nodeType) {
-                    node.toolTip = "<strong>" + node.nodeType + "</strong>";
+                    node.toolTip += "<strong>" + node.nodeType + "</strong>";
                 }
                 if ("processID" in element) {
                     refObj = ProcessService.get(element.processID);
@@ -387,7 +391,7 @@ angular.module('lcaApp.fragment.sankey',
                     var fragmentFlow = FragmentFlowService.get(newVal.nodeID);
                     switch (newVal.nodeType) {
                         case "Process" :
-                            $state.go("fragment-sankey.process-instance", {
+                            $state.go(".process-instance", {
                                     scenarioID: $scope.scenario.scenarioID,
                                     fragmentID: $scope.fragment.fragmentID,
                                     fragmentFlowID: fragmentFlow.fragmentFlowID,
