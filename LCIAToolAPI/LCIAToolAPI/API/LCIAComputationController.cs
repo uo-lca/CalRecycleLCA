@@ -3,6 +3,7 @@ using Entities.Models;
 using LcaDataModel;
 using Ninject;
 using System;
+using System.Configuration;
 using System.Diagnostics;
 using System.Collections.Generic;
 using System.Linq;
@@ -18,6 +19,7 @@ namespace LCAToolAPI.API
     /// Internal API routes for testing LCIA computation and ScoreCache control.  Creation [and deletion...] of
     /// Scenario Groups also happens here.
     /// </summary>
+    [CalRecycleAuthorize]
     [EnableCors(origins: "localhost", headers: "*", methods: "*")]
     public class LCIAComputationController : ApiController
     {
@@ -27,6 +29,8 @@ namespace LCAToolAPI.API
         private readonly IFragmentLCIAComputation _fragmentLCIAComputation;
         [Inject]
         private readonly ICacheManager _CacheManager;
+        [Inject]
+        private readonly IScenarioGroupService _ScenarioGroupService;
         //[Inject]
         //private readonly ITestGenericService _testService;
 
@@ -37,10 +41,12 @@ namespace LCAToolAPI.API
         /// <param name="lciaComputationV2"></param>
         /// <param name="fragmentLCIAComputation"></param>
         /// <param name="cacheManager"></param>
+        /// <param name="scenarioGroupService"></param>
         public LCIAComputationController(
             ILCIAComputationV2 lciaComputationV2, 
             IFragmentLCIAComputation fragmentLCIAComputation,
-            ICacheManager cacheManager)
+            ICacheManager cacheManager,
+            IScenarioGroupService scenarioGroupService)
         {
 
             if (lciaComputationV2 == null)
@@ -63,6 +69,7 @@ namespace LCAToolAPI.API
             }
 
             _CacheManager = cacheManager;
+            _ScenarioGroupService = scenarioGroupService;
 
             /*
             if (testGenericService == null)
@@ -83,6 +90,8 @@ namespace LCAToolAPI.API
         [HttpGet]
         public HttpResponseMessage InitializeCache()
         {
+            if (_ScenarioGroupService.CheckAuthorizedGroup(RequestContext) != ScenarioGroup.BASE_SCENARIO_GROUP)
+                return Request.CreateResponse(HttpStatusCode.Unauthorized);
             var result = _CacheManager.InitializeCache();
             return Request.CreateResponse(HttpStatusCode.OK, String.Format("Computed {0} fragments, {1} scenarios.", result[0], result[1]));
         }
@@ -100,6 +109,8 @@ namespace LCAToolAPI.API
         [HttpPost]
         public HttpResponseMessage CreateScenarioGroup([FromBody] ScenarioGroupResource postdata)
         {
+            if (_ScenarioGroupService.CheckAuthorizedGroup(RequestContext) != ScenarioGroup.BASE_SCENARIO_GROUP)
+                return Request.CreateResponse(HttpStatusCode.Unauthorized);
             if (postdata == null)
                 return Request.CreateResponse(HttpStatusCode.BadRequest, "No content provided.");
             if (String.IsNullOrEmpty(postdata.Secret))

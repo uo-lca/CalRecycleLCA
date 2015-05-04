@@ -597,6 +597,7 @@ namespace LCAToolAPI.API
         /// Compute aggregated LCI for fragment under scenario
         /// </summary>
         /// <param name="fragmentId"></param>
+        /// <param name="scenarioId"></param>
         /// <returns></returns>
         [CalRecycleAuthorize]
         [Route("api/scenarios/{scenarioId:int}/fragments/{fragmentId:int}/exchanges")]

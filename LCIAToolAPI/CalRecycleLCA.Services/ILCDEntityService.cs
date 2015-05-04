@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Configuration;
 using System.Xml.Linq;
 using System.IO;
 using Repository.Pattern.Repositories;
@@ -21,8 +22,8 @@ namespace CalRecycleLCA.Services
     public class ILCDEntityService : Service<ILCDEntity>, IILCDEntityService
     {
         // need to figure out how to configurate this
-        private String DataRoot = "C:/Users/Brandon/Documents/GitHub/LCA_Data/";
-
+        private String DataRoot = ConfigurationManager.AppSettings["DataRoot"];
+        
         private IRepository<ILCDEntity> _repository;
         public ILCDEntityService(IRepositoryAsync<ILCDEntity> repository)
             : base(repository)

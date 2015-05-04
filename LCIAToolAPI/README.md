@@ -36,13 +36,8 @@ The XML file server also requires access to the physical directory that
 stores the XML files.  This is the same as the directory used by the data
 loader.
 
-Currently that directory is configured via a **private variable in
-[ILCDEntityService.cs](CalRecycleLCA.Services/ILCDEntityService.cs)**
-called `DataRoot`.
-This variable's value must be re-defined before deployment.
-
-For obvious reasons I am seeking a more effective way to configure this
-setting.
+Currently that directory is configured in the `DataRoot` variable, stored
+in [web.config](LCIAToolAPI/web.config) in the `appSettings` block.
 
 ## Access-Restricted Controller
 
@@ -53,13 +48,19 @@ event of a problem (`POST /api/scenarios/x/clearscorecaches` and `POST
 /api/scenarios/x/clearnodecaches`); and creating new scenario groups (`POST
 /api/scenariogroups/add`).
 
-By default, this controller's access is restricted to `localhost` in the
-`EnableCors` attribute specification in
-[LCIAComputationController.cs](LCIAToolAPI/API/LCIAComputationController.cs). This
-value should be changed to match the domain(s) from which maintenance-oriented
-requests should be accepted.  Again, improved configuration of this setting
-is desired.
+Because of the difficulty in implementing a robust host-level authorization
+within the API, actions in the access-restricted controller use the same
+authorization framework as the other routes, except the authenticated
+Scenario Group must be the Base Scenario Group (ID 1).  The auth key for
+Base Scenario Group 1 is found in the
+`LCA_Data/scenarios/ScenarioGroup.csv` file.
 
+Originally, this controller's access was restricted to `localhost` in the
+`EnableCors` attribute specification in
+[LCIAComputationController.cs](LCIAToolAPI/API/LCIAComputationController.cs). Because
+the EnableCors attribute is outside of a class, it is not straightforward
+to access configuration data here.  Since CORS is not binding anyway, the
+CORS restriction is deprecated in favor of authorization.
 
 
 ## Documentation
@@ -77,9 +78,9 @@ documentation page to be available.
 3. Edit web.config in the publish destination. In the connection string with name=UsedOilLCAContext, change the Data Source to the name of the server hosting a deployed database (see database deployment instructions in ..\..\Database\README).
 4. In the deployed database, add user IIS APPPOOL\DefaultAppPool and grant it connect, read, and write privileges to the database.
 5. Restart the published web app in IIS.
-6. To initialize a newly deployed database, visit the API endpoint
-   `GET /api/init` from a site permitted to access the LCIAComputationController
-   (default: localhost).  This will generate the cache for all scenarios.
+6. To initialize a newly deployed database, visit the API endpoint `GET
+   /api/init?auth=...` using the ScenarioGroup 1 secret.  This will
+   generate the cache for all scenarios.
 
 #Usage Instructions
 
