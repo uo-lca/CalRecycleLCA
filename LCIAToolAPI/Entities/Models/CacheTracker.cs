@@ -22,14 +22,16 @@ namespace Entities.Models
         {
             LCIAMethodsStale = new List<int>();
             _fragmentFlows = new List<int>();
+            _fragmentTraverse = new List<int>();
             ParamModified = new List<int>();
             ParamUnchanged = new List<int>();
             ParamsToPost = new List<ParamResource>();
         }
         private bool _recompute;
-        private List<int> _fragmentFlows;
+        private List<int> _fragmentFlows; // list of flows whose scores need to be updates
+        private List<int> _fragmentTraverse; // list of flows whose fragments need to be traversed (plus parents)
 
-        public bool NodeCacheStale { get; set; }
+        public bool NodeCacheStale { get; set; } // supersedes Fragment traverse list
         public bool ScoreCacheStale { get; set; } // supersedes FragmentFlows list
         public List<int> LCIAMethodsStale { get; set; }
 
@@ -38,7 +40,8 @@ namespace Entities.Models
         public bool Recompute { 
             get {return ( _recompute | NodeCacheStale | ScoreCacheStale
                 | (LCIAMethodsStale.Count() > 0 )
-                | (_fragmentFlows.Count() > 0)); }
+                | (_fragmentFlows.Count() > 0)
+                | (_fragmentTraverse.Count() > 0)); }
             set { _recompute = value; }
         }
 
@@ -49,5 +52,10 @@ namespace Entities.Models
         }
         public List<int> ParamModified;
         public List<int> ParamUnchanged;
+        public List<int> FragmentFlowsTraverse
+        {
+            get { return _fragmentTraverse; }
+            set { _fragmentTraverse = value.Distinct().ToList(); }
+        }
     }
 }

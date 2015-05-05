@@ -64,7 +64,7 @@ namespace CalRecycleLCA.Repositories
 
          * */
 
-        public static void ClearScoreCacheForSubFragments(this IRepositoryAsync<ScoreCache> repository, int scenarioId)
+        public static void ClearScoreCacheForFragments(this IRepositoryAsync<ScoreCache> repository, int scenarioId)
         {
             var scoreCaches = repository.GetRepository<ScoreCache>().Queryable()
                 .Where(sc => sc.ScenarioID == scenarioId)
@@ -77,6 +77,20 @@ namespace CalRecycleLCA.Repositories
                 });
         }
 
+        public static void ClearScoreCacheForParentFragments(this IRepositoryAsync<ScoreCache> repository, List<int> fragmentIds, int scenarioId)
+        {
+            var scoreCaches = repository.GetRepository<ScoreCache>().Queryable()
+                .Where(sc => sc.ScenarioID == scenarioId)
+                .Where(sc => sc.FragmentFlow.NodeTypeID == 2)
+                .Where(sc => fragmentIds.Contains(sc.FragmentFlow.FragmentID))
+                .ToList();
+
+            scoreCaches.ForEach(x =>
+            {
+                repository.Delete(x);
+            });
+        }
+        
         public static void ClearScoreCacheByScenarioAndLCIAMethod(this IRepositoryAsync<ScoreCache> repository, int scenarioId, int lciaMethodID)
         {
             //get scoreCaches by scenarioId and LCIAMethod

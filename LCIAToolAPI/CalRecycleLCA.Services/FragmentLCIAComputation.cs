@@ -130,6 +130,24 @@ namespace CalRecycleLCA.Services
             return fs;
         }
 
+        public List<int> ParentFragments(List<int> fragmentFlowIds, int scenarioId = Scenario.MODEL_BASE_CASE_ID)
+        {
+            // for each ffid in, determine its fragment
+            // for each fragment, recurse on a list of ffids that resolve to it.  check FragmentSubstitution and FragmentNodeFragment
+            // then send back the whole list
+            List<int> frags = _fragmentFlowService.Queryable()
+                .Where(k => fragmentFlowIds.Contains(k.FragmentFlowID))
+                .Select(k => k.FragmentID).ToList();
+
+            List<int> subffs = _fragmentFlowService.ListParents(frags, scenarioId).ToList();
+
+            if (subffs.Count() > 0)
+                frags.AddRange(ParentFragments(subffs, scenarioId));
+
+            return frags.Distinct().ToList();
+        }
+
+
         public IEnumerable<NodeCache> FragmentTraverse(int fragmentId, int scenarioId = Scenario.MODEL_BASE_CASE_ID)
         {
             // this will eventually become private after diagnostics are done

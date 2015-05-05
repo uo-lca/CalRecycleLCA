@@ -395,7 +395,7 @@ namespace CalRecycleLCA.Repositories
                         }
                          * */
                         P.DependencyParams.Add(DP);
-                        cacheTracker.NodeCacheStale = true;
+                        cacheTracker.FragmentFlowsTraverse.Add(DP.FragmentFlowID);
                         break;
                     }
                 case 4:
@@ -411,7 +411,7 @@ namespace CalRecycleLCA.Repositories
                             ObjectState = ObjectState.Added
                         };
                         P.FlowPropertyParams.Add(fp);
-                        cacheTracker.NodeCacheStale = true;
+                        cacheTracker.NodeCacheStale = true; // nothing to do about this- no way to tell when flow property conversion is required
                         break;
                     }
                 case 5:
@@ -527,10 +527,10 @@ namespace CalRecycleLCA.Repositories
                             }
                             else
                             {
+                                /*
                                 FragmentFlow ff = repository.GetRepository<FragmentFlow>().Query(k => k.FragmentFlowID == put.FragmentFlowID)
                                     .Include(k => k.Flow)
                                     .Select().First();
-                                /*
                                 ConservationParam cp = repository.GetRepository<ConservationParam>().Queryable()
                                     .Where(k => k.DependencyParam.Param.ScenarioID == P.ScenarioID)
                                     .Where(k => k.FragmentFlowID == ff.ParentFragmentFlowID)
@@ -549,11 +549,12 @@ namespace CalRecycleLCA.Repositories
 
                                 P.DependencyParam.Value = (double)put.Value;
                                 P.DependencyParam.ObjectState = ObjectState.Modified;
-                                cacheTracker.NodeCacheStale = true;
+                                cacheTracker.FragmentFlowsTraverse.Add(P.DependencyParam.FragmentFlowID);
                                 cacheTracker.ParamModified.Add(P.ParamID);
                             }
                             break;
                         }
+                        /*
                     case 2:
                         {
                             if (P.DependencyParam.Value == put.Value)
@@ -567,6 +568,7 @@ namespace CalRecycleLCA.Repositories
                             }
                             break;
                         }
+                        */
                     case 4:
                         {
                             if (P.FlowPropertyParam.Value == put.Value)
@@ -660,6 +662,12 @@ namespace CalRecycleLCA.Repositories
             {
                 case 1:
                 case 2:
+                    {
+                        int ffid = repository.GetRepository<DependencyParam>().Query(k => k.ParamID == paramId)
+                            .Select(k => k.FragmentFlowID).First();
+                        cacheTracker.FragmentFlowsTraverse.Add(ffid);
+                        break;
+                    }
                 case 4:
                     {
                         cacheTracker.NodeCacheStale = true;

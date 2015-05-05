@@ -283,7 +283,7 @@ namespace CalRecycleLCA.Services
             var ffs = _FragmentFlowService.GetTerminatedFlows(fragmentID, scenarioID)
                 .ToList();
 
-            List<int> balanceFlows = _FragmentFlowService.ListBalanceFlows(fragmentID).ToList();
+            List<int> balanceFlows = _FragmentFlowService.ListBalanceFlows(fragmentID).Intersect(ffs.Select(k => k.FragmentFlowID)).ToList();
 
             foreach (var bal in balanceFlows)
             {

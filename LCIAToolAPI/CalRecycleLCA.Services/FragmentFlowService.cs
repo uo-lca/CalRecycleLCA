@@ -32,6 +32,7 @@ namespace CalRecycleLCA.Services
         IEnumerable<FragmentStageResource> GetRecursiveFragmentStages(int fragmentId);
 
         IEnumerable<int> ListBalanceFlows(int fragmentId);
+        IEnumerable<int> ListParents(List<int> fragids, int scenarioId = Scenario.MODEL_BASE_CASE_ID);
 
         //FragmentFlow GetFragmentFlow(int fragmentFlowId);
         //IEnumerable<FragmentFlow> GetFragmentFlows(IEnumerable<int> ffids);
@@ -312,6 +313,22 @@ namespace CalRecycleLCA.Services
             return _repository.GetRepository<FragmentNodeProcess>().Queryable()
                 .Where(fnp => fnp.FragmentFlow.FragmentID == fragmentId && fnp.ConservationFragmentFlowID != null)
                 .Select(fnp => (int)fnp.ConservationFragmentFlowID);
+        }
+
+        public IEnumerable<int> ListParents(List<int> fragids, int scenarioId = Scenario.MODEL_BASE_CASE_ID)
+        {
+            // lists FFIDs that could identify the named fragid as a SubFragment
+            var defaultParents = _repository.GetRepository<FragmentNodeFragment>().Queryable()
+                .Where(k => fragids.Contains(k.SubFragmentID))
+                .Select(k => k.FragmentFlowID).ToList();
+
+            if (scenarioId != Scenario.MODEL_BASE_CASE_ID)
+                defaultParents.AddRange(_repository.GetRepository<FragmentSubstitution>().Queryable()
+                    .Where(k => k.ScenarioID == scenarioId)
+                    .Where(k => fragids.Contains(k.SubFragmentID))
+                    .Select(k => k.FragmentNodeFragment.FragmentFlowID).ToList());
+
+            return defaultParents.Distinct();
         }
 
 

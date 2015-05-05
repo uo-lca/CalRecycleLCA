@@ -17,7 +17,8 @@ namespace CalRecycleLCA.Services
 
         void ClearScoreCacheByScenarioAndLCIAMethod(int scenarioId, int lciaMethodID);
 
-        void ClearScoreCacheForSubFragments(int scenarioId);
+        void ClearScoreCacheForFragments(int scenarioId);
+        void ClearScoreCacheForParentFragments(List<int> fragmentIds, int scenarioId);
 
         IEnumerable<ScoreCache> GetScenarioCaches(int fragmentId, int scenarioId = Scenario.MODEL_BASE_CASE_ID);
         IEnumerable<ScoreCache> GetFragmentFlowCaches(int fragmentFlowId, int scenarioId = Scenario.MODEL_BASE_CASE_ID);

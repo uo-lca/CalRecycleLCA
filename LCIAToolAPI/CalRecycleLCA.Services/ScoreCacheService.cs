@@ -37,12 +37,17 @@ namespace CalRecycleLCA.Services
         }
         */
 
-        public void ClearScoreCacheForSubFragments(int scenarioId)
+        public void ClearScoreCacheForFragments(int scenarioId)
          {
-             _repository.ClearScoreCacheForSubFragments(scenarioId);
+             _repository.ClearScoreCacheForFragments(scenarioId);
          }
 
-         public void ClearScoreCacheByScenarioAndLCIAMethod(int scenarioId, int lciaMethodID = 0)
+        public void ClearScoreCacheForParentFragments(List<int> fragmentIds, int scenarioId)
+        {
+            _repository.ClearScoreCacheForParentFragments(fragmentIds, scenarioId);
+        }
+
+        public void ClearScoreCacheByScenarioAndLCIAMethod(int scenarioId, int lciaMethodID = 0)
         {
             _repository.ClearScoreCacheByScenarioAndLCIAMethod(scenarioId, lciaMethodID);
         }

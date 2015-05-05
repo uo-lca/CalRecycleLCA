@@ -58,8 +58,13 @@ namespace CalRecycleLCA.Repositories
             }
             if (scenario.FlowID != put.ReferenceFlowID)
             {
+                // changing reference flow means we have to re-traverse the fragment
                 scenario.FlowID = put.ReferenceFlowID;
-                cacheTracker.NodeCacheStale = true;
+                int ffid = repository.GetRepository<FragmentFlow>().Queryable()
+                    .Where(k => k.FragmentID == scenario.TopLevelFragmentID)
+                    .Where(k => k.ParentFragmentFlowID == null)
+                    .Select(k => k.FragmentFlowID).First();
+                cacheTracker.FragmentFlowsTraverse.Add(ffid);
             }
             scenario.DirectionID = Convert.ToInt32(Enum.Parse(typeof(DirectionEnum),put.ReferenceDirection));
             return scenario;

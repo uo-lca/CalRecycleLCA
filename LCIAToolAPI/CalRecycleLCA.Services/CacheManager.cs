@@ -158,6 +158,28 @@ namespace CalRecycleLCA.Services
 
         public bool ImplementScenarioChanges(int scenarioId, CacheTracker cacheTracker)
         {
+            // NodeCache contains traversal results- needs to be reset for fragment and its parents when a fragment traversal is changed
+            // ScoreCache contains LCIA computations- for processes, these do not depend on traversal; for subfragments, they do
+            // they are also LCIA-method-specific.
+            // so ways of clearing NodeCache include: 
+            //  * for entire scenario 
+            //  * for a list of fragments in a scenario (&)
+            // ways of clearing ScoreCache include:
+            //  * for an entire scenario
+            //  * for a single LCIA method across a scenario
+            //  * for a list of individual fragment flows in a scenario
+            //  * for all fragment flows of type 2 (subfragments) in a scenario
+            //  * for all fragment flows of type 2 within a set of fragments in a scenario (&)
+            // Any time either cache is modified, subfragment totals must be cleared in all parent fragments.
+            //  = Node: Entire Scenario --> clear all subfragment nodes
+            //  = Node: List of Fragments --> clear subfragment nodes in ParentFragments(traversal)
+            //  = Score: entire scenario [null]
+            //  = Score: LCIA Method - will clear subfragment nodes automatically
+            //  = Score: individual FFs --> clear subfragment nodes in ParentFragments(FFs)
+            //  = Score: subfragment nodes - will clear subfragment nodes intrinsically
+            //  = Score: subfragment nodes in fragment list - will do the rest
+            // The two routes marked (&) use the ParentFragments() method to generate a list of fragments that are ancestors of a set of fragmentFlows.
+
             var sw = new CounterTimer();
             sw.CStart();
             // first, we do the most surgical operations: clear LCIA method-specific results
@@ -173,25 +195,34 @@ namespace CalRecycleLCA.Services
             sw.Click("methods");
             if (cacheTracker.NodeCacheStale)
             {
-                // next, clear all computed fragment scores
-                _ScoreCacheService.ClearScoreCacheForSubFragments(scenarioId);
+                _ScoreCacheService.ClearScoreCacheForFragments(scenarioId);
                 _NodeCacheService.ClearNodeCacheByScenario(scenarioId);
             }
-            sw.Click("node");
             if (cacheTracker.ScoreCacheStale)
                 _ScoreCacheService.ClearScoreCacheByScenario(scenarioId);
-            else
-                if (cacheTracker.FragmentFlowsStale.Count() > 0)
-                {
-                    _ScoreCacheService.ClearScoreCacheForSubFragments(scenarioId);
-                    _ScoreCacheService.ClearScoreCacheByScenario(scenarioId,cacheTracker.FragmentFlowsStale);
-                }
+
+            List<int> frags = new List<int>();
+            if (cacheTracker.FragmentFlowsTraverse.Count() > 0)
+            {
+                frags.AddRange(_FragmentLCIAComputation.ParentFragments(cacheTracker.FragmentFlowsTraverse, scenarioId));
+                _NodeCacheService.ClearNodeCacheByScenarioAndFragments(frags, scenarioId);
+            }
+
+            sw.Click("node");
+            if (cacheTracker.FragmentFlowsStale.Count() > 0)
+            {
+                frags.AddRange(_FragmentLCIAComputation.ParentFragments(cacheTracker.FragmentFlowsStale, scenarioId));
+                _ScoreCacheService.ClearScoreCacheByScenario(scenarioId, cacheTracker.FragmentFlowsStale);
+            }
+
+            if (frags.Count() > 0)
+                _ScoreCacheService.ClearScoreCacheForParentFragments(frags, scenarioId);
 
             sw.Click("score");
             if (_ScenarioService.IsStale(scenarioId))
             {
                 // IsStale indicates another thread is performing cache update-- so our changes are invalid
-                _unitOfWork.Rollback();
+                //_unitOfWork.Rollback(); // this doesn't work since we haven't defined a transaction- just abandon work
                 _unitOfWork.SetAutoDetectChanges(true);
                 return false;
             }

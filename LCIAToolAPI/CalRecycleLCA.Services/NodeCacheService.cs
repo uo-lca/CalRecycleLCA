@@ -26,9 +26,9 @@ namespace CalRecycleLCA.Services
             _repository.ClearNodeCacheByScenario(scenarioId);
         }
 
-        public void ClearNodeCacheByScenarioAndFragment(int scenarioId = Scenario.MODEL_BASE_CASE_ID, int fragmentId = 0)
+        public void ClearNodeCacheByScenarioAndFragments(List<int> fragmentIds, int scenarioId = Scenario.MODEL_BASE_CASE_ID)
         {
-            _repository.ClearNodeCacheByScenarioAndFragment(scenarioId, fragmentId);
+            _repository.ClearNodeCacheByScenarioAndFragments(fragmentIds, scenarioId);
         }
 
         public bool IsCached(int fragmentId, int scenarioId = Scenario.MODEL_BASE_CASE_ID)
