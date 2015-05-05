@@ -64,6 +64,79 @@ namespace CalRecycleLCA.Repositories
 
         }
 
+
+        public static IEnumerable<FragmentFlowModel> LookupDependencies(this IRepository<ProcessFlow> repository,
+            int fragmentFlowId, FlowTerminationModel term, int scenarioId)
+        {
+            return repository.Queryable()
+                .Where(pf => pf.ProcessID == term.ProcessID)
+                .Where(pf => pf.Flow.FlowTypeID == 1)
+                .GroupJoin(repository.GetRepository<FragmentFlow>().Queryable()
+                    .Where(ff => ff.ParentFragmentFlowID == fragmentFlowId),
+                    pf => new { pf.FlowID, pf.DirectionID },
+                    ff => new { ff.FlowID, ff.DirectionID },
+                    (pf,ff) => new { baseflows = pf, fragflows = ff })
+                .SelectMany(s => s.fragflows.DefaultIfEmpty(), (s,fragflows) => new { pfff = s, ffid = fragflows })
+                .GroupJoin(repository.GetRepository<DependencyParam>().Queryable()
+                    .Where(dp => dp.Param.ScenarioID == scenarioId),
+                    s => s.ffid.FragmentFlowID,
+                    dp => dp.FragmentFlowID,
+                    (s,dp) => new { pfffdp = s, dp = dp })
+                .SelectMany(k => k.dp.DefaultIfEmpty(), (k,dp) => new FragmentFlowModel()
+                {
+                    FlowID = k.pfffdp.pfff.baseflows.FlowID,
+                    DirectionID = k.pfffdp.pfff.baseflows.DirectionID,
+                    Result = (dp == null) ? k.pfffdp.pfff.baseflows.Result
+                                          : dp.Value,
+                    StDev = k.pfffdp.pfff.baseflows.STDev,
+                    FragmentFlowID = k.pfffdp.ffid.FragmentFlowID
+                });
+                   
+                    
+        }
+
+        public static IEnumerable<ConservationModel> LookupConservationFlows(this IRepository<ProcessFlow> repository,
+            int fragmentFlowId, FlowTerminationModel term, int scenarioId)
+        {
+            int refProp = repository.GetRepository<FragmentFlow>().Queryable().Where(ff => ff.FragmentFlowID == term.BalanceFFID)
+                .Select(ff => ff.Flow.ReferenceFlowProperty).First();
+
+            return repository.Queryable()
+                .Where(pf => pf.ProcessID == term.ProcessID)
+                .Where(pf => pf.Flow.FlowTypeID == 1)
+                .GroupJoin(repository.GetRepository<FlowFlowProperty>().Queryable()
+                    .Where(ffp => ffp.FlowPropertyID == refProp),
+                    pf => pf.FlowID,
+                    ffp => ffp.FlowID,
+                    (pf, ffp) => new { pf, ffp })
+                .SelectMany(r => r.ffp.DefaultIfEmpty(), (r, ffp) => new { pfs = r.pf, ffps = ffp })
+                .GroupJoin(repository.GetRepository<FragmentFlow>().Queryable()
+                    .Where(ff => ff.ParentFragmentFlowID == fragmentFlowId),
+                    pf => new { pf.pfs.FlowID, pf.pfs.DirectionID },
+                    ff => new { ff.FlowID, ff.DirectionID },
+                    (pf, ff) => new { baseflows = pf, fragflows = ff })
+                .SelectMany(s => s.fragflows.DefaultIfEmpty(), (s, fragflows) => new { pfff = s, ffid = fragflows })
+                .GroupJoin(repository.GetRepository<DependencyParam>().Queryable()
+                    .Where(dp => dp.Param.ScenarioID == scenarioId),
+                    s => s.ffid.FragmentFlowID,
+                    dp => dp.FragmentFlowID,
+                    (s, dp) => new { pfffdp = s, dp = dp })
+                .SelectMany(k => k.dp.DefaultIfEmpty(), (k, dp) => new ConservationModel()
+                {
+                    FlowID = k.pfffdp.pfff.baseflows.pfs.FlowID,
+                    DirectionID = k.pfffdp.pfff.baseflows.pfs.DirectionID,
+                    Result = (dp == null) ? k.pfffdp.pfff.baseflows.pfs.Result
+                                          : dp.Value,
+                    StDev = k.pfffdp.pfff.baseflows.pfs.STDev,
+                    FragmentFlowID = k.pfffdp.ffid.FragmentFlowID,
+                    FlowPropertyValue = k.pfffdp.pfff.baseflows.ffps == null ? 0
+                                      : k.pfffdp.pfff.baseflows.ffps.MeanValue
+                });
+
+
+        }
+
+
         public static IEnumerable<InventoryModel> GetEmissions(this IRepositoryAsync<ProcessFlow> repository,
             int processId, int scenarioId)
         {

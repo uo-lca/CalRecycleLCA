@@ -67,13 +67,13 @@ namespace CalRecycleLCA.Services
             // we only enter this function if traversal is required.
 
             var fragmentFlows = _fragmentFlowService.LGetFlowsByFragment(fragmentId);
-            var dependencyParams = _dependencyParamService.Query(dp => dp.Param.ScenarioID == scenarioId).Select().ToList();
+            //var dependencyParams = _dependencyParamService.Query(dp => dp.Param.ScenarioID == scenarioId).Select().ToList();
 
             float activity = 1;
 
             int refFlow = fragmentFlows.Where(k => k.ParentFragmentFlowID == null).Select(k => k.FragmentFlowID).First();
 
-            NodeRecurse(fragmentFlows, dependencyParams, refFlow, scenarioId, activity);
+            NodeRecurse(fragmentFlows, refFlow, scenarioId, activity);
 
             return nodeCaches;
 
@@ -85,11 +85,11 @@ namespace CalRecycleLCA.Services
 
             // here, traversal is required because dependency parameter is zero in default scenario
             var fragmentFlows = _fragmentFlowService.LGetFlowsByFragment(ffr.FragmentID);
-            var dependencyParams = _dependencyParamService.Query(dp => dp.Param.ScenarioID == scenarioId).Select().ToList();
+            //var dependencyParams = _dependencyParamService.Query(dp => dp.Param.ScenarioID == scenarioId).Select().ToList();
 
             float activity = 1;
 
-            NodeRecurse(fragmentFlows, dependencyParams, ffr.FragmentFlowID, scenarioId, activity);
+            NodeRecurse(fragmentFlows, ffr.FragmentFlowID, scenarioId, activity);
 
             return nodeCaches.Where(n => n.FragmentID == ffr.FragmentID) // un-traversed sub-fragments are an unhandled issue at present 
                 .Select(n => new FragmentFlowResource()
@@ -112,36 +112,18 @@ namespace CalRecycleLCA.Services
         /// <param name="scenarioId">scenario for current traversal</param>
         /// <param name="flowMagnitude">magnitude of current link exiting parent node.</param>
         public void NodeRecurse(IEnumerable<FragmentFlow> ff, 
-                                IEnumerable<DependencyParam> ff_param,
+                               // IEnumerable<DependencyParam> ff_param,
                                 int fragmentFlowId, int scenarioId, double flowMagnitude)
         {
             // TODO: enable the following and remove IsCached check in GetScenarioProductFlows
             //if (nodeCaches.Any(n => n.FragmentFlowID == fragmentFlowId))
               //  return; // bail out!
-
             var theFragmentFlow = _fragmentFlowService.GetNodeModel(ff
                 .Where(k => k.FragmentFlowID == fragmentFlowId).First());
             
-            FlowTerminationModel term = _fragmentFlowService.Terminate(theFragmentFlow,scenarioId, true); // don't bother to resolve background
-
-            // first, calculate node weight
-            double? flow_conv = _flowFlowPropertyService.FlowConv(theFragmentFlow.FlowID, term.TermFlowID, scenarioId);
-            // and incoming exchange
-            // note this is not subject to parameter adjustment
-            double flow_exch;
-            var outFlows = GetScenarioProductFlows(term, theFragmentFlow.DirectionID, out flow_exch);
-            
-            if (flow_conv == null)
-            {
-                throw new ArgumentNullException("Flow conversion was not found and cannot be null");
-            }
-
-            if (flow_exch == 0)
-            {
-                throw new ArgumentException("The inflow result cannot be 0");
-            }
-
-            double nodeWeight = flowMagnitude * (double)flow_conv / flow_exch;
+            double nodeWeight;
+            var outFlows = GetScenarioProductFlows(theFragmentFlow, scenarioId, out nodeWeight);
+            nodeWeight *= flowMagnitude;
 
             // do not cache if nodeweight == 0 
             if (nodeWeight != 0)
@@ -167,15 +149,15 @@ namespace CalRecycleLCA.Services
                 // abandon recursion if no recursive steps-- but foreach should just not run if outLinks is empty
                 foreach (var item in outLinks)
                 {
-                    var this_param = ff_param.Where(dp => dp.FragmentFlowID == item.FragmentFlowID).FirstOrDefault();
+                    //var this_param = ff_param.Where(dp => dp.FragmentFlowID == item.FragmentFlowID).FirstOrDefault();
                     double resultVal = (double)outFlows
                         .Where(o => o.FlowID == item.FlowID && o.DirectionID == item.DirectionID)
                         .First().Result; // First() should generate exception if no match is found
 
-                    if (this_param != null)
-                        resultVal = this_param.Value;
+                    //if (this_param != null)
+                    //    resultVal = this_param.Value;
 
-                    NodeRecurse(ff, ff_param, item.FragmentFlowID, scenarioId, nodeWeight * resultVal);
+                    NodeRecurse(ff, item.FragmentFlowID, scenarioId, nodeWeight * resultVal);
                 }
             }
 
@@ -216,29 +198,72 @@ namespace CalRecycleLCA.Services
         /// <param name="ex_directionId">Direction of the physical flow with respect to the *parent*</param>
         /// <param name="flow_exch">out param set equal to the inflow's exchange</param>
         /// <returns></returns>
-        public IEnumerable<InventoryModel> GetScenarioProductFlows(FlowTerminationModel term, int ex_directionId, out double flow_exch)
+        public IEnumerable<InventoryModel> GetScenarioProductFlows(NodeCacheModel theFragmentFlow, int scenarioId, out double nodeWeight)
         {
+
+            FlowTerminationModel term = _fragmentFlowService.Terminate(theFragmentFlow,scenarioId, true); // resolve background
+
+            // first, calculate node weight
+            double? flow_conv = _flowFlowPropertyService.FlowConv(theFragmentFlow.FlowID, term.TermFlowID, scenarioId);
+            if (flow_conv == null)
+            {
+                throw new ArgumentNullException("Flow conversion was not found and cannot be null");
+            }
+
+
+            double flow_exch;
+            // and incoming exchange
+            // note this is not subject to parameter adjustment            
             IEnumerable<InventoryModel> Outflows;
+
             switch (term.NodeTypeID)
             {
                 case 1:
                     {
                         // process-- lookup exchange and outflows separately
-                        var _flow_exch = _processFlowService.FlowExchange((int)term.ProcessID, term.TermFlowID, ex_directionId);
-                        if (_flow_exch == null)
-                        {
-                            throw new ArgumentNullException("Process inflow not found!");
-                        }
-                        flow_exch = (double)_flow_exch;
+                        //var _flow_exch = _processFlowService.FlowExchange((int)term.ProcessID, term.TermFlowID, theFragmentFlow.DirectionID);
+                        //if (_flow_exch == null)
+                        //{
+                        //    throw new ArgumentNullException("Process inflow not found!");
+                        //}
+                        //flow_exch = (double)_flow_exch;
 
-                        Outflows = _processFlowService.GetDependencies((int)term.ProcessID, term.TermFlowID, ex_directionId);
+                        //Outflows = _processFlowService.GetDependencies((int)term.ProcessID, term.TermFlowID, theFragmentFlow.DirectionID);
+
+                        if (term.BalanceFFID == null)
+                        {
+                            // no conservation performed
+                            var FFM = _processFlowService.LookupDependencies(theFragmentFlow.FragmentFlowID, term, scenarioId).ToList();
+                            flow_exch = (double)FFM.Where(k => k.FlowID == term.TermFlowID && k.DirectionID != theFragmentFlow.DirectionID)
+                                .Select(k => k.Result).First();
+                            Outflows = FFM.Where(k => k.FragmentFlowID != null).ToList();
+                        }
+                        else
+                        {
+                            var CM = _processFlowService.LookupConservationFlows(theFragmentFlow.FragmentFlowID, term, scenarioId).ToList();
+                            flow_exch = (double)CM.Where(k => k.FlowID == term.TermFlowID && k.DirectionID != theFragmentFlow.DirectionID)
+                                .Select(k => k.Result).First();
+
+                            var balanceDir = CM.Where(k => k.FragmentFlowID == term.BalanceFFID).Select(k => k.DirectionID).First();
+
+                            var balance = CM.Where(k => k.DirectionID != balanceDir).Sum(k => k.FlowPropertyResult)
+                                        - CM.Where(k => k.DirectionID == balanceDir).Where(k => k.FragmentFlowID != term.BalanceFFID)
+                                        .Sum(k => k.FlowPropertyResult);
+
+                            foreach (var bf in CM.Where(k => k.FragmentFlowID == term.BalanceFFID))
+                                bf.FlowPropertyResult = balance;
+
+                            Outflows = CM.Where(k => k.FragmentFlowID != null).ToList();
+
+                        }
+
                         break;
                     }
                 case 2:
                     {
                         // does the subfragment exist in the cache? if so, use that
                         if (_nodeCacheService.IsCached((int)term.SubFragmentID,term.ScenarioID))
-                            Outflows = _fragmentFlowService.GetDependencies((int)term.SubFragmentID, term.TermFlowID, ex_directionId,
+                            Outflows = _fragmentFlowService.GetDependencies((int)term.SubFragmentID, term.TermFlowID, theFragmentFlow.DirectionID,
                                 out flow_exch, term.ScenarioID);
                         else
                         {
@@ -254,7 +279,7 @@ namespace CalRecycleLCA.Services
                             // access the cache to determine outflow amounts
                             //Outflows = _fragmentFlowService.GetDependencies((int)term.SubFragmentID,term.TermFlowID,ex_directionId,
                             //    out flow_exch, term.ScenarioID);
-                            Outflows = GetDependencies((int)term.SubFragmentID, term.TermFlowID, ex_directionId,
+                            Outflows = GetDependencies((int)term.SubFragmentID, term.TermFlowID, theFragmentFlow.DirectionID,
                                 out flow_exch, term.ScenarioID);
                         }
                         break;
@@ -266,6 +291,13 @@ namespace CalRecycleLCA.Services
                         break;
                     }
             }
+            if (flow_exch == 0)
+            {
+                throw new ArgumentException("The inflow result cannot be 0");
+            }
+
+            nodeWeight = (double)flow_conv / flow_exch;
+
             return Outflows;
         }
 
@@ -287,7 +319,7 @@ namespace CalRecycleLCA.Services
 
             var Outflows = _fragmentFlowService.Queryable()
                 .Where(ff => ff.FragmentID == fragmentId)
-                .Where(ff => ff.FlowID != null)           // reference flow (null FlowID) is .Unioned below
+                //.Where(ff => ff.FlowID != null)           // reference flow (null FlowID) is .Unioned below
                 .Where(ff => ff.NodeTypeID == 3).ToList()          // of type InputOutput
                 .GroupJoin(nodeCaches,
                     ff => ff.FragmentFlowID,
@@ -295,7 +327,7 @@ namespace CalRecycleLCA.Services
                     (ff,nc) => new { ff, nc })
                 .SelectMany(d => d.nc.DefaultIfEmpty(), (d,nc) => new InventoryModel
                     {
-                        FlowID = (int)d.ff.FlowID,
+                        FlowID = d.ff.FlowID,
                         DirectionID = d.ff.DirectionID,
                         Result = nc == null ? 0.0 : nc.FlowMagnitude
                     }).ToList()                         // into List<InventoryModel>

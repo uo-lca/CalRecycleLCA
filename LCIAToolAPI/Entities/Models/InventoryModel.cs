@@ -18,4 +18,20 @@ namespace Entities.Models
         public double? StDev { get; set; }
 
     }
+
+    public class FragmentFlowModel : InventoryModel
+    {
+        public int? FragmentFlowID { get; set; }
+    }
+
+    public class ConservationModel : FragmentFlowModel
+    {
+        public double? FlowPropertyValue { get; set; }
+        public double? FlowPropertyResult
+        {
+            get { return base.Result * FlowPropertyValue; }
+            set { if (FlowPropertyValue != null && FlowPropertyValue != 0)
+                    base.Result = value / FlowPropertyValue; }
+        }
+    }
 }

@@ -65,6 +65,8 @@ namespace Entities.Models {
         public bool? IsBackground { get; set; } // ResolveBackground sets this flag; stomps on NodeTypeID
         public int? ProcessID { get; set; }     // FragmentNodeProcess.ProcessID, when NodeType is Process
         public int? SubFragmentID { get; set; } // FragmentNodeFragment.SubFragmentID, when NodeType is Fragment
+        public bool? isConserved { get; set; }
+        public bool? isBalanceFlow { get; set; }
 
         public ICollection<FlowPropertyMagnitude> FlowPropertyMagnitudes { get; set; }
     }

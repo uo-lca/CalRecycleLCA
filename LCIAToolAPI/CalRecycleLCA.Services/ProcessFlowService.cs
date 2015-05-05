@@ -18,6 +18,8 @@ namespace CalRecycleLCA.Services
         IEnumerable<InventoryModel> GetDependencies(int processId, int flowId, int ex_directionId);
         IEnumerable<InventoryModel> GetEmissions(int processId, int scenarioId = Scenario.MODEL_BASE_CASE_ID);
         IEnumerable<LCIAFactorResource> GetEmissionSensitivity(int processId, int flowId, int scenarioId = Scenario.MODEL_BASE_CASE_ID);
+        IEnumerable<FragmentFlowModel> LookupDependencies(int fragmentFlowId, FlowTerminationModel term, int scenarioId = Scenario.MODEL_BASE_CASE_ID);
+        IEnumerable<ConservationModel> LookupConservationFlows(int fragmentFlowId, FlowTerminationModel term, int scenarioId = Scenario.MODEL_BASE_CASE_ID);
         // IEnumerable<InventoryModel> GetEmissionsOld(int processId, int scenarioId);
     }
 
@@ -76,6 +78,17 @@ namespace CalRecycleLCA.Services
                     Result = a.Result
                 }).ToList();
 
+        }
+
+        public IEnumerable<FragmentFlowModel> LookupDependencies(int fragmentFlowId, FlowTerminationModel term, int scenarioId = Scenario.MODEL_BASE_CASE_ID)
+        {
+            // pull product flows, join to FragmentFlows on flow + direction.. also need out value
+            return _repository.LookupDependencies(fragmentFlowId, term, scenarioId);
+        }
+
+        public IEnumerable<ConservationModel> LookupConservationFlows(int fragmentFlowId, FlowTerminationModel term, int scenarioId = Scenario.MODEL_BASE_CASE_ID)
+        {
+            return _repository.LookupConservationFlows(fragmentFlowId, term, scenarioId);
         }
 
         public IEnumerable<InventoryModel> GetEmissions(int processId, int scenarioId = Scenario.MODEL_BASE_CASE_ID)

@@ -280,8 +280,29 @@ namespace CalRecycleLCA.Services
         /// <param name="scenarioID">ScenarioID filter for NodeCache</param>
         /// <returns>List of FragmentFlowResource objects</returns>
         public IEnumerable<FragmentFlowResource> GetFragmentFlowResources(int fragmentID, int scenarioID = Scenario.MODEL_BASE_CASE_ID) {
-            return _FragmentFlowService.GetTerminatedFlows(fragmentID, scenarioID)
+            var ffs = _FragmentFlowService.GetTerminatedFlows(fragmentID, scenarioID)
                 .ToList();
+
+            List<int> balanceFlows = _FragmentFlowService.ListBalanceFlows(fragmentID).ToList();
+
+            foreach (var bal in balanceFlows)
+            {
+                var balff = ffs.Where(k => k.FragmentFlowID==bal);
+                int balanceNode = balff.Select(k => (int)k.ParentFragmentFlowID).First();
+                var refFp = balff.Select(k => k.FlowPropertyMagnitudes.First()).Select(k => k.FlowPropertyID).First();
+    
+                foreach (var ff in ffs)
+                {
+                    if (ff.FragmentFlowID == balanceNode && ff.FlowPropertyMagnitudes.Select(k => k.FlowPropertyID == refFp).Count()>0)
+                        ff.isConserved = true;
+                    else if (ff.ParentFragmentFlowID == balanceNode && ff.FlowPropertyMagnitudes.Select(k => k.FlowPropertyID == refFp).Count()>0)
+                        ff.isConserved = true;
+
+                    if (ff.FragmentFlowID == bal)
+                        ff.isBalanceFlow = true;
+                }
+            }
+            return ffs;
         }
 
         /// <summary>
