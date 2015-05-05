@@ -567,7 +567,7 @@ namespace LCIAToolAPI.Tests
             //compare again what we actually recieve from the method.
             _fragmentFlows = new List<FragmentFlow>
                      {
-                            new FragmentFlow(){ FragmentFlowID=1, FragmentID=1, Name="Electricity, at grid", ShortName="Electricity, at grid", FragmentStageID=null, NodeTypeID=1, FlowID=null, DirectionID=1, ParentFragmentFlowID=null},
+                            new FragmentFlow(){ FragmentFlowID=1, FragmentID=1, Name="Electricity, at grid", ShortName="Electricity, at grid", FragmentStageID=null, NodeTypeID=1, FlowID=687, DirectionID=1, ParentFragmentFlowID=null},
                             new FragmentFlow(){ FragmentFlowID=2, FragmentID=1, Name="Electricity, at grid, CA", ShortName="Electricity, at grid, CA", FragmentStageID=null, NodeTypeID=1, FlowID=687, DirectionID=1, ParentFragmentFlowID=1}
                      }.ToList();
 

@@ -36,7 +36,7 @@ namespace LcaDataModel
 
         public int NodeTypeID { get; set; }
 
-        public int? FlowID { get; set; }
+        public int FlowID { get; set; }
 
         public int DirectionID { get; set; }
 

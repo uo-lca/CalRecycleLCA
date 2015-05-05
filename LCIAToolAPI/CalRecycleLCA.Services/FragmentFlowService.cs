@@ -31,6 +31,8 @@ namespace CalRecycleLCA.Services
         IEnumerable<FragmentStageResource> GetFragmentStages(int fragmentId);
         IEnumerable<FragmentStageResource> GetRecursiveFragmentStages(int fragmentId);
 
+        IEnumerable<int> ListBalanceFlows(int fragmentId);
+
         //FragmentFlow GetFragmentFlow(int fragmentFlowId);
         //IEnumerable<FragmentFlow> GetFragmentFlows(IEnumerable<int> ffids);
         //IEnumerable<FragmentFlow> GetFlowsByFragment(int fragmentId);
@@ -154,7 +156,7 @@ namespace CalRecycleLCA.Services
         /// <returns></returns>
         private FlowTerminationModel Terminate(FragmentFlowResource ff, int scenarioId, bool doBackground = false)
         {
-            return _repository.Terminate(new NodeCacheModel() 
+            return _repository.LTerminate(new NodeCacheModel() 
             { 
                 NodeTypeID = Convert.ToInt32(Enum.Parse(typeof(NodeTypeEnum),ff.NodeType)),
                 FragmentFlowID = ff.FragmentFlowID,
@@ -165,7 +167,7 @@ namespace CalRecycleLCA.Services
 
         public FlowTerminationModel Terminate(NodeCacheModel ncm, int scenarioId, bool doBackground = false)
         {
-            return _repository.Terminate(ncm, scenarioId, doBackground);
+            return _repository.LTerminate(ncm, scenarioId, doBackground);
         }
 
         public InventoryModel GetInFlow(int fragmentId)
@@ -302,6 +304,14 @@ namespace CalRecycleLCA.Services
                 flatStages.AddRange(GetRecursiveFragmentStages(subfrag));
 
             return flatStages.Distinct().OrderBy(k => k.FragmentStageID).ToList();
+        }
+
+        public IEnumerable<int> ListBalanceFlows(int fragmentId)
+        {
+            // lists all fragmentflows that are balances
+            return _repository.GetRepository<FragmentNodeProcess>().Queryable()
+                .Where(fnp => fnp.FragmentFlow.FragmentID == fragmentId && fnp.ConservationFragmentFlowID != null)
+                .Select(fnp => (int)fnp.ConservationFragmentFlowID);
         }
 
 

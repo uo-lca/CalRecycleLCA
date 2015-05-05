@@ -219,9 +219,17 @@ namespace LcaDataLoader {
             if (ent != null) {
                 ent.FragmentFlowID = fragmentFlowID;
                 ent.FragmentID = Convert.ToInt32(row["FragmentID"]);
+                int flowId;
+                if (dbContext.FindRefIlcdEntityID<Flow>(row["FlowUUID"], out flowId))
+                    ent.FlowID = flowId;
+                else
+                    throw new ArgumentNullException("Required field FragmentFlow.FlowID not valid");
                 // Set required properties. Others will be set by UpdateFragmentFlow
                 ent.DirectionID = Convert.ToInt32(row["DirectionID"]);
                 ent.NodeTypeID = Convert.ToInt32(row["NodeTypeID"]);
+                ent.FragmentStageID = TransformOptionalID(row["FragmentStageID"]);
+                ent.Name = row["Name"];
+                ent.ShortName = dbContext.ShortenName(ent.Name, 30);
                 isImported = isNew ? AddEntityWithVerification<FragmentFlow>(dbContext, ent) : (dbContext.SaveChanges() > 0);
             }
             return isImported;
@@ -233,16 +241,6 @@ namespace LcaDataLoader {
             FragmentFlow ent = dbContext.Find<FragmentFlow>(fragmentFlowID);
             Debug.Assert(ent != null, "FragmentFlow should have been created for this row.");
             if (ent != null) {
-                ent.FragmentStageID = TransformOptionalID(row["FragmentStageID"]);
-                ent.Name = row["Name"];
-                ent.ShortName = dbContext.ShortenName(ent.Name, 30);
-                ent.NodeTypeID = Convert.ToInt32(row["NodeTypeID"]);
-                if (!string.IsNullOrEmpty(row["FlowUUID"])) {
-                    int flowID;
-                    if (dbContext.FindRefIlcdEntityID<Flow>(row["FlowUUID"], out flowID))
-                        ent.FlowID = flowID;
-                }
-                ent.DirectionID = Convert.ToInt32(row["DirectionID"]);
                 ent.ParentFragmentFlowID = TransformOptionalID(row["ParentFragmentFlowID"]);
                 if (dbContext.SaveChanges() > 0) isImported = true;
             }
