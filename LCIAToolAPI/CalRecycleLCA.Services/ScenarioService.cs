@@ -1,5 +1,6 @@
 ﻿using LcaDataModel;
 using Repository.Pattern.Repositories;
+using Repository.Pattern.Infrastructure;
 using Service.Pattern;
 using System;
 using System.Collections.Generic;
@@ -13,6 +14,9 @@ namespace CalRecycleLCA.Services
 {
     public interface IScenarioService : IService<Scenario>
     {
+        ScenarioResource GetResource(Scenario s);
+        ScenarioResource GetResource(int scenarioId);
+        
         bool IsStale(int ScenarioId);
         void MarkStale(int ScenarioId);
         void UnMarkStale(int ScenarioId);
@@ -21,7 +25,10 @@ namespace CalRecycleLCA.Services
         Scenario NewScenario(ScenarioResource scenario);
         Scenario UpdateScenarioFlow(int scenarioId, ScenarioResource scenario, ref CacheTracker cacheTracker);
         Scenario UpdateScenarioDetails(int scenarioId, ScenarioResource scenario);
+
+        int? PublishScenario(int scenarioId, int targetGroupId = ScenarioGroup.BASE_SCENARIO_GROUP);
         void DeleteScenario(int scenarioId);
+
     }
 
     public class ScenarioService : Service<Scenario>, IScenarioService
@@ -32,6 +39,25 @@ namespace CalRecycleLCA.Services
             : base(repository)
         {
             _repository = repository;
+        }
+
+        public ScenarioResource GetResource(Scenario s)
+        {
+            return new ScenarioResource
+            {
+                ScenarioID = s.ScenarioID,
+                ScenarioGroupID = s.ScenarioGroupID,
+                Name = s.Name,
+                TopLevelFragmentID = s.TopLevelFragmentID,
+                ActivityLevel = s.ActivityLevel,
+                ReferenceFlowID = s.FlowID,
+                ReferenceDirection = Enum.GetName(typeof(DirectionEnum), (DirectionEnum)s.DirectionID)
+            };
+        }
+
+        public ScenarioResource GetResource(int scenarioId)
+        {
+            return _repository.Query(k => k.ScenarioID == scenarioId).Select().Select(k => GetResource(k)).FirstOrDefault();
         }
 
         public void MarkStale(int scenarioId)
@@ -66,6 +92,17 @@ namespace CalRecycleLCA.Services
             return (scenario == null) 
                 ? scenario
                 : _repository.UpdateScenario(scenario, put);
+        }
+
+        public int? PublishScenario(int scenarioId, int targetGroupId = ScenarioGroup.BASE_SCENARIO_GROUP)
+        {
+            Scenario scenario = _repository.Query(k => k.ScenarioID == scenarioId).Select().FirstOrDefault();
+            if (scenario == null)
+                return null;
+            scenario.ScenarioGroupID = targetGroupId;
+            scenario.ObjectState = ObjectState.Modified;
+            _repository.Update(scenario);
+            return targetGroupId;
         }
 
         public void DeleteScenario(int scenarioId)

@@ -128,6 +128,27 @@ namespace CalRecycleLCA.Services
             return _ScenarioGroupService.GetResource(newGroup.ScenarioGroupID);
         }
 
+        public ScenarioGroupResource UpdateScenarioGroup(int scenarioGroupId, ScenarioGroupResource putdata)
+        {
+            ScenarioGroup currentGroup = _ScenarioGroupService.UpdateScenarioGroup(scenarioGroupId, putdata);
+            _unitOfWork.SaveChanges();
+            return _ScenarioGroupService.GetResource(currentGroup.ScenarioGroupID);
+        }
+
+
+        public ScenarioResource PublishScenario(int scenarioId, int targetGroup = ScenarioGroup.BASE_SCENARIO_GROUP) // this needs _unitOfWork
+        {
+            // no error checking here, no thinking. just do it.
+            if (_ScenarioService.PublishScenario(scenarioId, targetGroup) == null)
+                return new ScenarioResource();
+            else
+            {
+                _unitOfWork.SaveChanges();
+                return _ScenarioService.GetResource(scenarioId);
+            }
+        }
+
+
         public int CreateScenario(ScenarioResource postScenario, int refScenarioId = Scenario.MODEL_BASE_CASE_ID)
         {
             var sw = new CounterTimer();

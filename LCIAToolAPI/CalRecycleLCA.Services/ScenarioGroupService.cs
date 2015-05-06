@@ -21,6 +21,8 @@ namespace CalRecycleLCA.Services
         ScenarioGroupResource GetResource(int scenarioGroupId);
         IEnumerable<ScenarioGroupResource> AuthorizedGroups(HttpRequestContext request);
         ScenarioGroup AddAuthenticatedScenarioGroup(ScenarioGroupResource postdata);
+        ScenarioGroup UpdateScenarioGroup(int scenarioGroupId, ScenarioGroupResource putdata);
+        IEnumerable<ScenarioGroupResource> ConfigListAllGroups();
     }
 
     public class ScenarioGroupService : Service<ScenarioGroup>, IScenarioGroupService
@@ -124,6 +126,38 @@ namespace CalRecycleLCA.Services
             };
             _repository.Insert(scenarioGroup);
             return scenarioGroup;
+        }
+
+        public ScenarioGroup UpdateScenarioGroup(int scenarioGroupId, ScenarioGroupResource putdata)
+        {
+            ScenarioGroup currentGroup = _repository.Queryable().Where(k => k.ScenarioGroupID == scenarioGroupId)
+                .First();
+
+            if (!String.IsNullOrEmpty(putdata.Secret))
+                currentGroup.Secret = putdata.Secret;
+            if (!String.IsNullOrEmpty(putdata.Name))
+                currentGroup.Name = putdata.Name;
+            if (!String.IsNullOrEmpty(putdata.Visibility))
+            {
+                VisibilityEnum sgid;
+                if (Enum.TryParse<VisibilityEnum>(putdata.Visibility, true, out sgid))
+                    currentGroup.VisibilityID = Convert.ToInt32(sgid);
+            }
+            currentGroup.ObjectState = ObjectState.Modified;
+            _repository.Update(currentGroup);
+            return currentGroup;
+        }
+
+
+        public IEnumerable<ScenarioGroupResource> ConfigListAllGroups()
+        {
+            // list all known groups via configuration controller.
+            return _repository.Queryable().ToList().Select(k => new ScenarioGroupResource()
+                {
+                    Name = k.Name,
+                    ScenarioGroupID = k.ScenarioGroupID,
+                    Visibility = Enum.GetName(typeof(VisibilityEnum), (VisibilityEnum)k.VisibilityID)
+                });
         }
     }
 }
