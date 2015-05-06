@@ -19,9 +19,8 @@ namespace LCAToolAPI.API
     /// Internal API routes for testing LCIA computation and ScoreCache control.  Creation [and deletion...] of
     /// Scenario Groups also happens here.
     /// </summary>
-    [CalRecycleAuthorize]
-    [EnableCors(origins: "localhost", headers: "*", methods: "*")]
-    public class LCIAComputationController : ApiController
+    [EnableCors(origins: "*", headers: "*", methods: "*")]
+    public class ConfigurationController : ApiController
     {
         [Inject]
         private readonly ILCIAComputationV2 _lciaComputationV2;
@@ -29,24 +28,20 @@ namespace LCAToolAPI.API
         private readonly IFragmentLCIAComputation _fragmentLCIAComputation;
         [Inject]
         private readonly ICacheManager _CacheManager;
-        [Inject]
-        private readonly IScenarioGroupService _ScenarioGroupService;
         //[Inject]
         //private readonly ITestGenericService _testService;
 
         /// <summary>
-        /// Constructor for LCIA computation diagnostic controller.  Creates computation objects 
+        /// Constructor for configuration + diagnostic controller.  Creates computation objects 
         /// via dependency injection.
         /// </summary>
         /// <param name="lciaComputationV2"></param>
         /// <param name="fragmentLCIAComputation"></param>
         /// <param name="cacheManager"></param>
-        /// <param name="scenarioGroupService"></param>
-        public LCIAComputationController(
+        public ConfigurationController(
             ILCIAComputationV2 lciaComputationV2, 
             IFragmentLCIAComputation fragmentLCIAComputation,
-            ICacheManager cacheManager,
-            IScenarioGroupService scenarioGroupService)
+            ICacheManager cacheManager)
         {
 
             if (lciaComputationV2 == null)
@@ -69,7 +64,6 @@ namespace LCAToolAPI.API
             }
 
             _CacheManager = cacheManager;
-            _ScenarioGroupService = scenarioGroupService;
 
             /*
             if (testGenericService == null)
@@ -86,12 +80,10 @@ namespace LCAToolAPI.API
         /// Base case has cache populated for all fragments, all LCIA methods
         /// Scenarios have cache populated for top level fragment and descendents, all LCIA methods.
         /// </summary>
-        [Route("api/init")]
+        [Route("config/init")]
         [HttpGet]
         public HttpResponseMessage InitializeCache()
         {
-            if (_ScenarioGroupService.CheckAuthorizedGroup(RequestContext) != ScenarioGroup.BASE_SCENARIO_GROUP)
-                return Request.CreateResponse(HttpStatusCode.Unauthorized);
             var result = _CacheManager.InitializeCache();
             return Request.CreateResponse(HttpStatusCode.OK, String.Format("Computed {0} fragments, {1} scenarios.", result[0], result[1]));
         }
@@ -104,13 +96,11 @@ namespace LCAToolAPI.API
         /// </summary>
         /// <param name="postdata"></param>
         /// <returns>ScenarioGroup resource with secret omitted.</returns>
-        [Route("api/scenariogroups/add")]
+        [Route("config/scenariogroups/add")]
         [AcceptVerbs("POST")]
         [HttpPost]
         public HttpResponseMessage CreateScenarioGroup([FromBody] ScenarioGroupResource postdata)
         {
-            if (_ScenarioGroupService.CheckAuthorizedGroup(RequestContext) != ScenarioGroup.BASE_SCENARIO_GROUP)
-                return Request.CreateResponse(HttpStatusCode.Unauthorized);
             if (postdata == null)
                 return Request.CreateResponse(HttpStatusCode.BadRequest, "No content provided.");
             if (String.IsNullOrEmpty(postdata.Secret))
@@ -121,6 +111,7 @@ namespace LCAToolAPI.API
                 _CacheManager.CreateScenarioGroup(postdata));
         }
 
+        /**
         //GET api/<controller>
         /// <summary>
         /// api/processes/{ProcessID}/scenarios/{scenarioID}/compute
@@ -170,16 +161,18 @@ namespace LCAToolAPI.API
             sw.Stop();
             return scores;
         }
+         * */
 
         /// <summary>
         /// Diagnostic function to compute a fragment and write both traversal and LCIA results to cache
-        /// as needed.  This should be used for testing only; user-generated scenarios should be computed 
-        /// via the UpdateScenario mechanism in ResourceServiceFacade; base scenarios should be populated
-        /// at initialization (TODO) and never deleted.
+        /// as needed.  This is useful for un-sticking a scenario that was marked "stale" but did not compute
+        /// (e.g. due to an exception) and is returning 409 Conflict.  Normal operation is for user-generated 
+        /// scenarios should be computed via the UpdateScenario mechanism in ResourceServiceFacade; base 
+        /// scenarios should be populated via /config/init and never deleted.
         /// </summary>
         /// <param name="fragmentId"></param>
         /// <param name="scenarioId"></param>
-        [Route("api/fragments/{FragmentID}/scenarios/{scenarioID}/compute")]
+        [Route("config/fragments/{FragmentID}/scenarios/{scenarioID}/compute")]
         [System.Web.Http.AcceptVerbs("GET", "POST")]
         [System.Web.Http.HttpGet]
         public void LCIAFragmentComputeSave(int fragmentId, int scenarioId)
@@ -226,10 +219,10 @@ namespace LCAToolAPI.API
         */
 
         /// <summary>
-        /// Clear NodeCache data by ScenarioID
+        /// Clear NodeCache data by ScenarioID, and re-compute via ImplementScenarioChanges().
         /// </summary>
         /// <param name="scenarioId"></param>
-        [Route("api/scenarios/{scenarioID:int}/clearnodecaches")]
+        [Route("config/scenarios/{scenarioID:int}/clearnodecaches")]
         [HttpPost]
         public void ClearNodeCacheByScenario(int scenarioId)
         {
@@ -251,10 +244,10 @@ namespace LCAToolAPI.API
         */
 
         /// <summary>
-        /// Clear ScoreCache data by ScenarioID
+        /// Clear ScoreCache data by ScenarioID, and re-compute via ImplementScenarioChanges().
         /// </summary>
         /// <param name="scenarioId"></param>
-        [Route("api/scenarios/{scenarioID:int}/clearscorecaches")]
+        [Route("config/scenarios/{scenarioID:int}/clearscorecaches")]
         [HttpPost]
         public void ClearScoreCacheByScenario(int scenarioId)
         {
@@ -277,12 +270,12 @@ namespace LCAToolAPI.API
 
 
         /// <summary>
-        /// Clear ScoreCache data by ScenarioID and LCIAMethodID
+        /// Clear ScoreCache data by ScenarioID and LCIAMethodID, and re-compute via ImplementScenarioChanges().
         /// 
         /// </summary>
         /// <param name="scenarioId"></param>
         /// <param name="lciaMethodId"></param>
-        [Route("api/scenarios/{scenarioID:int}/lciamethods/{lciaMethodID:int}/clearscorecaches")]
+        [Route("config/scenarios/{scenarioID:int}/lciamethods/{lciaMethodID:int}/clearscorecaches")]
         [HttpPost]
         public void ClearScoreCacheByScenarioAndLCIAMethod(int scenarioId, int lciaMethodId)
         {

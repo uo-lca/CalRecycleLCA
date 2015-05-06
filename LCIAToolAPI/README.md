@@ -43,24 +43,20 @@ in [web.config](LCIAToolAPI/web.config) in the `appSettings` block.
 
 The `LCIAComputationController` is used for debugging and for certain
 maintenance tasks, including the initial population of the NodeCache and
-ScoreCache (`GET /api/init`), clearing and recomputing the cache in the
-event of a problem (`POST /api/scenarios/x/clearscorecaches` and `POST
-/api/scenarios/x/clearnodecaches`); and creating new scenario groups (`POST
-/api/scenariogroups/add`).
+ScoreCache (`GET /config/init`), clearing and recomputing the cache in the
+event of a problem (`POST /config/scenarios/x/clearscorecaches` and `POST
+/config/scenarios/x/clearnodecaches`); and creating new scenario groups
+(`POST /config/scenariogroups/add`).
 
-Because of the difficulty in implementing a robust host-level authorization
-within the API, actions in the access-restricted controller use the same
-authorization framework as the other routes, except the authenticated
-Scenario Group must be the Base Scenario Group (ID 1).  The auth key for
-Base Scenario Group 1 is found in the
-`LCA_Data/scenarios/ScenarioGroup.csv` file.
+All the routes in this controller have the prefix `/config` instead of
+`/api`.  Access to these routes should be limited at the server level to
+computers authorized to make configuration changes.
 
 Originally, this controller's access was restricted to `localhost` in the
 `EnableCors` attribute specification in
-[LCIAComputationController.cs](LCIAToolAPI/API/LCIAComputationController.cs). Because
-the EnableCors attribute is outside of a class, it is not straightforward
-to access configuration data here.  Since CORS is not binding anyway, the
-CORS restriction is deprecated in favor of authorization.
+[LCIAComputationController.cs](LCIAToolAPI/API/LCIAComputationController.cs).
+Since CORS is not binding anyway, the CORS restriction is deprecated in
+favor of host-level access control implemented by the web server.
 
 
 ## Documentation
@@ -75,12 +71,22 @@ documentation page to be available.
 0. Create and populate the database using the [Data Loader](../Database/DataLoader).
 1. Build solution (..\CalRecycleLCA.sln), Release configuration
 2. Publish project, LCIAToolAPI. A publishing profile must first be configured. FTP is used at UCSB to publish to a test server. The profile is saved as LCIAToolAPI\Properties\PublishProfiles\kbcalr.pubxml.
-3. Edit web.config in the publish destination. In the connection string with name=UsedOilLCAContext, change the Data Source to the name of the server hosting a deployed database (see database deployment instructions in ..\..\Database\README).
+3. Edit web.config in the publish destination.
+
+    * In the connection string with name=UsedOilLCAContext, change the Data
+      Source to the name of the server hosting a deployed database (see
+      database deployment instructions in [..\..\Database\README](..\..\Database\README).
+    * In the appSettings, edit the value for key `DataRoot` to point to the
+      LCA data repository.
 4. In the deployed database, add user IIS APPPOOL\DefaultAppPool and grant it connect, read, and write privileges to the database.
-5. Restart the published web app in IIS.
+5. IIS Configuration
+
+    * Configure virtual directories for XML schemas and stylesheets.
+    * Configure access to configuration routes if desired.
+    * Restart the published web app in IIS.
+
 6. To initialize a newly deployed database, visit the API endpoint `GET
-   /api/init?auth=...` using the ScenarioGroup 1 secret.  This will
-   generate the cache for all scenarios.
+   /config/init` to generate the cache for all scenarios.
 
 #Usage Instructions
 
