@@ -166,7 +166,7 @@ namespace LCAToolAPI.API
         /// <summary>
         /// Diagnostic function to compute a fragment and write both traversal and LCIA results to cache
         /// as needed.  This is useful for un-sticking a scenario that was marked "stale" but did not compute
-        /// (e.g. due to an exception) and is returning 410 Conflict.  Normal operation is for user-generated 
+        /// (e.g. due to an exception) and is returning 409 Conflict.  Normal operation is for user-generated 
         /// scenarios should be computed via the UpdateScenario mechanism in ResourceServiceFacade; base 
         /// scenarios should be populated via /config/init and never deleted.
         /// </summary>
