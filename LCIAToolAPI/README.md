@@ -41,7 +41,7 @@ in [web.config](LCIAToolAPI/web.config) in the `appSettings` block.
 
 ## Access-Restricted Controller
 
-The `LCIAComputationController` is used for debugging and for certain
+The `ConfigurationController` is used for debugging and for certain
 maintenance tasks, including the initial population of the NodeCache and
 ScoreCache (`GET /config/init`), clearing and recomputing the cache in the
 event of a problem (`POST /config/scenarios/x/clearscorecaches` and `POST
@@ -54,7 +54,7 @@ computers authorized to make configuration changes.
 
 Originally, this controller's access was restricted to `localhost` in the
 `EnableCors` attribute specification in
-[LCIAComputationController.cs](LCIAToolAPI/API/LCIAComputationController.cs).
+[ConfigurationController.cs](LCIAToolAPI/API/ConfigurationController.cs).
 Since CORS is not binding anyway, the CORS restriction is deprecated in
 favor of host-level access control implemented by the web server.
 
