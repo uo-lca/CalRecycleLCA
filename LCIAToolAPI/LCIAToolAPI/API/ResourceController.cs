@@ -966,12 +966,14 @@ namespace LCAToolAPI.API
             if (authGroup != 0 && authGroup != null && _ScenarioGroupService.CanGet(RequestContext, cloneScenario))
             {
                 if (postdata == null)
-                    postdata = _ScenarioService.Queryable().Where(k => k.ScenarioID == cloneScenario)
-                        .Select(k => new ScenarioResource()
+                    postdata = new ScenarioResource();
+
+                postdata = _ScenarioService.Queryable().Where(k => k.ScenarioID == cloneScenario)
+                    .Select(k => new ScenarioResource()
                         {
-                            Name = "New Scenario",
-                            ActivityLevel = k.ActivityLevel,
-                            TopLevelFragmentID = k.TopLevelFragmentID
+                            Name = String.IsNullOrEmpty(postdata.Name) ? "New Scenario" : postdata.Name,
+                            ActivityLevel = postdata.ActivityLevel == 0 ? k.ActivityLevel : postdata.ActivityLevel,
+                            TopLevelFragmentID = postdata.TopLevelFragmentID == 0 ? k.TopLevelFragmentID : postdata.TopLevelFragmentID
                         }).First();
 
                 int scenarioId = _ResourceService.AddScenario(postdata, (int)authGroup, cloneScenario);
