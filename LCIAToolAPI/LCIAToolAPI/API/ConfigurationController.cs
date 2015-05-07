@@ -31,6 +31,8 @@ namespace LCAToolAPI.API
         private readonly ICacheManager _CacheManager;
         [Inject]
         private readonly IScenarioGroupService _scenarioGroupService;
+        [Inject]
+        private readonly IResourceServiceFacade _resourceService;
         //[Inject]
         //private readonly ITestGenericService _testService;
 
@@ -42,11 +44,13 @@ namespace LCAToolAPI.API
         /// <param name="fragmentLCIAComputation"></param>
         /// <param name="cacheManager"></param>
         /// <param name="scenarioGroupService"></param>
+        /// <param name="resourceService"></param>
         public ConfigurationController(
             ILCIAComputationV2 lciaComputationV2, 
             IFragmentLCIAComputation fragmentLCIAComputation,
             ICacheManager cacheManager,
-            IScenarioGroupService scenarioGroupService)
+            IScenarioGroupService scenarioGroupService,
+            IResourceServiceFacade resourceService)
         {
 
             if (lciaComputationV2 == null)
@@ -70,6 +74,7 @@ namespace LCAToolAPI.API
 
             _CacheManager = cacheManager;
             _scenarioGroupService = scenarioGroupService;
+            _resourceService = resourceService;
 
             /*
             if (testGenericService == null)
@@ -146,6 +151,30 @@ namespace LCAToolAPI.API
                 _CacheManager.UpdateScenarioGroup(id, putdata));
             
         }
+
+        /// <summary>
+        /// Config-protected route to view all scenarios
+        /// </summary>
+        /// <returns></returns>
+        [Route("config/scenarios")]
+        [HttpGet]
+        public IEnumerable<ScenarioResource> ListAllScenarios()
+        {
+            return _resourceService.GetScenarios().ToList();
+        }
+
+        /// <summary>
+        /// config-protected route to view all params for any scenario
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        [Route("config/scenarios/{id:int}/params")]
+        [HttpGet]
+        public IEnumerable<ParamResource> ListScenarioParams(int id)
+        {
+            return _resourceService.GetParams(id).ToList();
+        }
+
 
         /// <summary>
         /// Change a scenario's group ID.  Without a URL param, changes it to the base group- making it public.
