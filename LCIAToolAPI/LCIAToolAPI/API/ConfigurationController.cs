@@ -9,6 +9,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
+using System.Web;
 using System.Web.Http;
 using System.Web.Http.Cors;
 using CalRecycleLCA.Services;
@@ -28,6 +29,8 @@ namespace LCAToolAPI.API
         private readonly IFragmentLCIAComputation _fragmentLCIAComputation;
         [Inject]
         private readonly ICacheManager _CacheManager;
+        [Inject]
+        private readonly IScenarioGroupService _scenarioGroupService;
         //[Inject]
         //private readonly ITestGenericService _testService;
 
@@ -38,10 +41,12 @@ namespace LCAToolAPI.API
         /// <param name="lciaComputationV2"></param>
         /// <param name="fragmentLCIAComputation"></param>
         /// <param name="cacheManager"></param>
+        /// <param name="scenarioGroupService"></param>
         public ConfigurationController(
             ILCIAComputationV2 lciaComputationV2, 
             IFragmentLCIAComputation fragmentLCIAComputation,
-            ICacheManager cacheManager)
+            ICacheManager cacheManager,
+            IScenarioGroupService scenarioGroupService)
         {
 
             if (lciaComputationV2 == null)
@@ -64,6 +69,7 @@ namespace LCAToolAPI.API
             }
 
             _CacheManager = cacheManager;
+            _scenarioGroupService = scenarioGroupService;
 
             /*
             if (testGenericService == null)
@@ -89,6 +95,17 @@ namespace LCAToolAPI.API
         }
 
         /// <summary>
+        /// List all known scenario groups.
+        /// </summary>
+        /// <returns></returns>
+        [Route("config/scenariogroups")]
+        [HttpGet]
+        public IEnumerable<ScenarioGroupResource> ListAllScenarioGroups()
+        {
+            return _scenarioGroupService.ConfigListAllGroups();
+        }
+
+        /// <summary>
         /// Creates a new scenario group with a known "secret." Requests must use this secret as auth token when requesting scenarios belonging to this group.
         /// 
         /// Note that this should obviously use some more secure form of secret sharing.
@@ -111,7 +128,44 @@ namespace LCAToolAPI.API
                 _CacheManager.CreateScenarioGroup(postdata));
         }
 
-        /**
+        /// <summary>
+        /// Route for updating scenario group name, secrets and/or visibility.
+        /// </summary>
+        /// <param name="id"></param>
+        /// <param name="putdata"></param>
+        /// <returns></returns>
+        [Route("config/scenariogroups/{id:int}")]
+        [HttpPut]
+        public HttpResponseMessage UpdateScenarioGroup(int id, [FromBody] ScenarioGroupResource putdata)
+        {
+            if (putdata == null)
+                return Request.CreateResponse(HttpStatusCode.BadRequest, "No content provided.");
+            if (_scenarioGroupService.Queryable().Where(k => k.ScenarioGroupID == id).Count() != 1)
+                return Request.CreateResponse(HttpStatusCode.BadRequest, String.Format("ScenarioGroupID {0} does not exist.", id));
+            return Request.CreateResponse(HttpStatusCode.OK,
+                _CacheManager.UpdateScenarioGroup(id, putdata));
+            
+        }
+
+        /// <summary>
+        /// Change a scenario's group ID.  Without a URL param, changes it to the base group- making it public.
+        /// With a URL param group=id, change it to the group specified.
+        /// </summary>
+        /// <param name="scenarioId"></param>
+        /// <returns></returns>
+        [Route("config/scenarios/{scenarioId:int}/publish")]
+        [HttpPut]
+        public ScenarioResource PublishScenario(int scenarioId)
+        {
+            var targetGroupFromQuery = HttpUtility.ParseQueryString(Request.RequestUri.Query)["group"];
+
+            if (!String.IsNullOrEmpty(targetGroupFromQuery))
+                return _CacheManager.PublishScenario(scenarioId, Convert.ToInt32(targetGroupFromQuery));
+            else
+                return _CacheManager.PublishScenario(scenarioId);
+        }
+
+        /* *
         //GET api/<controller>
         /// <summary>
         /// api/processes/{ProcessID}/scenarios/{scenarioID}/compute

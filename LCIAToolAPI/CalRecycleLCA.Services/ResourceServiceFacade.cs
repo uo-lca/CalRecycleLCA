@@ -221,21 +221,6 @@ namespace CalRecycleLCA.Services
                 }
             };
         }
-
-
-        public ScenarioResource Transform(Scenario s)
-        {
-            return new ScenarioResource
-            {
-                ScenarioID = s.ScenarioID,
-                ScenarioGroupID = s.ScenarioGroupID,
-                Name = s.Name,
-                TopLevelFragmentID = s.TopLevelFragmentID,
-                ActivityLevel = Convert.ToDouble(s.ActivityLevel),
-                ReferenceFlowID = s.FlowID,
-                ReferenceDirection = Enum.GetName(typeof(DirectionEnum), (DirectionEnum)s.DirectionID)
-            };
-        }
         #endregion
 
         #region Service Providers
@@ -656,14 +641,14 @@ namespace CalRecycleLCA.Services
         public IEnumerable<ScenarioResource> GetScenarios()
         {
             IEnumerable<Scenario> scenarios = _ScenarioService.Queryable();
-            return scenarios.Select(c => Transform(c)).ToList();
+            return scenarios.Select(c => _ScenarioService.GetResource(c)).ToList();
         }
 
         public IEnumerable<ScenarioResource> GetScenarios(int? userGroupID)
         {
             IEnumerable<Scenario> scenarios = _ScenarioService.Queryable()
                 .Where(c => (c.ScenarioGroupID == 1 || c.ScenarioGroupID == userGroupID));
-            return scenarios.Select(c => Transform(c)).ToList();
+            return scenarios.Select(c => _ScenarioService.GetResource(c)).ToList();
         }
 
         /// <summary>
