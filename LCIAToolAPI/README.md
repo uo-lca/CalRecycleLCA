@@ -68,7 +68,7 @@ documentation page to be available.
 
 ## Deployment
 
-0. Create and populate the database using the [Data Loader](../Database/DataLoader).
+0. Create and populate the database using the [Data Loader](../Database/DataLoader). (Delete it first, if it was previously deployed).
 1. Build solution (..\CalRecycleLCA.sln), Release configuration
 2. Publish project, LCIAToolAPI. A publishing profile must first be configured. FTP is used at UCSB to publish to a test server. The profile is saved as LCIAToolAPI\Properties\PublishProfiles\kbcalr.pubxml.
 3. Edit web.config in the publish destination.
@@ -87,6 +87,11 @@ documentation page to be available.
 
 6. To initialize a newly deployed database, visit the API endpoint `GET
    /config/init` to generate the cache for all scenarios.
+
+### Notes for deploying to kbcalr
+
+* LCA_Data resides under ```C:\UsedOilLcaSites``` so that it inherits permissions needed for IIS
+* LCAToolAPI.xml is not deployed when LCIAToolAPI is published. Need to copy that file to ```C:\UsedOilLcaSites\UsedOilLcaServer\bin```
 
 #Usage Instructions
 
