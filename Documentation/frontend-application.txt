@@ -1,3 +1,187 @@
+Monday June 1 2015
+Specification for new features under revised SOW
+
+Three enhancements associated with the new approved scope of work.  These
+are listed easiest-first.
+
+ * Flow Composition Modeling and adjustment via the frontend
+
+   We need one or two new views:
+
+   = First, we need a table of composition models (this could be a new
+     navigation bar entry or simply a new table on the home screen)
+
+     This will just have: Composition Model Name, Flow Name
+
+     (In order to do this, I need to create API routes to report
+     composition models)
+
+   = Then we need a "Composition model detail" view which is just like the
+     LCIA method detail view.  It will have the name of the composition
+     model, a list of processes that refer to it, and a list of composition
+     data which is a param grid (and a scenario selector just like the LCIA
+     detail view).
+
+     Grid columns: Flow Property, Value, Param
+
+     (I will also need a composition data API route)
+
+     Param submission will be CompositionDataID and Value
+
+   = Finally, on Process LCIA view (both modes), if the ProcessResource has
+     a CompositionModelID field, create a link to the composition model
+     detail view that corresponds.
+
+   I think that's about it for this one.
+
+
+ * Process LCIA Comparison
+
+   It should be possible to compare two (or more) process LCIA results to
+   one another on the Process LCIA view.  This is tricky because in general
+   the processes will have different elementary flows, and the elementary
+   flows will appear in a different order.
+
+   I spelled out some pseudocode that should implement the desired
+   functionality.  This will also tie in with (and help resolve) #77
+
+   = pull-down list selects process
+
+   = once process is selected, a new pull-down list appears to select a
+     comparison process.  This could be repeated...
+
+   = For all processes selected: obtain detailed LCIA results from the API 
+
+   = for each LCIA method:
+
+     * determine axis_scale and axis_span:
+       compute sums of all positive and all negative contributions for each
+       process. 
+       axis_scale = (minimum(negative), maximum(positive))
+       axis_span = axis_scale(2) - axis_scale (1)
+
+     * generate a flow list
+
+       flow_list=[]
+       combine all lcia details into a single array that selects flowID,
+       abs(LCIAResult) as AbsResult, sort largest to smallest, save -> A
+       while A[0].AbsResult > threshold * axis_span:
+         if (A[0].flowID not in flow_list)
+	   flow_list=[flow_list A[0].flowID]
+         remove A[0] from A
+
+       flow_list now contains a sorted list of flows accounting for
+       (1-threshold) of the score (note, some other thresholding approach
+       could be used)
+
+       Add "Aggregate positive" to end of flow_list
+       Add "Aggregate negative"
+       
+     * Construct a summary table of LCIA scores (getFlowRows) from the
+       flow_list: 
+       summary_table columns: Color, Flow Category, Name, p1, p2...
+       (one data column for each process)
+       table should have rows equal to the length of flow_list (including Aggregate)
+
+       for each process: 
+         compute its total LCIA score from positive values -> Aggregate positive; 
+         compute its total LCIA score from negative values -> Aggregate negative; 
+
+       for each flowID in flow_list:
+       	 assign it a sequential color (generic grays / ? for aggregate rows)
+         lookup its compartment and name
+	 for each process:
+	   lookup LCIA result for current flowID
+	   if present:
+	     add value to the table
+	     if value >0 subtract value from Aggregate positive
+	     if value <0 subtract value from Aggregate negative
+	   else:
+	     add null value in table
+        
+     * Use populated summary table to (1) draw barchart and (2) draw d3 table
+
+       = barchart should accept as input (axis_scale, summary_table).  All
+       barcharts should use the same axis_scale.
+
+       = table output should suppress aggregate rows if they are all empty
+       (as is currently done)
+
+
+
+ * Sensitivity Analysis.  On "Fragment LCIA", only in fragment navigation mode,
+   provide UI for sensitivity to parameters belonging to the current scenario.  
+
+   Summary of Current operation:
+
+   - Stages present in a waterfall are given by
+     /api/fragments/{fid}/stages
+
+   - By default, scenario LCIA results come from query
+     /api/scenarios/{sid}/fragments/{fid}/lciaresults
+     which is an array of LCIAResultResource objects R[...]
+
+     Each stage value can be found in R[lciaMethodID][scenarioID][stageID]
+     as coded  (?)
+
+   - unit sensitivity results come from querying
+     /api/fragments/{fid}/params/{pid}/sensitivity
+     returns an LCIAResultResource S[...] with the same fragmentstages as already
+     shown 
+
+   - unit sensitivity value is found in
+     S[lciaMethodID][scenarioID][stageID].CumulativeResult
+     call it "unit_sens"
+
+     S[lciaMethodID][scenarioID].Total is "total_sens"
+
+   - param sensitivity value is:
+     sens_value = unit_sens*(param_default - param_value) 
+     (note: this is -1 times what I previously said- this is correct)
+
+   - similarly:
+     total_sens_value = total_sens*(param_default - param_value)
+
+   Implementation should look something like the following:
+
+   = create a whisker directive that accepts arguments (bar, sens_value)
+      and draws a whisker starting at the end of the named bar and having
+      length sens_value in axis units
+
+   = View Parameter Sensitivity: Drop-down box with a list of parameter
+     names belonging to the current scenario
+
+   = When user selects a parameter, query
+     /api/fragments/{fid}/params/{pid}/sensitivity 
+     compute (param_default - param_value) for later use
+
+   = For each LCIA method, decorate the (non-base-case) waterfall chart as
+     follows:
+
+     -- for each stage with a non-zero unit sensitivity, draw a whisker of
+        length sens_value starting from the end of the bar.
+
+     -- At or near the horizontal axis, draw a whisker of length
+        total_sens_value starting from the waterfall net total 
+
+   = "wishlist" feature: after user selects param, create a slider UI to
+      adjust param_slider.  Slider should mark param_default and
+      param_value, and param_slider should initially equal param_value.
+
+      modify whisker directive to accept three inputs (bar, sens_value,
+      slider_value) where sens_value is computed as before, 
+      slider_value = unit_sens*(param_default - param_slider)
+
+      If this could be d3-ified so that the whisker values automatically
+      update when the slider is moved, that would be awesome.
+
+
+
+
+
+
+
+======================================================================================================================
 Thur Apr 15 2015
 Future work ideas (not in scope of current SOW)
 
@@ -14,11 +198,27 @@ Fragment LCIA planned change summary
 
 The Fragment LCIA view + controller will have 2 different modes. The mode depends on UI router state. Here is how I imagine each mode will look and behave�
 
-1.	Top-level fragment LCIA mode is enabled when user selects Fragment LCIA from top menu bar.
-View contains drop-down selection list of top-level fragments and multiple selection list of scenarios. Fragment selection determines contents of scenario selection list. Fragment LCIA is not performed until user clicks a  button labeled, �Get Fragment LCIA Results� (?).
-2.	Fragment navigation mode is enabled when user clicks Fragment LCIA from Fragment Sankey view.
-In this mode, the view displays the current fragment navigation state as breadcrumbs. Fragment LCIA is performed immediately on current fragment, comparing current scenario to base case scenario. (If they are the same, then only one waterfall is shown in each panel).
-A sub-fragment selection list will allow the user to navigate to a sub-fragment. The behavior will be like in the Fragment Sankey view. Implementation of breadcrumbs may get tricky here. Will let you know how it goes.
+1.	Top-level fragment LCIA mode is enabled when user selects Fragment
+LCIA from top menu bar. 
+
+View contains drop-down selection list of top-level fragments and multiple
+selection list of scenarios. Fragment selection determines contents of
+scenario selection list. Fragment LCIA is not performed until user clicks a
+button labeled, �Get Fragment LCIA Results� (?).
+
+2.	Fragment navigation mode is enabled when user clicks Fragment LCIA
+from Fragment Sankey view.
+
+In this mode, the view displays the current fragment navigation state as
+breadcrumbs. Fragment LCIA is performed immediately on current fragment,
+comparing current scenario to base case scenario. (If they are the same,
+then only one waterfall is shown in each panel).
+
+A sub-fragment selection list will allow the user to navigate to a
+sub-fragment. The behavior will be like in the Fragment Sankey
+view. Implementation of breadcrumbs may get tricky here. Will let you know
+how it goes.
+
 
 In either mode, user may close LCIA method panels.
 ======================================================================================================================
