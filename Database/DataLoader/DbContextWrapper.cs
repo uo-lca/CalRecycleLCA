@@ -1,9 +1,11 @@
 ﻿using System;
+using System.Diagnostics;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Data.Entity;
+using System.Data.Entity.Validation;
 using System.Data.Entity.Infrastructure;
 using System.Runtime.CompilerServices;
 using LcaDataModel;
@@ -130,6 +132,22 @@ namespace LcaDataLoader {
                     Program.Logger.ErrorFormat("Inner exception: {0}", ie.Message);
                 }
 
+                return 0;
+            }
+            catch (DbEntityValidationException dbEx)
+            {
+                foreach (var validationErrors in dbEx.EntityValidationErrors)
+                {
+                    foreach (var validationError in validationErrors.ValidationErrors)
+                    {
+                        Trace.TraceInformation("Property: {0} Error: {1}", validationError.PropertyName, validationError.ErrorMessage);
+                    }
+                }
+                return 0;
+            }
+            catch (Exception e)
+            {
+                Program.Logger.ErrorFormat("Some other kind of exception: {0}", e.Message);
                 return 0;
             }
         }

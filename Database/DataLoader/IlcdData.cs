@@ -429,7 +429,10 @@ namespace LcaDataLoader {
                 SaveIlcdEntity(ilcdDb, process, DataTypeEnum.Process);
                 process.Name = GetElementValue(ElementName("baseName"));
                 process.ReferenceYear = GetElementValue(_CommonNamespace + "referenceYear");
-                process.Geography = GetElementAttributeValue(ElementName("locationOfOperationSupplyOrProduction"), "location");
+                string geog = GetElementAttributeValue(ElementName("locationOfOperationSupplyOrProduction"), "location");
+                if (geog.Length > 15)
+                    geog = geog.Substring(0, 15);
+                process.Geography = geog;
                 lookupName = GetElementAttributeValue(ElementName("quantitativeReference"), "type");
                 if (lookupName != null) {
                     process.ReferenceTypeID = ilcdDb.LookupEntityID<ReferenceType>(lookupName);
