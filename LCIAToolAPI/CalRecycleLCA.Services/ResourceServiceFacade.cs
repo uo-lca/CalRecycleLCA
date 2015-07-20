@@ -301,6 +301,12 @@ namespace CalRecycleLCA.Services
             return _FlowService.GetFlows(flowtypeID);
         }
 
+        public IEnumerable<FlowResource> GetCompositionFlows()
+        {
+            return _FlowService.GetCompositionFlows();
+        }
+
+
         /// <summary>
         /// Get a single flow. should really do bounds-checking
         /// </summary>
@@ -379,6 +385,12 @@ namespace CalRecycleLCA.Services
                 }).ToList();
 ;
         }
+
+        public IEnumerable<ProcessDissipationResource> GetProcessDissipation(int processId, int scenarioId = Scenario.MODEL_BASE_CASE_ID)
+        {
+            return _ProcessService.GetDissipation(processId, scenarioId);
+        }
+
 
         /// <summary>
         /// Return all flowproperties

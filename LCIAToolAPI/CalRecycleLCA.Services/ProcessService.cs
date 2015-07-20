@@ -16,6 +16,7 @@ namespace CalRecycleLCA.Services
         bool IsPrivate(int processID);
         IEnumerable<ProcessResource> GetProcesses(int flowTypeId = 0);
         IEnumerable<ProcessResource> GetProcess(int processId);
+        IEnumerable<ProcessDissipationResource> GetDissipation(int processId, int scenarioId = Scenario.MODEL_BASE_CASE_ID);
     }
 
     public class ProcessService : Service<Process>, IProcessService
@@ -44,6 +45,10 @@ namespace CalRecycleLCA.Services
                 return pData.Where(p => p.hasElementaryFlows == true);
             else
                 return pData;
+        }
+        public IEnumerable<ProcessDissipationResource> GetDissipation(int processId, int scenarioId = Scenario.MODEL_BASE_CASE_ID)
+        {
+            return _repository.GetDissipation(processId, scenarioId);
         }
     }
 }

@@ -154,6 +154,17 @@ namespace LCAToolAPI.API
         }
 
         /// <summary>
+        /// Return a list of flows that have composition information
+        /// </summary>
+        /// <returns></returns>
+        [Route("api/compositionflows")]
+        [HttpGet]
+        public IEnumerable<FlowResource> GetCompositionFlows()
+        {
+            return _ResourceService.GetCompositionFlows();
+        }
+
+        /// <summary>
         /// List enumerated flow types.  1-- Intermediate.  2-- Elementary.
         /// </summary>
         /// <returns></returns>
@@ -765,6 +776,39 @@ namespace LCAToolAPI.API
                 return Request.CreateResponse(HttpStatusCode.Unauthorized);
         }
 
+
+
+        /// <summary>
+        /// list dissipation of flow constituents for the process
+        /// </summary>
+        /// <param name="processID"></param>
+        /// <returns>ProcessFlowResource list</returns>
+        [Route("api/processes/{processID:int}/dissipation")]
+        [Route("api/processes/{processID:int}/dissipations")]
+        [HttpGet]
+        public IEnumerable<ProcessDissipationResource> GetProcessDissipation(int processID)
+        {
+            return _ResourceService.GetProcessDissipation(processID);
+        }
+
+        /// <summary>
+        /// Same as above, for specific scenario. Values will be parameterized, but not marked as such.
+        /// </summary>
+        /// <param name="processID"></param>
+        /// <param name="scenarioId"></param>
+        /// <returns></returns>
+        [CalRecycleAuthorize]
+        [Route("api/scenarios/{scenarioId:int}/processes/{processID:int}/dissipation")]
+        [Route("api/scenarios/{scenarioId:int}/processes/{processID:int}/dissipations")]
+        [HttpGet]
+        public HttpResponseMessage GetProcessDissipation(int processID, int scenarioId)
+        {
+            if (_ScenarioGroupService.CanGet(RequestContext))
+                return Request.CreateResponse(HttpStatusCode.OK,
+                    _ResourceService.GetProcessDissipation(processID, scenarioId));
+            else
+                return Request.CreateResponse(HttpStatusCode.Unauthorized);
+        }
 
         // ???
         /// <summary>

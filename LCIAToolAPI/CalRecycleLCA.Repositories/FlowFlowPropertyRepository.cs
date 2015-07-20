@@ -62,7 +62,23 @@ namespace CalRecycleLCA.Repositories
                         FlowPropertyID = s.factors.FlowPropertyID,
                         Unit = s.factors.FlowProperty.UnitGroup.ReferenceUnit,
                         Magnitude = parameter == null ? scale * s.factors.MeanValue : scale * parameter.Value
-                    });
+                    })
+                .Union( // CompositionData manifest outwardly as FlowPropertyMagnitudes
+                    repository.GetRepository<CompositionData>().Queryable().Where(cd => cd.CompositionModel.FlowID == flowId)
+                    .GroupJoin(repository.GetRepository<CompositionParam>().Queryable()
+                    .Where(p => p.Param.ScenarioID == scenarioId),
+                    cd => cd.CompositionDataID,
+                    cp => cp.CompositionDataID,
+                    (cd,cp) => new { compositions = cd, parameter = cp})
+                    .SelectMany(s => s.parameter.DefaultIfEmpty(),
+                    (s,parameter) => new FlowPropertyMagnitude
+                    {
+                        FlowPropertyID = s.compositions.FlowPropertyID,
+                        Unit = s.compositions.FlowProperty.UnitGroup.ReferenceUnit,
+                        // should we multiply by scale here?
+                        Magnitude = parameter == null ? scale * s.compositions.Value : scale * parameter.Value
+                    })
+                );
         }
     }
 }

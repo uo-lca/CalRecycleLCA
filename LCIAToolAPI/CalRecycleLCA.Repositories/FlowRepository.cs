@@ -56,6 +56,14 @@ namespace CalRecycleLCA.Repositories
                 .Select(f => repository.ToResource(f));
         }
 
+        public static IEnumerable<FlowResource> GetCompositionFlows(this IRepository<Flow> repository)
+        {
+            return repository.Query(f => f.CompostionModels.Count() > 0)
+                .Include(f => f.ILCDEntity)
+                .Select()
+                .Select(f => repository.ToResource(f));
+        }
+
         public static IEnumerable<FlowResource> GetFlows(this IRepositoryAsync<Flow> repository, int flowtypeId)
         {
             return repository.Query(f => f.FlowTypeID == flowtypeId)

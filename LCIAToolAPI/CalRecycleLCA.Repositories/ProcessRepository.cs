@@ -22,6 +22,9 @@ namespace CalRecycleLCA.Repositories
                 //ProcessTypeID = TransformNullable(p.ProcessTypeID, "Process.ProcessTypeID"),
                 ReferenceTypeID = p.ReferenceTypeID,
                 ReferenceFlowID = p.ReferenceFlowID,
+                CompositionFlowID = repository.GetRepository<ProcessComposition>().Queryable()
+                    .Where(pc => pc.ProcessID == p.ProcessID)
+                    .Select(pc => pc.CompositionModel.FlowID).FirstOrDefault(),
                 ReferenceYear = p.ReferenceYear,
                 UUID = p.ILCDEntity.UUID,
                 Version = p.ILCDEntity.Version,
@@ -58,6 +61,23 @@ namespace CalRecycleLCA.Repositories
                 .Include(p => p.ILCDEntity.DataSource)
                 .Select()
                 .Select(p => repository.ToResource(p)).ToList();
+        }
+
+        public static IEnumerable<ProcessDissipationResource> GetDissipation(this IRepository<Process> repository, int processId, int scenarioId)
+        {
+            return repository.GetRepository<ProcessDissipation>().Queryable().Where(pd => pd.ProcessID == processId)
+                .GroupJoin(repository.GetRepository<ProcessDissipationParam>().Queryable().Where(pdp => pdp.Param.ScenarioID == scenarioId),
+                    pd => pd.ProcessDissipationID,
+                    pdp => pdp.ProcessDissipationID,
+                    (pd, pdp) => new { dissp = pd, parameter = pdp })
+                .SelectMany(s => s.parameter.DefaultIfEmpty(),
+                    (s, parameter) => new ProcessDissipationResource()
+                    {
+                        DissipationFactor = parameter == null ? s.dissp.EmissionFactor : parameter.Value,
+                        FlowPropertyID = s.dissp.FlowPropertyEmission.FlowPropertyID,
+                        Scale = s.dissp.FlowPropertyEmission.Scale,
+                        EmissionFlowID = s.dissp.FlowPropertyEmission.FlowID
+                    });
         }
     }
 }
