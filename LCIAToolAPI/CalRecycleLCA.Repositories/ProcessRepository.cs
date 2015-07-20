@@ -22,6 +22,9 @@ namespace CalRecycleLCA.Repositories
                 //ProcessTypeID = TransformNullable(p.ProcessTypeID, "Process.ProcessTypeID"),
                 ReferenceTypeID = p.ReferenceTypeID,
                 ReferenceFlowID = p.ReferenceFlowID,
+                CompositionFlowID = repository.GetRepository<ProcessComposition>().Queryable()
+                    .Where(pc => pc.ProcessID == p.ProcessID)
+                    .Select(pc => pc.CompositionModel.FlowID).FirstOrDefault(),
                 ReferenceYear = p.ReferenceYear,
                 UUID = p.ILCDEntity.UUID,
                 Version = p.ILCDEntity.Version,

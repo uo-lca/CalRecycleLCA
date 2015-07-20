@@ -29,6 +29,8 @@ namespace Entities.Models {
 
         public int? ReferenceFlowID { get; set; }
 
+        public int? CompositionFlowID { get; set; }
+
         public string DataSource { get; set; }
 
         public bool hasElementaryFlows { get; set; }
