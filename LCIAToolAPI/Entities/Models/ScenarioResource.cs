@@ -59,8 +59,8 @@ namespace Entities.Models {
         public string Name { get; set; }
         // For ParamTypeID == 1, 2 [ 3 is irrelevant]
         public int? FragmentFlowID { get; set; }
-        // For ParamTypeID == 5 // note: not yet implemented
-        public int? CompositionDataID { get; set; }
+        // For ParamTypeID == 5 // eliminated: CompositionData params manifest as FlowPropertyParams in the outside world
+        // public int? CompositionDataID { get; set; }
         // For ParamTypeID == 4, 6, 8, 10
         public int? FlowID { get; set; }
         // For ParamTypeID == 4

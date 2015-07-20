@@ -42,14 +42,17 @@ namespace CalRecycleLCA.Services
         {
             if (isvalid(p.FragmentFlowID))
                 p.ParamTypeID = 1;
-            else if (isvalid(p.CompositionDataID))
-                p.ParamTypeID = 5;
+            //else if (isvalid(p.CompositionDataID))
+            //    p.ParamTypeID = 5;
             else if (!isvalid(p.FlowID))
                 return false;
             else if (isvalid(p.LCIAMethodID))
                 p.ParamTypeID = 10;
             else if (isvalid(p.FlowPropertyID))
-                p.ParamTypeID = 4;
+                if (_repository.GetCompositionId((int)p.FlowID, (int)p.FlowPropertyID) != null)
+                    p.ParamTypeID = 5; // this is an internal indicator- ParamTypeID==5 should never appear in the wild
+                else
+                    p.ParamTypeID = 4;
             else if (isvalid(p.ProcessID))
                 if (_repository.IsDissipation((int)p.ProcessID, (int)p.FlowID))
                     p.ParamTypeID = 6;
@@ -109,7 +112,7 @@ namespace CalRecycleLCA.Services
         /// <returns></returns>
         public IEnumerable<Param> NewOrUpdateParam(int scenarioId, ParamResource post, ref CacheTracker cacheTracker)
         {
-            if (isvalid(post.ParamTypeID) || DetermineType(ref post))
+            if (/*isvalid(post.ParamTypeID) || */DetermineType(ref post)) // ignore user-supplied ParamTypeID
                 return _repository.PostParam(scenarioId, post, ref cacheTracker);
             else
                 return null;
@@ -122,7 +125,7 @@ namespace CalRecycleLCA.Services
 
         public IEnumerable<Param> UpdateParam(int paramId, ParamResource put, ref CacheTracker cacheTracker)
         {
-            if (isvalid(put.ParamTypeID) || DetermineType(ref put))
+            if (/*isvalid(put.ParamTypeID) || */DetermineType(ref put)) // ignore user-supplied ParamTypeID
                 return _repository.UpdateParam(paramId, put, ref cacheTracker);
             else 
                 return null;

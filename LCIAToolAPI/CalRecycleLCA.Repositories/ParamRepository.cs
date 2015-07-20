@@ -21,6 +21,14 @@ namespace CalRecycleLCA.Repositories
                 .Count() > 0);
         }
 
+        public static int? GetCompositionId(this IRepository<Param> repository, int flowId, int flowPropertyId)
+        {
+            return (repository.GetRepository<CompositionData>().Queryable()
+                .Where(cd => cd.FlowPropertyID == flowPropertyId)
+                .Where(cd => cd.CompositionModel.FlowID == flowId)
+                .Select(cd => cd.CompositionDataID).FirstOrDefault());
+        }
+
         public static IEnumerable<ParamResource> GetParamResource(this IRepository<Param> repository,
             Param p)
         {
@@ -65,16 +73,21 @@ namespace CalRecycleLCA.Repositories
                         break;
                     }
                 case 5:
-                    {   // CompositionParam
+                    {   // CompositionParam -- this is a valid type for a Param but not for a ParamResource, because of schema design errors
+                        // (CompositionData shouldn't even exist)
+                        // CompositionData masquerade as FlowPropertyMagnitudes in the Real World
+                        // CompositionParams masquerade as FlowPropertyParams in the Real World
                         PR = repository.GetRepository<CompositionParam>()
                             .Query(k => k.ParamID == p.ParamID)
                             .Select(k => new ParamResource()
                         {
                             ParamID = p.ParamID,
-                            ParamTypeID = p.ParamTypeID,
+                            ParamTypeID = 4,
                             ScenarioID = p.ScenarioID,
                             Name = p.Name,
-                            CompositionDataID = k.CompositionDataID,
+                            FlowID = k.CompositionData.CompositionModel.FlowID,
+                            FlowPropertyID = k.CompositionData.FlowPropertyID,
+                            //CompositionDataID = k.CompositionDataID,
                             Value = k.Value,
                             DefaultValue = k.CompositionData.Value
                         }).ToList();
@@ -178,9 +191,10 @@ namespace CalRecycleLCA.Repositories
                     }
                 case 5:
                     {
+                        var cdid = repository.GetCompositionId((int)post.FlowID, (int)post.FlowPropertyID);
                         pid = repository.GetRepository<CompositionParam>().Queryable()
                             .Where(k => k.Param.ScenarioID == scenarioId)
-                            .Where(k => k.CompositionDataID == post.CompositionDataID)
+                            .Where(k => k.CompositionDataID == cdid)
                             .Select(k => k.ParamID).FirstOrDefault();
                         break;
                     }
@@ -217,7 +231,7 @@ namespace CalRecycleLCA.Repositories
             }
             if (pid == 0) // no match- create a new one
             {
-                cacheTracker.ParamsToPost.Add(post);
+                cacheTracker.ParamsToPost.Add(post); // ParamsToPost get posted all together in PostNewParams 
                 return new List<Param>();// { repository.NewParam(scenarioId, post, ref cacheTracker) };
             }
             else
@@ -244,8 +258,8 @@ namespace CalRecycleLCA.Repositories
                         .Where(k => k.Flow.ReferenceFlowProperty != post.FlowPropertyID)
                         .Count() == 1);
                 case 5:
-                    return (repository.GetRepository<CompositionData>().Queryable()
-                        .Where(k => k.CompositionDataID == post.CompositionDataID).Count() == 1);
+                    return true; /* (repository.GetRepository<CompositionData>().Queryable()
+                         .Where(k => k.CompositionDataID == post.CompositionDataID).Count() == 1); // ParamTypeID==5 implies already valid CompositionDataID */
                 case 6:
                     return (repository.GetRepository<ProcessDissipation>().Queryable()
                         .Where(k => k.ProcessID == post.ProcessID)
@@ -310,8 +324,9 @@ namespace CalRecycleLCA.Repositories
                     }
                 case 5:
                     {
+                        var cdid = repository.GetCompositionId((int)post.FlowID, (int)post.FlowPropertyID);
                         var n = repository.GetRepository<CompositionData>()
-                            .Query(k => k.CompositionDataID == post.CompositionDataID)
+                            .Query(k => k.CompositionDataID == cdid) //post.CompositionDataID) // TODO: is this type 4 or type 5 at this point?
                             .Include(k => k.CompositionModel.Flow)
                             .Include(k => k.FlowProperty)
                             .Select().First();
@@ -417,7 +432,8 @@ namespace CalRecycleLCA.Repositories
                 case 5:
                     {
                         var cp = repository.GetRepository<CompositionData>().Queryable()
-                            .Where(k => k.CompositionDataID == post.CompositionDataID)
+                            .Where(cd => cd.FlowPropertyID == (int)post.FlowPropertyID)
+                            .Where(cd => cd.CompositionModel.FlowID == (int)post.FlowID)
                             .First();
 
                         P.CompositionParams.Add(new CompositionParam()
