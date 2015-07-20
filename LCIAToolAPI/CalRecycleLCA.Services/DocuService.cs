@@ -95,6 +95,11 @@ namespace CalRecycleLCA.Services
                     Title = "Exchanges for Process",
                     Href = selfUrl + "/processflows"
                 });
+            links.Add(new Link() {
+                Rel = "process dissipation",
+                Title = "Environmental dissipation of flow constituents by the process",
+                Href = selfUrl + "/dissipation"
+            });
             links.AddRange(new List<Link>() {
                 new Link() {
                     Rel = "flow properties",
