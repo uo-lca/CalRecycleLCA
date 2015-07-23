@@ -122,7 +122,8 @@ namespace CalRecycleLCA.Services
                 .Where(k => k.FragmentFlowID == fragmentFlowId).First());
             
             double nodeWeight;
-            var outFlows = GetScenarioProductFlows(theFragmentFlow, scenarioId, out nodeWeight);
+            int? ilcdEntityId;
+            var outFlows = GetScenarioProductFlows(theFragmentFlow, scenarioId, out nodeWeight, out ilcdEntityId);
             nodeWeight *= flowMagnitude;
 
             // do not cache if nodeweight == 0 
@@ -181,6 +182,7 @@ namespace CalRecycleLCA.Services
                 FlowID = theFragmentFlow.FlowID,
                 DirectionID = theFragmentFlow.DirectionID,
                 ScenarioID = scenarioId,
+                ILCDEntityID = ilcdEntityId,
                 FlowMagnitude = flowMagnitude,
                 NodeWeight = nodeWeight
             });
@@ -198,7 +200,7 @@ namespace CalRecycleLCA.Services
         /// <param name="ex_directionId">Direction of the physical flow with respect to the *parent*</param>
         /// <param name="flow_exch">out param set equal to the inflow's exchange</param>
         /// <returns></returns>
-        public IEnumerable<InventoryModel> GetScenarioProductFlows(NodeCacheModel theFragmentFlow, int scenarioId, out double nodeWeight)
+        public IEnumerable<InventoryModel> GetScenarioProductFlows(NodeCacheModel theFragmentFlow, int scenarioId, out double nodeWeight, out int? ilcdEntityId)
         {
 
             FlowTerminationModel term = _fragmentFlowService.Terminate(theFragmentFlow,scenarioId, true); // resolve background
@@ -297,6 +299,7 @@ namespace CalRecycleLCA.Services
             }
 
             nodeWeight = (double)flow_conv / flow_exch;
+            ilcdEntityId = term.ILCDEntityID;
 
             return Outflows;
         }

@@ -38,7 +38,7 @@ namespace CalRecycleLCA.Repositories
 
             return new FlowTerminationModel
             {
-                RefID = fragmentNode.FragmentNodeProcessID,
+                //ILCDEntityID = fragmentNode.FragmentNodeProcessID,
                 NodeTypeID = 1,
                 ScenarioID = scenarioId,
                 ProcessID = fragmentNode.ProcessID,
@@ -57,7 +57,7 @@ namespace CalRecycleLCA.Repositories
                 .Where(ps => ps.ScenarioID == scenarioId).ToList();
             return new FlowTerminationModel()
             {
-                RefID = Dflt.FragmentNodeProcessID,
+                //ILCDEntityID = Dflt.FragmentNodeProcessID,
                 ScenarioID = scenarioId,
                 NodeTypeID = 1,
                 ProcessID = Subs.Count() == 0 ? Dflt.ProcessID : Subs.First().ProcessID,
@@ -76,7 +76,7 @@ namespace CalRecycleLCA.Repositories
                 .Where(ps => ps.ScenarioID == scenarioId).ToList();
             return new FlowTerminationModel()
             {
-                RefID = Dflt.FragmentNodeFragmentID,
+                //ILCDEntityID = Dflt.FragmentNodeFragmentID,
                 ScenarioID = scenarioId,
                 NodeTypeID = 2,
                 SubFragmentID = Subs.Count() == 0 ? Dflt.SubFragmentID : Subs.First().SubFragmentID,
@@ -105,7 +105,7 @@ namespace CalRecycleLCA.Repositories
 
             return new FlowTerminationModel
             {
-                RefID = fragmentNode.FragmentNodeFragmentID,
+                //ILCDEntityID = fragmentNode.FragmentNodeFragmentID,
                 NodeTypeID = 2,
                 ScenarioID = scenarioId,
                 SubFragmentID = fragmentNode.SubFragmentID,
@@ -236,7 +236,7 @@ namespace CalRecycleLCA.Repositories
                         throw new ArgumentNullException("FragmentFlow.FlowID must be set!");
                     }
                     fragmentNode.NodeTypeID = 3;
-                    fragmentNode.RefID = ff.FragmentFlowID;
+                    //fragmentNode.ILCDEntityID = ff.FragmentFlowID;
             		fragmentNode.ScenarioID = scenarioId;
                     fragmentNode.TermFlowID = (int)ff.FlowID; 
 		            break;
@@ -255,7 +255,7 @@ namespace CalRecycleLCA.Repositories
                     }
                     else
                     {
-                        fragmentNode.RefID = ff.FragmentFlowID;
+                        //fragmentNode.ILCDEntityID = ff.FragmentFlowID;
                         fragmentNode.ScenarioID = scenarioId;
                         fragmentNode.TermFlowID = inFlowId;
                     }
@@ -301,7 +301,7 @@ namespace CalRecycleLCA.Repositories
                     //{
                     //    throw new ArgumentNullException("FragmentFlow.FlowID must be set!");
                     //}
-                    fragmentNode.RefID = ff.FragmentFlowID;
+                    //fragmentNode.ILCDEntityID = ff.FragmentFlowID;
             		fragmentNode.ScenarioID = scenarioId;
                     fragmentNode.TermFlowID = ff.FlowID; 
 		            break;
@@ -321,7 +321,7 @@ namespace CalRecycleLCA.Repositories
                     }
                     else
                     {
-                        fragmentNode.RefID = ff.FragmentFlowID;
+                        //fragmentNode.ILCDEntityID = ff.FragmentFlowID;
                         fragmentNode.ScenarioID = scenarioId;
                         fragmentNode.TermFlowID = inFlowId;
                     }
