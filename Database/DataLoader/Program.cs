@@ -10,6 +10,8 @@ using NDesk.Options;
 using LcaDataModel;
 using log4net;
 using log4net.Config;
+using LcaDataModel.Migrations;
+using System.Data.Entity.Migrations;
 
 namespace LcaDataLoader {
     /// <summary>
@@ -26,6 +28,7 @@ namespace LcaDataLoader {
         static bool _DeleteFlag;
         static bool _CsvFlag;
         static bool _InitFlag;
+        static bool _UpgradeFlag;
 
         public static readonly ILog Logger = LogManager.GetLogger("LcaDataLoader");
 
@@ -43,19 +46,21 @@ namespace LcaDataLoader {
             _DeleteFlag = false;
             _CsvFlag = false;
             _InitFlag = false;
+            _UpgradeFlag = false;
 
             OptionSet options = new OptionSet() {
                 {"r|root=", "The full {DATA_ROOT} path.", v => _DataRoot = v },
                 {"s|source=", "ILCD archive {source name}.", v => _IlcdSourceName = v },
                 {"c|csv", "Load CSV files.", v => _CsvFlag = (v!=null)}, 
                 {"i|initialize", "Create database and seed.", v => _InitFlag = (v!=null)},
+                {"u|upgrade", "Upgrade database.", v => _UpgradeFlag = (v!=null)},
                 {"d|delete", "Delete database, then initialize.", v => _DeleteFlag = (v!=null)},
                 {"h|help",  "List options and exit", v => helpFlag = v != null },
             };
             List<string> extraArgs;
             try {
                 extraArgs = options.Parse(args);
-                Logger.InfoFormat("Initialize={0}, Data root={1}, Load CSVs={2}, Delete={3}", _InitFlag.ToString(), _DataRoot, _CsvFlag.ToString(), _DeleteFlag.ToString());
+                Logger.InfoFormat("Initialize={0}, Data root={1}, Load CSVs={2}, Delete={3}, Upgrade={4}", _InitFlag.ToString(), _DataRoot, _CsvFlag.ToString(), _DeleteFlag.ToString(), _UpgradeFlag.ToString());
                 if (!String.IsNullOrEmpty(_IlcdSourceName)) {
                     Logger.InfoFormat("ILCD source={0}", _IlcdSourceName);
                     if (String.IsNullOrEmpty(_DataRoot)) {
@@ -70,7 +75,7 @@ namespace LcaDataLoader {
                         throw new OptionException ("Missing root path.", "-r");
                     }
                 }
-                if (helpFlag || (!_DeleteFlag && !_InitFlag && String.IsNullOrEmpty(_IlcdSourceName) && !_CsvFlag)) {
+                if (helpFlag || (!_DeleteFlag && !_InitFlag && !_UpgradeFlag && String.IsNullOrEmpty(_IlcdSourceName) && !_CsvFlag)) {
                     options.WriteOptionDescriptions(Console.Out);
                 } else {
                     commandMode = true;
@@ -110,6 +115,12 @@ namespace LcaDataLoader {
                     }
                     else if (_InitFlag) {
                         Database.SetInitializer<EntityDataModel>(new CreateDatabaseInitializer());
+                    }
+                    else if (_UpgradeFlag) {
+                        var configuration = new Configuration();
+                        var migrator = new DbMigrator(configuration);
+                        migrator.Update();
+                        return 0;
                     }
                     else {
                         Database.SetInitializer<EntityDataModel>(null);

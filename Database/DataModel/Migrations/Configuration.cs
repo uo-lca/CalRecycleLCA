@@ -5,14 +5,14 @@ namespace LcaDataModel.Migrations
     using System.Data.Entity.Migrations;
     using System.Linq;
 
-    internal sealed class Configuration : DbMigrationsConfiguration<LcaDataModel.UsedOilLCAContext>
+    public sealed class Configuration : DbMigrationsConfiguration<LcaDataModel.EntityDataModel>
     {
         public Configuration()
         {
-            AutomaticMigrationsEnabled = false;
+            AutomaticMigrationsEnabled = true;
         }
 
-        protected override void Seed(LcaDataModel.UsedOilLCAContext context)
+        protected override void Seed(LcaDataModel.EntityDataModel context)
         {
             //  This method will be called after migrating to the latest version.
 
