@@ -8,7 +8,7 @@ namespace Entities.Models
 {
     public class FlowTerminationModel
     {
-        public int? RefID { get; set; } // referer-- either FragmentNodeProcessID, FragmentNodeFragmentID, FragmentFlowID, BackgroundID
+        public int? ILCDEntityID { get; set; } // result of node resolution
         public int ScenarioID { get; set; }   // node behavior is scenario dependent
         public int NodeTypeID { get; set; }   // included here for background resolution
         public int? ProcessID { get; set; }     // FragmentNodeProcess.ProcessID, when NodeType is Process
@@ -29,6 +29,7 @@ namespace Entities.Models
         public int DirectionID { get; set; }
         public int FragmentFlowID { get; set; }
         public int ScenarioID { get; set; }
+        public int? ILCDEntityID { get; set; }
         public double NodeWeight { get; set; }
         public double FlowMagnitude { get; set; }
     }

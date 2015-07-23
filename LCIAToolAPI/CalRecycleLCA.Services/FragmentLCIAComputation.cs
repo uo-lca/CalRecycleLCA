@@ -163,6 +163,7 @@ namespace CalRecycleLCA.Services
                     ScenarioID = k.ScenarioID,
                     FlowMagnitude = k.FlowMagnitude,
                     NodeWeight = k.NodeWeight,
+                    ILCDEntityID = k.ILCDEntityID,
                     ObjectState = ObjectState.Added
                 });
                 _unitOfWork.SetAutoDetectChanges(false);

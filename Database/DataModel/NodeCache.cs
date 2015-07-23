@@ -23,9 +23,12 @@ namespace LcaDataModel
 
         public double FlowMagnitude { get; set; }
 
+        public int? ILCDEntityID { get; set; }
+
         public virtual FragmentFlow FragmentFlow { get; set; }
 
         public virtual Scenario Scenario { get; set; }
 
+        public virtual ILCDEntity ILCDEntity { get; set; }
     }
 }
