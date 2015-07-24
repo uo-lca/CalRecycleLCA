@@ -60,7 +60,7 @@ namespace CalRecycleLCA.Repositories
                     (s, parameter) => new FlowPropertyMagnitude
                     {
                         FlowPropertyID = s.factors.FlowPropertyID,
-                        Unit = s.factors.FlowProperty.UnitGroup.ReferenceUnit,
+                        //Unit = s.factors.FlowProperty.UnitGroup.ReferenceUnit,
                         Magnitude = parameter == null ? scale * s.factors.MeanValue : scale * parameter.Value
                     })
                 .Union( // CompositionData manifest outwardly as FlowPropertyMagnitudes
@@ -74,7 +74,7 @@ namespace CalRecycleLCA.Repositories
                     (s,parameter) => new FlowPropertyMagnitude
                     {
                         FlowPropertyID = s.compositions.FlowPropertyID,
-                        Unit = s.compositions.FlowProperty.UnitGroup.ReferenceUnit,
+                        //Unit = s.compositions.FlowProperty.UnitGroup.ReferenceUnit,
                         // should we multiply by scale here?
                         Magnitude = parameter == null ? scale * s.compositions.Value : scale * parameter.Value
                     })

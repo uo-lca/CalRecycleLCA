@@ -6,16 +6,6 @@ using System.Threading.Tasks;
 
 namespace Entities.Models {
 
-    /// <summary>
-    /// FlowPropertyMagnitude - associates Flow Property with Magnitude.
-    /// Embedded in FragmentFlowResource model.
-    /// </summary>
-    public class FlowPropertyMagnitude {
-        public int FlowPropertyID { get; set; }
-        public String Unit { get; set; }
-        public double Magnitude { get; set; }  // NodeCache.FlowMagnitude * FlowFlowProperty.MeanValue
-    }
-
     public class FragmentStageResource :IEquatable<FragmentStageResource>
     {
         public int FragmentStageID { get; set; }
