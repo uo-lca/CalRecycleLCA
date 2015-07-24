@@ -35,7 +35,7 @@ namespace CalRecycleLCA.Repositories
                {
                    NodeTypeID = bg.NodeTypeID,
                    ScenarioID = scenarioId,
-                   RefID = (int)bg.ILCDEntityID,
+                   ILCDEntityID = (int)bg.ILCDEntityID,
                    TermFlowID = (int)flowId
                }).FirstOrDefault();
 
@@ -48,7 +48,7 @@ namespace CalRecycleLCA.Repositories
                 {
                     NodeTypeID = bg.NodeTypeID,
                     ScenarioID = scenarioId,
-                    RefID = (int)bg.ILCDEntityID,
+                    ILCDEntityID = (int)bg.ILCDEntityID,
                     TermFlowID = (int)flowId
                 }).FirstOrDefault();
 
@@ -62,13 +62,13 @@ namespace CalRecycleLCA.Repositories
             {
                 case 1:
                     targetId = repository.GetRepository<Process>().Queryable()
-                        .Where(x => x.ILCDEntityID == background.RefID)
+                        .Where(x => x.ILCDEntityID == background.ILCDEntityID)
                         .Select(z => (int)z.ProcessID).FirstOrDefault();
                     background.ProcessID = targetId;
                     break;
                 case 2:
                     targetId = repository.GetRepository<Fragment>().Queryable()
-                        .Where(x => x.ILCDEntityID == background.RefID)
+                        .Where(x => x.ILCDEntityID == background.ILCDEntityID)
                         .Select(z => (int)z.FragmentID).FirstOrDefault();
                     background.SubFragmentID = targetId;
                     break;

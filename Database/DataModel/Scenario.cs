@@ -41,6 +41,8 @@ namespace LcaDataModel
 
         public bool StaleCache { get; set; }
 
+        public string Description { get; set; }
+
         public virtual ICollection<BackgroundCache> BackgroundCaches { get; set; }
 
         public virtual ICollection<NodeCache> NodeCaches { get; set; }
