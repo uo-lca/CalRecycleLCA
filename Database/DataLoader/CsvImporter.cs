@@ -812,6 +812,11 @@ namespace LcaDataLoader {
                 scenario.FlowID = refFlow.FlowID;
                 scenario.DirectionID = Direction.comp(refFlow.DirectionID);
             }
+            // clear the caches -- must run /config/init afterwards
+            var nodeCaches = dbContext.GetDbSet<NodeCache>();
+            nodeCaches.RemoveRange(nodeCaches);
+            var scoreCaches = dbContext.GetDbSet<ScoreCache>();
+            scoreCaches.RemoveRange(scoreCaches);
             dbContext.SaveChanges();
         }
     }
