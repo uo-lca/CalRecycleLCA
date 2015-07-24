@@ -24,6 +24,7 @@ namespace LcaDataLoader {
             bool appendDirExists = LoadAppend(appendDir, dbContext);
             LoadFragments(Path.Combine(dirName, "fragments"), dbContext);
             LoadScenarios(Path.Combine(dirName, "scenarios"), dbContext);
+            MigrateScenarios(dbContext);
             if (appendDirExists) {
                 LoadClassification(appendDir, dbContext);
             }
@@ -799,6 +800,19 @@ namespace LcaDataLoader {
             else {
                 Program.Logger.WarnFormat("Scenarios folder, {0}, does not exist.", dirName);
             }
+        }
+        public static void MigrateScenarios(DbContextWrapper dbContext)
+        {
+            // this function sets all scenario reference flows to the reference flow of the top level fragment.
+            // note: this could result in very large activity levels
+            var scenarios = dbContext.GetDbSet<Scenario>();
+            foreach (Scenario scenario in scenarios)
+            {
+                var refFlow = dbContext.FragmentReferenceFlow(scenario.TopLevelFragmentID);
+                scenario.FlowID = refFlow.FlowID;
+                scenario.DirectionID = Direction.comp(refFlow.DirectionID);
+            }
+            dbContext.SaveChanges();
         }
     }
 }

@@ -333,6 +333,12 @@ namespace LcaDataLoader {
             return _DbContext.Set<T>().Find(id);
         }
 
+        public FragmentFlow FragmentReferenceFlow(int fragmentId)
+        {
+            return _DbContext.Set<FragmentFlow>().AsQueryable().Where(f => f.FragmentID == fragmentId && f.ParentFragmentFlowID == null)
+                .First();
+        }
+
         /// <summary>
         /// Expose DbSet members for operations on relationship and other unusual tables.
         /// </summary>

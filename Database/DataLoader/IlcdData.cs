@@ -268,6 +268,28 @@ namespace LcaDataLoader {
             return ilcdEntity;
         }
 
+        private ILCDEntity SaveIlcdStub(DbContextWrapper ilcdDb, DataTypeEnum dtEnum)
+        {
+            ILCDEntity ilcdEntity = new ILCDEntity();
+            ilcdEntity.UUID = GetCommonUUID();
+            ilcdEntity.Version = GetCommonVersion();
+            ilcdEntity.DataTypeID = Convert.ToInt32(dtEnum);
+            ilcdEntity.DataSourceID = ilcdDb.GetCurrentIlcdDataSourceID();
+            return ilcdEntity;
+        }
+
+        private bool SaveStub(DbContextWrapper ilcdDb, DataTypeEnum dtEnum)
+        {
+            bool isSaved = false;
+            string uuid = GetCommonUUID();
+            if (ilcdDb.GetIlcdEntity(GetCommonUUID()) == null)
+            {
+                ILCDEntity stub = SaveIlcdStub(ilcdDb, dtEnum);
+                isSaved = ilcdDb.AddEntity<ILCDEntity>(stub);
+            }
+            return isSaved;
+        }
+
         /// <summary>
         /// Import data from loaded unitgroup file to new UnitGroup entity
         /// </summary>
@@ -478,6 +500,12 @@ namespace LcaDataLoader {
                     break;
                 case "http://lca.jrc.it/ILCD/Process":
                     isSaved = SaveProcess(ilcdDb);
+                    break;
+                case "http://lca.jrc.it/ILCD/Source":
+                    isSaved = SaveStub(ilcdDb, DataTypeEnum.Source);
+                    break;
+                case "http://lca.jrc.it/ILCD/Contact":
+                    isSaved = SaveStub(ilcdDb, DataTypeEnum.Contact);
                     break;
             }
 

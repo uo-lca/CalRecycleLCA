@@ -20,6 +20,14 @@ namespace LcaDataModel
             ProcessFlows = new HashSet<ProcessFlow>();
         }
 
+        public static int comp(int directionId)
+        {
+            if (directionId == 1)
+                return 2;
+            else
+                return 1;
+        }
+
         public int DirectionID { get; set; }
 
         [StringLength(100)]

@@ -33,6 +33,8 @@ namespace LcaDataLoader {
                 LoadDataType(Path.Combine(dirName, "flows"), dbContext);
                 LoadDataType(Path.Combine(dirName, "LCIAmethods"), dbContext);
                 LoadDataType(Path.Combine(dirName, "processes"), dbContext);
+                LoadDataType(Path.Combine(dirName, "sources"), dbContext);
+                LoadDataType(Path.Combine(dirName, "contacts"), dbContext);
                 dbContext.SetAutoDetectChanges(true);
             }
         }
