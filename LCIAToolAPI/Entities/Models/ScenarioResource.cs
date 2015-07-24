@@ -24,6 +24,7 @@ namespace Entities.Models {
         // from Scenario table
         public int ScenarioID { get; set; }
         public string Name { get; set; }
+        public string Description { get; set; }
         public int TopLevelFragmentID { get; set; }
         public double ActivityLevel { get; set; }
         public int ReferenceFlowID { get; set; }

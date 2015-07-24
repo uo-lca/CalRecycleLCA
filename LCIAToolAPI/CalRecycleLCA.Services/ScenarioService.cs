@@ -48,6 +48,7 @@ namespace CalRecycleLCA.Services
                 ScenarioID = s.ScenarioID,
                 ScenarioGroupID = s.ScenarioGroupID,
                 Name = s.Name,
+                Description = s.Description,
                 TopLevelFragmentID = s.TopLevelFragmentID,
                 ActivityLevel = s.ActivityLevel,
                 ReferenceFlowID = s.FlowID,

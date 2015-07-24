@@ -18,6 +18,7 @@ namespace CalRecycleLCA.Repositories
             {
                 ScenarioGroupID = post.ScenarioGroupID,
                 Name = post.Name,
+                Description = post.Description,
                 ActivityLevel = post.ActivityLevel,
                 TopLevelFragmentID = post.TopLevelFragmentID,
                 FlowID = post.ReferenceFlowID,
@@ -77,6 +78,8 @@ namespace CalRecycleLCA.Repositories
                 scenario.Name = put.Name;
             if (put.ActivityLevel != 0)
                 scenario.ActivityLevel = put.ActivityLevel;
+            if (!String.IsNullOrEmpty(put.Description))
+                scenario.Description = put.Description;
             scenario.ObjectState = ObjectState.Modified;
             repository.Update(scenario);
             return scenario;

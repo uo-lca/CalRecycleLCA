@@ -1017,7 +1017,8 @@ namespace LCAToolAPI.API
                         {
                             Name = String.IsNullOrEmpty(postdata.Name) ? "New Scenario" : postdata.Name,
                             ActivityLevel = postdata.ActivityLevel == 0 ? k.ActivityLevel : postdata.ActivityLevel,
-                            TopLevelFragmentID = postdata.TopLevelFragmentID == 0 ? k.TopLevelFragmentID : postdata.TopLevelFragmentID
+                            TopLevelFragmentID = postdata.TopLevelFragmentID == 0 ? k.TopLevelFragmentID : postdata.TopLevelFragmentID,
+                            Description = String.IsNullOrEmpty(postdata.Description) ? k.Description : postdata.Description
                         }).First();
 
                 int scenarioId = _ResourceService.AddScenario(postdata, (int)authGroup, cloneScenario);
