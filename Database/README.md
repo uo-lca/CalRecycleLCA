@@ -15,6 +15,7 @@ Option                     | Description
 -s, --source=source name   | ILCD archive source name.
 -c, --csv                  | Load CSV files.
 -i, --initialize           | Create database and seed.
+-u, --upgrade              | Upgrade database to latest version.
 -d, --delete               | Delete database, then initialize.
 -h, --help                 | List options and exit
 
@@ -38,8 +39,12 @@ Deployment Instructions
 3. In the server folder containing the release build, edit LcaDataLoader.exe.config
   1. In connectionStrings, change Data Source to the name of the SQL Server instance where the database is to be created.
   2. log4net is configured to create log files in the same directory as the executable. If you want to change the location of the log files, edit the value of the File param (prepend a path).
-4. As a user who has access to create a database, open a command prompt on the server and cd to the directory containing the release build. Create the database by executing
-<pre><code>LcaDataLoader -i</pre></code>
+4. As a user who has access to create a database, open a command prompt on the server and cd to the directory containing the release build. 
+
+ If this is a new installation, create the database by executing
+ <pre><code>LcaDataLoader -i</pre></code>
+ If the database was created by an earlier version, back it up, then upgrade it by executing
+    <pre><code>LcaDataLoader -u</pre></code>
 5. If other users will be loading data, grant them write access to the new database, UsedOilLCA. 
 
 Usage Instructions
