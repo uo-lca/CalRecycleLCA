@@ -68,7 +68,7 @@ documentation page to be available.
 
 ## Deployment
 
-0. Create and populate the database using the [Data Loader](../Database/DataLoader). (Delete it first, if it was previously deployed).
+0. Create or upgrade the database and populate it using the [Data Loader](../Database/DataLoader). 
 1. Build solution (..\CalRecycleLCA.sln), Release configuration
 2. Publish project, LCIAToolAPI. A publishing profile must first be configured. FTP is used at UCSB to publish to a test server. The profile is saved as LCIAToolAPI\Properties\PublishProfiles\kbcalr.pubxml.
 3. Edit web.config in the publish destination.
