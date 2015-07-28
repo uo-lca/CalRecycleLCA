@@ -120,7 +120,8 @@ namespace LcaDataLoader {
                         var configuration = new Configuration();
                         var migrator = new DbMigrator(configuration);
                         migrator.Update();
-                        return 0;
+                        Logger.InfoFormat("Upgraded database.");
+                        Database.SetInitializer<EntityDataModel>(null);
                     }
                     else {
                         Database.SetInitializer<EntityDataModel>(null);
