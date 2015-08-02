@@ -109,6 +109,23 @@ namespace LCAToolAPI.API
         }
 
         /// <summary>
+        /// Get generalComment for process by ID.
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns>redirect to canonical XML reference</returns>
+        [Route("api/processes/{id:int}/comment")]
+        [HttpGet]
+        public String CommentByProcessID(int id)
+        {
+            ILCDEntity entity = _processService.Query(k => k.ProcessID == id)
+                .Include(k => k.ILCDEntity.DataSource)
+                .Select(k => k.ILCDEntity)
+                .FirstOrDefault();
+
+            return _ilcdEntityService.GetGeneralComment(entity);
+        }
+
+        /// <summary>
         /// Lookup a flow by its internal ID.
         /// </summary>
         /// <param name="id"></param>
@@ -123,6 +140,23 @@ namespace LCAToolAPI.API
                 .FirstOrDefault();
 
             return CreateRedirectResponse(entity);
+        }
+
+        /// <summary>
+        /// Get generalComment for flow by ID.
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns>redirect to canonical XML reference</returns>
+        [Route("api/flows/{id:int}/comment")]
+        [HttpGet]
+        public String CommentByFlowID(int id)
+        {
+            ILCDEntity entity = _flowService.Query(k => k.FlowID == id)
+                .Include(k => k.ILCDEntity.DataSource)
+                .Select(k => k.ILCDEntity)
+                .FirstOrDefault();
+
+            return _ilcdEntityService.GetGeneralComment(entity);
         }
 
         /// <summary>

@@ -17,18 +17,33 @@ namespace CalRecycleLCA.Services
         List<ILCDEntity> LookupUUID(string uuid);
         ILCDEntity LookupUUID(string uuid, string version);
         StringWriter GetXmlDocument(ILCDEntity entity);
+        String GetGeneralComment(ILCDEntity entity);
     }
 
     public class ILCDEntityService : Service<ILCDEntity>, IILCDEntityService
     {
         // need to figure out how to configurate this
         private String DataRoot = ConfigurationManager.AppSettings["DataRoot"];
+        private static readonly XNamespace _CommonNamespace = "http://lca.jrc.it/ILCD/Common";
         
         private IRepository<ILCDEntity> _repository;
         public ILCDEntityService(IRepositoryAsync<ILCDEntity> repository)
             : base(repository)
         {
             _repository = repository; 
+        }
+
+        private XDocument FindXmlDocument(ILCDEntity entity)
+        {
+            // note: entity must be Eager-queried to .Include DataSource
+            var filePath = DataRoot + entity.DataSource.Name + "/ILCD/"
+                + Enum.GetName(typeof(DataPathEnum), (DataPathEnum)entity.DataTypeID) + "/"
+                + entity.UUID + ".xml";
+
+            if (!File.Exists(filePath))
+                return null;
+
+            return XDocument.Load(filePath);
         }
 
         public List<ILCDEntity> LookupUUID(String uuid)
@@ -53,15 +68,8 @@ namespace CalRecycleLCA.Services
         public StringWriter GetXmlDocument(ILCDEntity entity)
         {
             var sw = new StringWriter();
-            // note: entity must be Eager-queried to .Include DataSource
-            var filePath = DataRoot + entity.DataSource.Name + "/ILCD/"
-                + Enum.GetName(typeof(DataPathEnum), (DataPathEnum)entity.DataTypeID) + "/"
-                + entity.UUID + ".xml";
 
-            if (!File.Exists(filePath))
-                return null;
-
-            XDocument xmlDocument = XDocument.Load(filePath);
+            XDocument xmlDocument = FindXmlDocument(entity);
 
             if (entity.DataSource.VisibilityID == Convert.ToInt32(VisibilityEnum.Private))
             {
@@ -78,6 +86,16 @@ namespace CalRecycleLCA.Services
 
             return sw;
 
+        }
+
+        public String GetGeneralComment(ILCDEntity entity)
+        {
+            XDocument xmlDocument = FindXmlDocument(LookupUUID(entity.UUID, entity.Version));
+            var ns = xmlDocument.Root.Name.Namespace;
+            //return xmlDocument.Descendants(ns + "dataSetInformation").Descendants("common:generalComment").ToString();
+            var y = xmlDocument.Descendants(ns + "dataSetInformation")
+                        .Descendants(_CommonNamespace + "generalComment").FirstOrDefault();
+            return y == null ? null : y.Value;
         }
     }
 }

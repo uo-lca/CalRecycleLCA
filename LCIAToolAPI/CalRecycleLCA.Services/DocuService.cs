@@ -80,6 +80,11 @@ namespace CalRecycleLCA.Services
                     Rel = "flow properties",
                     Title = "Flow Property magnitudes for Flow",
                     Href = selfUrl + "/flowpropertymagnitudes"
+                },
+                new Link() {
+                    Rel = "comment",
+                    Title = "General Comment for flow",
+                    Href = selfUrl + "/comment"
                 }
             };
         }
@@ -119,6 +124,12 @@ namespace CalRecycleLCA.Services
                     Title = "Detailed LCIA results for a single LCIA method",
                     Href = selfUrl + "/lciamethods/{x}/lciaresults"
                 });
+            links.Add(new Link()
+            {
+                Rel = "comment",
+                Title = "General Comment for process",
+                Href = selfUrl + "/comment"
+            });
             return links;
         }
 
