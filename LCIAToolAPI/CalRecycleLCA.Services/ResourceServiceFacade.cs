@@ -268,12 +268,12 @@ namespace CalRecycleLCA.Services
             var ffs = _FragmentFlowService.GetTerminatedFlows(fragmentID, scenarioID)
                 .ToList();
 
-            foreach (var ff in ffs)
-                ff.FlowPropertyMagnitudes = ff.FlowPropertyMagnitudes.Select(k => new FlowPropertyMagnitude()
-                {
-                    FlowProperty = _FlowPropertyService.GetResource((int)k.FlowPropertyID),
-                    Magnitude = k.Magnitude
-                }).ToList();
+            //foreach (var ff in ffs)
+            //    ff.FlowPropertyMagnitudes = ff.FlowPropertyMagnitudes.Select(k => new FlowPropertyMagnitude()
+            //    {
+            //        FlowProperty = _FlowPropertyService.GetResource((int)k.FlowPropertyID),
+            //        Magnitude = k.Magnitude
+            //    }).ToList();
 
             List<int> balanceFlows = _FragmentFlowService.ListBalanceFlows(fragmentID).Intersect(ffs.Select(k => k.FragmentFlowID)).ToList();
 
