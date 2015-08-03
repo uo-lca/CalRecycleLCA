@@ -31,6 +31,7 @@ namespace Entities.Models
     public class FlowPropertyMagnitude
     {
         public int? FlowPropertyID { get; set; }
+        public string Unit { get; set; }
         public FlowPropertyResource FlowProperty { get; set; }
         public double Magnitude { get; set; }  // NodeCache.FlowMagnitude * FlowFlowProperty.MeanValue
     }
