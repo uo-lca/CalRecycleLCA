@@ -49,7 +49,7 @@ namespace CalRecycleLCA.Services
             else if (isvalid(p.LCIAMethodID))
                 p.ParamTypeID = 10;
             else if (isvalid(p.FlowPropertyID))
-                if (_repository.GetCompositionId((int)p.FlowID, (int)p.FlowPropertyID) != null)
+                if (isvalid(_repository.GetCompositionId((int)p.FlowID, (int)p.FlowPropertyID)))
                     p.ParamTypeID = 5; // this is an internal indicator- ParamTypeID==5 should never appear in the wild
                 else
                     p.ParamTypeID = 4;

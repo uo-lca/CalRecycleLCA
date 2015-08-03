@@ -271,7 +271,9 @@ namespace CalRecycleLCA.Services
             foreach (var ff in ffs)
                 ff.FlowPropertyMagnitudes = ff.FlowPropertyMagnitudes.Select(k => new FlowPropertyMagnitude()
                 {
-                    FlowProperty = _FlowPropertyService.GetResource((int)k.FlowPropertyID),
+                    FlowPropertyID = k.FlowPropertyID,
+                    Unit = _FlowPropertyService.Queryable().Where(fp => fp.FlowPropertyID == k.FlowPropertyID)
+                        .Select(fp => fp.UnitGroup.ReferenceUnit).FirstOrDefault(),
                     Magnitude = k.Magnitude
                 }).ToList();
 
