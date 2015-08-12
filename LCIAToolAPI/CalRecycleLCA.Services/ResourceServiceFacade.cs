@@ -548,25 +548,24 @@ namespace CalRecycleLCA.Services
         /// <param name="lciaMethodID"></param>
         /// <param name="scenarioID">Defaults to base scenario</param>
         /// <returns>Fragment LCIA results for given parameters</returns> 
-        public LCIAResultResource GetFragmentLCIAResults(int fragmentID, int lciaMethodID, int scenarioID = Scenario.MODEL_BASE_CASE_ID) {
+        public LCIAResultResource GetFragmentLCIAResultsOneMethod(int fragmentID, int lciaMethodID, int scenarioID = Scenario.MODEL_BASE_CASE_ID) {
             sw_lcia.CStart();
             var result = GroupFragmentLCIA(_FragmentLCIAComputation
-                    .FragmentLCIA(fragmentID, scenarioID, lciaMethodID).ToList(),
+                    .FragmentLCIA(fragmentID, scenarioID).Where(r => r.LCIAMethodID == lciaMethodID).ToList(),
                     scenarioID)
-                .Where(r => r.LCIAMethodID == lciaMethodID).FirstOrDefault();
+                    .FirstOrDefault();
             sw_lcia.CStop("Flat FID " + Convert.ToString(fragmentID) + " LCIA " + Convert.ToString(lciaMethodID));
             return result;
 
         }
 
-        public LCIAResultResource GetRecursiveFragmentLCIAResults(int fragmentID, int lciaMethodID, int scenarioID = Scenario.MODEL_BASE_CASE_ID)
+        public LCIAResultResource GetRecursiveFragmentLCIAResultsOneMethod(int fragmentID, int lciaMethodID, int scenarioID = Scenario.MODEL_BASE_CASE_ID)
         {
             sw_lcia.CStart();
-            var result = GroupFragmentLCIA(_FragmentLCIAComputation
-                    .RecursiveFragmentLCIA(fragmentID, scenarioID, lciaMethodID).ToList(),
-                    scenarioID)
-                .Where(r => r.LCIAMethodID == lciaMethodID).FirstOrDefault();
-            sw_lcia.CStop("Reur FID " + Convert.ToString(fragmentID) + " LCIA " + Convert.ToString(lciaMethodID));
+            var result = GroupFragmentLCIA(_FragmentLCIAComputation.RecursiveFragmentLCIA(fragmentID, scenarioID)
+                .Where(r => r.LCIAMethodID == lciaMethodID).ToList(),
+                scenarioID).FirstOrDefault();
+            sw_lcia.CStop("Recur FID " + Convert.ToString(fragmentID) + " LCIA " + Convert.ToString(lciaMethodID));
             return result;
         }
 
@@ -581,7 +580,7 @@ namespace CalRecycleLCA.Services
         public IEnumerable<LCIAResultResource> GetFragmentLCIAResultsAllScenarios(int fragmentID, int lciaMethodID, int scenarioGroupID = 1)
         {
             IEnumerable<Scenario> scenarios = _ScenarioService.Queryable().Where(s => s.ScenarioGroupID == scenarioGroupID).ToList();
-            return scenarios.Select(s => GetFragmentLCIAResults(fragmentID, lciaMethodID, s.ScenarioID)).ToList();
+            return scenarios.Select(s => GetFragmentLCIAResultsOneMethod(fragmentID, lciaMethodID, s.ScenarioID)).ToList();
         }
 
         public IEnumerable<LCIAResultResource> GetRecursiveFragmentLCIAResultsAllScenarios(int fragmentID, int lciaMethodID, int scenarioGroupID = 1)
@@ -589,7 +588,7 @@ namespace CalRecycleLCA.Services
             sw_lcia.Reset();
 
             IEnumerable<Scenario> scenarios = _ScenarioService.Queryable().Where(s => s.ScenarioGroupID == scenarioGroupID).ToList();
-            return scenarios.Select(s => GetRecursiveFragmentLCIAResults(fragmentID, lciaMethodID, s.ScenarioID)).ToList();
+            return scenarios.Select(s => GetRecursiveFragmentLCIAResultsOneMethod(fragmentID, lciaMethodID, s.ScenarioID)).ToList();
         }
         
         /// <summary>
@@ -601,16 +600,19 @@ namespace CalRecycleLCA.Services
         /// <returns>List of LCIAResultResource objects</returns> 
         public IEnumerable<LCIAResultResource> GetFragmentLCIAResultsAllMethods(int fragmentID, int scenarioId = Scenario.MODEL_BASE_CASE_ID)
         {
-            IEnumerable<int> lciaMethods = _LciaMethodService.QueryActiveMethods();
-            return lciaMethods.Select(s => GetFragmentLCIAResults(fragmentID, s, scenarioId)).ToList();
+            //IEnumerable<int> lciaMethods = _LciaMethodService.QueryActiveMethods();
+            //return lciaMethods.Select(s => GetFragmentLCIAResultsOneMethod(fragmentID, s, scenarioId)).ToList();
+            return GroupFragmentLCIA(_FragmentLCIAComputation.FragmentLCIA(fragmentID, scenarioId).ToList(),scenarioId);
         }
 
         public IEnumerable<LCIAResultResource> GetRecursiveFragmentLCIAResultsAllMethods(int fragmentID, int scenarioId = Scenario.MODEL_BASE_CASE_ID)
         {
             sw_lcia.Reset();
 
-            IEnumerable<int> lciaMethods = _LciaMethodService.QueryActiveMethods();
-            return lciaMethods.Select(s => GetRecursiveFragmentLCIAResults(fragmentID, s, scenarioId)).ToList();
+            //IEnumerable<int> lciaMethods = _LciaMethodService.QueryActiveMethods();
+            //return lciaMethods.Select(s => GetRecursiveFragmentLCIAResultsOneMethod(fragmentID, s, scenarioId)).ToList();
+            return GroupFragmentLCIA(_FragmentLCIAComputation.RecursiveFragmentLCIA(fragmentID,scenarioId).ToList(),scenarioId);
+
         }
         
         public IEnumerable<LCIAResultResource> GetFragmentSensitivity(int fragmentId, int paramId)

@@ -226,27 +226,27 @@ namespace CalRecycleLCA.Services
 
         }
 
-        private IEnumerable<FragmentLCIAModel> JoinCaches(IQueryable<FragmentFlow> FFs, int scenarioId, int lciaMethodId)
+        private IEnumerable<FragmentLCIAModel> JoinCaches(IQueryable<FragmentFlow> FFs, int scenarioId)
         {
             // internally: return one record per FragmentFlow; aggregate in ResourceService
             return FFs.Join(_nodeCacheService.Queryable().Where(x => x.ScenarioID == scenarioId),
                         ff => ff.FragmentFlowID,
                         nc => nc.FragmentFlowID,
                         (ff, nc) => new { ff, nc })
-                    .Join(_scoreCacheService.Queryable().Where(x => x.ScenarioID == scenarioId && x.LCIAMethodID == lciaMethodId),
+                    .Join(_scoreCacheService.Queryable().Where(x => x.ScenarioID == scenarioId),
                         l => l.nc.FragmentFlowID,
                         sc => sc.FragmentFlowID,
                         (nc, sc) => new { nodeCaches = nc, scoreCaches = sc }).Select(s => new FragmentLCIAModel
                         {
                             FragmentFlowID = s.nodeCaches.ff.FragmentFlowID,
                             FragmentStageID = s.nodeCaches.ff.FragmentStageID,
-                            LCIAMethodID = lciaMethodId,
+                            LCIAMethodID = s.scoreCaches == null ? 0 : s.scoreCaches.LCIAMethodID,
                             NodeWeight = s.nodeCaches.nc.NodeWeight,
                             ImpactScore = s.scoreCaches == null ? 0 : s.scoreCaches.ImpactScore
                         });
         }
 
-        public IEnumerable<FragmentLCIAModel> RecursiveFragmentLCIA(int fragmentId, int scenarioId, int lciaMethodId)
+        public IEnumerable<FragmentLCIAModel> RecursiveFragmentLCIA(int fragmentId, int scenarioId)
         {
             // stack 3 things: 
             // non-subfragment nodes; 
@@ -255,13 +255,13 @@ namespace CalRecycleLCA.Services
             // for now: return one record per FragmentFlow
             var lcia = JoinCaches(_fragmentFlowService.Queryable()
                                     .Where(x => x.FragmentID == fragmentId)
-                                    .Where(x => x.NodeTypeID != 2), scenarioId, lciaMethodId)
+                                    .Where(x => x.NodeTypeID != 2), scenarioId)
                                     .ToList();
 
             lcia.AddRange(JoinCaches(_fragmentFlowService.Queryable()
                                     .Where(x => x.FragmentID == fragmentId)
                                     .Where(x => x.NodeTypeID == 2)
-                                    .Where(x => x.FragmentNodeFragments.FirstOrDefault().Descend == false), scenarioId, lciaMethodId));
+                                    .Where(x => x.FragmentNodeFragments.FirstOrDefault().Descend == false), scenarioId));
 
             var recurse = _fragmentFlowService.Queryable()
                 .Where(x => x.FragmentID == fragmentId)
@@ -278,12 +278,13 @@ namespace CalRecycleLCA.Services
                 }).ToList();
 
             foreach (var subfragment in recurse)
-                lcia.AddRange(RecursiveFragmentLCIA(subfragment.FragmentID, scenarioId, lciaMethodId)
+                lcia.AddRange(RecursiveFragmentLCIA(subfragment.FragmentID, scenarioId)
+                    .Where(k => k.LCIAMethodID != 0) // do we need this? does this cause bugs?
                     .Select(k => new FragmentLCIAModel
                     {
                         FragmentFlowID = k.FragmentFlowID,
                         FragmentStageID = k.FragmentStageID,
-                        LCIAMethodID = lciaMethodId,
+                        LCIAMethodID = k.LCIAMethodID,
                         NodeWeight = subfragment.NodeWeight * k.NodeWeight,
                         ImpactScore = k.ImpactScore
                     }));
@@ -292,10 +293,10 @@ namespace CalRecycleLCA.Services
         }
 
 
-        public IEnumerable<FragmentLCIAModel> FragmentLCIA(int fragmentId, int scenarioId, int lciaMethodId)
+        public IEnumerable<FragmentLCIAModel> FragmentLCIA(int fragmentId, int scenarioId)
         {
             return JoinCaches(_fragmentFlowService.Queryable()
-                .Where(x => x.FragmentID == fragmentId),scenarioId, lciaMethodId);
+                .Where(x => x.FragmentID == fragmentId),scenarioId);
         }
 
         public IEnumerable<FragmentLCIAModel> Sensitivity(int fragmentId, ParamResource p)
@@ -483,39 +484,29 @@ namespace CalRecycleLCA.Services
                                 FragmentFlowID = fragmentFlowId,
                                 LCIAMethodID = lciaMethodId,
                                 ImpactScore = score,
+                                ObjectState = ObjectState.Added
                             });
 
                         }
                     }
-
-                    foreach (var processScoreCache in scoreCachesInProgress)
-                    {
-                        processScoreCache.ObjectState = ObjectState.Added;
-                    }
-
                     break;
                 case 2:
-                    foreach (var lciaMethodId in needLciaMethods)
                     {
-                        var lcias = FragmentLCIA((int)fragmentNode.SubFragmentID, fragmentNode.ScenarioID, lciaMethodId);
-
-                        scoreCachesInProgress.Add(new ScoreCache()
-                        {
-                            ScenarioID = fragmentNode.ScenarioID,
-                            FragmentFlowID = fragmentFlowId,
-                            LCIAMethodID = lciaMethodId,
-                            ImpactScore = Convert.ToDouble(lcias.Sum(a => a.Result))
-                        });
-                    }
-
-                    foreach (var fragmentScoreCache in scoreCachesInProgress)
-                    {
-                        fragmentScoreCache.ObjectState = ObjectState.Added;
+                        scoreCachesInProgress.AddRange(FragmentLCIA((int)fragmentNode.SubFragmentID, fragmentNode.ScenarioID)
+                            .Where(r => needLciaMethods.Contains(r.LCIAMethodID)).GroupBy(r => r.LCIAMethodID)
+                            .Select(group => new ScoreCache()
+                            {
+                                ScenarioID = fragmentNode.ScenarioID,
+                                FragmentFlowID = fragmentFlowId,
+                                LCIAMethodID = group.Key,
+                                ImpactScore = Convert.ToDouble(group.Sum(a => a.Result)),
+                                ObjectState = ObjectState.Added
+                            }));
                     }
                     break;
             }  /* end of switch NodeType */
 
-            sw_lcia.CStop();
+            sw_lcia.CStop(String.Format("FFID {0} Type {1}", fragmentFlowId, fragmentNode.NodeTypeID));
 
             return scoreCachesInProgress;
         } /* end of SetScoreCache */

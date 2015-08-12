@@ -16,8 +16,8 @@ namespace CalRecycleLCA.Services
         IEnumerable<ScoreCache> FragmentLCIAComputeNoSave(int fragmentId, int scenarioId);
         void FragmentLCIAComputeSave(int fragmentId, int scenarioId);
         //void FragmentFlowLCIA(int? fragmentId, int scenarioId, IEnumerable<int> lciaMethods);
-        IEnumerable<FragmentLCIAModel> RecursiveFragmentLCIA(int fragmentId, int scenarioId, int lciaMethodId);
-        IEnumerable<FragmentLCIAModel> FragmentLCIA(int fragmentId, int scenarioId, int lciaMethodId);
+        IEnumerable<FragmentLCIAModel> RecursiveFragmentLCIA(int fragmentId, int scenarioId);
+        IEnumerable<FragmentLCIAModel> FragmentLCIA(int fragmentId, int scenarioId);
         IEnumerable<FragmentLCIAModel> Sensitivity(int fragmentId, ParamResource p);
         List<InventoryModel> ComputeFragmentLCI(int fragmentId, int scenarioId);
     }

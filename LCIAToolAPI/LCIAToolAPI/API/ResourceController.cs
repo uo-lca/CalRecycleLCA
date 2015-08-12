@@ -436,7 +436,7 @@ namespace LCAToolAPI.API
                 return Request.CreateResponse(HttpStatusCode.Conflict, conflictMsg);
             if (_ScenarioGroupService.CanGet(RequestContext))
                 return Request.CreateResponse(HttpStatusCode.OK,
-                    _ResourceService.GetFragmentLCIAResults(fragmentID, lciaMethodID, scenarioID));
+                    _ResourceService.GetFragmentLCIAResultsOneMethod(fragmentID, lciaMethodID, scenarioID));
             else
                 return Request.CreateResponse(HttpStatusCode.Unauthorized);
         }
@@ -464,7 +464,7 @@ namespace LCAToolAPI.API
                 return Request.CreateResponse(HttpStatusCode.Conflict, conflictMsg);
             if (_ScenarioGroupService.CanGet(RequestContext))
                 return Request.CreateResponse(HttpStatusCode.OK,
-                    _ResourceService.GetRecursiveFragmentLCIAResults(fragmentID, lciaMethodID, scenarioID));
+                    _ResourceService.GetRecursiveFragmentLCIAResultsOneMethod(fragmentID, lciaMethodID, scenarioID));
             else
                 return Request.CreateResponse(HttpStatusCode.Unauthorized);
         }
