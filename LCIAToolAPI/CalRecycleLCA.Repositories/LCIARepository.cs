@@ -14,12 +14,12 @@ namespace CalRecycleLCA.Repositories
     {
 
         public static IEnumerable<LCIAModel> ComputeLCIA(this IRepositoryAsync<LCIA> repository,
-            IEnumerable<InventoryModel> inventory, int lciaMethodId, int scenarioId)
+            IEnumerable<InventoryModel> inventory, int scenarioId)
         {
             return repository.Queryable()
                 .Where(x => x.FlowID != null
-                        && x.Geography == null
-                        && x.LCIAMethodID == lciaMethodId)
+                        && x.Geography == null)
+//                        && x.LCIAMethodID == lciaMethodId)
                 .Join(inventory,
                     l => l.FlowID,
                     i => i.FlowID,
@@ -33,6 +33,8 @@ namespace CalRecycleLCA.Repositories
                 .SelectMany(s => s.parameter.DefaultIfEmpty(),
                     (s, parameter) => new LCIAModel
                     {
+                        LCIAMethodID = s.lcias.l.LCIAMethodID,
+                        ScenarioID = scenarioId,
                         FlowID = (int)s.lcias.l.FlowID,
                         DirectionID = s.lcias.l.DirectionID,
                         Quantity = (double)s.lcias.i.Result, // inventory table
@@ -47,12 +49,12 @@ namespace CalRecycleLCA.Repositories
         }
 
         public static IEnumerable<LCIAModel> ComputeLCIADiss(this IRepositoryAsync<LCIA> repository,
-            IEnumerable<InventoryModel> inventory, int lciaMethodId, int scenarioId)
+            IEnumerable<InventoryModel> inventory, int scenarioId)
         {
             return repository.Queryable()
                 .Where(x => x.FlowID != null
-                        && x.Geography == null
-                        && x.LCIAMethodID == lciaMethodId)
+                        && x.Geography == null)
+//                        && x.LCIAMethodID == lciaMethodId)
                 .Join(inventory,
                     l => l.FlowID,
                     i => i.FlowID,
@@ -66,6 +68,8 @@ namespace CalRecycleLCA.Repositories
                 .SelectMany(s => s.parameter.DefaultIfEmpty(),
                     (s, parameter) => new LCIAModel
                     {
+                        LCIAMethodID = s.lcias.l.LCIAMethodID,
+                        ScenarioID = scenarioId,
                         FlowID = (int)s.lcias.l.FlowID,
                         DirectionID = s.lcias.l.DirectionID,
                         Composition = s.lcias.i.Composition,
@@ -80,6 +84,7 @@ namespace CalRecycleLCA.Repositories
                     });
         }
 
+        /*
         public static IEnumerable<LCIAModel> OldComputeLCIA(this IRepositoryAsync<LCIA> repository,
             IEnumerable<InventoryModel> inventory, int lciaMethodId, int scenarioId)
         {
@@ -127,6 +132,7 @@ namespace CalRecycleLCA.Repositories
             //.Where(x => x.DirectionID == inventory.Select(i => i.DirectionID).FirstOrDefault());
             //.Where(x => x.Geography == null);
         }
+         * */
 
         public static IEnumerable<LCIAFactorResource> QueryFactors(this IRepositoryAsync<LCIA> repository, 
             int lciaMethodId)

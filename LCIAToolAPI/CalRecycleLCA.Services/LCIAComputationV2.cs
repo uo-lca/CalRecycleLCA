@@ -138,7 +138,7 @@ namespace CalRecycleLCA.Services
          /// <param name="processId"></param>
          /// <param name="scenarioId"></param>
          /// <returns></returns>
-        public IEnumerable<LCIAResult> LCIACompute(int processId, int scenarioId)
+        public List<LCIAModel> LCIACompute(int processId, int scenarioId)
         {
             //var lciaMethods = from u in _lciaService.Queryable().AsEnumerable()
             //            select new LCIAModel
@@ -155,26 +155,40 @@ namespace CalRecycleLCA.Services
 
         }
 
-        public IEnumerable<LCIAResult> ProcessLCIA(int processId, IEnumerable<int> lciaMethods, int scenarioId = Scenario.MODEL_BASE_CASE_ID)
+        public List<LCIAModel> ProcessLCIA(int processId, IEnumerable<int> lciaMethods, int scenarioId = Scenario.MODEL_BASE_CASE_ID)
         {
+            var sw = new CounterTimer();
+            sw.CStart();
             var inventory = ComputeProcessEmissions(processId, scenarioId);
+            var lcias = _lciaService.ComputeLCIA(inventory, lciaMethods, scenarioId);
+            sw.Click("inventory");
 
-            //var dissipation = new IEnumerable<InventoryModel>();
-            var dissipation = ComputeProcessDissipation(processId, scenarioId);
-            var diss_flows = new HashSet<int>(dissipation.Select(q => q.FlowID));
-
-            //IEnumerable<LCIAModel> lcias=null;
-            List<LCIAResult> lciaResults = new List<LCIAResult>();
-            foreach (var lciaMethodId in lciaMethods.ToList())
+            if (_processDissipationService.HasDissipation(processId))
             {
-                var diss_lcias = new List<LCIAModel>();
-                if (_processDissipationService.HasDissipation(processId))
-                    diss_lcias = _lciaService.ComputeLCIADiss(dissipation, lciaMethodId, scenarioId); 
-
-                var lcias = _lciaService.ComputeLCIA(inventory, lciaMethodId, scenarioId); 
+                //var dissipation = new IEnumerable<InventoryModel>();
+                var dissipation = ComputeProcessDissipation(processId, scenarioId);
+                var diss_flows = new HashSet<int>(dissipation.Select(q => q.FlowID));
+                var diss_lcias = _lciaService.ComputeLCIADiss(dissipation, lciaMethods, scenarioId); 
+                sw.Click("diss");
 
                 lcias.RemoveAll(k => k.DirectionID == (int)DirectionEnum.Output && diss_flows.Contains(k.FlowID));
                 lcias.AddRange(diss_lcias);
+            }
+            sw.CStop("done");
+            return lcias;
+            /*
+            //IEnumerable<LCIAModel> lcias=null;
+            //List<LCIAResult> lciaResults = new List<LCIAResult>();
+            foreach (var lciaMethodId in lciaMethods.ToList())
+            {
+                var diss_lcias = new List<LCIAModel>();
+                    
+                    sw.Click(String.Format("diss {0}", lciaMethodId));
+                }
+
+
+                sw.Click(String.Format("LCIA {0}", lciaMethodId));
+
 
                 lciaResults.Add(new LCIAResult()
                 {
@@ -182,7 +196,7 @@ namespace CalRecycleLCA.Services
                     ScenarioID = scenarioId,
                     LCIADetail = lcias
                 });
-                /*
+                
                 if (lcias.Count() == 0)
                 {
                     lciaResults.Add(new LCIAModel()
@@ -206,10 +220,11 @@ namespace CalRecycleLCA.Services
                    });
                    
                }
-                */
-
+                
             }
-            return lciaResults;
+            sw.CStop();
+            return lciaResults.ToList();
+            */
         }
 
         public List<InventoryModel> ComputeProcessLCI(int processId, int scenarioId, bool includeProducts = true)

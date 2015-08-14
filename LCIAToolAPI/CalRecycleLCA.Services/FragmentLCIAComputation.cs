@@ -86,6 +86,11 @@ namespace CalRecycleLCA.Services
         {
             fragsThisRound = new bool[_fragmentService.Count() + 1];
             currentCache.Clear();
+            sw_traverse.Reset();
+            sw_ff.Reset();
+            sw_cache.Reset();
+            sw_lcia.Reset();
+            sw_local.Reset();
         }
 
         /// <summary>
@@ -150,13 +155,20 @@ namespace CalRecycleLCA.Services
 
         public IEnumerable<NodeCache> FragmentTraverse(int fragmentId, int scenarioId = Scenario.MODEL_BASE_CASE_ID)
         {
+            sw_traverse.Reset();
+            sw_traverse.CStart();
+
             // this will eventually become private after diagnostics are done
             if (_nodeCacheService.IsCached(fragmentId, scenarioId))
+            {
+                sw_traverse.CStop();
                 return _nodeCacheService.Queryable()
                     //.Where(nc => nc.FragmentFlow.FragmentID == fragmentId)
                     .Where(nc => nc.ScenarioID == scenarioId).ToList();
+            }
             else
             {
+                sw_traverse.Click("is not cached");
                 var nodeCaches = _fragmentTraversalV2.EnterTraversal((int)fragmentId, scenarioId).Select(k => new NodeCache
                 {
                     FragmentFlowID = k.FragmentFlowID,
@@ -166,11 +178,13 @@ namespace CalRecycleLCA.Services
                     ILCDEntityID = k.ILCDEntityID,
                     ObjectState = ObjectState.Added
                 });
+                sw_traverse.Click("exit traverse");
                 _unitOfWork.SetAutoDetectChanges(false);
                 _nodeCacheService.InsertGraphRange(nodeCaches);
                 _unitOfWork.SaveChanges();
                 _unitOfWork.SetAutoDetectChanges(true);
-                
+                sw_traverse.Click("update cache");
+                sw_traverse.CStop();
                 return nodeCaches;
             }
 
@@ -454,8 +468,6 @@ namespace CalRecycleLCA.Services
         {
             List<ScoreCache> scoreCachesInProgress = new List<ScoreCache>();
 
-            sw_lcia.CStart();
-
             IEnumerable<int> haveLciaMethods = currentCache.Where(x => x.FragmentFlowID == fragmentFlowId)
                                                         .Select(x => x.LCIAMethodID);
 
@@ -463,13 +475,25 @@ namespace CalRecycleLCA.Services
 
             if (needLciaMethods.Count() == 0)
                 return scoreCachesInProgress;
+            sw_lcia.CStart();
 
             switch (fragmentNode.NodeTypeID)
             {
                 case 1:
+                    {
+                        var lcias = _lciaComputationV2.ProcessLCIA((int)fragmentNode.ProcessID, needLciaMethods, fragmentNode.ScenarioID);
 
-                    var scores = _lciaComputationV2.ProcessLCIA((int)fragmentNode.ProcessID, needLciaMethods, fragmentNode.ScenarioID);
-
+                        scoreCachesInProgress.AddRange(lcias.GroupBy(k => new { k.LCIAMethodID, k.ScenarioID })
+                            .Select(group => new ScoreCache()
+                            {
+                                ScenarioID = group.Key.ScenarioID,
+                                FragmentFlowID = fragmentFlowId,
+                                LCIAMethodID = group.Key.LCIAMethodID,
+                                ImpactScore = group.Sum(a => a.Result),
+                                ObjectState = ObjectState.Added
+                            }));
+                    }
+                    /*
                     foreach (var lciaMethodId in needLciaMethods.AsQueryable())
                     {
                         if (scores.Any(s => s.LCIAMethodID == lciaMethodId))
@@ -489,6 +513,7 @@ namespace CalRecycleLCA.Services
 
                         }
                     }
+                     * */
                     break;
                 case 2:
                     {

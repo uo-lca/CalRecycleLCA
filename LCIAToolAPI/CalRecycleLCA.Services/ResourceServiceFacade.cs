@@ -174,6 +174,51 @@ namespace CalRecycleLCA.Services
             };
         }
 
+        private LCIAResultResource EnsureMethod(IEnumerable<LCIAResultResource> results, int lciaMethodId, int scenarioId, int processId)
+        {
+            var result = results.Where(k => k.LCIAMethodID == lciaMethodId).FirstOrDefault();
+            return (result == null)
+                ? new LCIAResultResource()
+                {
+                    LCIAMethodID = lciaMethodId,
+                    ScenarioID = scenarioId,
+                    LCIAScore = new List<AggregateLCIAResource>() {
+                        new AggregateLCIAResource() {
+                            CumulativeResult = 0.0,
+                            ProcessID = processId
+                        }
+                    }
+                }
+                : result;
+        }
+
+        private IEnumerable<LCIAResultResource> Transform(List<LCIAModel> lciaModel, int processId, bool detail=true)
+        {
+            return lciaModel.GroupBy(m => new { m.LCIAMethodID, m.ScenarioID })
+                .Select(group => new LCIAResultResource() {
+                    LCIAMethodID = group.Key.LCIAMethodID,
+                    ScenarioID = group.Key.ScenarioID,
+                    LCIAScore = new List<AggregateLCIAResource>() {
+                        new AggregateLCIAResource() {
+                            ProcessID = processId,
+                            CumulativeResult = Convert.ToDouble(group.Sum(a => a.Result)),
+                            LCIADetail = (_ProcessService.IsPrivate(processId) || detail == false )
+                                ? new List<DetailedLCIAResource>() {}
+                                : group.Select(a => new DetailedLCIAResource() {
+                                FlowID = a.FlowID, 
+                                Direction = Enum.GetName(typeof(DirectionEnum), (DirectionEnum)a.DirectionID),
+                                Content = a.Composition,
+                                Dissipation = a.Dissipation,
+                                Quantity = Convert.ToDouble(a.Quantity),
+                                Factor = Convert.ToDouble(a.Factor),
+                                Result = Convert.ToDouble(a.Result)
+                            }).OrderBy(k => k.FlowID).ToList()
+                        }
+                    }
+                }).OrderBy(l => l.LCIAMethodID).ToList();
+        }
+
+        /*
         public DetailedLCIAResource Transform(LCIAModel m)
         {
             return new DetailedLCIAResource
@@ -189,7 +234,6 @@ namespace CalRecycleLCA.Services
             };
         }
 
-        /*
         public AggregateLCIAResource Transform(FragmentLCIAModel m)
         {
             //ICollection<DetailedLCIAResource> details = new List<DetailedLCIAResource>();
@@ -204,7 +248,6 @@ namespace CalRecycleLCA.Services
                 //LCIADetail = details
             };
         }
-        */
         public LCIAResultResource Transform(LCIAResult m, int processId)
         {
             return new LCIAResultResource
@@ -221,6 +264,7 @@ namespace CalRecycleLCA.Services
                 }
             };
         }
+        */
         #endregion
 
         #region Service Providers
@@ -495,10 +539,15 @@ namespace CalRecycleLCA.Services
         /// Work around problem in LCIA computation: should be filtering out LCIA with Geography 
         /// </summary>
         /// <returns>LCIAResultResource or null if lciaMethodID not found</returns> 
-        public LCIAResultResource GetProcessLCIAResult(int processId, int lciaMethodId, int scenarioId = Scenario.MODEL_BASE_CASE_ID) {
+        public LCIAResultResource GetProcessLCIAResult(int processId, int lciaMethodId, int scenarioId = Scenario.MODEL_BASE_CASE_ID) 
+        {
             var lciaMethod = new List<int> { lciaMethodId };
-                LCIAResult lciaResult = _LCIAComputation.ProcessLCIA(processId, lciaMethod, scenarioId).First();
-                var lciaAgg = new AggregateLCIAResource
+            var result = Transform(_LCIAComputation.ProcessLCIA(processId, lciaMethod, scenarioId), processId);
+            return EnsureMethod(result, lciaMethodId, scenarioId, processId);
+
+                
+                
+/*                var lciaAgg = new AggregateLCIAResource
                     {
                         ProcessID = processId,
                         CumulativeResult = (double)lciaResult.Total,
@@ -513,13 +562,15 @@ namespace CalRecycleLCA.Services
                     LCIAScore = new List<AggregateLCIAResource>() { lciaAgg }
                 };
                 return lciaResource;
+ * */
         }
 
         
         public IEnumerable<LCIAResultResource> GetProcessLCIAResults(int processId, int scenarioId = Scenario.MODEL_BASE_CASE_ID)
         {
-            IEnumerable<LCIAResult> lciaResults = _LCIAComputation.LCIACompute(processId, scenarioId);
-            return lciaResults.Select(m => Transform(m, processId));
+            var results = Transform(_LCIAComputation.LCIACompute(processId, scenarioId), processId, false);
+            return _LciaMethodService.QueryActiveMethods().Select(m => EnsureMethod(results.Where(k => k.LCIAMethodID == m),
+                m, scenarioId, processId));
         }
         
 
@@ -537,8 +588,8 @@ namespace CalRecycleLCA.Services
                             FragmentStageID = grp.Key,
                             CumulativeResult = grp.Sum(a => a.Result),
                             LCIADetail = new List<DetailedLCIAResource>()
-                        }).ToList()
-                });
+                        }).OrderBy(k => k.FragmentStageID).ToList()
+                }).OrderBy(r => r.LCIAMethodID);
         }
 
         /// <summary>
