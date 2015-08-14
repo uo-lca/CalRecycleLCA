@@ -30,14 +30,6 @@ Note: on a debugging machine, the file to be edited is
 `//configuration/system.applicationHost/sites/site` that matches the
 project.
 
-## Data Path Configuration
-
-The XML file server also requires access to the physical directory that
-stores the XML files.  This is the same as the directory used by the data
-loader.
-
-Currently that directory is configured in the `DataRoot` variable, stored
-in [web.config](LCIAToolAPI/web.config) in the `appSettings` block.
 
 ## Access-Restricted Controller
 
@@ -57,6 +49,21 @@ Originally, this controller's access was restricted to `localhost` in the
 [ConfigurationController.cs](LCIAToolAPI/API/ConfigurationController.cs).
 Since CORS is not binding anyway, the CORS restriction is deprecated in
 favor of host-level access control implemented by the web server.
+
+## Path Configurations
+
+The [web.config](LCIAToolAPI/web.config) file contains two configuration
+settings, which can be found in the `appSettings` block at the end of
+the file.
+
+ 1. The XML file server requires access to the physical directory that
+	stores the XML files in the `DataRoot` variable.  This is the same as
+	the directory used by the data loader.
+
+ 2. The `/config/init` function can be slow, so it reports a progress
+    log. This is stored in the location specified by the `LogPath` variable
+    (along with any future logs). The web server must have permission to
+    write to this path.
 
 
 ## Documentation
