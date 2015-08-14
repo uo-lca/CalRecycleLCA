@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -58,26 +59,60 @@ namespace CalRecycleLCA.Services
             _ScenarioGroupService = verifiedDependency(scenarioGroupService);
         }
 
-        public List<int> InitializeCache()
+        private void LogTo(string logfile, string msg)
         {
-            // first- compute FragmentFlowLCIA for all fragments for base scenario
-            List<int> frags = _FragmentService.Queryable().Select(k => k.FragmentID).ToList();
-            foreach (int frag in frags)
-                _FragmentLCIAComputation.FragmentLCIAComputeSave(frag, Scenario.MODEL_BASE_CASE_ID);
+            using (StreamWriter appendLog = File.AppendText(logfile))
+                appendLog.WriteLine(msg);
+        }
 
+        private string toc(DateTime start)
+        {
+            return (DateTime.Now - start).ToString(@"mm\:ss");
+        }
+
+        public List<int> InitializeCache(string logPath)
+        {
+            if (!Directory.Exists(logPath))
+                Directory.CreateDirectory(logPath);
+            string logFile = string.Format("{0}ConfigInit.log", logPath);
+
+            LogTo(logFile, "");
+            DateTime start = DateTime.Now;
+            LogTo(logFile, string.Format("{0}: Beginning /config/init",start.ToString("s")));
+            List<int> frags = _FragmentService.Queryable().Select(k => k.FragmentID).ToList();
             List<Scenario> scenarios = _ScenarioService.Queryable()
                 .Where(k => k.ScenarioID != Scenario.MODEL_BASE_CASE_ID)
                 .ToList();
 
-            foreach (Scenario s in scenarios)
-                _FragmentLCIAComputation.FragmentLCIAComputeSave(s.TopLevelFragmentID, s.ScenarioID);
+            int i = 1;
 
+            LogTo(logFile, string.Format("Computing {0} Fragments over {1} Scenarios", frags.Count(), 
+                scenarios.Count()));
+            
+            // first- compute FragmentFlowLCIA for all fragments for base scenario
+            foreach (int frag in frags)
+            {
+                _FragmentLCIAComputation.FragmentLCIAComputeSave(frag, Scenario.MODEL_BASE_CASE_ID);
+                LogTo(logFile,string.Format("[{0}] Completed base case traversal for FragmentID {1} of {2}", toc(start),frag, frags.Count()));
+            }
+
+            foreach (Scenario s in scenarios)
+            {
+                _FragmentLCIAComputation.FragmentLCIAComputeSave(s.TopLevelFragmentID, s.ScenarioID);
+                LogTo(logFile, string.Format("[{0}] Completed scenario data for ScenarioID {1} ({2} of {3})", toc(start), s.ScenarioID, ++i, scenarios.Count()));
+            }
+            LogTo(logFile,string.Format( "{0}: /config/init finished.",DateTime.Now.ToString("s")));
             return new List<int>() { frags.Count, scenarios.Count };
         }
  
         private void CloneRefScenario(int fragmentId, int newScenarioId, int refScenarioId)
         {
+            var sw = new CounterTimer();
+            sw.CStart();
+            sw.Click("zero");
             var fs = _FragmentLCIAComputation.FragmentsEncountered(fragmentId, refScenarioId);
+
+            sw.Click("traced");
 
             var nc = _NodeCacheService.Queryable()
                 .Where(k => k.ScenarioID == refScenarioId)
@@ -91,6 +126,8 @@ namespace CalRecycleLCA.Services
                     ObjectState = ObjectState.Added
                 });
             
+            sw.Click(String.Format("{0} nodeCaches created",nc.Count()));
+
             var sc = _ScoreCacheService.Queryable()
                 .Where(k => k.ScenarioID == refScenarioId)
                 .Where(k => fs.Contains(k.FragmentFlow.FragmentID)).ToList()
@@ -103,14 +140,22 @@ namespace CalRecycleLCA.Services
                     ObjectState = ObjectState.Added
                 });
 
+            sw.Click(String.Format("{0} scoreCaches created", sc.Count()));
+
             if (refScenarioId != Scenario.MODEL_BASE_CASE_ID)
                 _ScenarioService.CloneScenarioElements(newScenarioId, refScenarioId);
 
+            sw.Click("elements cloned");
+            
             _unitOfWork.SetAutoDetectChanges(false);
             _NodeCacheService.InsertGraphRange(nc);
             _ScoreCacheService.InsertGraphRange(sc);
+            sw.Click("inserts");
             _unitOfWork.SaveChanges();
+            sw.Click("saved");
             _unitOfWork.SetAutoDetectChanges(true);
+            sw.Stop();
+            return;
         }
 
         public ScenarioGroupResource CreateScenarioGroup(ScenarioGroupResource postdata)

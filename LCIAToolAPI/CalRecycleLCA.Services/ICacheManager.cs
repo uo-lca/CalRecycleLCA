@@ -10,7 +10,7 @@ namespace CalRecycleLCA.Services
 {
     public interface ICacheManager
     {
-        List<int> InitializeCache();
+        List<int> InitializeCache(string logPath);
 
         ScenarioGroupResource CreateScenarioGroup(ScenarioGroupResource postdata); // this needs _unitOfWork
         ScenarioGroupResource UpdateScenarioGroup(int scenarioGroupId, ScenarioGroupResource putdata); // this needs _unitOfWork
