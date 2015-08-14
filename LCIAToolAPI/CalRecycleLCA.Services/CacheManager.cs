@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using System.Configuration;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -70,11 +71,12 @@ namespace CalRecycleLCA.Services
             return (DateTime.Now - start).ToString(@"mm\:ss");
         }
 
-        public List<int> InitializeCache(string logPath)
+        public List<int> InitializeCache()
         {
+            logPath = ConfigurationManager.AppSettings["LogPath"];
             if (!Directory.Exists(logPath))
                 Directory.CreateDirectory(logPath);
-            string logFile = string.Format("{0}ConfigInit.log", logPath);
+            string logFile = Path.Combine(logPath, "ConfigInit.log");
 
             LogTo(logFile, "");
             DateTime start = DateTime.Now;

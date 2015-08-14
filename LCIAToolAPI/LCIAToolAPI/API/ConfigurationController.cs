@@ -95,7 +95,7 @@ namespace LCAToolAPI.API
         [HttpGet]
         public HttpResponseMessage InitializeCache()
         {
-            var result = _CacheManager.InitializeCache(HttpContext.Current.Server.MapPath("~/App_Data/"));
+            var result = _CacheManager.InitializeCache();
             return Request.CreateResponse(HttpStatusCode.OK, String.Format("Computed {0} fragments, {1} scenarios.", result[0], result[1]));
         }
 
