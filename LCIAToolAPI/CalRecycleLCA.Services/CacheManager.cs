@@ -73,7 +73,7 @@ namespace CalRecycleLCA.Services
 
         public List<int> InitializeCache()
         {
-            logPath = ConfigurationManager.AppSettings["LogPath"];
+            var logPath = ConfigurationManager.AppSettings["LogPath"];
             if (!Directory.Exists(logPath))
                 Directory.CreateDirectory(logPath);
             string logFile = Path.Combine(logPath, "ConfigInit.log");
