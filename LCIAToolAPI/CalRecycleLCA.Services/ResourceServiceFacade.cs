@@ -185,7 +185,8 @@ namespace CalRecycleLCA.Services
                     LCIAScore = new List<AggregateLCIAResource>() {
                         new AggregateLCIAResource() {
                             CumulativeResult = 0.0,
-                            ProcessID = processId
+                            ProcessID = processId,
+                            LCIADetail = new List<DetailedLCIAResource>() {}
                         }
                     }
                 }
