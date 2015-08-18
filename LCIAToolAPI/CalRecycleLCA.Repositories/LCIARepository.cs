@@ -14,12 +14,13 @@ namespace CalRecycleLCA.Repositories
     {
 
         public static IEnumerable<LCIAModel> ComputeLCIA(this IRepositoryAsync<LCIA> repository,
-            IEnumerable<InventoryModel> inventory, int scenarioId)
+            IEnumerable<InventoryModel> inventory, IEnumerable<int> lciaMethods, int scenarioId)
         {
             return repository.Queryable()
                 .Where(x => x.FlowID != null
                         && x.Geography == null)
 //                        && x.LCIAMethodID == lciaMethodId)
+                .Where(x => lciaMethods.Contains(x.LCIAMethodID))
                 .Join(inventory,
                     l => l.FlowID,
                     i => i.FlowID,
@@ -49,12 +50,13 @@ namespace CalRecycleLCA.Repositories
         }
 
         public static IEnumerable<LCIAModel> ComputeLCIADiss(this IRepositoryAsync<LCIA> repository,
-            IEnumerable<InventoryModel> inventory, int scenarioId)
+            IEnumerable<InventoryModel> inventory, IEnumerable<int> lciaMethods, int scenarioId)
         {
             return repository.Queryable()
                 .Where(x => x.FlowID != null
                         && x.Geography == null)
 //                        && x.LCIAMethodID == lciaMethodId)
+                .Where(x => lciaMethods.Contains(x.LCIAMethodID))
                 .Join(inventory,
                     l => l.FlowID,
                     i => i.FlowID,

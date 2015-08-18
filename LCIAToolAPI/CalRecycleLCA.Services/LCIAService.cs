@@ -31,9 +31,9 @@ namespace CalRecycleLCA.Services
 
         public List<LCIAModel> ComputeLCIA(IEnumerable<InventoryModel> inventory, IEnumerable<int> lciaMethods, int scenarioId = Scenario.MODEL_BASE_CASE_ID)
         {
-            List<LCIAModel> model = _repository.ComputeLCIA(inventory, scenarioId)
+            List<LCIAModel> model = _repository.ComputeLCIA(inventory, lciaMethods, scenarioId)
                 .Where(k => String.IsNullOrEmpty(k.Geography))
-                .Where(k => lciaMethods.Contains(k.LCIAMethodID)).ToList();
+                .ToList();
 
             foreach (var k in model)
                 k.Result = k.Quantity * k.Factor;
@@ -42,9 +42,9 @@ namespace CalRecycleLCA.Services
         }
         public List<LCIAModel> ComputeLCIADiss(IEnumerable<InventoryModel> dissipation, IEnumerable<int> lciaMethods, int scenarioId = Scenario.MODEL_BASE_CASE_ID)
         {
-            List<LCIAModel> model = _repository.ComputeLCIADiss(dissipation, scenarioId)
+            List<LCIAModel> model = _repository.ComputeLCIADiss(dissipation, lciaMethods, scenarioId)
                 .Where(k => String.IsNullOrEmpty(k.Geography))
-                .Where(k => lciaMethods.Contains(k.LCIAMethodID)).ToList();
+                .ToList();
 
             model.RemoveAll(k => k.Composition == null || k.Dissipation == null);
 
