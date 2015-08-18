@@ -19,7 +19,7 @@ manager -> package manager console) and run the command:
 The migration tool will generate a file in `DataModel/Migrations`
 containing the changes to the SQL server.
 
-### Applying Migrations
+## Applying Migrations
 
 Migrations can be applied manually in visual studio or via the data
 loader.
@@ -35,6 +35,37 @@ Add the `-Script` switch to generate a SQL query without executing it.
 To apply the migration via the data loader, first ensure that the migration
 file is present in `DataModel/Migrations`, and then simply run the data
 loader with the `-u` switch.
+
+## Migration-specific instructions
+
+### NodeCache-ILCDEntity -- 2015-07-22
+
+A mild migration to add ILCDEntity field to NodeCache. Also add a
+description field to Scenario.  After migrating, the cache will need to be
+rebuilt with `/config/init`
+
+ 1. Run `data-loader -u` from the command prompt
+ 2. Start up the server and request `/config/init` 
+	
+
+### Classification -- 2015-08-17
+
+Change Classification table to be internally generated with a
+database-generated primary key.  In order to make this change the table
+must be dropped and re-generated.
+
+Classification data are no longer drawn from the CSV file in the data
+loader; instead they are drawn from the ILCD entity data files directly.
+The data loader will extract classification data even for entities that
+have already been loaded.  In order to rebuild the classification table,
+please run the data loader:
+
+ 1. Run `data-loader -u` from the command prompt
+ 2. Update LCA_Data
+ 3. Run `data-loader -r <root directory> -s <source folder>` for each data
+    source in use.  This will slurp up classification information from the
+    data files.
+ 
 
 
 Database Initialization Tool
