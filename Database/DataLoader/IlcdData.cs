@@ -142,17 +142,68 @@ namespace LcaDataLoader {
 
         /// <summary>
         /// Create a list of FlowFlowProperty entities from elements under flowProperties.
+        /// This will only add entries that do not exist, but will not update entries that do exist.
         /// </summary>
         /// <param name="ilcdDb">Database context wrapper object</param>
         /// <param name="flow">Flow parent entity</param>
-        private List<FlowFlowProperty> CreateFFPList(DbContextWrapper ilcdDb, Flow flow) {
-            return LoadedDocument.Root.Descendants(ElementName("flowProperties")).Elements(ElementName("flowProperty")).Select(fp =>
+        private List<FlowFlowProperty> CreateFFPList(DbContextWrapper ilcdDb, int flowId) {
+            var ffpExist = ilcdDb.GetDbSet<FlowFlowProperty>().AsQueryable().Where(k => k.FlowID == flowId).Select(k => k.FlowPropertyID).ToList();
+            return LoadedDocument.Root.Descendants(ElementName("flowProperties")).Elements(ElementName("flowProperty"))
+                .Select(fp =>
                     new FlowFlowProperty {
-                        FlowID = flow.FlowID,
+                        FlowID = flowId,
                         FlowPropertyID = GetFlowPropertyID(ilcdDb, fp),
                         MeanValue = (double)fp.Element(ElementName("meanValue")),
                         StDev = (double?)fp.Element(ElementName("relativeStandardDeviation95In"))
-                    }).ToList();
+                    }).Where(fp => !ffpExist.Contains(fp.FlowPropertyID)).ToList();
+        }
+
+        private int GetCategoryIdForIntermediate(DbContextWrapper ilcdDb, XElement c)
+        {
+            string externalClassId = c.Attribute("classId").Value;
+            return ilcdDb.GetDbSet<Category>().AsQueryable().Where(a => a.ExternalClassID == externalClassId)
+                .Select(a => a.CategoryID).FirstOrDefault();
+        }
+        private int GetCategoryIdForElementary(DbContextWrapper ilcdDb, XElement c)
+        {
+            string name = c.Value;
+            return ilcdDb.GetDbSet<Category>().AsQueryable().Where(a => a.Name == name && a.CategorySystem.Name == "ILCDEflow")
+                .Select(a => a.CategoryID).FirstOrDefault();
+        }
+
+        private List<Classification> CreateClassificationList(DbContextWrapper ilcdDb, string uuid)
+        {
+            int ilcdEntityId = ilcdDb.GetIlcdEntity(uuid).ILCDEntityID;
+            var catExist = ilcdDb.GetDbSet<Classification>().AsQueryable().Where(c => c.ILCDEntityID == ilcdEntityId)
+                .Select(c => c.CategoryID).ToList();
+            var classInfo = LoadedDocument.Root.Descendants(ElementName("classificationInformation")).FirstOrDefault();
+            var c1 = new List<Classification>();
+                
+            c1.AddRange(classInfo.Element(_CommonNamespace + "elementaryFlowCategorization").Elements(_CommonNamespace + "category")
+                    .Select(c => new Classification
+                    {
+                        ILCDEntityID = ilcdEntityId,
+                        CategoryID = GetCategoryIdForElementary(ilcdDb, c)
+                    }).Where(c => c.CategoryID !=0).ToList());
+            if (c1.Count() == 0)
+            {
+                try
+                {
+                    c1.AddRange(classInfo.Element(_CommonNamespace + "classification").Elements(_CommonNamespace + "class")
+                        .Select(c => new Classification
+                    {
+                        ILCDEntityID = ilcdEntityId,
+                        CategoryID = GetCategoryIdForIntermediate(ilcdDb, c)
+                    }).Where(c => c.CategoryID != 0).ToList());
+                }
+                catch (Exception e)
+                    {
+                        Program.Logger.ErrorFormat("Something went wrong");
+                    }
+
+            }
+            return c1.Where(c => !catExist.Contains(c.CategoryID)).ToList();
+
         }
 
         /// <summary>
@@ -373,7 +424,11 @@ namespace LcaDataLoader {
             int? fpID;
             string dataSetInternalID = "0";
             string uuid = GetCommonUUID();
-            if (!ilcdDb.IlcdEntityAlreadyExists<Flow>(uuid)) {
+            int flowId = 0;
+            if (ilcdDb.IlcdEntityAlreadyExists<Flow>(uuid))
+                ilcdDb.FindRefIlcdEntityID<Flow>(uuid, out flowId);
+            else
+                {
                 XElement fpElement;
                 Flow flow = new Flow();
                 SaveIlcdEntity(ilcdDb, flow, DataTypeEnum.Flow);
@@ -388,9 +443,19 @@ namespace LcaDataLoader {
                 flow.ReferenceFlowProperty = (int)fpID;
 
                 if (ilcdDb.AddIlcdEntity(flow, uuid)) {
-                    ilcdDb.AddEntities<FlowFlowProperty>(CreateFFPList(ilcdDb, flow));
                     isSaved = true;
+                    flowId = flow.FlowID;
                 }
+            }
+            if (flowId != 0) // successful import or existing object
+            {
+                // add flow properties that don't already exist
+                var ffp = CreateFFPList(ilcdDb, flowId);
+                ilcdDb.AddEntities<FlowFlowProperty>(ffp);
+                // add classification data if it is not already present
+                var cs = CreateClassificationList(ilcdDb, uuid);
+                ilcdDb.AddEntities<Classification>(cs);
+                Program.Logger.InfoFormat("Added {0} FlowFlowProperty entries and {1} Classification entries", ffp.Count(), cs.Count());
             }
 
             return isSaved;

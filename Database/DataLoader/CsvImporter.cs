@@ -25,9 +25,11 @@ namespace LcaDataLoader {
             LoadFragments(Path.Combine(dirName, "fragments"), dbContext);
             LoadScenarios(Path.Combine(dirName, "scenarios"), dbContext);
             MigrateScenarios(dbContext);
+            /*
             if (appendDirExists) {
                 LoadClassification(appendDir, dbContext);
             }
+             * */
         }
 
         private static bool ImportCategorySystem(Row row, DbContextWrapper dbContext) {
@@ -65,6 +67,13 @@ namespace LcaDataLoader {
             return false;
         }
 
+        /*
+        private static bool ClassificationExists(DbContextWrapper dbContext, int ilcdEntityId, int categoryId)
+        {
+            return (dbContext.GetDbSet<Classification>().AsQueryable().Where(c => c.ILCDEntityID == ilcdEntityId && c.CategoryID == categoryId)
+                .Count() > 0);
+        }
+
         private static bool ImportClassification(Row row, DbContextWrapper dbContext) {
             bool isImported = false;
             string uuid = row["UUID"];
@@ -73,11 +82,11 @@ namespace LcaDataLoader {
             if (ilcdEntity == null) {
                 Program.Logger.ErrorFormat("Classification UUID {0} not found. Skipping record.", uuid);
             } else {
-                if (dbContext.EntityIdExists<Classification>(id)) {
+                int categoryId = Convert.ToInt32(row["CategoryID"]);
+                if (ClassificationExists(dbContext, ilcdEntity.ILCDEntityID, categoryId)) {
                     Program.Logger.WarnFormat("Classification ID {0} exists. Skipping record.", id);
                 } else {
                     Classification obj = new Classification {
-                        ClassificationID = id,
                         ILCDEntityID = ilcdEntity.ILCDEntityID,
                         CategoryID = Convert.ToInt32(row["CategoryID"])
                     };
@@ -86,6 +95,7 @@ namespace LcaDataLoader {
             }
             return isImported;
         }
+         * */
 
         private static bool ImportFlowPropertyEmission(Row row, DbContextWrapper dbContext) {
             bool isImported = false;
@@ -738,6 +748,7 @@ namespace LcaDataLoader {
             return appendExists;
         }
 
+        /*
         /// <summary>
         /// Import Classification last because it references UUIDs in other files and will end with large DbSet.
         ///  Improve performance by disabling AutoDetectChanges and only executing Adds (no updates).
@@ -749,6 +760,7 @@ namespace LcaDataLoader {
             ImportCSV(Path.Combine(dirName, "Classification.csv"), ImportClassification, dbContext);
             dbContext.SetAutoDetectChanges(true);
         }
+         * */
 
         /// <summary>
         /// Load CSV files in fragments directory

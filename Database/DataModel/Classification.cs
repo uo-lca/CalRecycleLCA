@@ -10,7 +10,7 @@ namespace LcaDataModel
     [Table("Classification")]
     public partial class Classification : Entity
     {
-        [DatabaseGenerated(DatabaseGeneratedOption.None)]
+        //[DatabaseGenerated(DatabaseGeneratedOption.None)]
         public int ClassificationID { get; set; }
 
         public int CategoryID { get; set; }

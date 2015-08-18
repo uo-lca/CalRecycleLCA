@@ -1,3 +1,42 @@
+LCA Data Model
+==============
+
+The Used Oil LCA tool uses Microsoft Entity Framework to maintain the data
+model in code.  The LcaDataModel project is an Entity Framework model
+containing all the database tables.  The LcaDataLoader project can create
+and update databases generated with the model, and populate them with
+data.
+
+Migrations
+----------
+
+To perform a migration, first edit the data model to make the change. Then,
+in Visual Studio open the package manager console (Tools -> Library package
+manager -> package manager console) and run the command:
+
+    PM> Add-Migration my-migration-name -ProjectName LcaDataModel  -StartupProjectName LCIAToolAPI
+	
+The migration tool will generate a file in `DataModel/Migrations`
+containing the changes to the SQL server.
+
+### Applying Migrations
+
+Migrations can be applied manually in visual studio or via the data
+loader.
+
+In Visual Studio, from the package manager console enter
+
+    PM> Update-Database my-migration-name -ProjectName LcaDataModel \
+        -StartupProjectName LCIAToolAPI -ConnectionString "contents of connection \
+        string as specified in web.config" -Verbose
+
+Add the `-Script` switch to generate a SQL query without executing it.
+
+To apply the migration via the data loader, first ensure that the migration
+file is present in `DataModel/Migrations`, and then simply run the data
+loader with the `-u` switch.
+
+
 Database Initialization Tool
 ============================
 
