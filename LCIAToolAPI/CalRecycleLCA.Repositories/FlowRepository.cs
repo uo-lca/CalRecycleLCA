@@ -33,7 +33,7 @@ namespace CalRecycleLCA.Repositories
                                                 .Select();
 
             maxHL = classes.Max(c => c.Category.HierarchyLevel);
-            categoryName = classes.Where(c => c.Category.HierarchyLevel == maxHL).Single().Category.Name;
+            categoryName = classes.Where(c => c.Category.HierarchyLevel == maxHL).FirstOrDefault().Category.Name;
 
             return new FlowResource
             {
