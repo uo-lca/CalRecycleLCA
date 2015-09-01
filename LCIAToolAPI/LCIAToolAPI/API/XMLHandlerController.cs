@@ -9,6 +9,7 @@ using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Web;
 using System.Web.Http;
+using System.Web.Http.Cors;
 using System.Xml;
 using LcaDataModel;
 using CalRecycleLCA.Services;
@@ -18,6 +19,7 @@ namespace LCAToolAPI.API
     /// <summary>
     /// this is ultimately supposed to provide access to the XML files (except for processes that are protected).
     /// </summary>
+    [EnableCors(origins: "*", headers: "*", methods: "*")]
     public class XMLHandlerController : ApiController
     {
         [Inject]
