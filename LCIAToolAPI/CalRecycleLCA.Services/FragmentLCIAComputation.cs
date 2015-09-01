@@ -215,6 +215,12 @@ namespace CalRecycleLCA.Services
 
         }
 
+        public void FragmentLCIAComputeSave(int scenarioId)
+        {
+            int tlf = _ScenarioService.Query(k => k.ScenarioID == scenarioId).Select(k => k.TopLevelFragmentID).First();
+            FragmentLCIAComputeSave(tlf, scenarioId);
+        }
+
         public void FragmentLCIAComputeSave(int fragmentId, int scenarioId)
         {
             ClearLocalVars();

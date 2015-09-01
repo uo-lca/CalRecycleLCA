@@ -302,8 +302,7 @@ namespace CalRecycleLCA.Services
             sw.Click("save");
             if (cacheTracker.Recompute)
             {
-                int tlf = _ScenarioService.Query(k => k.ScenarioID == scenarioId).Select(k => k.TopLevelFragmentID).First();
-                _FragmentLCIAComputation.FragmentLCIAComputeSave(tlf, scenarioId);
+                _FragmentLCIAComputation.FragmentLCIAComputeSave(scenarioId);
             }
             sw.Click("recompute");
             sw.CStop();

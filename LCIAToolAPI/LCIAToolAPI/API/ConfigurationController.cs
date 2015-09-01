@@ -255,17 +255,31 @@ namespace LCAToolAPI.API
         /// </summary>
         /// <param name="fragmentId"></param>
         /// <param name="scenarioId"></param>
-        [Route("config/fragments/{FragmentID}/scenarios/{scenarioID}/compute")]
+        [Route("config/scenarios/{scenarioID}/compute")]
         [System.Web.Http.AcceptVerbs("GET", "POST")]
         [System.Web.Http.HttpGet]
-        public void LCIAFragmentComputeSave(int fragmentId, int scenarioId)
+        public void LCIAFragmentComputeSave(int scenarioId)
         {
             var sw = Stopwatch.StartNew();
-            _fragmentLCIAComputation.FragmentLCIAComputeSave(fragmentId, scenarioId);
+            _fragmentLCIAComputation.FragmentLCIAComputeSave(scenarioId);
             sw.Stop();
             return;// scores;
         }
 
+        /// <summary>
+        /// Diagnostic function to compute a fragment under a given scenario and return ScoreCache values.
+        /// This should not be used much in practice.
+        /// </summary>
+        /// <param name="fragmentId"></param>
+        /// <param name="scenarioId"></param>
+        [Route("config/fragments/{FragmentID}/scenarios/{scenarioID}/compute")]
+        [System.Web.Http.AcceptVerbs("GET", "POST")]
+        [System.Web.Http.HttpGet]
+        public IEnumerable<ScoreCache> LCIAFragmentCompute(int fragmentId, int scenarioId)
+        {
+            var sw = Stopwatch.StartNew();
+            return _fragmentLCIAComputation.FragmentLCIAComputeNoSave(fragmentId, scenarioId);
+        }
 
         /*
         // Diagnostic functions
