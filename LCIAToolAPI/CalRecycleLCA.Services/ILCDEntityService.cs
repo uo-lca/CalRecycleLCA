@@ -9,6 +9,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using LcaDataModel;
+using Entities.Models;
 
 namespace CalRecycleLCA.Services
 {
@@ -17,7 +18,7 @@ namespace CalRecycleLCA.Services
         List<ILCDEntity> LookupUUID(string uuid);
         ILCDEntity LookupUUID(string uuid, string version);
         StringWriter GetXmlDocument(ILCDEntity entity);
-        String GetGeneralComment(ILCDEntity entity);
+        XMLComment GetGeneralComment(ILCDEntity entity);
     }
 
     public class ILCDEntityService : Service<ILCDEntity>, IILCDEntityService
@@ -88,14 +89,17 @@ namespace CalRecycleLCA.Services
 
         }
 
-        public String GetGeneralComment(ILCDEntity entity)
+        public XMLComment GetGeneralComment(ILCDEntity entity)
         {
             XDocument xmlDocument = FindXmlDocument(LookupUUID(entity.UUID, entity.Version));
             var ns = xmlDocument.Root.Name.Namespace;
             //return xmlDocument.Descendants(ns + "dataSetInformation").Descendants("common:generalComment").ToString();
             var y = xmlDocument.Descendants(ns + "dataSetInformation")
                         .Descendants(_CommonNamespace + "generalComment").FirstOrDefault();
-            return y == null ? null : y.Value;
+            return new XMLComment()
+            {
+                Comment = y == null ? "none" : y.Value
+            };
         }
     }
 }

@@ -155,6 +155,7 @@
     <Compile Include="Models\ProcessResource.cs" />
     <Compile Include="Models\Resource.cs" />
     <Compile Include="Models\ScenarioResource.cs" />
+    <Compile Include="Models\XMLComment.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

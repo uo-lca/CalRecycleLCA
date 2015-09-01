@@ -13,6 +13,7 @@ using System.Web.Http.Cors;
 using System.Xml;
 using LcaDataModel;
 using CalRecycleLCA.Services;
+using Entities.Models;
 
 namespace LCAToolAPI.API
 {
@@ -117,14 +118,16 @@ namespace LCAToolAPI.API
         /// <returns>redirect to canonical XML reference</returns>
         [Route("api/processes/{id:int}/comment")]
         [HttpGet]
-        public String CommentByProcessID(int id)
+        public XMLComment CommentByProcessID(int id)
         {
             ILCDEntity entity = _processService.Query(k => k.ProcessID == id)
                 .Include(k => k.ILCDEntity.DataSource)
                 .Select(k => k.ILCDEntity)
                 .FirstOrDefault();
 
-            return _ilcdEntityService.GetGeneralComment(entity);
+            var x = _ilcdEntityService.GetGeneralComment(entity);
+            x.ProcessID = id;
+            return x;
         }
 
         /// <summary>
@@ -151,14 +154,16 @@ namespace LCAToolAPI.API
         /// <returns>redirect to canonical XML reference</returns>
         [Route("api/flows/{id:int}/comment")]
         [HttpGet]
-        public String CommentByFlowID(int id)
+        public XMLComment CommentByFlowID(int id)
         {
             ILCDEntity entity = _flowService.Query(k => k.FlowID == id)
                 .Include(k => k.ILCDEntity.DataSource)
                 .Select(k => k.ILCDEntity)
                 .FirstOrDefault();
 
-            return _ilcdEntityService.GetGeneralComment(entity);
+            var x = _ilcdEntityService.GetGeneralComment(entity);
+            x.FlowID = id;
+            return x;
         }
 
         /// <summary>
