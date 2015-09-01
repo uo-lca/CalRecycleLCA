@@ -40,7 +40,7 @@ namespace CalRecycleLCA.Repositories
                 FlowID = f.FlowID,
                 Name = f.Name,
                 FlowTypeID = f.FlowTypeID,
-                ReferenceFlowPropertyID = (int)f.ReferenceFlowProperty,
+                ReferenceFlowPropertyID = f.ReferenceFlowProperty,
                 CASNumber = f.CASNumber,
                 Category = categoryName,
                 UUID = f.ILCDEntity.UUID,

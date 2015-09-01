@@ -50,6 +50,7 @@ namespace CalRecycleLCA.Repositories
         public static IEnumerable<FlowPropertyMagnitude> GetFlowPropertyMagnitudes(this IRepository<FlowFlowProperty> repository,
             int flowId, int scenarioId, double scale = 1.0)
         {
+            int reffp = repository.GetRepository<Flow>().Queryable().Where(f => f.FlowID == flowId).Select(f => f.ReferenceFlowProperty).First();
             return repository.Queryable().Where(fp => fp.FlowID == flowId)
                 .GroupJoin(repository.GetRepository<FlowPropertyParam>().Queryable()
                     .Where(p => p.Param.ScenarioID == scenarioId),
@@ -78,7 +79,7 @@ namespace CalRecycleLCA.Repositories
                         // should we multiply by scale here?
                         Magnitude = parameter == null ? scale * s.compositions.Value : scale * parameter.Value
                     })
-                );
+                ).OrderBy(m => m.FlowPropertyID != reffp);
         }
     }
 }
