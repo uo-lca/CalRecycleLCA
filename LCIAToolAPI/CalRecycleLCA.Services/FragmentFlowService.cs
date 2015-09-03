@@ -19,8 +19,8 @@ namespace CalRecycleLCA.Services
         //FlowTerminationModel Terminate(FragmentFlowResource ff, int scenarioId, bool doBackground = false);  // used by LAZY
         FlowTerminationModel Terminate(NodeCacheModel ncm, int scenarioId, bool doBackground = false);  // used by LAZY
 
-        IEnumerable<FragmentFlow> GetLCIAFlows(int fragmentId);          // EAGER
-        FlowTerminationModel Terminate(FragmentFlow ff, int scenarioId, bool doBackground = false); // used by EAGER 
+        //IEnumerable<FlowTerminationModel> GetLCIAFlows(int fragmentId, int scenarioId);          // EAGER
+        //FlowTerminationModel Terminate(FragmentFlow ff, int scenarioId, bool doBackground = false); // used by EAGER 
 
         int GetReferenceFlowID(int fragmentId);
         InventoryModel GetInFlow(int fragmentId);
@@ -144,10 +144,12 @@ namespace CalRecycleLCA.Services
         /// <param name="scenarioId"></param>
         /// <param name="doBackground"></param>
         /// <returns>FragmentNodeResource</returns>
+        /*
         public FlowTerminationModel Terminate(FragmentFlow ff, int scenarioId, bool doBackground = false)
 	    {
 	        return _repository.Terminate(ff, scenarioId, doBackground);
     	}
+         * */
         /// <summary>
         /// Same again, but for non-eager-loading.
         /// </summary>
@@ -251,10 +253,12 @@ namespace CalRecycleLCA.Services
 
         }
 
-        public IEnumerable<FragmentFlow> GetLCIAFlows(int fragmentId)
+        /*
+        public IEnumerable<FlowTerminationModel> GetLCIAFlows(int fragmentId, int scenarioId)
         {
-            return _repository.GetLCIAFlows(fragmentId);
+            return _repository.GetLCIAFlows(fragmentId, scenarioId);
         }
+         * */
 
         public double GetNodeScaling(FragmentFlowResource ffr, int scenarioId = Scenario.MODEL_BASE_CASE_ID)
         {

@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Entities.Models
 {
-    public class FlowTerminationModel
+    public class FlowTerminationModel // constructed during traversal
     {
         public int? ILCDEntityID { get; set; } // result of node resolution
         public int ScenarioID { get; set; }   // node behavior is scenario dependent
@@ -15,6 +15,15 @@ namespace Entities.Models
         public int? SubFragmentID { get; set; } // FragmentNodeFragment.SubFragmentID, when NodeType is Fragment
         public int TermFlowID { get; set; }  //  FragmentNodeProcess.FlowID or FragmentNodeFragment.FlowID depending on whether NodeType is Process or Fragment 
         public int? BalanceFFID { get; set; } // the outbound FFID for balancing
+    }
+
+    public class FlowNodeModel // retrieved for score computation
+    {
+        public int FragmentFlowID { get; set; } // result of node resolution
+        public int ScenarioID { get; set; }   // node behavior is scenario dependent
+        public int NodeTypeID { get; set; }   // included here for background resolution
+        public int? ProcessID { get; set; }     // FragmentNodeProcess.ProcessID, when NodeType is Process
+        public int? SubFragmentID { get; set; } // FragmentNodeFragment.SubFragmentID, when NodeType is Fragment
     }
 
     /// <summary>

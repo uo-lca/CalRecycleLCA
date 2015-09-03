@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Entities.Models;
 
 namespace CalRecycleLCA.Repositories
 {
@@ -50,6 +51,23 @@ namespace CalRecycleLCA.Repositories
                 .Select(ff => ff.FragmentFlowID).First();
             return (repository.Query(k => k.FragmentFlowID == refFlow && k.ScenarioID == scenarioId)
                 .Select().ToList().Count() > 0);
+        }
+
+        public static IEnumerable<FlowNodeModel> GetLCIAFlows(this IRepository<NodeCache> repository, 
+            int fragmentId, int scenarioId)
+        {
+            return repository.Queryable().Where(nc => nc.ScenarioID == scenarioId)
+                .Where(nc => nc.FragmentFlow.FragmentID == fragmentId)
+                .Where(nc => nc.FragmentFlow.NodeTypeID != 3)
+                .Select(nc => new FlowNodeModel()
+                {
+                    FragmentFlowID = nc.FragmentFlowID,
+                    ScenarioID = nc.ScenarioID, 
+                    NodeTypeID = nc.ILCDEntityID == null ? 5 :
+                                    (nc.ILCDEntity.DataType.Name == "Process" ? 1 : 2),
+                    ProcessID = nc.ILCDEntity.Processes.Select(a => a.ProcessID).FirstOrDefault(),
+                    SubFragmentID = nc.ILCDEntity.Fragments.Select(a => a.FragmentID).FirstOrDefault()
+                });
         }
     }
 }

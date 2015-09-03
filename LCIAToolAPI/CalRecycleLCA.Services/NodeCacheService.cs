@@ -35,5 +35,10 @@ namespace CalRecycleLCA.Services
         {
             return _repository.IsCached(fragmentId, scenarioId);
         }
+
+        public IEnumerable<FlowNodeModel> GetLCIAFlows(int fragmentId, int scenarioId)
+        {
+            return _repository.GetLCIAFlows(fragmentId, scenarioId);
+        }
     }
 }
