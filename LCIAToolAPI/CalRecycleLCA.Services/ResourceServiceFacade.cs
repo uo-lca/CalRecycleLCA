@@ -314,6 +314,7 @@ namespace CalRecycleLCA.Services
                 .ToList();
 
             foreach (var ff in ffs)
+            {
                 ff.FlowPropertyMagnitudes = ff.FlowPropertyMagnitudes.Select(k => new FlowPropertyMagnitude()
                 {
                     FlowPropertyID = k.FlowPropertyID,
@@ -321,6 +322,8 @@ namespace CalRecycleLCA.Services
                         .Select(fp => fp.UnitGroup.ReferenceUnit).FirstOrDefault(),
                     Magnitude = k.Magnitude
                 }).ToList();
+                ff.Name = _FlowService.Queryable().Where(f => f.FlowID == ff.FlowID).Select(f => f.Name).First();
+            }
 
             List<int> balanceFlows = _FragmentFlowService.ListBalanceFlows(fragmentID).Intersect(ffs.Select(k => k.FragmentFlowID)).ToList();
 
