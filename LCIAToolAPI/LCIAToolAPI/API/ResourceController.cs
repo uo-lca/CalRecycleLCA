@@ -95,7 +95,7 @@ namespace LCAToolAPI.API
         }
 
         /// <summary>
-        /// In lieu of HATEOAS, here's a link to documentation. 
+        /// Link to documentation. 
         /// </summary>
         /// <returns>Link to documentation.</returns>
         [Route("api")]
@@ -121,7 +121,7 @@ namespace LCAToolAPI.API
         }
 
         /// <summary>
-        /// List all flows in the database.  
+        /// List all flows in the database, optionally filtered by flow type (1 = intermediate, 2 = elementary)
         /// </summary>
         /// <returns></returns>
         [Route("api/flows")]
@@ -136,7 +136,7 @@ namespace LCAToolAPI.API
         /// flow by ID
         /// </summary>
         /// <param name="flowId">int</param>
-        /// <returns>list of FlowResource</returns>
+        /// <returns>FlowResource</returns>
         [Route("api/flows/{flowId}")]
         [HttpGet]
         public HttpResponseMessage GetFlow(int flowId)
@@ -198,7 +198,8 @@ namespace LCAToolAPI.API
         }
 
         /// <summary>
-        /// List specific flowproperties for a flow
+        /// List specific flowproperties for a flow and their magnitudes per 
+        /// unit of the flow's reference property
         /// </summary>
         /// <returns>FlowPropertyMagnitude list</returns>
         [Route("api/flows/{flowId}/flowproperties")]
@@ -238,7 +239,7 @@ namespace LCAToolAPI.API
         // Fragments //////////////////////////////////////////////////////////////
         /// <summary>
         /// Returns a list of FragmentFlows belonging to a fragment.. i.e. the links in the 
-        /// fragment tree structure.  .
+        /// fragment tree structure.  This resource includes the results of fragment traversal.
         /// </summary>
         /// <param name="fragmentId"></param>
         /// <returns>FragmentFlowResource array</returns>
@@ -250,7 +251,7 @@ namespace LCAToolAPI.API
         }
 
         /// <summary>
-        /// scenario-specific.
+        /// Retrieve scenario-specific FragmentFlow results.
         /// </summary>
         /// <param name="fragmentID"></param>
         /// <param name="scenarioID"></param>
@@ -370,6 +371,8 @@ namespace LCAToolAPI.API
         /// sub-fragments marked with the "descend" flag true [!! this flag is not visible to end users!],
         /// the sub-fragments' stages will be reported separately.  If "descend" flag is false, the 
         /// sub-fragment stages will be aggregated together.
+        ///
+        /// Ultimately descent should be user-determined and scenario-specific.
         /// </summary>
         /// <param name="fragmentID"></param>
         /// <param name="lciaMethodID"></param>
@@ -517,6 +520,7 @@ namespace LCAToolAPI.API
                 return Request.CreateResponse(HttpStatusCode.Unauthorized);
         }
 
+        /*
         /// <summary>
         /// Given a Param ID, returns sensitivity results-- dr/dx for lcia score r
         /// </summary>
@@ -590,9 +594,11 @@ namespace LCAToolAPI.API
             else
                 return Request.CreateResponse(HttpStatusCode.Unauthorized);
         }
+         * */
 
         /// <summary>
-        /// Compute aggregated LCI for fragment
+        /// Compute aggregated LCI for fragment. This is very slow and has not been validated.
+        /// Use at your own risk.
         /// </summary>
         /// <param name="fragmentId"></param>
         /// <returns></returns>
@@ -605,7 +611,8 @@ namespace LCAToolAPI.API
         }
 
         /// <summary>
-        /// Compute aggregated LCI for fragment under scenario
+        /// Compute aggregated LCI for fragment under scenario. This is very slow and has not been validated.
+        /// Use at your own risk.
         /// </summary>
         /// <param name="fragmentId"></param>
         /// <param name="scenarioId"></param>
@@ -626,7 +633,8 @@ namespace LCAToolAPI.API
         // LCIA Metadata ////////////////////////////////////////////////////////////
         /// <summary>
         /// GET api/impactcategories
-        /// List impact categories-- these were manually extracted from the ELCD-LCIA archive
+        /// List impact categories-- these include the ELCD-LCIA reference list, as well as 
+        /// four TRACI 2.0 methods manually extracted from GaBi.
         /// </summary>
         /// <returns>ImpactCategoryResource (list)</returns>
         [Route("api/impactcategories")]
@@ -745,7 +753,7 @@ namespace LCAToolAPI.API
 
         
         /// <summary>
-        /// list definite (i.e. quantity-bearing) flows associated with a process
+        /// list exchange flows associated with a process
         /// (privacy protected in ProcessService)
         /// </summary>
         /// <param name="processID"></param>
@@ -948,7 +956,6 @@ namespace LCAToolAPI.API
         /// <summary>
         /// GET api/scenarios
         /// Get the list of all scenarios eligible to be viewed given the connection's authorization.
-        /// Note: authorization is presently not implemented.
         /// </summary>
         /// <returns></returns>
         [Route("api/scenarios")]
@@ -966,7 +973,6 @@ namespace LCAToolAPI.API
         /// <summary>
         /// GET api/scenarios
         /// Get the list of all scenarios eligible to be viewed given the connection's authorization.
-        /// Note: authorization is presently not implemented.
         /// </summary>
         /// <returns>ScenarioResource</returns>
         [Route("api/scenarios/{scenarioId}")]
