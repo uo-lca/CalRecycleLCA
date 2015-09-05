@@ -121,6 +121,7 @@ namespace CalRecycleLCA.Services
                 .Where(k => fs.Contains(k.FragmentFlow.FragmentID)).ToList()
                 .Select(k => new NodeCache
                 {
+                    ILCDEntityID = k.ILCDEntityID,
                     ScenarioID = newScenarioId,
                     FragmentFlowID = k.FragmentFlowID,
                     NodeWeight = k.NodeWeight,
