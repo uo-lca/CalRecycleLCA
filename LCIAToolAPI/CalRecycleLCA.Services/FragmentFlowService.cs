@@ -32,7 +32,7 @@ namespace CalRecycleLCA.Services
         IEnumerable<FragmentStageResource> GetRecursiveFragmentStages(int fragmentId);
 
         IEnumerable<int> ListBalanceFlows(int fragmentId);
-        IEnumerable<int> ListParents(List<int> fragids, int scenarioId = Scenario.MODEL_BASE_CASE_ID);
+        //IEnumerable<int> ListParents(List<int> fragids, int scenarioId = Scenario.MODEL_BASE_CASE_ID);
 
         //FragmentFlow GetFragmentFlow(int fragmentFlowId);
         //IEnumerable<FragmentFlow> GetFragmentFlows(IEnumerable<int> ffids);
@@ -319,6 +319,7 @@ namespace CalRecycleLCA.Services
                 .Select(fnp => (int)fnp.ConservationFragmentFlowID);
         }
 
+        /*
         public IEnumerable<int> ListParents(List<int> fragids, int scenarioId = Scenario.MODEL_BASE_CASE_ID)
         {
             // lists FFIDs that could identify the named fragid as a SubFragment
@@ -335,6 +336,6 @@ namespace CalRecycleLCA.Services
             return defaultParents.Distinct();
         }
 
-
+        */
     }
 }

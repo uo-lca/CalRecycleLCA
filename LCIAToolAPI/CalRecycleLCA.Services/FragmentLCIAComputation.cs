@@ -109,13 +109,14 @@ namespace CalRecycleLCA.Services
                 if (!found.Contains(queue[0]))
                 {
                     found.Add(queue[0]);
-                    queue.AddRange(SubFragmentsEncountered(queue[0], scenarioId));
+                    queue.AddRange(_nodeCacheService.SubFragmentsEncountered(queue[0], scenarioId));
                 }
                 queue.RemoveAt(0);
             }
             return found;
         }
 
+        /*
         /// <summary>
         /// List of fragments encountered- called recursively
         /// </summary>
@@ -134,6 +135,7 @@ namespace CalRecycleLCA.Services
             }
             return fs;
         }
+         * */
 
         public List<int> ParentFragments(List<int> fragmentFlowIds, int scenarioId = Scenario.MODEL_BASE_CASE_ID)
         {
@@ -144,7 +146,7 @@ namespace CalRecycleLCA.Services
                 .Where(k => fragmentFlowIds.Contains(k.FragmentFlowID))
                 .Select(k => k.FragmentID).ToList();
 
-            List<int> subffs = _fragmentFlowService.ListParents(frags, scenarioId).ToList();
+            List<int> subffs = _nodeCacheService.ListParents(frags, scenarioId).ToList();
 
             if (subffs.Count() > 0)
                 frags.AddRange(ParentFragments(subffs, scenarioId));

@@ -15,5 +15,7 @@ namespace CalRecycleLCA.Services
         void ClearNodeCacheByScenarioAndFragments(List<int> fragmentIds, int scenarioId = Scenario.MODEL_BASE_CASE_ID);
         bool IsCached(int fragmentId, int scenarioId = Scenario.MODEL_BASE_CASE_ID);
         IEnumerable<FlowNodeModel> GetLCIAFlows(int fragmentId, int scenarioId);
+        IEnumerable<int> ListParents(List<int> fragids, int scenarioId = Scenario.MODEL_BASE_CASE_ID);
+        List<int> SubFragmentsEncountered(int fragmentId, int scenarioId = Scenario.MODEL_BASE_CASE_ID);
     }
 }
