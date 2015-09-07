@@ -495,7 +495,7 @@ namespace CalRecycleLCA.Services
             if (fragmentId == null)
                 return _FragmentService.Query()
                     .Include(k => k.ILCDEntity)
-                    .Select().Select(f => Transform(f)).ToList();
+                    .Select().Select(f => Transform(f)).OrderBy(f => f.FragmentID).ToList();
             else
                 return _FragmentService.Query(f => f.FragmentID == fragmentId)
                     .Include(k => k.ILCDEntity)
