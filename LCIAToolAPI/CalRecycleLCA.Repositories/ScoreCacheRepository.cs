@@ -79,10 +79,15 @@ namespace CalRecycleLCA.Repositories
 
         public static void ClearScoreCacheForParentFragments(this IRepositoryAsync<ScoreCache> repository, List<int> fragmentIds, int scenarioId)
         {
-            var scoreCaches = repository.GetRepository<ScoreCache>().Queryable()
-                .Where(sc => sc.ScenarioID == scenarioId)
-                .Where(sc => sc.FragmentFlow.NodeTypeID == 2)
-                .Where(sc => fragmentIds.Contains(sc.FragmentFlow.FragmentID))
+            var scoreCaches = repository.GetRepository<NodeCache>().Queryable()
+                .Where(nc => nc.ScenarioID == scenarioId)
+                .Where(nc => nc.ILCDEntity.DataType.Name == "Fragment")
+                .Join(repository.Queryable().Where(sc => sc.ScenarioID == scenarioId),
+                    nc => nc.FragmentFlowID,
+                    sc => sc.FragmentFlowID,
+                    (nc,sc) => new {sc})
+                .Where(j => fragmentIds.Contains(j.sc.FragmentFlow.FragmentID))
+                .Select(j => j.sc)
                 .ToList();
 
             scoreCaches.ForEach(x =>
