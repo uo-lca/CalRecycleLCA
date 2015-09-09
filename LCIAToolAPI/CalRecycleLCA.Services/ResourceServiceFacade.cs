@@ -30,8 +30,6 @@ namespace CalRecycleLCA.Services
         // LcaDataModel services
         //
         [Inject]
-        private readonly IClassificationService _ClassificationService;
-        [Inject]
         private readonly IFragmentService _FragmentService;
         [Inject]
         private readonly IFragmentFlowService _FragmentFlowService;
@@ -85,7 +83,6 @@ namespace CalRecycleLCA.Services
         /// Constructor for use with Ninject dependency injection
         /// </summary>
         public ResourceServiceFacade(
-                               IClassificationService classificationService,
                                IFragmentService fragmentService,
                                IFragmentFlowService fragmentFlowService,
                                IFragmentStageService fragmentStageService,
@@ -104,7 +101,6 @@ namespace CalRecycleLCA.Services
                                ILCIAService lciaService,
                                ICacheManager cacheManager) 
         {
-            _ClassificationService = verifiedDependency(classificationService);
             _FragmentService = verifiedDependency(fragmentService);
             _FragmentFlowService = verifiedDependency(fragmentFlowService);
             _FragmentStageService = verifiedDependency(fragmentStageService);

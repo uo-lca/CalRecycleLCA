@@ -133,8 +133,8 @@ namespace LCAToolAPI.App_Start
 
 
             kernel.Bind<IRepositoryProvider>().To<RepositoryProvider>();
-            kernel.Bind<ICategoryService>().To<CategoryService>();
-            kernel.Bind<IClassificationService>().To<ClassificationService>();
+            //kernel.Bind<ICategoryService>().To<CategoryService>();
+            //kernel.Bind<IClassificationService>().To<ClassificationService>();
             kernel.Bind<IFragmentService>().To<FragmentService>();
             kernel.Bind<IFragmentFlowService>().To<FragmentFlowService>();
             kernel.Bind<IFragmentStageService>().To<FragmentStageService>();
@@ -151,15 +151,15 @@ namespace LCAToolAPI.App_Start
             kernel.Bind(typeof(INodeCacheService)).To(typeof(NodeCacheService));
             kernel.Bind(typeof(IFlowFlowPropertyService)).To(typeof(FlowFlowPropertyService));
             //kernel.Bind(typeof(IProcessEmissionParamService)).To(typeof(ProcessEmissionParamService));
-            kernel.Bind(typeof(IFlowPropertyEmissionService)).To(typeof(FlowPropertyEmissionService));
+            //kernel.Bind(typeof(IFlowPropertyEmissionService)).To(typeof(FlowPropertyEmissionService));
             kernel.Bind(typeof(IProcessDissipationService)).To(typeof(ProcessDissipationService));
             //kernel.Bind(typeof(IProcessDissipationParamService)).To(typeof(ProcessDissipationParamService));
             kernel.Bind(typeof(ILCIAService)).To(typeof(LCIAService));
             //kernel.Bind(typeof(ICharacterizationParamService)).To(typeof(CharacterizationParamService));
             kernel.Bind(typeof(IParamService)).To(typeof(ParamService));
             kernel.Bind(typeof(IScoreCacheService)).To(typeof(ScoreCacheService));
-            kernel.Bind(typeof(IBackgroundService)).To(typeof(BackgroundService));
-            kernel.Bind<IDependencyParamService>().To<DependencyParamService>();
+            //kernel.Bind(typeof(IBackgroundService)).To(typeof(BackgroundService));
+            //kernel.Bind<IDependencyParamService>().To<DependencyParamService>();
             //kernel.Bind<IFlowPropertyParamService>().To<FlowPropertyParamService>();
 
 

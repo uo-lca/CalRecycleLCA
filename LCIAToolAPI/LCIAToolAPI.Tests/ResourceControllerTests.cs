@@ -25,8 +25,8 @@ namespace LCIAToolAPI.Tests
     public class ResourceControllerTests
     {
 
-        private ICategoryService _categoryService;
-        private IClassificationService _classificationService;
+        //private ICategoryService _categoryService;
+        //private IClassificationService _classificationService;
         private IFragmentService _fragmentService;
         private IFragmentFlowService _fragmentFlowService;
         private IFragmentStageService _fragmentStageService;
@@ -43,16 +43,16 @@ namespace LCIAToolAPI.Tests
         //private IFragmentNodeProcessService _fragmentNodeProcessService;
         //private IFragmentNodeFragmentService _fragmentNodeFragmentService;
         private IFlowFlowPropertyService _flowFlowPropertyService;
-        private IDependencyParamService _dependencyParamService;
+        //private IDependencyParamService _dependencyParamService;
         //private IFlowPropertyParamService _flowPropertyParamService;
         private IParamService _paramService;
         private IScoreCacheService _scoreCacheService;
-        private IProcessSubstitutionService _processSubstitutionService;
-        private IFragmentSubstitutionService _fragmentSubstitutionService;
+        //private IProcessSubstitutionService _processSubstitutionService;
+        //private IFragmentSubstitutionService _fragmentSubstitutionService;
         //private IBackgroundSubstitutionService _backgroundSubstitutionService;
-        private IBackgroundService _backgroundService;
+        //private IBackgroundService _backgroundService;
         //private IProcessEmissionParamService _processEmissionParamService;
-        private IFlowPropertyEmissionService _flowPropertyEmissionService;
+        //private IFlowPropertyEmissionService _flowPropertyEmissionService;
         private IProcessDissipationService _processDissipationService;
         //private IProcessDissipationParamService _processDissipationParamService;
         private ILCIAService _lciaService;
@@ -156,11 +156,11 @@ namespace LCIAToolAPI.Tests
             //expects the resource facade to be passed to it.  In turn the resource facade takes these 
             //service types and methods.
             _flowTypeService = new FlowTypeService(_mockFlowTypeRepository.Object);
-            _categoryService = new CategoryService(_mockCategoryRepository.Object);
-            _classificationService = new ClassificationService(_mockClassificationRepository.Object);
+            //_categoryService = new CategoryService(_mockCategoryRepository.Object);
+            //_classificationService = new ClassificationService(_mockClassificationRepository.Object);
             _fragmentService = new FragmentService(_mockFragmentRepository.Object);
             _fragmentFlowService = new FragmentFlowService(_mockFragmentFlowRepository.Object);
-            _fragmentStageService = new FragmentStageService(_mockFragmentStageRepository.Object);
+            //_fragmentStageService = new FragmentStageService(_mockFragmentStageRepository.Object);
             _flowService = new FlowService(_mockFlowRepository.Object);
             _flowPropertyService = new FlowPropertyService(_mockFlowPropertyRepository.Object);
             _impactCategoryService = new ImpactCategoryService(_mockImpactCategoryRepository.Object);
@@ -173,17 +173,17 @@ namespace LCIAToolAPI.Tests
             //_fragmentNodeProcessService = new FragmentNodeProcessService(_mockFragmentNodeProcessRepository.Object);
             //_fragmentNodeFragmentService = new FragmentNodeFragmentService(_mockFragmentNodeFragmentRepository.Object);
             _flowFlowPropertyService = new FlowFlowPropertyService(_mockFlowFlowPropertyRepository.Object);
-            _dependencyParamService = new DependencyParamService(_mockDependencyParamRepository.Object);
+            //_dependencyParamService = new DependencyParamService(_mockDependencyParamRepository.Object);
             //_flowPropertyParamService = new FlowPropertyParamService(_mockFlowPropertyParamRepository.Object);
             //_flowPropertyParamService = new FlowPropertyParamService(_mockFlowPropertyParamRepository.Object);
             _paramService = new ParamService(_mockParamRepository.Object);
             _scoreCacheService = new ScoreCacheService(_mockScoreCacheRepository.Object);
-            _processSubstitutionService = new ProcessSubstitutionService(_mockProcessSubstitutionRepository.Object);
-            _fragmentSubstitutionService = new FragmentSubstitutionService(_mockFragmentSubstitutionRepository.Object);
+            //_processSubstitutionService = new ProcessSubstitutionService(_mockProcessSubstitutionRepository.Object);
+            //_fragmentSubstitutionService = new FragmentSubstitutionService(_mockFragmentSubstitutionRepository.Object);
             //_backgroundSubstitutionService = new BackgroundSubstitutionService(_mockBackgroundSubstitutionRepository.Object);
-            _backgroundService = new BackgroundService(_mockBackgroundRepository.Object);
+            //_backgroundService = new BackgroundService(_mockBackgroundRepository.Object);
             //_processEmissionParamService = new ProcessEmissionParamService(_mockProcessEmissionParamRepository.Object);
-            _flowPropertyEmissionService = new FlowPropertyEmissionService(_mockFlowPropertyEmissionRepository.Object);
+            //_flowPropertyEmissionService = new FlowPropertyEmissionService(_mockFlowPropertyEmissionRepository.Object);
             _processDissipationService = new ProcessDissipationService(_mockProcessDissipationRepository.Object);
             //_processDissipationParamService = new ProcessDissipationParamService(_mockProcessDissipationParamRepository.Object);
             _lciaService = new LCIAService(_mockLCIARepository.Object);
@@ -195,8 +195,7 @@ namespace LCIAToolAPI.Tests
                 _fragmentFlowService,
                 _nodeCacheService,
                 _processFlowService,
-                _flowFlowPropertyService,
-                _dependencyParamService);
+                _flowFlowPropertyService);
 
             _lciaComputation = new LCIAComputationV2(_processFlowService,
                 //_processEmissionParamService,
@@ -227,7 +226,6 @@ namespace LCIAToolAPI.Tests
             _unitOfWork);
 
             _resourceServiceFacade = new ResourceServiceFacade(
-                               _classificationService,
                                _fragmentService,
                                _fragmentFlowService,
                                _fragmentStageService,

@@ -24,8 +24,6 @@ namespace CalRecycleLCA.Services
         private readonly IProcessFlowService _processFlowService;
         [Inject]
         private readonly IFlowFlowPropertyService _flowFlowPropertyService;
-        [Inject]
-        private readonly IDependencyParamService _dependencyParamService;
 
         private List<NodeCacheModel> nodeCaches;
 
@@ -34,14 +32,12 @@ namespace CalRecycleLCA.Services
             IFragmentFlowService fragmentFlowService,
             INodeCacheService nodeCacheService,
             IProcessFlowService processFlowService,
-            IFlowFlowPropertyService flowFlowPropertyService,
-            IDependencyParamService dependencyParamService)
+            IFlowFlowPropertyService flowFlowPropertyService)
         {
             _fragmentFlowService = fragmentFlowService;
             _nodeCacheService = nodeCacheService;
             _processFlowService = processFlowService;
             _flowFlowPropertyService = flowFlowPropertyService;
-            _dependencyParamService = dependencyParamService;
 
             nodeCaches = new List<NodeCacheModel>();
         }
