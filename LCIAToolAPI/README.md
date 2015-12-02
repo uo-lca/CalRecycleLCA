@@ -99,6 +99,25 @@ documentation page to be available.
 
 * LCA_Data resides under ```C:\UsedOilLcaSites``` so that it inherits permissions needed for IIS
 * LCAToolAPI.xml is not deployed when LCIAToolAPI is published. Need to copy that file to ```C:\UsedOilLcaSites\UsedOilLcaServer\bin```
+* SQL Server - database credentials use `sa` account, with the same password as the `kbcalr_admin` login account.
+
+# Notes for deploying to DiscountASP.NET
+
+Now that KBCALR project has ended, it is necessary for hosting to move away from UCSB resources to a private site.
+For the time being I have selected http://DiscountASP.NET because it is cheap and seems to provide the required services.
+
+The data service will be hosted at http://www.antelope-lca.net/uo-lca and the front end will continue to be hosted at [github.io](http://uo-lca.github.io). 
+
+The components of the data service are similar to above:
+ * MS SQL Server 2012 Database
+ * .NET project to implement the API
+ * `LCA_Data` repository on-site for XML file access
+ * `web.config` file for configuring Connection String, DataRoot, and ConfigInit log
+ * `LCAToolAPI.XML` file for live API documentation
+
+1. Create a backup of the current database and upload via FTP 
+
+More TODO
 
 #Usage Instructions
 
